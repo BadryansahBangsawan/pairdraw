@@ -9,7 +9,7 @@ export {
   type PlayPointerReaction,
   type PlayRevert
 } from './pointer'
-export { effectiveReactions, sameReaction } from './reactions'
+export { asInstanceEdit, effectiveReactions, sameReaction } from './reactions'
 export {
   changeTarget,
   createPlayScene,
@@ -17,7 +17,8 @@ export {
   type PlayScene,
   type PlaySceneView
 } from './scene'
-export { scrollRange } from './scroll'
+export { scrollRange, type ScrollChange } from './scroll'
+export { snapshotPlayFrame } from './snapshot'
 export {
   PLAY_SCENE_LIMIT,
   createPlayScenes,

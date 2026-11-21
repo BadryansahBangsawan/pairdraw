@@ -81,3 +81,48 @@ export function clampScroll(graph: SceneGraph, scroll: Map<string, Vector>): voi
     scroll.set(id, { x: Math.min(offset.x, range.x), y: Math.min(offset.y, range.y) })
   }
 }
+
+/** One frame a Scroll to moved, from and to its offsets, for an animation to step between. */
+export interface ScrollChange {
+  id: string
+  from: Vector
+  to: Vector
+}
+
+/**
+ * Scrolls every frame around `targetId` inside `rootId`, innermost first, so the layer meets each
+ * one's top left as far as it can scroll, as Figma's Scroll to does. Returns the frames it moved,
+ * and where the layer is now drawn, for a screen that scrolls by panning to bring into view.
+ */
+export function scrollIntoView(
+  graph: SceneGraph,
+  scroll: Map<string, Vector>,
+  rootId: string,
+  targetId: string
+): { scrolled: ScrollChange[]; reveal: Vector | null } {
+  const target = graph.getNode(targetId)
+  if (!target || target.id === rootId || !graph.isDescendant(targetId, rootId)) {
+    return { scrolled: [], reveal: null }
+  }
+  const place = getAxisAlignedWorldBounds(target, graph)
+  const scrolled: ScrollChange[] = []
+  let shiftX = 0
+  let shiftY = 0
+  graph.closest(target.parentId ?? rootId, (frame) => {
+    const range = scrollRange(graph, frame.id)
+    if (range.x > 0 || range.y > 0) {
+      const box = getAxisAlignedWorldBounds(frame, graph)
+      const from = scroll.get(frame.id) ?? NO_SCROLL
+      const to = {
+        x: clamp(place.x - shiftX - box.x, 0, range.x),
+        y: clamp(place.y - shiftY - box.y, 0, range.y)
+      }
+      scroll.set(frame.id, to)
+      scrolled.push({ id: frame.id, from, to })
+      shiftX += to.x
+      shiftY += to.y
+    }
+    return frame.id === rootId
+  })
+  return { scrolled, reveal: { x: place.x - shiftX, y: place.y - shiftY } }
+}

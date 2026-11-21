@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  asInstanceEdit,
   createPlayScenes,
   effectiveReactions,
   reactionAt,
@@ -148,6 +149,66 @@ describe('Change to in play', () => {
     expect(second?.action).toMatchObject({ nodeId: off.id })
   })
 
+  test("runs a variant's edited reaction on instances that carry Figma's copy of the old one", () => {
+    const { graph, screen, instance, on, off, other } = toggleScreen()
+    // Figma writes the main's interaction on each instance, with the main's id.
+    graph.updateNode(instance.id, { prototypeReactions: [changeTo(on.id)] })
+    const navigate: PrototypeReaction = {
+      id: changeTo(on.id).id,
+      trigger: { type: 'ON_CLICK', delay: 0 },
+      actions: [
+        {
+          type: 'NODE',
+          nodeId: other.id,
+          navigation: 'NAVIGATE',
+          transition: { type: 'INSTANT', duration: 0 },
+          overlayPosition: 'CENTER'
+        }
+      ]
+    }
+    graph.updateNode(off.id, { prototypeReactions: [navigate] })
+    const hit = reactionAt(graph, startSession(screen.id), 5, 5)
+    expect(hit?.action).toMatchObject({ nodeId: other.id })
+
+    // The copy goes with a switch even when the main it came from was edited since.
+    graph.updateNode(off.id, {
+      prototypeReactions: [{ ...changeTo(on.id), actions: [{ type: 'BACK' }] }]
+    })
+    const scenes = createPlayScenes(() => graph)
+    scenes.run(startSession(screen.id), click(instance.id, changeTo(on.id).actions[0]))
+    const after = reactionAt(scenes.graphFor(screen.id), startSession(screen.id), 5, 5)
+    expect(after?.action).toMatchObject({ nodeId: off.id })
+  })
+
+  test("an edit to Figma's copy on an instance becomes the instance's own, which play runs", () => {
+    const { graph, screen, instance, on, other } = toggleScreen()
+    const off = instanceMainComponent(graph, instance)
+    const [main] = off?.prototypeReactions ?? []
+    if (!off || !main) throw new Error('no main reaction')
+    const copy = { ...main }
+    // Unchanged, the copy keeps the main's id and stays a copy.
+    expect(asInstanceEdit(copy, off.prototypeReactions)).toBe(copy)
+    const navigate: PrototypeReaction = {
+      ...copy,
+      actions: [
+        {
+          type: 'NODE',
+          nodeId: other.id,
+          navigation: 'NAVIGATE',
+          transition: { type: 'INSTANT', duration: 0 },
+          overlayPosition: 'CENTER'
+        }
+      ]
+    }
+    const edited = asInstanceEdit(navigate, off.prototypeReactions)
+    expect(edited.id).not.toBe(main.id)
+    graph.updateNode(instance.id, { prototypeReactions: [edited] })
+    expect(reactionAt(graph, startSession(screen.id), 5, 5)?.action).toMatchObject({
+      nodeId: other.id
+    })
+    expect(on.id).toBeDefined()
+  })
+
   test("an instance's own reaction replaces the main's of the same trigger", () => {
     const { graph, instance, other, on } = toggleScreen()
     const navigate: PrototypeReaction = {
@@ -163,7 +224,7 @@ describe('Change to in play', () => {
         }
       ]
     }
-    const hover = changeTo(on.id, 'ON_HOVER')
+    const hover = { ...changeTo(on.id, 'ON_HOVER'), id: 'own-hover' }
     graph.updateNode(instance.id, { prototypeReactions: [navigate, hover] })
     const node = graph.getNode(instance.id)
     if (!node) throw new Error('no instance')
@@ -256,6 +317,29 @@ describe('Change to in play', () => {
     expect(scenes.views.size).toBe(0)
   })
 
+  test('forgets a changed frame when the document edits or deletes a variant its copy holds', () => {
+    const { graph, set, screen, instance, on } = toggleScreen()
+    const spare = graph.createNode('COMPONENT', set.id, { name: 'State=Spare', x: 120 })
+    const scenes = createPlayScenes(() => graph)
+    scenes.run(startSession(screen.id), click(instance.id, changeTo(on.id).actions[0]))
+    expect(scenes.views.size).toBe(1)
+
+    // The variants live outside the frame, on the page; the copy holds them all the same.
+    scenes.forget([on.id])
+    expect(scenes.views.size).toBe(0)
+
+    scenes.run(startSession(screen.id), click(instance.id, changeTo(on.id).actions[0]))
+    graph.deleteNode(spare.id)
+    scenes.forget([spare.id])
+    expect(scenes.views.size).toBe(0)
+    // A Change to the deleted variant then does nothing.
+    const gone = scenes.run(
+      startSession(screen.id),
+      click(instance.id, changeTo(spare.id).actions[0])
+    )
+    expect(gone.changed).toBeNull()
+  })
+
   test('lists the After delay reactions of the instances a frame shows, by the variant they show', () => {
     const { graph, screen, instance, on, off } = toggleScreen()
     graph.updateNode(on.id, { prototypeReactions: [changeTo(off.id, 'AFTER_TIMEOUT')] })
@@ -267,6 +351,7 @@ describe('Change to in play', () => {
       {
         sourceId: instance.id,
         variantId: on.id,
+        reactionId: changeTo(off.id, 'AFTER_TIMEOUT').id,
         action: changeTo(off.id).actions[0],
         delayMs: 2000
       }

@@ -123,3 +123,54 @@ describe('scrolling in play', () => {
     expect(scenes.scroll.size).toBe(0)
   })
 })
+
+describe('Scroll to in play', () => {
+  function scrollTo(sourceId: string, targetId: string) {
+    return {
+      sourceId,
+      action: {
+        type: 'NODE' as const,
+        nodeId: targetId,
+        navigation: 'SCROLL_TO' as const,
+        transition: { type: 'INSTANT' as const, duration: 0 },
+        overlayPosition: 'CENTER' as const
+      },
+      transition: null
+    }
+  }
+
+  test('scrolls each frame around the layer, innermost first, to bring it to their top left', () => {
+    const { graph, screen, list, strip, chips, rows } = listScreen()
+    const scenes = createPlayScenes(() => graph)
+    const step = scenes.run(startSession(screen.id), scrollTo(screen.id, chips[2].id))
+    expect(scenes.scroll.get(strip.id)).toEqual({ x: 80, y: 0 })
+    expect(scenes.scroll.get(list.id)).toEqual({ x: 0, y: 40 })
+    expect(step.scrolled).toEqual([
+      { id: strip.id, from: { x: 0, y: 0 }, to: { x: 80, y: 0 } },
+      { id: list.id, from: { x: 0, y: 0 }, to: { x: 0, y: 40 } }
+    ])
+    // The chip is drawn 40 px right of the strip's left edge, the strip at the list's top.
+    expect(step.reveal).toEqual({ x: 40, y: 50 })
+
+    // A row near the end scrolls the list only as far as it goes.
+    scenes.run(startSession(screen.id), scrollTo(screen.id, rows[4].id))
+    expect(scenes.scroll.get(list.id)).toEqual({ x: 0, y: 100 })
+  })
+
+  test('a layer in no frame that scrolls moves nothing, and is revealed where it is', () => {
+    const { graph, screen, list } = listScreen()
+    const scenes = createPlayScenes(() => graph)
+    const step = scenes.run(startSession(screen.id), scrollTo(screen.id, list.id))
+    expect(step.scrolled).toEqual([])
+    expect(step.reveal).toEqual({ x: 0, y: 50 })
+    expect(step.session).toEqual(startSession(screen.id))
+  })
+
+  test('an offset set by hand moves the frame there, as an animated scroll steps it', () => {
+    const { graph, screen, list } = listScreen()
+    const scenes = createPlayScenes(() => graph)
+    scenes.setScroll(list.id, { x: 0, y: 30 })
+    expect(scenes.scroll.get(list.id)).toEqual({ x: 0, y: 30 })
+    expect(screen.id).toBeDefined()
+  })
+})

@@ -11,7 +11,7 @@ import {
   type PlayScene,
   type PlaySceneView
 } from './scene'
-import { clampScroll, scrollAlong } from './scroll'
+import { clampScroll, scrollAlong, scrollIntoView, type ScrollChange } from './scroll'
 import { primaryAction, shownFrame, step, type PlayClick, type PlaySession } from './session'
 
 /** How many changed frames play keeps; a frame dropped beyond them starts again as designed. */
@@ -19,19 +19,26 @@ export const PLAY_SCENE_LIMIT = 4
 
 /**
  * An After delay reaction of an instance a frame shows: the instance, the variant it shows, whose
- * reaction it is, the action, and the delay in milliseconds.
+ * reaction it is, the reaction, its action, and the delay in milliseconds.
  */
 export interface PlayTimeout {
   sourceId: string
   variantId: string
+  reactionId: string
   action: PrototypeAction
   delayMs: number
 }
 
-/** What a reaction did: the session after it, and the Change to it made, if it made one. */
+/**
+ * What a reaction did: the session after it, and the Change to it made, if it made one. A Scroll
+ * to also says which frames it scrolled, for an animation to step between, and where the layer it
+ * scrolled to is drawn now, for a screen that scrolls by panning to bring into view.
+ */
 export interface PlayStep {
   session: PlaySession
   changed: PlayChange | null
+  scrolled?: ScrollChange[]
+  reveal?: Vector | null
 }
 
 /**
@@ -51,6 +58,8 @@ export interface PlayScenes {
    * what none of them could take, for the canvas to pan by.
    */
   scrollBy(rootId: string, path: readonly string[], dx: number, dy: number): Vector
+  /** Sets one frame's offset, as an animated Scroll to steps it toward where it ends. */
+  setScroll(id: string, offset: Vector): void
   /** Runs a reaction of a layer in `rootId`, the shown frame unless a timer names another. */
   run(session: PlaySession, click: PlayClick, rootId?: string): PlayStep
   /**
@@ -60,7 +69,10 @@ export interface PlayScenes {
   revert(session: PlaySession, revert: PlayRevert): PlayStep
   /** The After delay reactions of the instances `rootId` shows, by the variants they show now. */
   instanceTimeouts(rootId: string): PlayTimeout[]
-  /** Drops the copies of frames that hold any of these document layers, after an edit to them. */
+  /**
+   * Drops the copies of frames that hold any of these document layers, after an edit to them:
+   * the frame's own layers and the variants its copy holds.
+   */
   forget(nodeIds: Iterable<string>): void
   clear(): void
 }
@@ -100,10 +112,18 @@ export function createPlayScenes(
     scrollBy(rootId, path, dx, dy) {
       return scrollAlong(graphFor(rootId), scroll, path, dx, dy)
     },
+    setScroll(id, offset) {
+      scroll.set(id, offset)
+    },
     run(session, { sourceId, action }, rootId = shownFrame(session)) {
       if (action.type === 'NODE' && action.navigation === 'CHANGE_TO') {
         const changed = action.nodeId ? changeIn(rootId, sourceId, action.nodeId) : null
         return { session, changed }
+      }
+      if (action.type === 'NODE' && action.navigation === 'SCROLL_TO') {
+        if (!action.nodeId) return { session, changed: null, scrolled: [], reveal: null }
+        const moved = scrollIntoView(graphFor(rootId), scroll, rootId, action.nodeId)
+        return { session, changed: null, ...moved }
       }
       return { session: step(getDocument(), session, action), changed: null }
     },
@@ -135,7 +155,13 @@ export function createPlayScenes(
               const action = reaction.trigger.type === 'AFTER_TIMEOUT' && primaryAction(reaction)
               if (action) {
                 const delayMs = reaction.trigger.delay * 1000
-                timeouts.push({ sourceId: child.id, variantId, action, delayMs })
+                timeouts.push({
+                  sourceId: child.id,
+                  variantId,
+                  reactionId: reaction.id,
+                  action,
+                  delayMs
+                })
               }
             }
           }
@@ -149,9 +175,11 @@ export function createPlayScenes(
       const design = getDocument()
       for (const id of nodeIds) {
         for (const [rootId, scene] of scenes) {
-          if (design.isDescendant(id, rootId) || scene.graph.isDescendant(id, rootId)) {
-            scenes.delete(rootId)
-          }
+          // The copy holds the frame and every variant its instances switch to, wherever they
+          // are, under the page and document it copied, which an edit elsewhere touches too.
+          const copied = scene.graph.getNode(id)
+          const held = copied !== undefined && copied.type !== 'CANVAS' && id !== scene.graph.rootId
+          if (design.isDescendant(id, rootId) || held) scenes.delete(rootId)
         }
       }
     },

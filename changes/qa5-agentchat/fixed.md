@@ -1,0 +1,1 @@
+- A coding agent that exits mid-reply ends the reply with an error instead of leaving the chat waiting, and the next message starts a fresh agent.

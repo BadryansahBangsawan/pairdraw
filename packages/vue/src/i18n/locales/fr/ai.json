@@ -249,6 +249,7 @@
   "deleteChatDescription": "« {title} » et ses messages sont supprimés. Cette action est irréversible.",
   "chatReadOnly": "Cette discussion appartient à un autre document. Ouvrez-le pour continuer.",
   "chatAgentReadOnly": "La conversation avec l’agent est enregistrée, mais sa session ne peut pas encore reprendre ici. Commencez une nouvelle discussion.",
+  "chatAgentExited": "Le processus de l’agent s’est arrêté de façon inattendue.",
   "chatStorageFailed": "Impossible d’enregistrer l’historique. Gardez cette fenêtre ouverte et réessayez.",
   "chatHistoryFailed": "Impossible de mettre à jour l’historique. Réessayez.",
   "chatInterrupted": "Cette réponse a été interrompue.",

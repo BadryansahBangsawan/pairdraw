@@ -147,7 +147,7 @@ export function buildCrashChunks(
   if (destroying) return { chunks: [], shouldNullSession: false }
   const chunks: UIMessageChunk[] = []
   if (textStarted) chunks.push({ type: 'text-end', id: textId })
-  chunks.push({ type: 'error', errorText: 'Agent process exited unexpectedly.' })
+  chunks.push({ type: 'error', errorText: aiMessages.get().chatAgentExited })
   chunks.push({ type: 'finish-step' })
   chunks.push({ type: 'finish', finishReason: 'error' })
   return { chunks, shouldNullSession: true }
@@ -283,6 +283,17 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
           return
         }
 
+        // The SDK leaves the prompt pending when the agent exits, so the reply also ends when
+        // the connection closes: a crash reports its error instead of waiting forever.
+        const exited = connection.closed.then(() => {
+          if (closed) return undefined
+          recordACPTransportFailure({
+            operation: 'message',
+            ...describeDiagnosticError(new Error('The agent process exited unexpectedly.'))
+          })
+          finish('error', aiMessages.get().chatAgentExited)
+          return undefined
+        })
         connection
           .prompt({
             sessionId,
@@ -301,6 +312,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
             })
             finish('error', formatConnectionError(e, this.agentDef))
           })
+        void exited
       }
     })
   }
@@ -330,6 +342,9 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         logId: this.agentDef.id,
         onExit: () => {
           if (!this.session) return
+          // The agent is gone: its chat's document belongs to no reply, and a late tool call
+          // from it must not find the run. The next message starts a fresh agent.
+          forgetAgentChat(this.session.chat)
           this.session.endControls()
           // The agent is gone, so the chat id it was named with cannot name anything again.
           forgetChatAgent(this.session.chat)

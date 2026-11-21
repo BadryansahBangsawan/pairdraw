@@ -53,6 +53,7 @@ export const aiMessageDefaults = {
   chatReadOnly: 'This conversation belongs to another document. Open its document to continue.',
   chatAgentReadOnly:
     'This agent transcript is saved, but its session cannot be resumed here yet. Start a new chat to continue working.',
+  chatAgentExited: 'Agent process exited unexpectedly.',
   chatStorageFailed: 'Chat history could not be saved. Keep this window open and try again.',
   chatHistoryFailed: 'Could not update chat history. Try again.',
   chatInterrupted: 'This response was interrupted.',

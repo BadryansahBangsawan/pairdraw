@@ -249,6 +249,7 @@
   "deleteChatDescription": "«{title}» e i suoi messaggi vengono eliminati. L’operazione non può essere annullata.",
   "chatReadOnly": "Questa chat appartiene a un altro documento. Aprilo per continuare.",
   "chatAgentReadOnly": "La conversazione con l’agente è salvata, ma non è ancora possibile riprendere la sessione qui. Avvia una nuova chat.",
+  "chatAgentExited": "Il processo dell’agente è terminato inaspettatamente.",
   "chatStorageFailed": "Impossibile salvare la cronologia. Tieni aperta questa finestra e riprova.",
   "chatHistoryFailed": "Impossibile aggiornare la cronologia. Riprova.",
   "chatInterrupted": "Questa risposta è stata interrotta.",

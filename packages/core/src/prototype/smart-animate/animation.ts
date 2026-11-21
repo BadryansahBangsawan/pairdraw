@@ -165,14 +165,6 @@ function carryLeaving(
   return copied
 }
 
-/**
- * A Smart animate from `from` to `to`: a copy of the destination frame in which each layer that
- * matches one of the start frame (`matchLayers`) moves from the start layer's position, size,
- * rotation, opacity, corner radius and solid fill colours to its own, the start frame's layers
- * with no match fade out where they were, and the destination's fade in. The destination frame
- * keeps its place and size and blends its fill. Neither frame changes. Matching and the copy cost
- * one pass when it is made; a step writes only the layers that change.
- */
 /** A fade of one layer's opacity, or null for a layer already invisible. */
 function fadeTrack(id: string, from: number, to: number): LayerTrack | null {
   return from === to ? null : { id, numbers: [{ field: 'opacity', from, to }], fills: null }

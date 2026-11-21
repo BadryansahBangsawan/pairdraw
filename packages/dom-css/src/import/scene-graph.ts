@@ -382,6 +382,8 @@ function applyElementStyle(
     }
     node.strokes = strokes
     setBorderWeights(node, style, strokes[0])
+    // A CSS border takes room: content sits inside it, as auto layout with strokes included does.
+    node.strokesIncludedInLayout = true
   }
 
   const effects = cssShadows(pickStyle(style, 'box-shadow'))

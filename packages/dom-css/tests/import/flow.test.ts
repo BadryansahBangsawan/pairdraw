@@ -75,6 +75,14 @@ describe('HTML flow as auto layout', () => {
     expect(byName('name').clipsContent).toBe(true)
   })
 
+  it('lays content out inside a border, as CSS gives a border room', async () => {
+    const { byName } = await importHTML(
+      `<div id="bar" style="display:flex;padding:4px;border:1px solid #000"><div style="width:10px;height:10px"></div></div><div id="plain" style="display:flex;padding:4px"></div>`
+    )
+    expect(byName('bar').strokesIncludedInLayout).toBe(true)
+    expect(byName('plain').strokesIncludedInLayout).toBe(false)
+  })
+
   it('places flex items in their CSS order', async () => {
     const { graph, byName } = await importHTML(
       `<div id="row" style="display:flex;flex-wrap:wrap"><div id="picker" style="order:2;width:80px;height:8px"></div><div id="send" style="width:20px;height:8px"></div><div id="first" style="order:-1;width:20px;height:8px"></div></div>`

@@ -5,6 +5,7 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import { framesOnPage, startFrame } from '#core/prototype'
 import { defineTool, toolNumber } from '#core/tools/schema'
+import { getVideoEncoder } from '#core/tools/video-host'
 
 /** A top-level frame of the page by ID or name. */
 function pageFrame(graph: SceneGraph, pageId: string, ref: string): SceneNode | null {
@@ -50,7 +51,7 @@ export const exportVideo = defineTool({
       v.pipe(
         v.picklist(['mp4', 'gif', 'webm']),
         v.description(
-          'File format: mp4 (H.264, default), gif, or webm (VP9). MP4 and WebM need WebCodecs, which the app has; headless, record a GIF'
+          'File format: mp4 (H.264, default), gif, or webm (VP9). MP4 and WebM need WebCodecs, which the app has, or headlessly an ffmpeg on the path'
         )
       ),
       'mp4'
@@ -180,7 +181,9 @@ export const exportVideo = defineTool({
         tailMs: args.tail * 1000,
         clicks
       })
-      recorded = await video.recordPrototypeVideo(graph, plan, render)
+      recorded = await video.recordPrototypeVideo(graph, plan, render, {
+        host: getVideoEncoder(graph)
+      })
     } catch (error) {
       if (error instanceof TimelineError || error instanceof video.VideoFormatError) {
         return { error: error.message }

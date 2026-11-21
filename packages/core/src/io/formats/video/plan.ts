@@ -3,7 +3,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import type { RasterCodec } from '#core/io/formats/raster'
 import { planTimeline, TimelineError, type Timeline, type TimelineClick } from '#core/prototype'
 
-import { openVideoSink } from './formats'
+import { openVideoSink, type VideoHostEncoder } from './formats'
 import { recordPrototype, type RecordResult, type RenderFrame } from './record'
 import type { VideoFormat } from './sink'
 import { MAX_VIDEO_BYTES, MAX_VIDEO_EDGE, videoSize } from './size'
@@ -81,16 +81,22 @@ export async function recordPrototypeVideo(
   graph: SceneGraph,
   plan: PrototypeVideoPlan,
   render: RenderFrame,
-  options: { signal?: AbortSignal; onProgress?: (done: number, total: number) => void } = {}
+  options: {
+    signal?: AbortSignal
+    onProgress?: (done: number, total: number) => void
+    /** The host's encoder for what WebCodecs cannot encode there, such as the CLI's ffmpeg. */
+    host?: VideoHostEncoder | null
+  } = {}
 ): Promise<RecordResult> {
   const { width, height, fps, timeline } = plan
-  const sink = await openVideoSink(plan.format, { width, height, fps, loops: timeline.loops })
+  const { host, ...progress } = options
+  const sink = await openVideoSink(plan.format, { width, height, fps, loops: timeline.loops }, host)
   return recordPrototype(graph, timeline, render, sink, {
     width,
     height,
     fps,
     maxBytes: MAX_VIDEO_BYTES,
-    ...options
+    ...progress
   })
 }
 

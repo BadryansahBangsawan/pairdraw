@@ -1,5 +1,6 @@
-import { describe, expect, setDefaultTimeout, test } from 'bun:test'
-import { mkdtemp, readFile } from 'node:fs/promises'
+import { afterAll, describe, expect, setDefaultTimeout, test } from 'bun:test'
+import { spawnSync } from 'node:child_process'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -12,6 +13,17 @@ import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
 import exportCommand from '#cli/commands/export'
 
 setDefaultTimeout(60_000)
+
+/** The folders the tests write documents and videos into, removed when they finish. */
+const folders: string[] = []
+afterAll(async () => {
+  await Promise.all(folders.map((folder) => rm(folder, { recursive: true, force: true })))
+})
+
+/** Headless MP4 needs an ffmpeg with libx264 on the path, which this machine may not have. */
+const hasFFmpeg = spawnSync('ffmpeg', ['-hide_banner', '-encoders'], {
+  encoding: 'utf8'
+}).stdout?.includes('libx264')
 
 function solid(r: number, g: number, b: number): Fill[] {
   return [
@@ -53,7 +65,9 @@ async function writeFlowFig(): Promise<string> {
       }
     ]
   })
-  const path = join(await mkdtemp(join(tmpdir(), 'pairdraw-video-')), 'flow.fig')
+  const folder = await mkdtemp(join(tmpdir(), 'pairdraw-video-test-'))
+  folders.push(folder)
+  const path = join(folder, 'flow.fig')
   const written = await new IORegistry(BUILTIN_IO_FORMATS).writeDocument('fig', graph)
   await Bun.write(path, written.data)
   return path
@@ -103,5 +117,18 @@ describe('export a prototype video', () => {
     expect(await proc.exited).toBe(1)
     expect(stderr).toContain('MP4 can’t be encoded here at 60×40. Formats that work here: GIF.')
     expect(await Bun.file(output).exists()).toBe(false)
+  })
+
+  test.skipIf(!hasFFmpeg)('records an MP4 from a file through ffmpeg', async () => {
+    const file = await writeFlowFig()
+    const output = join(file, '..', 'flow.mp4')
+
+    await runCommand(exportCommand, {
+      rawArgs: [file, '-f', 'mp4', '--start', 'Intro', '--fps', '10', '-o', output]
+    })
+
+    const mp4 = await readFile(output)
+    // An MP4 starts with its `ftyp` box.
+    expect(new TextDecoder().decode(mp4.subarray(4, 8))).toBe('ftyp')
   })
 })

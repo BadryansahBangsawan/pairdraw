@@ -195,6 +195,12 @@
       "import": "./dist/node/fs.js",
       "default": "./dist/node/fs.js"
     },
+    "./node/video": {
+      "bun": "./src/node/video.ts",
+      "types": "./dist/node/video.d.ts",
+      "import": "./dist/node/video.js",
+      "default": "./dist/node/video.js"
+    },
     "./node/design-system": {
       "bun": "./src/node/design-system.ts",
       "types": "./dist/node/design-system.d.ts",

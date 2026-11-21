@@ -6,7 +6,13 @@ import {
   headlessRenderNodes,
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
-import { ALL_TOOLS, registerHTMLToolHost, type ToolDef } from '@pairdraw/core/tools'
+import { createFFmpegEncoder } from '@pairdraw/core/node/video'
+import {
+  ALL_TOOLS,
+  registerHTMLToolHost,
+  registerVideoEncoder,
+  type ToolDef
+} from '@pairdraw/core/tools'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
@@ -33,6 +39,8 @@ export async function createHeadlessFigma(graph: SceneGraph): Promise<FigmaAPI> 
   figma.exportImage = (nodeIds, options) =>
     headlessRenderNodes(graph, options.pageId ?? figma.currentPageId, nodeIds, options)
   figma.rasterCodec = createCanvasKitRasterCodec(await initCanvasKit())
+  // Bun has no WebCodecs, so MP4 and WebM go through an ffmpeg on the path when there is one.
+  registerVideoEncoder(graph, createFFmpegEncoder())
   // Node reads Tailwind's stylesheets from the installed package, so export needs no loader.
   registerHTMLToolHost(graph, { style: headlessHTMLStyler })
   return figma

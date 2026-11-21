@@ -98,7 +98,8 @@ const config: KnipConfig = {
     // The deployment's own settings, which each Cloudflare deployment adds next to the Worker.
     './pairdraw-cloud.toml'
   ],
-  ignoreBinaries: ['figma-use', 'identify', 'magick', 'open', 'osascript'],
+  // System tools some code and tests run when installed; ffmpeg encodes CLI videos.
+  ignoreBinaries: ['ffmpeg', 'figma-use', 'identify', 'magick', 'open', 'osascript'],
   workspaces: {
     '.': {
       ignoreDependencies: [

@@ -14,6 +14,7 @@ export {
   canRecordFormat,
   openVideoSink,
   recordableFormats,
+  type VideoHostEncoder,
   VIDEO_FORMAT_LABELS,
   VideoFormatError
 } from './formats'

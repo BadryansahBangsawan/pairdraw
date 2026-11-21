@@ -350,7 +350,7 @@ Discover available tools and their arguments from the connected server or browse
 - **`describe`** — semantic analysis of role, visual style, layout, and design issues.
 - **`batch_update`** — apply multiple node updates efficiently.
 - **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables; `export_image` takes `quality` (1–100) for JPG and WEBP.
-- **`export_video`** — records the prototype from a start frame, following After delays and Dissolves (and scripted `clicks`) on a virtual clock, as MP4 (default), GIF, or WebM; check the returned `steps`, and pass `path` for the file. MP4 and WebM need the app's WebCodecs; headless, ask for a GIF.
+- **`export_video`** — records the prototype from a start frame, following After delays and Dissolves (and scripted `clicks`) on a virtual clock, as MP4 (default), GIF, or WebM; check the returned `steps`, and pass `path` for the file. MP4 and WebM need the app's WebCodecs or, headless, `ffmpeg` on the path; otherwise ask for a GIF.
 - **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.
 - **`diff_changes`** — outside AI chat, call it with `mark: true`, then later without it to see what you or the designer changed since.
 - **`find_empty_space`** — a free spot of a given size beside existing content, before placing new frames.

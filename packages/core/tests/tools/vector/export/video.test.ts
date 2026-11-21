@@ -10,6 +10,7 @@ import {
   headlessRenderNodes,
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
+import { registerVideoEncoder } from '@pairdraw/core/tools'
 import type { PrototypeReaction } from '@pairdraw/scene-graph'
 
 const ck = await initCanvasKit()
@@ -164,5 +165,23 @@ describe('export_video', () => {
     expect(await runTool(figma, 'export_video', { start: 'Red', format: 'gif', fps: 60 })).toEqual({
       error: 'GIF plays at most 50 frames per second'
     })
+  })
+
+  test('encodes through the host’s encoder what WebCodecs cannot encode here', async () => {
+    const { graph, figma } = setup()
+    registerVideoEncoder(graph, {
+      supports: (format) => format === 'webm',
+      create: () =>
+        Promise.resolve({
+          add: () => Promise.resolve(),
+          finish: () => Promise.resolve(new TextEncoder().encode('webm')),
+          cancel: () => Promise.resolve(),
+          byteLength: 0
+        })
+    })
+
+    const result = await runTool(figma, 'export_video', { start: 'Red', format: 'webm', fps: 10 })
+
+    expect(result).toMatchObject({ mimeType: 'video/webm', byteLength: 4 })
   })
 })

@@ -1,8 +1,12 @@
 import { escapeAttribute, escapeText } from 'entities'
 
+import {
+  webCaptureDesignDocument,
+  type WebCaptureDesignElement,
+  type WebCaptureDesignNode
+} from './design-document'
 import type { WebCapture } from './format'
 import { ownValue } from './record'
-import type { WebCaptureElement, WebCaptureNode } from './types'
 
 const VOID_TAGS = new Set(['area', 'br', 'col', 'hr', 'img', 'input', 'source', 'wbr'])
 
@@ -17,7 +21,7 @@ function styleAttribute(style: Record<string, string>): string {
     .join('; ')
 }
 
-function attributes(element: WebCaptureElement, options: WebCaptureHTMLOptions): string {
+function attributes(element: WebCaptureDesignElement, options: WebCaptureHTMLOptions): string {
   const attrs: Record<string, string> = { ...element.attrs }
   if (options.images === false && ownValue(attrs, 'src')?.startsWith('data:')) delete attrs.src
   const style = styleAttribute(element.computedStyle)
@@ -27,7 +31,7 @@ function attributes(element: WebCaptureElement, options: WebCaptureHTMLOptions):
     .join('')
 }
 
-function serialize(node: WebCaptureNode, options: WebCaptureHTMLOptions): string {
+function serialize(node: WebCaptureDesignNode, options: WebCaptureHTMLOptions): string {
   if (node.type === 'text') return escapeText(node.text)
   const open = `<${node.tagName}${attributes(node, options)}>`
   if (VOID_TAGS.has(node.tagName)) return open
@@ -36,9 +40,12 @@ function serialize(node: WebCaptureNode, options: WebCaptureHTMLOptions): string
 }
 
 /**
- * The capture as static HTML whose elements carry their computed styles inline, for
- * applications that read clipboard HTML but not the capture itself.
+ * The capture as static HTML whose elements carry their styles inline, for applications that
+ * read clipboard HTML but not the capture itself, and for importing it as HTML. It is the styled
+ * DOM a paste builds layers from, so the HTML importer reads the capture as the paste does.
  */
 export function webCaptureToHTML(capture: WebCapture, options: WebCaptureHTMLOptions = {}): string {
-  return serialize(capture.root, options)
+  return webCaptureDesignDocument(capture)
+    .children.map((node) => serialize(node, options))
+    .join('')
 }

@@ -1,11 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
 import { createEditor } from '@pairdraw/core'
+import { readHTMLDocument } from '@pairdraw/core/io/formats/html/import'
 import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   encodeWebCaptureClipboard,
   readWebCaptureClipboard,
   webCaptureDesignDocument,
+  webCaptureToHTML,
   type WebCapture,
   type WebCaptureElement
 } from '@pairdraw/web-capture'
@@ -21,6 +24,17 @@ function element(
   attrs: Record<string, string> = {}
 ): WebCaptureElement {
   return { type: 'element', tagName, attrs, computedStyle, children }
+}
+
+/**
+ * The layers a capture imports as by both routes into a document: pasted from the clipboard, and
+ * as the HTML it serializes to, which the CLI's `import` and the `import_html` tool read.
+ */
+async function importedBothWays(capture: WebCapture): Promise<SceneGraph[]> {
+  const read = readWebCaptureClipboard(encodeWebCaptureClipboard(capture).html)
+  if (!read?.ok) throw new Error('the capture survives the clipboard')
+  const html = await readHTMLDocument(webCaptureToHTML(read.capture))
+  return [sceneGraphFromStyledHTML(webCaptureDesignDocument(read.capture)), html.graph]
 }
 
 const CAPTURE: WebCapture = {
@@ -100,7 +114,7 @@ describe('importing a web capture', () => {
     expect(link?.type).toBe('TEXT')
   })
 
-  test('places grid items where the page drew them', () => {
+  test('places grid items where the page drew them', async () => {
     const cell = (x: number, y: number) => ({
       ...element('div', { display: 'block', 'background-color': 'rgb(255, 91, 46)' }),
       box: { x, y, width: 80, height: 40 }
@@ -118,17 +132,17 @@ describe('importing a web capture', () => {
       }
     }
 
-    const graph = sceneGraphFromStyledHTML(webCaptureDesignDocument(grid))
-
-    const [frame] = graph.getChildren(graph.getPages()[0]?.id ?? '')
-    expect(frame).toMatchObject({ width: 248, height: 84 })
-    const cells = graph.getChildren(frame?.id ?? '')
-    expect(cells.map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual([
-      { x: 0, y: 0, width: 80, height: 40 },
-      { x: 84, y: 0, width: 80, height: 40 },
-      { x: 168, y: 0, width: 80, height: 40 },
-      { x: 0, y: 44, width: 80, height: 40 }
-    ])
+    for (const graph of await importedBothWays(grid)) {
+      const [frame] = graph.getChildren(graph.getPages()[0]?.id ?? '')
+      expect(frame).toMatchObject({ width: 248, height: 84 })
+      const cells = graph.getChildren(frame?.id ?? '')
+      expect(cells.map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual([
+        { x: 0, y: 0, width: 80, height: 40 },
+        { x: 84, y: 0, width: 80, height: 40 },
+        { x: 168, y: 0, width: 80, height: 40 },
+        { x: 0, y: 44, width: 80, height: 40 }
+      ])
+    }
   })
 
   test('pastes the capture into a document as one undo step named after the page', async () => {
@@ -142,7 +156,7 @@ describe('importing a web capture', () => {
     expect(editor.graph.getChildren(editor.state.currentPageId)).toHaveLength(0)
   })
 
-  test('joins words a page boxed one by one back into one paragraph of text', () => {
+  test('joins words a page boxed one by one back into one paragraph of text', async () => {
     // Streaming Markdown renderers fade words in, each in an inline-block that draws nothing.
     // Tailwind's reset gives every element a solid border of no width.
     const reset = { 'border-top-style': 'solid', 'border-top-width': '0px' }
@@ -187,14 +201,11 @@ describe('importing a web capture', () => {
         box: { x: 0, y: 0, width: 352, height: 16 }
       }
     }
-    const read = readWebCaptureClipboard(encodeWebCaptureClipboard(paragraph).html)
-    if (!read?.ok) throw new Error('the capture survives the clipboard')
-
-    const graph = sceneGraphFromStyledHTML(webCaptureDesignDocument(read.capture))
-
-    const texts = [...graph.getAllNodes()].filter((node) => node.type === 'TEXT')
-    expect(texts.map((node) => node.text)).toEqual(['Created the expense dashboard.'])
-    expect(texts[0]?.styleRuns).toEqual([{ start: 12, length: 17, style: { fontWeight: 600 } }])
+    for (const graph of await importedBothWays(paragraph)) {
+      const texts = [...graph.getAllNodes()].filter((node) => node.type === 'TEXT')
+      expect(texts.map((node) => node.text)).toEqual(['Created the expense dashboard.'])
+      expect(texts[0]?.styleRuns).toEqual([{ start: 12, length: 17, style: { fontWeight: 600 } }])
+    }
   })
 
   test('paints a captured gradient background as a gradient fill behind the text', () => {

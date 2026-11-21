@@ -6,6 +6,7 @@ description: Creating and editing text with rich formatting, fonts, and inline e
 # Text Editing
 
 Create text nodes and edit them directly on the canvas with full rich text support.
+
 ## Creating Text
 
 Press <kbd>T</kbd> to activate the text tool, then click on the canvas. An empty text node appears with a blinking cursor — start typing immediately.
@@ -18,12 +19,12 @@ Text is rendered directly on the canvas — there's no separate text input overl
 
 ## Cursor Navigation
 
-| Action | Mac | Windows / Linux |
-|--------|-----|-----------------|
-| Move left/right | <kbd>←</kbd> / <kbd>→</kbd> | <kbd>←</kbd> / <kbd>→</kbd> |
-| Move up/down | <kbd>↑</kbd> / <kbd>↓</kbd> | <kbd>↑</kbd> / <kbd>↓</kbd> |
-| Move by word | <kbd>⌥</kbd><kbd>←</kbd> / <kbd>⌥</kbd><kbd>→</kbd> | <kbd>Ctrl</kbd> + <kbd>←</kbd> / <kbd>Ctrl</kbd> + <kbd>→</kbd> |
-| Move to line start/end | <kbd>⌘</kbd><kbd>←</kbd> / <kbd>⌘</kbd><kbd>→</kbd> | <kbd>Home</kbd> / <kbd>End</kbd> |
+| Action                 | Mac                                                 | Windows / Linux                                                 |
+| ---------------------- | --------------------------------------------------- | --------------------------------------------------------------- |
+| Move left/right        | <kbd>←</kbd> / <kbd>→</kbd>                         | <kbd>←</kbd> / <kbd>→</kbd>                                     |
+| Move up/down           | <kbd>↑</kbd> / <kbd>↓</kbd>                         | <kbd>↑</kbd> / <kbd>↓</kbd>                                     |
+| Move by word           | <kbd>⌥</kbd><kbd>←</kbd> / <kbd>⌥</kbd><kbd>→</kbd> | <kbd>Ctrl</kbd> + <kbd>←</kbd> / <kbd>Ctrl</kbd> + <kbd>→</kbd> |
+| Move to line start/end | <kbd>⌘</kbd><kbd>←</kbd> / <kbd>⌘</kbd><kbd>→</kbd> | <kbd>Home</kbd> / <kbd>End</kbd>                                |
 
 Hold <kbd>Shift</kbd> with any movement key to extend the selection.
 
@@ -38,10 +39,10 @@ Hold <kbd>Shift</kbd> with any movement key to extend the selection.
 
 Apply formatting to selected text, or toggle the style for the entire node when nothing is selected.
 
-| Action | Mac | Windows / Linux |
-|--------|-----|-----------------|
-| Bold | <kbd>⌘</kbd><kbd>B</kbd> | <kbd>Ctrl</kbd> + <kbd>B</kbd> |
-| Italic | <kbd>⌘</kbd><kbd>I</kbd> | <kbd>Ctrl</kbd> + <kbd>I</kbd> |
+| Action    | Mac                      | Windows / Linux                |
+| --------- | ------------------------ | ------------------------------ |
+| Bold      | <kbd>⌘</kbd><kbd>B</kbd> | <kbd>Ctrl</kbd> + <kbd>B</kbd> |
+| Italic    | <kbd>⌘</kbd><kbd>I</kbd> | <kbd>Ctrl</kbd> + <kbd>I</kbd> |
 | Underline | <kbd>⌘</kbd><kbd>U</kbd> | <kbd>Ctrl</kbd> + <kbd>U</kbd> |
 
 Strikethrough is available via the **S** toggle button in the Typography section of the properties panel (no keyboard shortcut — <kbd>⌘</kbd><kbd>S</kbd> is used for Save).
@@ -58,13 +59,13 @@ Text can link to a web page or an email address, on the whole text or on selecte
 
 ## Editing Operations
 
-| Action | Mac | Windows / Linux |
-|--------|-----|-----------------|
+| Action                    | Mac                      | Windows / Linux                        |
+| ------------------------- | ------------------------ | -------------------------------------- |
 | Delete word before cursor | <kbd>⌥</kbd><kbd>⌫</kbd> | <kbd>Ctrl</kbd> + <kbd>Backspace</kbd> |
-| Delete to line start | <kbd>⌘</kbd><kbd>⌫</kbd> | — |
-| Cut | <kbd>⌘</kbd><kbd>X</kbd> | <kbd>Ctrl</kbd> + <kbd>X</kbd> |
-| Copy | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
-| Paste | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
+| Delete to line start      | <kbd>⌘</kbd><kbd>⌫</kbd> | —                                      |
+| Cut                       | <kbd>⌘</kbd><kbd>X</kbd> | <kbd>Ctrl</kbd> + <kbd>X</kbd>         |
+| Copy                      | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd>         |
+| Paste                     | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd>         |
 
 ## Resizing and Truncation
 
@@ -120,7 +121,13 @@ exports. Fonts the document carries need no install and no provider.
 
 When a requested family or style cannot be loaded, Pairdraw displays a warning above the editor instead of silently treating fallback rendering as faithful typography.
 
-Expand the warning to see every affected face and its active substitute. Use **Select layers** to locate all affected text nodes or **Retry fonts** after changing network access, local-font permission, or provider settings. A style may be synthesized from another loaded face in the same family; a missing family falls back to Inter when available.
+Expand the warning to see every affected face and its active substitute. Use **Select layers** to locate all affected text nodes, **Replace fonts** to swap a face for one that is available, or **Retry fonts** after changing network access, local-font permission, or provider settings. A style may be synthesized from another loaded face in the same family; a missing family falls back to Inter when available.
+
+## Replacing Fonts
+
+**Replace fonts** opens from the missing-fonts warning and from the footer of any font-family menu. It lists every family and style the document uses, with missing faces first and the number of text layers that draw in each. Missing faces are selected by default and point at Inter Regular; any row can be unchecked or pointed at another family and style.
+
+Applying replacements changes every place the source face appears — each text layer's own font, every character range that overrides it, and text styles — in one undoable step. Other fonts keep their character ranges. Run **list_fonts** with `scope: "document"` from an agent to see the faces, and **replace_fonts** to do the same from a script or MCP client.
 
 ## Tips
 

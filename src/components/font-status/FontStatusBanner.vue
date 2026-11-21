@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { openReplaceFontsDialog } from '@/app/editor/fonts/replace-dialog'
 import { useDocumentFontStatus } from '@/app/editor/fonts/status'
 import { banner } from '@/components/ui/feedback/banner'
 import Tip from '@/components/ui/overlay/Tip.vue'
@@ -27,6 +28,14 @@ const issues = computed(() => status.value.issues)
         @click="expanded = !expanded"
       >
         {{ issues.length === 1 ? fonts.issueFound : fonts.issuesFound({ count: issues.length }) }}
+      </button>
+      <button
+        type="button"
+        data-test-id="font-status-replace"
+        :class="styles.action()"
+        @click="openReplaceFontsDialog"
+      >
+        {{ fonts.replaceFonts }}
       </button>
       <button
         type="button"

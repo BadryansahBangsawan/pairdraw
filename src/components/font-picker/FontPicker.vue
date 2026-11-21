@@ -11,10 +11,11 @@ import {
   localFontAccessState,
   requestLocalFontAccess
 } from '@/app/editor/fonts'
+import { openReplaceFontsDialog } from '@/app/editor/fonts/replace-dialog'
 import { usePopoverUI } from '@/components/ui/overlay/popover'
 import { useSelectUI } from '@/components/ui/select/select'
 
-const { panels } = useI18n()
+const { panels, fonts } = useI18n()
 /** The placeholder shows while no family is set, such as Mixed for texts in different fonts. */
 const { label: labelProp, placeholder } = defineProps<{ label?: string; placeholder?: string }>()
 const label = computed(() => labelProp ?? panels.value.fontFamily)
@@ -99,6 +100,21 @@ function loadPreviewFont(family: string, source: string) {
           {{ source }}
         </span>
       </div>
+    </template>
+
+    <template #footer="{ close }">
+      <button
+        type="button"
+        data-test-id="font-picker-replace"
+        class="flex w-full items-center gap-2 border-t border-border px-3 py-2 text-left text-xs text-surface hover:bg-panel-field"
+        @click="
+          close()
+          openReplaceFontsDialog()
+        "
+      >
+        <icon-lucide-replace class="size-3.5 text-muted" />
+        {{ fonts.replaceFonts }}
+      </button>
     </template>
   </FontPickerRoot>
 </template>

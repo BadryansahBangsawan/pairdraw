@@ -13,6 +13,7 @@ import { aiSetupDialogOpen } from '@/app/ai/models/settings/onboarding/dialog'
 import { startCloud } from '@/app/cloud/integration'
 import { useDocumentCloseProtection } from '@/app/document/close/use'
 import { useFollowingEditorStore } from '@/app/editor/active-store'
+import { replaceFontsDialogOpen } from '@/app/editor/fonts/replace-dialog'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { settingsDialogOpen } from '@/app/settings/dialog'
 import { installRecentFilesMenu } from '@/app/shell/menu/recent-files'
@@ -46,6 +47,9 @@ const SettingsDialog = defineAsyncComponent(
 )
 const AISetupDialog = defineAsyncComponent(
   () => import('@/components/settings/ai-setup/AISetupDialog.vue')
+)
+const ReplaceFontsDialog = defineAsyncComponent(
+  () => import('@/components/fonts/ReplaceFontsDialog.vue')
 )
 
 const { updates, locale } = useI18n()
@@ -89,6 +93,7 @@ onMounted(() => {
       </AppShell>
       <LazyOverlay :open="settingsDialogOpen"><SettingsDialog /></LazyOverlay>
       <LazyOverlay :open="aiSetupDialogOpen"><AISetupDialog /></LazyOverlay>
+      <LazyOverlay :open="replaceFontsDialogOpen"><ReplaceFontsDialog /></LazyOverlay>
       <CompanionPairDialog />
       <PluginPermissionDialog />
       <SaveToHost />

@@ -61,6 +61,10 @@ const { searchTerm, open, filtered, loading, accessState, requestAccess, select 
 const { portalActive } = useRetainedPopup(open)
 const root = useTemplateRef<{ highlightItem: (value: AcceptableValue) => void }>('root')
 
+function closeMenu(): void {
+  open.value = false
+}
+
 // The families arrive after the list opens, too late for Reka's own scroll to the chosen font.
 watch(
   () => open.value && !loading.value && filtered.value.length > 0,
@@ -184,6 +188,7 @@ function familyOf(value: unknown): unknown {
             </div>
           </div>
         </ComboboxViewport>
+        <slot name="footer" :close="closeMenu" />
       </ComboboxContent>
     </ComboboxPortal>
   </ComboboxRoot>

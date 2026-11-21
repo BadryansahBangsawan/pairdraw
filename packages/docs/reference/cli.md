@@ -174,7 +174,7 @@ pairdraw export [file] [options]
 | `--tail` | | Video: seconds the last frame stays when the flow ends (default: 1) |
 | `--click` | | Video: a click to run, `<seconds>:<layer name or ID>`; repeat it for more clicks |
 
-A video plays the prototype from its start frame as Play does, following each After delay and its Dissolve on a virtual clock rather than in real time, so the clip is the same on every run. It ends when play returns to the start frame (the GIF then loops), when nothing else happens, or at `--max-duration`. The command prints each step it recorded. MP4 (H.264) and WebM (VP9) are encoded with WebCodecs in the running app; from a file the CLI encodes them with `ffmpeg` when it is on the path (with `libx264` and `libvpx-vp9`), and otherwise records only GIF:
+A video plays the prototype from its start frame as Play does, following each After delay and its Dissolve or Smart animate on a virtual clock rather than in real time, so the clip is the same on every run. It ends when play returns to the start frame (the GIF then loops), when nothing else happens, or at `--max-duration`. The command prints each step it recorded. MP4 (H.264) and WebM (VP9) are encoded with WebCodecs in the running app; from a file the CLI encodes them with `ffmpeg` when it is on the path (with `libx264` and `libvpx-vp9`), and otherwise records only GIF:
 
 ```sh
 pairdraw export hero.fig -f gif --start "Hero 1" -o hero.gif

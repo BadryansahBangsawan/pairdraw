@@ -121,7 +121,7 @@ The headless CLI already supports `analyze colors/typography/spacing/clusters`. 
 
 ### Prototyping
 
-Preview already runs components with behaviours as live controls, and the Prototype section plays click and after-delay interactions that navigate between frames, open and close overlays, or go back, with instant or dissolve transitions, stored as Figma prototype reactions. Next: variables that let controls drive the rest of a design, and more triggers and transitions.
+Preview already runs components with behaviours as live controls, and the Prototype section plays click and after-delay interactions that navigate between frames, open and close overlays, or go back, with instant, dissolve, or Smart animate transitions, stored as Figma prototype reactions. Next: variables that let controls drive the rest of a design, and more triggers and transitions.
 
 ### Code Signing
 

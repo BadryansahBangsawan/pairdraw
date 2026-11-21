@@ -17,7 +17,7 @@ Open and save native Figma files directly. The import/export pipeline uses the s
 - **Components** — create (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd>), component sets, instances with override support, slots, live sync
 - **Behaviours and preview** — make components work as Reka UI controls (switch, slider, tabs, text field, accordion, …) and try them live over the canvas with <kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> ([Components](/user-guide/components#behaviours-and-preview))
 - **Script layers** — a layer's contents drawn by a JavaScript program stored in the document, with `@input` controls you can bind to variables, a live re-run when the code, inputs, or size change, and one step to convert the result into ordinary layers ([Script layers](/user-guide/script-layers))
-- **Prototypes** — click, hover, press, mouse enter and leave, and after-delay interactions on a layer that navigate to a frame, open or close an overlay, go back, switch a component's variant, or scroll to a layer, with frames that scroll, played on the canvas with instant or dissolve transitions ([Playing a prototype](/user-guide/playing-a-prototype))
+- **Prototypes** — click, hover, press, mouse enter and leave, and after-delay interactions on a layer that navigate to a frame, open or close an overlay, go back, switch a component's variant, or scroll to a layer, with frames that scroll, played on the canvas with instant, dissolve, or Smart animate transitions ([Playing a prototype](/user-guide/playing-a-prototype))
 - **Variables** — design tokens with collections, modes (Light/Dark), color/float/string/boolean types, variable binding
 - **Sections** — organizational containers with auto-adopting children and title pills
 

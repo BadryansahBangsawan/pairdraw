@@ -14,7 +14,7 @@ Select a layer. The design panel's **Prototype** section lists its interactions;
 - **Trigger** — **On click**, **While hovering**, **While pressing**, **Mouse enter**, **Mouse leave**, or **After delay**. After delay, Mouse enter, and Mouse leave have a **Delay** in seconds; a new After delay starts at 1 second, a new Mouse enter or Mouse leave at none.
 - **Action** — **Navigate to**, **Open overlay**, **Change to**, **Scroll to**, **Back**, or **Close overlay**. Change to is offered on a variant, an instance of a variant, or a layer inside one; Scroll to on a screen that has something to scroll.
 - **Destination** — a top-level frame on the same page for Navigate to and Open overlay; another variant of the set for Change to, named by the value that tells it apart; a layer inside a scrolling frame for Scroll to.
-- **Animation** — **Instant** or **Dissolve**; Dissolve adds a **Duration**, 0.3 seconds for a new interaction.
+- **Animation** — **Instant**, **Dissolve**, or **Smart animate**. Dissolve and Smart animate add a **Duration**, 0.3 seconds for a new interaction, and an **Easing**: **Ease out**, which a new one starts with, **Ease in**, **Ease in and out**, or **Linear**.
 
 The minus removes an interaction. Every change is an undo step of its own.
 
@@ -61,19 +61,31 @@ A click goes to the topmost layer under the pointer, inside the frame being show
 - **Change to** shows the chosen variant on the instance the layer belongs to, keeping its overrides, and lays out the auto layout around it.
 - **Back** returns to the frame you navigated from and drops any overlays; with no frame behind it, Back does nothing.
 - An **After delay** interaction on the frame being shown runs when its delay passes, counted from when the transition into that frame ends, as in Figma. Changing the frame starts its delays again, and leaving play cancels them.
-- **Dissolve** crossfades from the frame you leave for the interaction's own **Duration**, easing out, whether a click or a delay started it. With reduced motion on, it cuts instead.
+- **Dissolve** crossfades from the frame you leave for the interaction's own **Duration**, along its **Easing**, whether a click or a delay started it. With reduced motion on, it cuts instead.
+- **Smart animate** moves the layers the two frames share, as [Smart Animate](#smart-animate) describes.
 
-**While hovering** runs as the pointer enters a layer and is undone as it leaves: a variant switches back, and an overlay closes when the pointer leaves the trigger in the frame behind it. **While pressing** runs on press and is undone on release, or when the pointer leaves the canvas first, closing an overlay it opened. A Dissolve crossfades for a hover, a press, and a delay as it does for a click. **Mouse enter** and **Mouse leave** run as the pointer enters or leaves, after their delay unless the pointer moves back first, and are not undone. A hovered variant goes back when another frame shows.
+**While hovering** runs as the pointer enters a layer and is undone as it leaves: a variant switches back, and an overlay closes when the pointer leaves the trigger in the frame behind it. **While pressing** runs on press and is undone on release, or when the pointer leaves the canvas first, closing an overlay it opened. A Dissolve crossfades for a hover, a press, and a delay as it does for a click, and a Smart animate Change to animates back the way it came when the pointer leaves or lifts. **Mouse enter** and **Mouse leave** run as the pointer enters or leaves, after their delay unless the pointer moves back first, and are not undone. A hovered variant goes back when another frame shows.
 
 A click that hits no interaction, or lands outside the frame, does nothing. A layer that holds controls takes its own click: play is the canvas's preview view, so a live control runs there as it does in Preview.
+
+## Smart Animate
+
+Smart animate moves layers from one frame to the next instead of crossfading the whole frame. It runs on **Navigate to** between screens and on **Change to**, where it moves from the variant an instance showed to the one it shows. Play compares the two and:
+
+- matches a layer with the layer of the same name at the same place in the hierarchy: directly in both frames, or inside layers that match each other. When siblings share a name, the first matches the first, the second the second. Duplicate a frame, or name its layers alike, to have them match; grouping a layer in one frame and not in the other stops it matching. A frame matches a group, component, or instance of the same name.
+- moves each matching layer from its position, size, rotation, opacity, corner radius, and solid fill colors in the first frame to those in the second, over the **Duration** along the **Easing**. The destination frame's own fill blends too; its place and size do not change.
+- fades out the first frame's layers that have no match, where they were, and fades in the second frame's, where they are. A layer hidden in either frame, a layer of another kind, and text whose characters differ crossfade the same way instead of moving.
+
+Opening an overlay, or navigating while one is open, crossfades instead, as Figma has no Smart animate for overlays. With animations turned off in Settings, reduced motion on, or Ultralight mode, Smart animate cuts.
 
 ## What Play Does Not Do
 
 - An interaction runs its first action only, and the panel edits that one action. A file that carries more actions keeps them, but play runs only the first.
 - There is no drag or key trigger, and no Swap overlay, Open link, or variable action.
 - An overlay always opens fitted to the window, like a frame. The panel offers no corner position, and play ignores the position a file stores.
-- A While hovering that navigates is not undone: the frame stays until Back, as the new frame covers the layer the pointer would leave.
-- Dissolve is the only animation besides Instant. Smart animate from a Figma file plays as a dissolve and is kept when the file is saved, as is Figma's animated scroll on a Scroll to. A Scroll to set to Dissolve in Pairdraw eases in play but is saved to `.fig` as instant, since which animation Figma reads for one is not confirmed.
+- A While hovering or While pressing that opens an overlay or navigates is not undone: the overlay stays open until it is closed, and the frame stays until Back, as the new frame covers the layer the pointer would leave.
+- Instant, Dissolve, and Smart animate are the animations; Figma's slide, push, and move play as a cut, and Figma's animated scroll on a Scroll to plays eased. Each is kept when the file is saved. A Scroll to set to Dissolve in Pairdraw eases in play but is saved to `.fig` as instant, since which animation Figma reads for one is not confirmed.
+- Smart animate moves no gradient, image, stroke, effect, or text size, and does not morph one vector shape into another: those take the second frame's look at once. A spring or custom easing from a Figma file plays as ease out, and the file keeps it until the easing is changed.
 - Scroll to ignores the offset a Figma file stores.
 - A frame that holds live controls is drawn by Preview, so a Change to or scrolling inside it does not show.
 - Navigating to the frame already shown, or opening it as an overlay over itself, does nothing.
@@ -90,8 +102,8 @@ A click that hits no interaction, or lands outside the frame, does nothing. A la
 
 The recording follows the start frame's After delay interactions on a clock of its own, so the video is the same every time and never drops a frame. It ends when play comes back to the start frame, and then loops seamlessly as a GIF; when nothing else happens, after holding the last frame for a second; or at the max length. The dialog says how long the video lasts and at what size before you export, and a frame with no After delay to follow says so instead. An overlay shows over its frame, dimmed by a scrim, where its interaction places it.
 
-The video holds what each frame shows as designed: a live control, a shader, or an animated image fill appears as it is drawn on the canvas, standing still. It follows frames, overlays, and their After delays: a Change to, a hover, a press, and scrolling are not recorded, so an instance shows the variant it has in the design. Agents record the same video through the `export_video` tool, and the CLI through `pairdraw export -f mp4` ([CLI reference](/reference/cli#export)).
+The video holds what each frame shows as designed: a live control, a shader, or an animated image fill appears as it is drawn on the canvas, standing still. It follows frames, overlays, and their After delays, with each Dissolve and Smart animate between frames as Play shows it: a Change to, a hover, a press, and scrolling are not recorded, so an instance shows the variant it has in the design. Agents record the same video through the `export_video` tool, and the CLI through `pairdraw export -f mp4` ([CLI reference](/reference/cli#export)).
 
 ## Saved with the Document
 
-Interactions and overflow scrolling are saved on their layers with the document and written into a `.fig` file as Figma prototype reactions and scroll settings, so Figma reads the same prototype and a round trip keeps it. A **Mouse enter** or **Mouse leave** delay read from a Figma file goes back into it; one set in Pairdraw plays but is not written to `.fig` yet, until where Figma stores it is confirmed. Playing changes nothing in the document: the session lives in the canvas view and leaves with it.
+Interactions and overflow scrolling are saved on their layers with the document and written into a `.fig` file as Figma prototype reactions and scroll settings, with each transition's Smart animate and easing, so Figma reads the same prototype and a round trip keeps it. A **Mouse enter** or **Mouse leave** delay read from a Figma file goes back into it; one set in Pairdraw plays but is not written to `.fig` yet, until where Figma stores it is confirmed. Playing changes nothing in the document: the session lives in the canvas view and leaves with it.

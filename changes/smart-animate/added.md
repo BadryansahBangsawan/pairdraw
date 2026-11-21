@@ -1,0 +1,2 @@
+- Prototype interactions can Smart animate: on Navigate to and Change to, layers that share a name and place in both frames or variants move, resize, rotate, fade, and change corner radius and solid fill color, and the rest fade out or in, in Play and in exported videos. Figma files keep Smart animate through a round trip, and agents set it with `set_reactions`.
+- Dissolve and Smart animate take an easing (Ease out, Ease in, Ease in and out, or Linear) in the Prototype section, read from and written to `.fig` files.

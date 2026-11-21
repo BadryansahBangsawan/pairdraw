@@ -35,7 +35,7 @@ Options:
 
 ## Video Export
 
-Record the page's prototype as a video: it plays from a top-level frame, follows each After delay interaction and its Dissolve on a clock of its own rather than in real time, and writes every frame, so the clip is the same on every run.
+Record the page's prototype as a video: it plays from a top-level frame, follows each After delay interaction and its Dissolve or Smart animate on a clock of its own rather than in real time, and writes every frame, so the clip is the same on every run.
 
 ```sh
 pairdraw export flow.fig -f gif --start "Hero 1"                 # flow.gif beside the file

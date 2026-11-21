@@ -71,8 +71,13 @@ export function captureClipboardSnapshot(
     if (componentDependencies.has(id) || selectedIds.has(id)) return
     const component = graph.getNode(id)
     if (!component || (component.type !== 'COMPONENT' && component.type !== 'COMPONENT_SET')) return
-    const tree = capture(component)
-    componentDependencies.set(id, tree)
+    // A variant travels as its set: the variant properties, the values each variant sets, and the
+    // properties defined on the set live there, so a copy of one variant without it cannot switch.
+    const parent = component.parentId ? graph.getNode(component.parentId) : undefined
+    const carried = parent?.type === 'COMPONENT_SET' ? parent : component
+    if (componentDependencies.has(carried.id) || selectedIds.has(carried.id)) return
+    const tree = capture(carried)
+    componentDependencies.set(carried.id, tree)
     visitReferences(tree)
   }
   function visitReferences(node: ClipboardNodeTree) {

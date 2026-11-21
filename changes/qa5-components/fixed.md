@@ -1,0 +1,1 @@
+- An instance of a component variant copied into another document brings its component set, so the pasted instance keeps its variant and set properties and can switch variants.

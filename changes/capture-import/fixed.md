@@ -2,3 +2,4 @@
 - Imported web captures keep words a page boxes one by one, as streaming chat replies do, in one paragraph instead of breaking each word at its own width.
 - Imported HTML and web captures lay a paragraph with boxed runs in it, such as inline code, out in wrapping lines instead of stacking each piece, and no longer turn a line break into an empty box.
 - Web captures draw icons a page paints through a CSS mask, as Iconify and Tailwind icon classes do, as the icon in its color instead of a solid square.
+- Imported HTML and web captures keep text that the page does not wrap on one line, clipped by its box, instead of breaking it inside a narrow box and losing the end of a label.

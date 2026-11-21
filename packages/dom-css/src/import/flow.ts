@@ -204,6 +204,17 @@ function hasDefiniteWidth(graph: SceneGraph, node: SceneNode): boolean {
 }
 
 /**
+ * Whether CSS keeps the text on its lines however narrow its box, and the text starts at the
+ * box's start edge, so its own width places it as the box does. A box narrower than the text
+ * clips it rather than breaking it, which wrapping text measured in other fonts would do.
+ */
+function staysOnItsLines(style: DesignStyleDeclaration): boolean {
+  const whiteSpace = pickStyle(style, 'white-space')?.trim()
+  const align = pickStyle(style, 'text-align')?.trim() ?? 'start'
+  return (whiteSpace === 'nowrap' || whiteSpace === 'pre') && ['start', 'left'].includes(align)
+}
+
+/**
  * Text wraps where its width is fixed or fills a parent with a width of its own, and hugs its
  * content otherwise. It is measured when the document is laid out.
  */
@@ -242,6 +253,10 @@ export function applyFlowSizing(
       node,
       autoLayoutSizingFields(node.layoutMode, own(size.fixedWidth), own(size.fixedHeight))
     )
+  }
+  if (node.type === 'TEXT' && staysOnItsLines(style)) {
+    applyTextSizing(graph, node, { fixedWidth: false, fixedHeight: size.fixedHeight })
+    return
   }
   applyParentFill(graph, node, style, display, parentFlow, size)
   if (node.type === 'TEXT') applyTextSizing(graph, node, size)

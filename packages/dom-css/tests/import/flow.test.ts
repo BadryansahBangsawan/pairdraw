@@ -65,6 +65,16 @@ describe('HTML flow as auto layout', () => {
     ])
   })
 
+  it('keeps text that does not wrap on one line at its own width, clipped by its box', async () => {
+    const { graph, byName, sizing } = await importHTML(
+      `<div style="width:300px"><span id="name" style="display:block;width:40px;overflow:hidden;white-space:nowrap">Selected focused</span></div>`
+    )
+    const text = textIn(graph, byName('name'))
+    expect(text.textAutoResize).toBe('WIDTH_AND_HEIGHT')
+    expect(sizing(text)[0]).toBe('HUG')
+    expect(byName('name').clipsContent).toBe(true)
+  })
+
   it('stacks block children inside an inline-block, which sits in a line itself', async () => {
     const { byName, sizing } = await importHTML(
       `<div style="width:300px"><div id="chip" style="display:inline-block"><div>Title</div><div>Detail</div></div></div>`

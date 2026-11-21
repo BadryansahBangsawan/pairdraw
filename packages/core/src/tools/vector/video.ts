@@ -84,7 +84,9 @@ export const exportVideo = defineTool({
           v.number(),
           v.minValue(64),
           v.maxValue(3840),
-          v.description('Longest width or height in pixels (default: 1920; a GIF is at most 960)')
+          v.description(
+            'Longest width or height in pixels (default: 1920). A GIF is capped at 960 even when this is larger'
+          )
         )
       )
     ),

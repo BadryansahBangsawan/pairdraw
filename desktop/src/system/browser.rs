@@ -263,6 +263,11 @@ pub fn browser_close<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 const CAPTURE_RUNTIME: &str = include_str!("browser-capture.js");
 const CAPTURE_ERROR_PREFIX: &str = "pairdraw-capture-error:";
 const CAPTURE_WAIT: Duration = Duration::from_secs(60);
+/// The capture HTML the reader accepts, the same bound the in-page capturer enforces
+/// (`MAX_WEB_HTML_LENGTH` in web-capture). A page that bypasses the capturer cannot exceed it.
+const CAPTURE_RESULT_LIMIT: usize = 8 * 1024 * 1024;
+/// A pick returns one selector; anything larger is not one.
+const PICK_RESULT_LIMIT: usize = 64 * 1024;
 
 /// The body of the async function that loads the capturer and returns `call`'s promise.
 fn capture_call(call: &str) -> String {
@@ -275,6 +280,7 @@ async fn eval_capture<R: Runtime>(window: &WebviewWindow<R>, call: &str) -> Resu
         &capture_call(call),
         CAPTURE_WAIT,
         "The capture timed out",
+        CAPTURE_RESULT_LIMIT,
     )
     .await
 }
@@ -318,6 +324,7 @@ async fn eval_pick<R: Runtime>(window: &WebviewWindow<R>) -> Result<String, Stri
         &format!("{PICK_ELEMENT}\nreturn pickElement();"),
         Duration::from_secs(30),
         "The pick timed out",
+        PICK_RESULT_LIMIT,
     )
     .await
 }

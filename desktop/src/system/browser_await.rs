@@ -65,8 +65,13 @@ enum Slot {
     Gone,
 }
 
-/// The answer a read found: none yet, the script's text, or why there will be none.
-pub(crate) fn read_outcome(reported: &str) -> Result<Option<String>, String> {
+/// The answer a read found: none yet, the script's text, or why there will be none. A report
+/// longer than `limit` bytes is refused before it is parsed: a hostile page can park a string
+/// of any size in the slot, and serde would allocate all of it.
+pub(crate) fn read_outcome(reported: &str, limit: usize) -> Result<Option<String>, String> {
+    if reported.len() > limit {
+        return Err("The page returned too much".to_owned());
+    }
     let slot: Slot =
         serde_json::from_str(reported).map_err(|_| "The page returned nothing".to_owned())?;
     match slot {
@@ -78,19 +83,21 @@ pub(crate) fn read_outcome(reported: &str) -> Result<Option<String>, String> {
 }
 
 /// Runs `body` as an async function in the page and waits up to `wait` for the text it returns.
-/// `expired` is the sentence the caller shows when the page takes longer.
+/// `expired` is the sentence the caller shows when the page takes longer; `limit` bounds the
+/// answer's reported size in bytes.
 pub(crate) async fn eval_awaited<R: Runtime>(
     window: &WebviewWindow<R>,
     body: &str,
     wait: Duration,
     expired: &str,
+    limit: usize,
 ) -> Result<String, String> {
     let slot = slot_name()?;
     let read = read_script(&slot)?;
     let answer = async {
         eval_text(window, &start_script(&slot, body)?).await?;
         loop {
-            if let Some(value) = read_outcome(&eval_text(window, &read).await?)? {
+            if let Some(value) = read_outcome(&eval_text(window, &read).await?, limit)? {
                 return Ok(value);
             }
             tokio::time::sleep(POLL_PAUSE).await;
@@ -108,9 +115,7 @@ mod tests {
         let first = slot_name().expect("name");
         let second = slot_name().expect("name");
         assert_ne!(first, second);
-        let suffix = first
-            .strip_prefix("__pairdrawAwait")
-            .expect("prefix");
+        let suffix = first.strip_prefix("__pairdrawAwait").expect("prefix");
         assert_eq!(suffix.len(), 32);
         assert!(suffix.chars().all(|c| c.is_ascii_hexdigit()));
     }
@@ -152,19 +157,39 @@ mod tests {
 
     #[test]
     fn a_read_is_pending_done_failed_or_gone() {
-        assert_eq!(read_outcome(r#"{"state":"pending"}"#), Ok(None));
+        assert_eq!(read_outcome(r#"{"state":"pending"}"#, 1024), Ok(None));
         assert_eq!(
-            read_outcome(r#"{"state":"done","value":"<p>hi</p>"}"#),
+            read_outcome(r#"{"state":"done","value":"<p>hi</p>"}"#, 1024),
             Ok(Some("<p>hi</p>".to_owned()))
         );
         assert_eq!(
-            read_outcome(r#"{"state":"failed","error":"boom"}"#),
+            read_outcome(r#"{"state":"failed","error":"boom"}"#, 1024),
             Err("boom".to_owned())
         );
         assert_eq!(
-            read_outcome(r#"{"state":"gone"}"#),
+            read_outcome(r#"{"state":"gone"}"#, 1024),
             Err("The page changed before it answered".to_owned())
         );
-        assert!(read_outcome("").is_err());
+        assert!(read_outcome("", 1024).is_err());
+    }
+
+    #[test]
+    fn an_answer_over_the_limit_is_refused_before_it_is_parsed() {
+        // A hostile page can park a string of any size straight in the slot; the reader must
+        // refuse it on its reported length, before serde allocates the value.
+        let huge = format!("{{\"state\":\"done\",\"value\":\"{}\"}}", "x".repeat(4096));
+        assert_eq!(
+            read_outcome(&huge, 1024),
+            Err("The page returned too much".to_owned())
+        );
+        // At the limit the answer still arrives.
+        let fits = format!("{{\"state\":\"done\",\"value\":\"{}\"}}", "x".repeat(900));
+        assert!(read_outcome(&fits, 1024).is_ok());
+        // A failed state's error text is bounded the same way.
+        let huge_error = format!(
+            "{{\"state\":\"failed\",\"error\":\"{}\"}}",
+            "e".repeat(4096)
+        );
+        assert!(read_outcome(&huge_error, 1024).is_err());
     }
 }

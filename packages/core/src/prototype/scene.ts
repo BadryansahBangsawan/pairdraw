@@ -5,19 +5,16 @@ import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import { reflow } from '#core/editor/play/states'
 import { extractPageContext, findPageId } from '#core/io/subgraph'
 import { computeAllLayouts, computeLayout } from '#core/layout'
+import type { RenderedPlayScene } from '#core/canvas/renderer/types'
 
 import { withoutInheritedCopies } from './reactions'
 
 /**
  * What the canvas draws in place of a top-level frame while play changed it: the frame's private
  * copy, a count that grows with every change, and the layers the changes touched, whose cached
- * drawings are stale.
+ * drawings are stale. The renderer's own name for the same view.
  */
-export interface PlaySceneView {
-  readonly graph: SceneGraph
-  readonly revision: number
-  readonly touched: ReadonlySet<string>
-}
+export type PlaySceneView = RenderedPlayScene
 
 /** One Change to: the instance it switched, in the frame it sits in, and the two variants. */
 export interface PlayChange {

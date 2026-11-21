@@ -8,6 +8,7 @@ import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { usePlayScenes } from '@/app/editor/prototype/scenes'
 import { createEditorStore } from '@/app/editor/session'
+import type { ArmedTimer } from '#tests/helpers/prototype-timers'
 
 const DELAY_MS = 1500
 
@@ -41,12 +42,6 @@ function loaderDocument() {
   const instance = graph.createInstance(idle.id, screen.id)
   if (!instance) throw new Error('no instance')
   return { graph, screen, instance, idle, loading, done }
-}
-
-interface ArmedTimer {
-  fn: () => void
-  ms: number
-  cleared: boolean
 }
 
 function installTimerProbe() {

@@ -1,3 +1,5 @@
+import type { FontFaceReference } from '#core/text/replace-fonts'
+
 /**
  * The curated visual directions `get_style` serves, by id. Each one is Pairdraw's own: tokens
  * here and its written direction in `guides/<id>.md`.
@@ -29,10 +31,7 @@ export const STYLE_ARCHETYPE_IDS = [
 export type StyleArchetypeId = (typeof STYLE_ARCHETYPE_IDS)[number]
 
 /** A font face as the text tools name it: a family the web font services carry and a style. */
-export interface StyleFont {
-  family: string
-  style: string
-}
+export type StyleFont = FontFaceReference
 
 /** The colors of a direction by role, as hex. Text roles meet WCAG AA on what they sit on. */
 export interface StylePalette {

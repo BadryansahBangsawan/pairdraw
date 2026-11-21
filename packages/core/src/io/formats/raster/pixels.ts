@@ -7,6 +7,13 @@ export interface RGBAImage {
   data: Uint8Array
 }
 
+/** A PNG's bytes and the size they were drawn at. */
+export interface EncodedPNG {
+  png: Uint8Array
+  width: number
+  height: number
+}
+
 /** Decode and encode raster images for pixel-level tools; backed by CanvasKit in app and CLI. */
 export interface RasterCodec {
   decode(bytes: Uint8Array): RGBAImage | null

@@ -5,12 +5,10 @@ import { useCollaborationMessages } from '@pairdraw/vue/i18n'
 import { activeRoom } from '@/app/collab/rooms'
 import { CAN_CHOOSE_SPEAKERS, SYSTEM_DEVICE, useVoiceCall } from '@/app/collab/voice/call'
 import type { PresencePersonRow } from '@/components/presence/rows'
+import type { AppSelectOption } from '@/components/ui/select/select'
 
 /** A microphone or speaker as the call's pickers list it. */
-export interface VoiceDeviceOption {
-  value: string
-  label: string
-}
+export type VoiceDeviceOption = Pick<AppSelectOption<string>, 'value' | 'label'>
 
 /**
  * The active tab's room call as the call control shows it: whether we are in it, who else is,

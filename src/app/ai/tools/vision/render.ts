@@ -1,4 +1,4 @@
-import { computeContentBounds } from '@pairdraw/core/io/formats/raster'
+import { computeContentBounds, type EncodedPNG } from '@pairdraw/core/io/formats/raster'
 
 import type { EditorStore } from '@/app/editor/active-store'
 
@@ -7,11 +7,7 @@ import { boundedImageScale } from './inspect'
 export const DEFAULT_VISION_MAX_EDGE = 1280
 
 /** A render of layers for a model to look at: the encoded PNG, and the size it was drawn at. */
-export interface ModelRender {
-  png: Uint8Array
-  width: number
-  height: number
-}
+export type ModelRender = EncodedPNG
 
 /**
  * The layers on `pageId` drawn together as a PNG whose longer edge is at most `maxEdge`. Null

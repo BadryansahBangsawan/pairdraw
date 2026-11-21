@@ -7,6 +7,7 @@ import {
   variationSetsOnPage,
   type VariationSetView
 } from '@pairdraw/scene-graph/variations'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { createVariations, type VariationRequest } from '#core/editor/variations/create'
 import { assertVariationPickable } from '#core/editor/variations/pick'
@@ -14,11 +15,8 @@ import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api/index'
 
 import { nodeOf, type NodeRef } from './behaviours'
 
-/** A layer of a set as `toJSON` and the tools report it. */
-export interface VariationLayerInfo {
-  id: string
-  name: string
-}
+/** A layer of a set as `toJSON` and the tools report it: the node's id and name. */
+export type VariationLayerInfo = Pick<SceneNode, 'id' | 'name'>
 
 /** A set of variations as `toJSON` and the tools report it. */
 export interface VariationSetInfo {

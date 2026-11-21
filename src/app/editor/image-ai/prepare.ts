@@ -1,13 +1,11 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
+import type { EncodedPNG } from '@pairdraw/core/io/formats/raster'
+
 /** Image services answer at about 1–2 megapixels, so a larger upload only costs time. */
 const IMAGE_AI_MAX_DIMENSION = 2048
 
-interface PreparedImage {
-  png: Uint8Array
-  width: number
-  height: number
-}
+type PreparedImage = EncodedPNG
 
 /** `width` × `height` scaled down to fit `maxDimension` on its longer side, never up. */
 function fitWithin(

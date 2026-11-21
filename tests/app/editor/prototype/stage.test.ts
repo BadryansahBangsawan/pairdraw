@@ -7,6 +7,7 @@ import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { createEditorStore } from '@/app/editor/session'
+import type { ArmedTimer } from '#tests/helpers/prototype-timers'
 
 const START = '1:1'
 const TARGET = '1:2'
@@ -33,12 +34,6 @@ function documentWith(timeout: boolean) {
   graph.createNodeWithId(TARGET, 'FRAME', pageId, { x: 400, y: 0, width: 300, height: 200 })
   if (timeout) graph.updateNode(START, { prototypeReactions: [timeoutToTarget] })
   return graph
-}
-
-interface ArmedTimer {
-  fn: () => void
-  ms: number
-  cleared: boolean
 }
 
 function ensureWindow(): void {

@@ -1,7 +1,7 @@
-type ThumbnailPage = {
-  id: string
-  name: string
-}
+import type { SceneNode } from '@pairdraw/scene-graph'
+
+/** The fields of a page the thumbnail choice reads. */
+type ThumbnailPage = Pick<SceneNode, 'id' | 'name'>
 
 const COVER_PAGE_NAME = 'cover'
 

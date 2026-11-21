@@ -35,6 +35,49 @@ function clipOf(svg: string, element: string): string {
   return expectDefined(new RegExp(`<clipPath id="${id}">([\\s\\S]*?)</clipPath>`).exec(svg))[1]
 }
 
+/** A solid stroke of `color`, its weight and alignment. */
+function solid(color: [number, number, number], weight: number, align: Stroke['align']): Stroke {
+  return {
+    type: 'SOLID',
+    color: { r: color[0], g: color[1], b: color[2], a: 1 },
+    opacity: 1,
+    visible: true,
+    weight,
+    align
+  }
+}
+
+/** The SVG for a 100 × 60 rectangle carrying `strokes`, without a fill. */
+function rectangleWith(strokes: Stroke[]): string {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0].id
+  const node = graph.createNode('RECTANGLE', page, { width: 100, height: 60, strokes })
+  return expectDefined(renderNodesToSVG(graph, page, [node.id], { xmlDeclaration: false }))
+}
+
+describe('every visible stroke exported to SVG', () => {
+  test('draws each stroke in layer order, not only the first', () => {
+    const svg = rectangleWith([solid([1, 0, 0], 2, 'CENTER'), solid([0, 0, 1], 6, 'CENTER')])
+    const red = expectDefined(/<rect [^>]*stroke="#FF0000" stroke-width="2"/.exec(svg))
+    const blue = expectDefined(/<rect [^>]*stroke="#0000FF" stroke-width="6"/.exec(svg))
+    expect(red.index).toBeLessThan(blue.index)
+  })
+
+  test('keeps each stroke’s alignment: a centred one on the edge, an outside one around it', () => {
+    const svg = rectangleWith([solid([1, 0, 0], 2, 'CENTER'), solid([0, 0, 1], 4, 'OUTSIDE')])
+    expect(svg).toMatch(/<rect [^>]*stroke="#FF0000" stroke-width="2"/)
+    const outside = expectDefined(/<path [^>]*stroke="#0000FF" stroke-width="8"[^>]*>/.exec(svg))[0]
+    expect(clipOf(svg, outside)).toContain('clip-rule="evenodd"')
+  })
+
+  test('skips a hidden stroke', () => {
+    const hidden = { ...solid([0, 1, 0], 3, 'CENTER'), visible: false }
+    const svg = rectangleWith([solid([1, 0, 0], 2, 'CENTER'), hidden])
+    expect(svg).toContain('stroke="#FF0000"')
+    expect(svg).not.toContain('#00FF00')
+  })
+})
+
 describe('aligned strokes exported to SVG', () => {
   test('an inside stroke stays in the box: twice its weight, clipped to the outline', () => {
     const svg = exported('FRAME', 'INSIDE')

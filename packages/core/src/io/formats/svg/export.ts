@@ -434,7 +434,9 @@ function strokeElements(
   if (aligned) {
     return [
       ...alignedStrokeElement(node, aligned, strokeAttrs, ctx),
-      ...(node.type === 'SHAPE_WITH_TEXT' ? shapeWithTextDetailElements(node, strokeAttrs, ctx) : [])
+      ...(node.type === 'SHAPE_WITH_TEXT'
+        ? shapeWithTextDetailElements(node, strokeAttrs, ctx)
+        : [])
     ]
   }
   if (node.type === 'VECTOR') return vectorStrokeElements(node, strokeAttrs)
@@ -561,9 +563,7 @@ function maskWire(
   const content = renderNode(mask, ctx)
   if (mask.maskType === 'VECTOR') {
     const id = nextDefId(ctx, 'clip')
-    ctx.defs.push(
-      svg('clipPath', { id, clipPathUnits: 'userSpaceOnUse' }, content ?? undefined)
-    )
+    ctx.defs.push(svg('clipPath', { id, clipPathUnits: 'userSpaceOnUse' }, content ?? undefined))
     return { attribute: 'clip-path', id }
   }
   const id = nextDefId(ctx, 'mask')

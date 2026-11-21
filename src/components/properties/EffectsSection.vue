@@ -11,6 +11,8 @@ import {
   commitDiscretePropertyListChange,
   useBlendModeGroups
 } from '@/components/properties/blend-mode/use'
+import NoiseSettings from '@/components/properties/effects/NoiseSettings.vue'
+import TextureSettings from '@/components/properties/effects/TextureSettings.vue'
 import PropertyItemRow from '@/components/properties/item-list/PropertyItemRow.vue'
 import PropertyListRoot from '@/components/properties/PropertyListRoot.vue'
 import ShaderEffectEditor from '@/components/properties/shader-effect/ShaderEffectEditor.vue'
@@ -170,6 +172,18 @@ function effectPreview(effect: ShadowEffect): Fill {
               (changes: Partial<ShaderEffect>) =>
                 commitDiscretePropertyListChange(flush, () => actions.patch(index, changes))
             "
+          />
+          <NoiseSettings
+            v-else-if="effect.type === 'NOISE'"
+            :effect="effect"
+            @scrub="effectsCtx.scrubEffect(index, $event)"
+            @commit="effectsCtx.commitEffect(index, $event)"
+          />
+          <TextureSettings
+            v-else-if="effect.type === 'TEXTURE'"
+            :effect="effect"
+            @scrub="effectsCtx.scrubEffect(index, $event)"
+            @commit="effectsCtx.commitEffect(index, $event)"
           />
           <template v-else-if="effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'">
             <div class="flex items-center gap-1.5">

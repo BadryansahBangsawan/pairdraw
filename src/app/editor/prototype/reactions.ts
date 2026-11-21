@@ -1,3 +1,4 @@
+import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   PrototypeAction,
   PrototypeActionType,
@@ -34,11 +35,6 @@ function nodeAction(action: Partial<PrototypeNodeAction> = {}): PrototypeNodeAct
     overlayPosition: 'CENTER',
     ...action
   }
-}
-
-/** The interaction the panel edits: the first action, which this version edits alone. */
-export function primaryAction(reaction: PrototypeReaction): PrototypeAction | null {
-  return reaction.actions[0] ?? null
 }
 
 function replaceAction(reaction: PrototypeReaction, action: PrototypeAction): PrototypeReaction {

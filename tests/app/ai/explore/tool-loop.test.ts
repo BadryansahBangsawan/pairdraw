@@ -98,35 +98,25 @@ const TOOL_STEP: LanguageModelV4StreamPart = {
 }
 
 /**
- * A model that starts variants from the layer the note links, as the note says: it runs the
- * note's copy script for each variant, places the copy in the row, then answers.
+ * A model that starts variants from the layer the note links, as the note says: it makes the
+ * versions with `create_variations`, then answers.
  */
-function clonerModel() {
+function versionsModel() {
   let step = 0
   return new MockLanguageModelV4({
     doStream: async (options) => {
       step++
       const text = lastUserText(options)
       const chunks: LanguageModelV4StreamPart[] = []
-      const script = /in `eval`, `([^`]+)`/.exec(text)?.[1]
-      if (step === 1 && script) {
+      const id = /`create_variations` once with id "([^"]+)"/.exec(text)?.[1]
+      if (step === 1 && id) {
         const count = attribute(text, 'count')
-        const x = attribute(text, 'x')
-        const y = attribute(text, 'y')
-        const gap = attribute(text, 'gap')
-        for (let index = 0; index < count; index++) {
-          const left = x + index * (VARIANT.width + gap)
-          chunks.push(
-            toolCall(`variant-${index + 1}`, 'eval', {
-              code: `${script}; copy.x = ${left}; copy.y = ${y}; copy.name = 'Card — Variant ${index + 1}'; return copy.id`
-            })
-          )
-        }
-        chunks.push(TOOL_STEP)
+        const labels = Array.from({ length: count }, (_, index) => `Idea ${index + 1}`)
+        chunks.push(toolCall('versions', 'create_variations', { id, count, labels }), TOOL_STEP)
       } else {
         chunks.push(
           { type: 'text-start', id: 'reply' },
-          { type: 'text-delta', id: 'reply', delta: 'The variants are ready.' },
+          { type: 'text-delta', id: 'reply', delta: 'The versions are ready.' },
           { type: 'text-end', id: 'reply' },
           { type: 'finish', finishReason: { unified: 'stop', raw: undefined }, usage: MOCK_USAGE }
         )
@@ -203,7 +193,7 @@ function expectRow(variants: readonly SceneNode[], pageId: string, left: number,
   }
 }
 
-test('Let it cook: the tool loop builds the variants side by side as new top-level frames', async () => {
+test('Let it cook without a layer to start from builds the variants as new top-level frames', async () => {
   await withEditor(async (store) => {
     const pageId = store.state.currentPageId
     const original = store.graph.createNode('FRAME', pageId, {
@@ -212,7 +202,6 @@ test('Let it cook: the tool loop builds the variants side by side as new top-lev
       y: 80,
       ...VARIANT
     })
-    store.select([original.id])
     const before = { ...original }
 
     const model = explorerModel()
@@ -231,7 +220,7 @@ test('Let it cook: the tool loop builds the variants side by side as new top-lev
   })
 })
 
-test('Let it cook: copies of a nested layer go onto the page, and its parent keeps its layers', async () => {
+test('Let it cook on a layer makes versions of it in a set beside it, and its parent keeps its layers', async () => {
   await withEditor(async (store) => {
     const pageId = store.state.currentPageId
     const screen = store.graph.createNode('FRAME', pageId, {
@@ -257,13 +246,21 @@ test('Let it cook: copies of a nested layer go onto the page, and its parent kee
     store.select([card.id])
     const screenChildren = store.graph.getChildren(screen.id).map((child) => child.id)
 
-    const model = clonerModel()
+    const model = versionsModel()
     await explore(store, model, 'Explore this card')
 
     expect(model.doStreamCalls).toHaveLength(2)
     expect(store.graph.getChildren(screen.id).map((child) => child.id)).toEqual(screenChildren)
     expect(store.graph.getNode(card.id)).toMatchObject({ parentId: screen.id, x: 40, y: 120 })
-    const variants = store.graph.getChildren(pageId).filter((frame) => frame.id !== screen.id)
-    expectRow(variants, pageId, screen.x + screen.width, 120)
+    const section = store.graph.getChildren(pageId).find((node) => node.id !== screen.id)
+    if (!section) throw new Error('no set of variations')
+    const set = store.getVariationSet(section.id)
+    expect(set?.original?.id).toBe(card.id)
+    expect(set?.versions.map((version) => version.name)).toEqual([
+      'V1 · Idea 1',
+      'V2 · Idea 2',
+      'V3 · Idea 3'
+    ])
+    expect(section.x).toBeGreaterThan(screen.x + screen.width)
   })
 })

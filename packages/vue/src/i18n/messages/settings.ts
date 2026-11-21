@@ -87,6 +87,7 @@ export const settingsMessageDefaults = {
   capabilityShow: 'Show',
   capabilityShowAll: 'All',
   skills: 'Skills',
+  prompts: 'Prompts',
   edit: 'Edit',
   configured: 'Configured',
   notConfigured: 'Not configured',

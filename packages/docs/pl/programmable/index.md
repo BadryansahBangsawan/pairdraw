@@ -86,6 +86,6 @@ W macOS schemat należy do zainstalowanego pakietu aplikacji, więc odnośniki t
 
 ## Dlaczego otwartość?
 
-Figma jest platformą zamkniętą. Jej serwer MCP działa tylko do odczytu. Dostęp do przeglądarki przez CDP został zablokowany w wersji 126. Pliki projektowe są przechowywane w zastrzeżonym formacie na cudzych serwerach. Tworzenie wtyczek wymaga osobnego środowiska uruchomieniowego z ograniczonym API.
+Figma jest platformą zamkniętą. Jej serwer MCP oferuje na razie tylko betę, która zapisuje na kanwie przez `use_figma`. Dostęp do przeglądarki przez CDP został zablokowany w wersji 126. Pliki projektowe są przechowywane w zastrzeżonym formacie na cudzych serwerach. Tworzenie wtyczek wymaga osobnego środowiska uruchomieniowego z ograniczonym API.
 
 Pairdraw jest alternatywą: otwarte źródła, licencja MIT, każda operacja dostępna ze skryptu, dane przechowywane lokalnie. Twoje pliki projektowe należą do Ciebie — sprawdzaj je, przekształcaj, przetwarzaj w CI i przekazuj modelowi językowemu. Bez pytania o pozwolenie.

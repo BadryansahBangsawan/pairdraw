@@ -60,17 +60,44 @@ function variantInstructions(
 }
 
 /**
+ * Variants of a layer that can be varied are versions in its set of variations, which the tool
+ * places beside it and the person keeps one of with Use this.
+ */
+function versionInstructions(
+  request: Extract<ExploreRequest, { kind: 'variants' }>,
+  base: ReferencedNode
+): string {
+  const link = referenceLink({ kind: 'node', id: base.id, label: base.name })
+  return dedent`
+    Let it cook: make ${request.count} distinct versions of ${link} for what this message asks.
+    - ${AXIS_INSTRUCTIONS[request.axis]}
+    - Call \`create_variations\` once with id "${base.id}", count ${request.count}, and one short label per version naming the idea it tries (in \`eval\`, \`pairdraw.createVariations(...)\`). It copies the layer into a Variations section beside it; leave the original as it is.
+    - Change the versions one after another, each in a clearly different direction from the ones before it, by editing the layers inside each version with \`batch_update\`, \`set_*\`, or \`render\` with parent_id or replace_id inside it. Keep each version's own root layer: one whose root becomes another kind of layer cannot replace the original.
+    - Do not pick a version or discard them: the user compares them and keeps one with Use this.
+    - When all ${request.count} are done, check them together with \`export_image\` of the set, then summarize each in one line.
+  `
+}
+
+/**
  * The note that tells the model how to explore a request. Variants start from `base`, the first
- * layer the message names or the selection, and go in a row right of everything on the page.
+ * layer the message names or the selection: versions in its set of variations when `canVary`
+ * says it can be varied, else copies in a row right of everything on the page.
  */
 export function exploreNote(
   graph: SceneGraph,
   pageId: string,
   request: ExploreRequest,
-  base: ReferencedNode | null
+  base: ReferencedNode | null,
+  canVary: (nodeId: string) => boolean = () => false
 ): ExploreNote {
   if (request.kind === 'single') {
     return { attributes: { mode: 'single' }, instructions: SINGLE_INSTRUCTIONS }
+  }
+  if (base && canVary(base.id)) {
+    return {
+      attributes: { mode: 'variants', count: request.count, axis: request.axis, base: base.id },
+      instructions: versionInstructions(request, base)
+    }
   }
   const placement = variantPlacement(graph, pageId, base?.id)
   return {

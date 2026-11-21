@@ -1,7 +1,5 @@
 import { ref, shallowRef } from 'vue'
 
-import type { Effect } from '@pairdraw/scene-graph'
-
 import {
   EFFECT_OPTIONS,
   createDefaultEffect,
@@ -9,6 +7,10 @@ import {
   createEffectEditActions,
   isShadow,
   isShadowEffect,
+  noiseChange,
+  noiseTypeChange,
+  textureChange,
+  type EffectChange,
   type EffectEditSnapshot
 } from '#vue/controls/effects/helpers'
 import { useNodeProps } from '#vue/controls/node-props/use'
@@ -35,12 +37,15 @@ export function useEffectsControls() {
     createDefaultEffect,
     isShadow,
     isShadowEffect,
+    noiseChange,
+    noiseTypeChange,
+    textureChange,
     /** Previews a change to one effect on every selected layer. */
-    scrubEffect: (index: number, changes: Partial<Effect>) =>
-      editActions.scrubEffect(nodes.value, index, changes),
+    scrubEffect: (index: number, change: EffectChange) =>
+      editActions.scrubEffect(nodes.value, index, change),
     /** Applies a change to one effect on every selected layer in one undo step. */
-    commitEffect: (index: number, changes: Partial<Effect>) =>
-      editActions.commitEffect(nodes.value, index, changes),
+    commitEffect: (index: number, change: EffectChange) =>
+      editActions.commitEffect(nodes.value, index, change),
     ...controlActions
   }
 }

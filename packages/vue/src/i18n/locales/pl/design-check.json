@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Promień narożnika powinien pochodzić ze skali promieni lub ze zmiennej.",
   "ruleNoHardcodedColors": "Niepowiązany kolor",
   "ruleNoHardcodedColorsHelp": "Ten kolor odpowiada zmiennej koloru. Powiąż go, aby zmiany motywu i palety docierały do tej warstwy.",
+  "ruleNoUnboundTokenValues": "Niepowiązana wartość tokenu",
+  "ruleNoUnboundTokenValuesHelp": "Ten promień, odstęp lub rozmiar czcionki odpowiada tokenowi. Powiąż go, aby zmiany tokenu docierały do tej warstwy.",
   "detailStrokeColor": "Obrys: {variable}",
   "bindVariable": "Powiąż z {variable}",
   "bindAll": "Powiąż wszystkie ({count})",
@@ -80,5 +82,15 @@
   "ruleNoMixedStyles": "Mieszane style tekstu",
   "ruleNoMixedStylesHelp": "Kilka stylów w jednej warstwie tekstu łatwo zepsuć podczas edycji.",
   "ruleNoDetachedInstances": "Wygląda jak komponent",
-  "ruleNoDetachedInstancesHelp": "Ta ramka wygląda jak element wielokrotnego użytku. Użyj instancji komponentu."
+  "ruleNoDetachedInstancesHelp": "Ta ramka wygląda jak element wielokrotnego użytku. Użyj instancji komponentu.",
+  "ruleDesignMemoryColors": "Kolor spoza pamięci projektu",
+  "ruleDesignMemoryColorsHelp": "Użyj koloru dozwolonego przez pamięć projektu albo zezwól na ten.",
+  "ruleDesignMemoryFonts": "Font spoza pamięci projektu",
+  "ruleDesignMemoryFontsHelp": "Użyj fontu dozwolonego przez pamięć projektu albo zezwól na ten.",
+  "ruleDesignMemoryFontSizes": "Rozmiar fontu spoza pamięci projektu",
+  "ruleDesignMemoryFontSizesHelp": "Użyj rozmiaru fontu z pamięci projektu albo zezwól na ten.",
+  "ruleDesignMemorySpacing": "Odstęp spoza pamięci projektu",
+  "ruleDesignMemorySpacingHelp": "Użyj odstępu z pamięci projektu albo zezwól na ten.",
+  "ruleDesignMemoryRadius": "Promień spoza pamięci projektu",
+  "ruleDesignMemoryRadiusHelp": "Użyj promienia narożnika z pamięci projektu albo zezwól na ten."
 }

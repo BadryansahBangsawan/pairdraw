@@ -211,6 +211,17 @@ export function createSelectionCommands({
       enabled: capabilities.canGoToMainComponent,
       run: () => void editor.goToMainComponent()
     },
+    'selection.duplicateAsVariation': {
+      id: 'selection.duplicateAsVariation',
+      get label() {
+        return t.value.duplicateAsVariation
+      },
+      enabled: capabilities.canCreateVariations,
+      run: () => {
+        const node = selection.selectedNode.value
+        if (node) editor.duplicateAsVariation(node.id)
+      }
+    },
     'selection.createSlot': {
       id: 'selection.createSlot',
       get label() {

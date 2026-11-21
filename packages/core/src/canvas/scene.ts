@@ -73,6 +73,7 @@ import {
 } from './text/derived'
 import { drawLaidOutEmoji, drawSavedEmoji } from './text/emoji'
 import { stickyPlaceholderNode } from './text/placeholder'
+import { withTextureEffect } from './texture'
 
 function drawVisibleFills(
   r: SkiaRenderer,
@@ -1088,7 +1089,9 @@ export function renderShapeUncached(
   graph: SceneGraph
 ): void {
   r.renderEffects(canvas, node, graph, 'behind')
-  paintShapeContent(r, canvas, node, graph, () => r.renderEffects(canvas, node, graph, 'inner'))
+  const content = () =>
+    paintShapeContent(r, canvas, node, graph, () => r.renderEffects(canvas, node, graph, 'inner'))
+  if (!withTextureEffect(r, canvas, node, content)) content()
   r.renderEffects(canvas, node, graph, 'front')
 }
 

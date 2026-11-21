@@ -1,0 +1,77 @@
+{
+  "designMemory": "Mémoire de design",
+  "editDesignMemory": "Modifier la mémoire de design…",
+  "createFromDocument": "Créer à partir de ce document",
+  "emptyHint": "Couleurs, polices et espacements que les agents doivent respecter dans ce document.",
+  "colorCount": {
+    "one": "{count} couleur",
+    "many": "{count} couleurs"
+  },
+  "fontCount": {
+    "one": "{count} police",
+    "many": "{count} polices"
+  },
+  "sizeCount": {
+    "one": "{count} taille de police",
+    "many": "{count} tailles de police"
+  },
+  "decisionCount": {
+    "one": "{count} décision",
+    "many": "{count} décisions"
+  },
+  "exampleCount": {
+    "one": "{count} exemple",
+    "many": "{count} exemples"
+  },
+  "rules": "Règles",
+  "decisions": "Décisions",
+  "examples": "Exemples",
+  "colors": "Couleurs",
+  "fonts": "Polices",
+  "fontSizes": "Tailles de police",
+  "spacing": "Espacement",
+  "radius": "Rayon des angles",
+  "fromSystem": "Inclure les variables et les styles",
+  "fromSystemCount": {
+    "one": "{count} valeur issue des variables et des styles",
+    "many": "{count} valeurs issues des variables et des styles"
+  },
+  "enforcement": "Quand un agent utilise une autre valeur",
+  "refuse": "Annuler la modification",
+  "warn": "Avertir",
+  "off": "Désactivé",
+  "notChecked": "Rien n’est encore autorisé, donc rien n’est vérifié",
+  "addValue": "Ajouter une valeur",
+  "pickColor": "Choisir une couleur",
+  "moreValues": "{count} de plus",
+  "removeValue": "Retirer {value}",
+  "newDecision": "Écrire une décision que les agents doivent suivre",
+  "addDecision": "Ajouter la décision",
+  "removeDecision": "Retirer la décision",
+  "byAgent": "Agent",
+  "noDecisionsYet": "Aucune décision pour l’instant",
+  "noDecisions": "Notez les choix que les agents doivent suivre, par exemple la couleur de l’action principale.",
+  "editDecision": "Modifier la décision",
+  "moveUp": "Monter",
+  "moveDown": "Descendre",
+  "noExamplesYet": "Aucun exemple pour l’instant",
+  "noExamples": "Sélectionnez un cadre qui montre le design réussi et épinglez-le comme exemple.",
+  "pinExample": "Épingler comme exemple",
+  "unpinExample": "Désépingler l’exemple",
+  "showExample": "Afficher",
+  "removeExample": "Retirer l’exemple",
+  "missingExample": "N’est plus dans le document",
+  "learn": "Apprendre de la sélection",
+  "learnHeading": "Valeurs utilisées par la sélection",
+  "learnHint": "Les valeurs utilisées une seule fois sont décochées.",
+  "uses": {
+    "one": "{count} utilisation",
+    "many": "{count} utilisations"
+  },
+  "addChecked": "Ajouter les valeurs cochées",
+  "nothingToLearn": "La sélection n’utilise aucune valeur que la mémoire n’autorise pas déjà.",
+  "deleteMemory": "Supprimer la mémoire de design",
+  "allow": "Autoriser {value}",
+  "allowed": "{value} autorisé",
+  "refused": "Annulé par la mémoire de design"
+}

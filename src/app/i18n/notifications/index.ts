@@ -16,6 +16,9 @@ const notificationMessageDefaults = {
     'These styles refer to a variable whose path another collection also has, so other tools may read the wrong one: {names}.'
   ),
   designTokensImported: params('Imported {count} design tokens.'),
+  designTokensNeedReview: params(
+    '{count} tokens changed on the canvas or in both places. Review them in Variables.'
+  ),
   unsupportedVariableExpressions: params(
     'Pairdraw can’t evaluate these variables yet, so layers keep the values saved in the file: {names}.'
   ),
@@ -34,6 +37,15 @@ const notificationMessageDefaults = {
   ),
   importedLibrariesUnreadable: params(
     'Couldn’t open the libraries “{name}” imports ({paths}), so their components show as placeholders.'
+  ),
+  unknownVariables: params(
+    'Layers reference variables the document does not define ({names}); they use their fallback values.'
+  ),
+  missingImages: params(
+    'Image files the document names are missing ({names}); their fills are left out.'
+  ),
+  unknownNodeTypes: params(
+    'Layers use node types Pairdraw does not know ({names}); they show as placeholders.'
   ),
   viewDiagnostics: 'View diagnostics',
   importedDOMCSS: 'Imported DOM/CSS document.',

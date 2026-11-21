@@ -22,7 +22,7 @@ function fileOutput(toolName: string, result: unknown): string | Uint8Array | nu
   const jsx = recordValue(result, 'jsx')
   if (toolName === 'get_jsx') return typeof jsx === 'string' ? jsx : null
   const base64 = recordValue(result, 'base64')
-  if (toolName === 'export_image' || toolName === 'export_pdf') {
+  if (toolName === 'export_image' || toolName === 'export_pdf' || toolName === 'export_video') {
     return typeof base64 === 'string' ? toUint8Array(base64) : null
   }
   return null
@@ -30,7 +30,8 @@ function fileOutput(toolName: string, result: unknown): string | Uint8Array | nu
 
 function argumentPath(tool: ToolDef, args: Record<string, unknown>): string | undefined {
   if (!('path' in args) || typeof args.path !== 'string') return undefined
-  if (!['export_svg', 'get_jsx', 'export_image', 'export_pdf'].includes(tool.name)) return undefined
+  const writesFile = ['export_svg', 'get_jsx', 'export_image', 'export_pdf', 'export_video']
+  if (!writesFile.includes(tool.name)) return undefined
   return args.path
 }
 

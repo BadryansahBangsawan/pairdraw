@@ -1,6 +1,15 @@
 import * as v from 'valibot'
 
-import type { BlendMode, Effect, ShadowEffect } from '@pairdraw/scene-graph'
+import type {
+  BlendMode,
+  Effect,
+  NoiseEffect,
+  NoiseEffectParams,
+  ShaderEffect,
+  TextureEffect
+} from '@pairdraw/scene-graph'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { TRANSPARENT } from '#core/constants'
 
@@ -29,12 +38,20 @@ const BLEND_MODE_KEYS = {
 export const BLEND_MODES = Object.keys(BLEND_MODE_KEYS) as BlendMode[]
 
 /** Effect kinds Figma's plugin API accepts that Pairdraw does not model yet. */
-const UNSUPPORTED_EFFECT_TYPES = new Set(['NOISE', 'TEXTURE', 'GLASS', 'SHADER'])
+const UNSUPPORTED_EFFECT_TYPES = new Set(['GLASS', 'SHADER'])
 
 // Figma rejects Infinity as well as NaN ("Number must be finite").
 const finiteSchema = v.pipe(v.number(), v.finite())
 const unitSchema = v.pipe(finiteSchema, v.minValue(0), v.maxValue(1))
 const nonNegativeSchema = v.pipe(finiteSchema, v.minValue(0))
+
+// Figma keeps a grain size, and a texture's radius, above 100 at 100 rather than refusing it.
+const GRAIN_MAX = 100
+const grainSchema = v.pipe(
+  nonNegativeSchema,
+  v.transform((size) => Math.min(size, GRAIN_MAX))
+)
+const grainVectorSchema = v.optional(v.strictObject({ x: grainSchema, y: grainSchema }))
 
 const colorSchema = v.strictObject({ r: unitSchema, g: unitSchema, b: unitSchema, a: unitSchema })
 const vectorSchema = v.strictObject({ x: finiteSchema, y: finiteSchema })
@@ -51,6 +68,17 @@ const shadowEntries = {
   boundVariables: boundVariablesSchema
 }
 
+// A noise has no visible radius, yet only its radius binds, as on a blur (Figma 126).
+const noiseEntries = {
+  type: v.literal('NOISE'),
+  visible: v.boolean(),
+  boundVariables: boundVariablesSchema,
+  noiseSize: grainSchema,
+  noiseSizeVector: grainVectorSchema,
+  color: colorSchema,
+  density: unitSchema
+}
+
 const effectSchema = v.variant('type', [
   v.strictObject({
     type: v.literal('DROP_SHADOW'),
@@ -64,6 +92,24 @@ const effectSchema = v.variant('type', [
     visible: v.boolean(),
     blurType: v.optional(v.literal('NORMAL'), 'NORMAL'),
     boundVariables: boundVariablesSchema
+  }),
+  v.variant('noiseType', [
+    v.strictObject({ ...noiseEntries, noiseType: v.literal('MONOTONE') }),
+    v.strictObject({
+      ...noiseEntries,
+      noiseType: v.literal('DUOTONE'),
+      secondaryColor: colorSchema
+    }),
+    v.strictObject({ ...noiseEntries, noiseType: v.literal('MULTITONE'), opacity: unitSchema })
+  ]),
+  v.strictObject({
+    type: v.literal('TEXTURE'),
+    visible: v.boolean(),
+    radius: grainSchema,
+    boundVariables: boundVariablesSchema,
+    noiseSize: grainSchema,
+    noiseSizeVector: grainVectorSchema,
+    clipToShape: v.boolean()
   })
 ])
 
@@ -94,6 +140,29 @@ function unsupportedEffect(value: unknown): string | null {
 }
 
 /**
+ * Figma's complaint about an effect whose `noiseSize` is not its `noiseSizeVector.x`, read from
+ * the values it was given, or null. The vector's `y` may differ: that is how a grain is not square.
+ */
+function grainSizeMismatch(value: unknown): string | null {
+  const grain = v.object({ noiseSize: v.number(), noiseSizeVector: v.object({ x: v.number() }) })
+  if (!Array.isArray(value)) return null
+  for (const effect of value) {
+    if (!v.is(grain, effect) || effect.noiseSize === effect.noiseSizeVector.x) continue
+    return `Effect noiseSize (${effect.noiseSize}) does not match noiseSizeVector.x (${effect.noiseSizeVector.x}). Ensure these values are consistent.`
+  }
+  return null
+}
+
+/**
+ * `effects` with every texture after the first left out, as Figma silently keeps one. The effects
+ * setter reads bindings from the same list, so their indexes match the effects it keeps.
+ */
+export function firstTextureOnly<T extends { readonly type: string }>(effects: readonly T[]): T[] {
+  const first = effects.findIndex((effect) => effect.type === 'TEXTURE')
+  return effects.filter((effect, index) => effect.type !== 'TEXTURE' || index === first)
+}
+
+/**
  * Check `value` against Figma's effect shapes and convert it to scene effects.
  * Throws with the first problem, as Figma's `effects` setter does.
  */
@@ -107,17 +176,48 @@ export function parseFigmaEffects(value: unknown): Effect[] {
       `Property "effects" failed validation: ${issue.message} at ${issuePath(issue.path) || 'effects'}`
     )
   }
-  return result.output.map(toSceneEffect)
+  const mismatch = grainSizeMismatch(value)
+  if (mismatch) throw new Error(`Property "effects" failed validation: ${mismatch}`)
+  return firstTextureOnly(result.output).map(toSceneEffect)
 }
 
 /** `value` as scene effects when it holds valid Figma effects, or null. */
 export function tryParseFigmaEffects(value: unknown): Effect[] | null {
   if (unsupportedEffect(value)) return null
   const result = v.safeParse(effectsSchema, value)
-  return result.success ? result.output.map(toSceneEffect) : null
+  if (!result.success) return null
+  if (grainSizeMismatch(value)) return null
+  return firstTextureOnly(result.output).map(toSceneEffect)
+}
+
+/** A grain size as both axes, from the vector when given, else the one number. */
+function grainSize(effect: { noiseSize: number; noiseSizeVector?: Vector }): Vector {
+  return effect.noiseSizeVector
+    ? { ...effect.noiseSizeVector }
+    : { x: effect.noiseSize, y: effect.noiseSize }
 }
 
 function toSceneEffect(effect: FigmaEffect): Effect {
+  if (effect.type === 'NOISE') {
+    const noise: NoiseEffectParams = {
+      noiseType: effect.noiseType,
+      noiseSize: grainSize(effect),
+      density: effect.density
+    }
+    if (effect.noiseType === 'DUOTONE') noise.secondaryColor = { ...effect.secondaryColor }
+    if (effect.noiseType === 'MULTITONE') noise.opacity = effect.opacity
+    return { type: 'NOISE', color: { ...effect.color }, visible: effect.visible, noise }
+  }
+  if (effect.type === 'TEXTURE') {
+    return {
+      type: 'TEXTURE',
+      // A `.fig` texture carries an opaque black colour it does not use.
+      color: { ...BLACK },
+      radius: effect.radius,
+      visible: effect.visible,
+      texture: { noiseSize: grainSize(effect), clipToShape: effect.clipToShape }
+    }
+  }
   if (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW') {
     return {
       type: effect.type,
@@ -144,7 +244,9 @@ function toSceneEffect(effect: FigmaEffect): Effect {
 }
 
 /** A scene effect in the shape Figma's `effects` getter returns. */
-export function toFigmaEffect(effect: ShadowEffect): FigmaEffect {
+export function toFigmaEffect(effect: Exclude<Effect, ShaderEffect>): FigmaEffect {
+  if (effect.type === 'NOISE') return figmaNoiseEffect(effect)
+  if (effect.type === 'TEXTURE') return figmaTextureEffect(effect)
   if (
     effect.type === 'LAYER_BLUR' ||
     effect.type === 'FOREGROUND_BLUR' ||
@@ -176,4 +278,40 @@ export function toFigmaEffect(effect: ShadowEffect): FigmaEffect {
         showShadowBehindNode: effect.showShadowBehindNode ?? true
       }
     : { type: 'INNER_SHADOW', ...shadow }
+}
+
+/** A scene noise effect as Figma's `effects` getter returns it, each noise type with its field. */
+function figmaNoiseEffect(effect: NoiseEffect): FigmaEffect {
+  const noise = effect.noise
+  const base = {
+    type: 'NOISE' as const,
+    visible: effect.visible,
+    boundVariables: {},
+    noiseSize: noise.noiseSize.x,
+    noiseSizeVector: { ...noise.noiseSize },
+    color: { ...effect.color },
+    density: noise.density
+  }
+  if (noise.noiseType === 'DUOTONE') {
+    const secondaryColor = { ...(noise.secondaryColor ?? effect.color) }
+    return { ...base, noiseType: 'DUOTONE', secondaryColor }
+  }
+  if (noise.noiseType === 'MULTITONE') {
+    return { ...base, noiseType: 'MULTITONE', opacity: noise.opacity ?? 1 }
+  }
+  return { ...base, noiseType: 'MONOTONE' }
+}
+
+/** A scene texture effect as Figma's `effects` getter returns it. */
+function figmaTextureEffect(effect: TextureEffect): FigmaEffect {
+  const texture = effect.texture
+  return {
+    type: 'TEXTURE',
+    visible: effect.visible,
+    radius: effect.radius,
+    boundVariables: {},
+    noiseSize: texture.noiseSize.x,
+    noiseSizeVector: { ...texture.noiseSize },
+    clipToShape: texture.clipToShape
+  }
 }

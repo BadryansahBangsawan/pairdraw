@@ -1,6 +1,7 @@
 import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { insertScriptNode } from '@/app/code/script/create'
+import { openVideoExport } from '@/app/document/export/video/open'
 import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
 import { openFindLayers } from '@/app/editor/layers/find'
 import { openTextLinkEditor } from '@/app/editor/links'
@@ -110,6 +111,8 @@ export function createSharedEditorMenuActions(
     goodies: () => openGoodies(store),
     'find-layers': () => openFindLayers(store),
     'export-pdf': () => void exportFramesToPDF(store),
+    // The dialog belongs to the tab on screen, not to the shell's forwarding store.
+    'export-video': () => openVideoExport(getActiveEditorStore()),
     'theme-light': () => setTheme('light'),
     'theme-dark': () => setTheme('dark'),
     'theme-auto': () => setTheme('auto'),

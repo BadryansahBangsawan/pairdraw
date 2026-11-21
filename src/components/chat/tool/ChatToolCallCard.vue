@@ -6,6 +6,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
   displayedToolOutput,
+  toolDesignRefusals,
   toolDisplayName,
   toolErrorText,
   toolHasInput,
@@ -17,6 +18,7 @@ import {
 } from '@/app/ai/chat/tool-calls/display'
 import { readToolChange } from '@/app/ai/tools/changes/store'
 import ChatToolChangeView from '@/components/chat/tool/ChatToolChangeView.vue'
+import ChatToolDesignRefusal from '@/components/chat/tool/ChatToolDesignRefusal.vue'
 import ChatToolNodeChips from '@/components/chat/tool/ChatToolNodeChips.vue'
 import { toolCallState } from '@/components/chat/tool/state'
 import { loadCodeViewer } from '@/components/code-editor/lazy'
@@ -61,6 +63,7 @@ const errorLine = computed(() => {
   return lines.at(-1) ?? null
 })
 const image = computed(() => toolImage(part))
+const refusals = computed(() => toolDesignRefusals(part))
 const nodeIds = computed(() => (state.value === 'pending' ? [] : toolNodeIds(part)))
 const hasInput = computed(() => toolHasInput(part))
 const output = computed(() => displayedToolOutput(part))
@@ -152,6 +155,7 @@ function json(value: unknown): string {
             </AppButton>
           </template>
         </AppAlert>
+        <ChatToolDesignRefusal v-if="refusals.length > 0" :refusals="refusals" />
         <ChatToolNodeChips :ids="nodeIds" />
         <SegmentedControl
           v-if="views.length > 1"

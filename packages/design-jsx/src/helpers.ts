@@ -9,8 +9,12 @@ import {
   foregroundBlur,
   innerShadow,
   layerBlur,
+  noise,
+  texture,
   type BlurEffectOptions,
-  type ShadowEffectOptions
+  type NoiseEffectOptions,
+  type ShadowEffectOptions,
+  type TextureEffectOptions
 } from './effects'
 import {
   angularGradient,
@@ -47,6 +51,25 @@ const BLUR_OPTIONS = {
   radius: true,
   visible: true
 } satisfies OptionKeys<BlurEffectOptions>
+
+const NOISE_OPTIONS = {
+  noiseType: true,
+  noiseSize: true,
+  density: true,
+  color: true,
+  secondaryColor: true,
+  opacity: true,
+  seed: true,
+  visible: true
+} satisfies OptionKeys<NoiseEffectOptions>
+
+const TEXTURE_OPTIONS = {
+  noiseSize: true,
+  radius: true,
+  clipToShape: true,
+  seed: true,
+  visible: true
+} satisfies OptionKeys<TextureEffectOptions>
 
 const SOLID_OPTIONS = {
   opacity: true,
@@ -119,6 +142,8 @@ export function designJSXHelpers(warnings: string[]) {
     layerBlur: checked(warnings, 'layerBlur', layerBlur, BLUR_OPTIONS, 0),
     backgroundBlur: checked(warnings, 'backgroundBlur', backgroundBlur, BLUR_OPTIONS, 0),
     foregroundBlur: checked(warnings, 'foregroundBlur', foregroundBlur, BLUR_OPTIONS, 0),
+    noise: checked(warnings, 'noise', noise, NOISE_OPTIONS, 0),
+    texture: checked(warnings, 'texture', texture, TEXTURE_OPTIONS, 0),
     defineVars,
     defineMode,
     designVar,

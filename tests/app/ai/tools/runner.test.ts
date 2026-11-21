@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'bun:test'
 
 import { ALL_TOOLS } from '@pairdraw/core/tools'
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { allowDesignValue, createDesignMemory } from '@pairdraw/scene-graph/design-memory'
 
 import { runEditorTool } from '@/app/ai/tools/runner'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
@@ -185,4 +186,57 @@ test('a batch that throws part way through leaves the large document as it was',
   expect(store.snapshotPage(pageId)).toEqual(before)
   expect(store.undo.peekUndo()).toBeUndefined()
   expect(store.hasUnsavedChanges()).toBe(false)
+})
+
+test("an agent's off-system color is refused and put back; a person's is not", async () => {
+  const setFill = expectDefined(
+    ALL_TOOLS.find((tool) => tool.name === 'set_fill'),
+    'set_fill'
+  )
+  const pageId = store.state.currentPageId
+  store.setDesignMemory(allowDesignValue(createDesignMemory(), 'colors', '#1A73E8'))
+  const card = store.graph.createNode('RECTANGLE', pageId, { name: 'Card', width: 100, height: 60 })
+  const figma = makeFigmaFromStore(store, pageId)
+  const before = store.graph.getNode(card.id)?.fills
+  const undoBefore = store.undo.peekUndo()
+
+  const refused = await runEditorTool({
+    store,
+    figma,
+    def: setFill,
+    args: { id: card.id, color: '#FF00AA' },
+    source: 'MCP'
+  })
+  expect(refused).toMatchObject({
+    error: expect.stringContaining('nearest allowed: #1A73E8'),
+    design_memory: { refused: [expect.objectContaining({ value: '#FF00AA', nodeId: card.id })] }
+  })
+  expect(store.graph.getNode(card.id)?.fills).toEqual(before)
+  expect(store.undo.peekUndo()).toBe(undoBefore)
+
+  store.updateNodeWithUndo(card.id, {
+    fills: [{ type: 'SOLID', visible: true, opacity: 1, color: { r: 1, g: 0, b: 2 / 3, a: 1 } }]
+  })
+  expect(store.graph.getNode(card.id)?.fills[0]?.color.g).toBe(0)
+})
+
+test('an agent edit with an off-scale gap goes through with a warning', async () => {
+  const batchUpdate = expectDefined(
+    ALL_TOOLS.find((tool) => tool.name === 'batch_update'),
+    'batch_update'
+  )
+  const pageId = store.state.currentPageId
+  store.setDesignMemory(allowDesignValue(createDesignMemory(), 'spacing', 16))
+  const stack = store.graph.createNode('FRAME', pageId, { name: 'Stack', layoutMode: 'VERTICAL' })
+  const result = await runEditorTool({
+    store,
+    figma: makeFigmaFromStore(store, pageId),
+    def: batchUpdate,
+    args: { operations: [{ id: stack.id, props: { spacing: 13 } }] },
+    source: 'MCP'
+  })
+  expect(store.graph.getNode(stack.id)?.itemSpacing).toBe(13)
+  expect(result).toMatchObject({
+    design_memory: { violations: [expect.objectContaining({ group: 'spacing', value: 13 })] }
+  })
 })

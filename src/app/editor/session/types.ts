@@ -32,6 +32,8 @@ export function createInitialAppEditorState(pageId: string): AppEditorState {
     renameSelectionOpen: false,
     variablesOpen: false,
     statusesOpen: false,
+    designMemoryOpen: false,
+    designMemoryLearnFrom: null,
     iconPickerOpen: false,
     findLayersOpen: false,
     goodiesOpen: false,
@@ -62,6 +64,10 @@ export type AppEditorState = EditorState & {
   variablesOpen: boolean
   /** The statuses dialog, opened from the Status section, the canvas menu, or the page panel. */
   statusesOpen: boolean
+  /** The design memory dialog, opened from the Design memory section or a selection's. */
+  designMemoryOpen: boolean
+  /** The layers the dialog proposes rules from, as Learn asks; null shows the rules. */
+  designMemoryLearnFrom: string[] | null
   /** The icon picker, opened from the toolbar, the Object menu, or the palette. */
   iconPickerOpen: boolean
   /** Find layers, opened from the Edit menu, its key, or the palette. */

@@ -2,6 +2,7 @@ import { IS_BROWSER } from '@pairdraw/core/constants'
 
 import { providerBackend } from '@/app/ai/chat/history/backend'
 import { createConversationHistory } from '@/app/ai/chat/history/controller'
+import { conversationTitle } from '@/app/ai/chat/history/title'
 import { chatColumnOpen, propertiesTab } from '@/app/ai/chat/panel'
 import { createChatSessionManager } from '@/app/ai/chat/session'
 import {
@@ -68,7 +69,8 @@ const history = createConversationHistory({
   backend: () => {
     if (isACPProvider.value) return 'acp'
     return isHarnessProvider.value ? 'harness' : 'direct'
-  }
+  },
+  title: conversationTitle
 })
 
 registerAIChatEffects(chatSession.markTransportDirty)

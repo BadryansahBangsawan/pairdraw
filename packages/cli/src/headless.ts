@@ -81,6 +81,30 @@ function documentImportOpener(filePath: string): ReadDocumentInput['openImport']
 /** Tells the user on stderr what a document opened without, keeping stdout for the output. */
 function printReadWarnings(filePath: string, warnings: readonly ReadDocumentWarning[] = []): void {
   for (const warning of warnings) {
+    if (warning.kind === 'unknown-variable') {
+      console.error(
+        warn(
+          `${filePath}: references variables it does not define (${warning.names.join(', ')}); they read as their fallbacks.`
+        )
+      )
+      continue
+    }
+    if (warning.kind === 'missing-image') {
+      console.error(
+        warn(
+          `${filePath}: names image files it cannot read (${warning.urls.join(', ')}); their fills are left out.`
+        )
+      )
+      continue
+    }
+    if (warning.kind === 'unknown-node') {
+      console.error(
+        warn(
+          `${filePath}: uses node types it does not know (${warning.types.join(', ')}); they read as placeholder frames.`
+        )
+      )
+      continue
+    }
     console.error(
       warn(
         `${filePath}: could not open the libraries it imports (${warning.paths.join(', ')}); their components read as placeholders.`

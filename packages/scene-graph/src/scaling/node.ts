@@ -52,8 +52,13 @@ function scaledStrokes(strokes: readonly Stroke[], scale: number): Stroke[] {
 function scaledEffects(effects: readonly Effect[], scale: number): Effect[] {
   return effects.map((effect) => {
     const copy = structuredClone(effect)
-    // A shader effect has no geometry of its own; only a shadow's measures follow the layer.
-    if (copy.type === 'SHADER') return copy
+    // A shader effect has no geometry of its own, and a noise's grain keeps its size.
+    if (copy.type === 'SHADER' || copy.type === 'NOISE') return copy
+    // A texture roughens the edges by its radius; its grain keeps its size too.
+    if (copy.type === 'TEXTURE') {
+      copy.radius *= scale
+      return copy
+    }
     copy.offset = { x: copy.offset.x * scale, y: copy.offset.y * scale }
     copy.radius *= scale
     copy.spread *= scale

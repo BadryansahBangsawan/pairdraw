@@ -72,3 +72,25 @@ export const approveActions = computed({
     }
   }
 })
+
+/** Whether a long chat compacts itself before the context fills; Settings → AI turns it off. */
+export const compactAutomatically = computed({
+  get: () => appPreferences.value.chat.compactAutomatically,
+  set: (compactAutomatically: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, compactAutomatically }
+    }
+  }
+})
+
+/** Whether the chat shows each reply's tokens and the conversation's cost; Settings → AI turns it off. */
+export const showTokenUsage = computed({
+  get: () => appPreferences.value.chat.showTokenUsage,
+  set: (showTokenUsage: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, showTokenUsage }
+    }
+  }
+})

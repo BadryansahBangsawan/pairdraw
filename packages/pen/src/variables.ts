@@ -50,7 +50,7 @@ function varName(ref: string): string {
 export function bindIfVar(node: SceneNode, field: string, val: unknown, ctx: VarContext): void {
   if (!isVarRef(val)) return
   const variable = ctx.byName.get(varName(val))
-  if (variable) node.boundVariables[field] = variable.id
+  if (variable) node.boundVariables = { ...node.boundVariables, [field]: variable.id }
 }
 
 /** A number, or the value of the number variable it references. */
@@ -250,7 +250,11 @@ function addThemeCollection(graph: SceneGraph, axes: Axis[]): ThemeCollection {
   return { id, axes, themes, modes, modeByTheme }
 }
 
-export function buildVarContext(graph: SceneGraph, doc: PenDocument): VarContext {
+export function buildVarContext(
+  graph: SceneGraph,
+  doc: PenDocument,
+  onUnknownVariable?: (name: string) => void
+): VarContext {
   const axes = themeAxes(doc)
   const definitions = Object.entries(doc.variables ?? {})
   const collections = axisGroups(
@@ -303,6 +307,7 @@ export function buildVarContext(graph: SceneGraph, doc: PenDocument): VarContext
   /** A variable's value in the current theme, following aliases. */
   function resolve(ref: string): VariableValue | undefined {
     let variable = byName.get(varName(ref))
+    if (!variable) onUnknownVariable?.(varName(ref))
     for (let hops = 0; variable && hops <= byName.size; hops++) {
       const collection = collectionById.get(variable.collectionId)
       const value = collection ? variable.valuesByMode[modeIn(collection)] : undefined

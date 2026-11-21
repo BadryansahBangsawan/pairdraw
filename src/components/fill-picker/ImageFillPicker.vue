@@ -25,6 +25,7 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 
+import ImageAdjustments from './ImageAdjustments.vue'
 import ImageFillPickerAIActions from './ImageFillPickerAIActions.vue'
 import ImageFillPickerURLField from './ImageFillPickerURLField.vue'
 import { useImageFill } from './useImageFill'
@@ -279,5 +280,6 @@ function cropOnCanvas() {
         <icon-lucide-rotate-cw class="size-3.5" />
       </IconButton>
     </div>
+    <ImageAdjustments :fill @update="emit('update', $event)" />
   </div>
 </template>

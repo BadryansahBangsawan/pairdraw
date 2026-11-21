@@ -31,15 +31,18 @@ describe('page backgrounds in the plugin API', () => {
     const page = graph.getNode(api.currentPage.id)
     expect(page).toBeDefined()
     if (!page) return
-    page.source.fig.rawNodeFields.backgroundPaints = [
-      {
-        type: 'SOLID',
-        color: { r: 0.5, g: 0.75, b: 1, a: 1 },
-        opacity: 1,
-        visible: true,
-        blendMode: 'NORMAL'
-      }
-    ]
+    page.source.fig.rawNodeFields = {
+      ...page.source.fig.rawNodeFields,
+      backgroundPaints: [
+        {
+          type: 'SOLID',
+          color: { r: 0.5, g: 0.75, b: 1, a: 1 },
+          opacity: 1,
+          visible: true,
+          blendMode: 'NORMAL'
+        }
+      ]
+    }
 
     expect(api.currentPage.backgrounds).toEqual([
       {

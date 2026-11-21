@@ -28,6 +28,7 @@ const emit = defineEmits<{
   openRow: [row: IssueRowView]
   hoverRow: [row: IssueRowView | null]
   fix: [row: IssueRowView]
+  allow: [row: IssueRowView]
   fixAll: []
   turnOff: []
   showMore: []
@@ -98,6 +99,7 @@ const hiddenCount = computed(() => group.count - group.rows.length)
         @open="emit('openRow', row)"
         @hover="(hovered) => emit('hoverRow', hovered ? row : null)"
         @fix="emit('fix', row)"
+        @allow="emit('allow', row)"
       />
     </ul>
     <AppButton

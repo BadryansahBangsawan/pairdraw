@@ -12,13 +12,19 @@ export interface ContextUsageMetadata {
   context: ContextUsage
 }
 
+/** The usage one reply carries in its metadata, or null when it reported none. */
+export function contextUsageOf(message: UIMessage): ContextUsage | null {
+  const parsed = v.safeParse(contextUsageSchema, messageMetadata(message).context)
+  return parsed.success ? parsed.output : null
+}
+
 /** The usage the latest reply that reported one carries, or null before any did. */
 export function latestContextUsage(messages: readonly UIMessage[]): ContextUsage | null {
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index]
     if (message.role !== 'assistant') continue
-    const parsed = v.safeParse(contextUsageSchema, messageMetadata(message).context)
-    if (parsed.success) return parsed.output
+    const usage = contextUsageOf(message)
+    if (usage) return usage
   }
   return null
 }

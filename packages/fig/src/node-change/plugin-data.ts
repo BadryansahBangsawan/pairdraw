@@ -22,6 +22,7 @@ import type { Rect } from '@pairdraw/scene-graph/primitives'
 import { paintBindingTarget } from '@pairdraw/scene-graph/variables'
 
 import { readEffectiveFigmaRawField } from '../source-metadata'
+import { modeledEffectIndexes } from './paint'
 import {
   resolveVariableConsumptionEntry,
   variableConsumptionEntries,
@@ -96,6 +97,71 @@ export function extractMeshFills(nc: NodeChange): StoredMeshFill[] {
   return readNodeChangePluginData(nc, meshFills) ?? []
 }
 
+/** A binding on an effect, keyed by the effect's position: `effects/0/radius`. */
+const EFFECT_BINDING = /^effects\/(\d+)\/(.+)$/
+
+/**
+ * Bindings once the effects the scene graph models stand in for the file's own: a binding keeps
+ * the position its effect has among the modeled ones, and a binding on an effect the scene graph
+ * leaves out, such as a repeat, goes with it. Every other binding passes through.
+ */
+export function remapEffectBindings(
+  bindings: Record<string, string>,
+  effects: readonly unknown[] | undefined
+): Record<string, string> {
+  if (!effects) return bindings
+  const modeled = modeledEffectIndexes(effects)
+  return moveEffectBindings(bindings, (index) => modeled[index] ?? undefined)
+}
+
+/**
+ * `bindings` with each effect binding moved to the index `move` gives its effect's index, and
+ * left out where it gives none. Every other binding passes through.
+ */
+function moveEffectBindings(
+  bindings: Record<string, string>,
+  move: (index: number) => number | undefined
+): Record<string, string> {
+  const remapped: Record<string, string> = {}
+  for (const [field, variableId] of Object.entries(bindings)) {
+    const match = EFFECT_BINDING.exec(field)
+    if (!match) {
+      remapped[field] = variableId
+      continue
+    }
+    const index = move(Number(match[1]))
+    if (index === undefined) continue
+    remapped[`effects/${index}/${match[2]}`] = variableId
+  }
+  return remapped
+}
+
+/**
+ * Bindings back at the positions a record's own effects have, for a record written from its raw
+ * payload: a binding on a modeled effect moves to the index that effect has in the record, and a
+ * binding whose effect is not in the record is left out.
+ */
+export function remapEffectBindingsToRaw(
+  bindings: Record<string, string>,
+  effects: readonly unknown[] | undefined
+): Record<string, string> {
+  if (!effects) return bindings
+  const rawOfModeled = new Map<number, number>()
+  modeledEffectIndexes(effects).forEach((modeled, raw) => {
+    if (modeled !== null) rawOfModeled.set(modeled, raw)
+  })
+  return moveEffectBindings(bindings, (index) => rawOfModeled.get(index))
+}
+
+/**
+ * Whether a record keeps an effect the scene graph does not model, so an export writes the
+ * record's own effect list instead of the modeled one.
+ */
+export function hasUnmodeledEffects(node: SceneNode): boolean {
+  const effects = readEffectiveFigmaRawField(node, 'effects')
+  return Array.isArray(effects) && modeledEffectIndexes(effects).some((index) => index === null)
+}
+
 export function extractBoundVariables(nc: NodeChange): Record<string, string> {
   let bindings = readNodeChangePluginData(nc, boundVariables) ?? {}
   // Each paint carries its colour's alias. An instance's copy pairs its component's plugin data
@@ -125,7 +191,7 @@ export function extractBoundVariables(nc: NodeChange): Record<string, string> {
     const variableGuid = paint.colorVar?.value?.alias?.guid
     if (variableGuid) bindings[`strokes/${i}/color`] = guidToString(variableGuid)
   })
-  return bindings
+  return remapEffectBindings(bindings, nc.effects)
 }
 
 function mapNativeImageType(imageType: unknown): ExportFormatId | null {

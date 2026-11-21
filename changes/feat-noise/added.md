@@ -1,0 +1,5 @@
+- Noise effects carry their grain in the scene graph and are edited in the effects panel: a mono, duo, or multi noise, its size, density, colour, and opacity.
+- Texture effects roughen a layer, with a grain size, a radius, and clipping to the layer's shape.
+- Design JSX gains `noise()` and `texture()` helpers, and JSX export writes both effects as those calls.
+- SVG export draws a noise as Figma's turbulence chain and a texture as Figma's displacement chain.
+- The canvas draws noise with Figma's measured grain statistics over cached tiles, and a texture displaces a layer's edges by its radius.

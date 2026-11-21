@@ -86,6 +86,8 @@ pairdraw variables design.fig
 pairdraw variables --collection "Colors" --type COLOR
 pairdraw tokens design.fig --format tailwind > theme.css
 pairdraw tokens design.fig --format dtcg --out tokens  # W3C design tokens; import_design_tokens reads them back
+pairdraw tokens design.fig --check src/app.css  # list tokens that differ from code; exits 1 on drift
+pairdraw tokens design.fig --sync src/app.css --write  # bring code-only changes in; canvas edits are kept
 ```
 
 ### Search and XPath query
@@ -121,6 +123,7 @@ pairdraw export design.fig -f jsx --style tailwind -o component.tsx
 pairdraw export design.pen -f storybook -o src/stories --watch  # stories + design images per component, re-exported on save
 pairdraw export 'src/**/*.pen' -f storybook --beside  # stories next to each design file
 pairdraw export design.fig --thumbnail --width 1920 --height 1080
+pairdraw export flow.fig -f gif --start "Hero 1" -o hero.gif  # record the prototype's After delay chain
 pairdraw export --page "Components" -o components.png
 
 pairdraw convert design.fig -o design.pen
@@ -222,6 +225,16 @@ pairdraw eval design.fig -w -c 'pairdraw.setStatus(figma.currentPage.findOne(n =
 
 `pairdraw.getStatus(node)` reads one. Over MCP the same is `get_statuses` and `set_status`.
 
+A document can keep a design memory: the colors, fonts, font sizes, spacing and corner radii its designs may use (its own variables and styles plus values the person allowed), decisions written down about them, and frames pinned as examples. Read it before you design in the document. Through Pairdraw's agent surfaces (MCP, the app's chat and coding agents, `pairdraw agent`), an edit that brings in a color or font the memory does not allow is undone, and the error names the nearest allowed values; new sizes, spacing and radii off its scale go through with a warning in the result. A color you write is judged even when the document already uses it elsewhere; values kept on layers you duplicate, group, flatten or convert are not refused, and Pairdraw's defaults for new layers only warn, so give layers allowed colors rather than leaving the defaults. A variable or style you create, change or rescope is judged on every value it would let in, and the memory itself can only gain decisions and examples, so propose a new value with `record_design_decision` and let the person allow it:
+
+```bash
+pairdraw design-memory design.fig
+pairdraw eval design.fig -c 'pairdraw.checkDesignValues({ colors: ["#FF00AA"], spacing: [13] })'
+pairdraw tool call record_design_decision design.fig --args '{"text": "Cards use 16 px padding."}' --write
+```
+
+Over MCP the same is `get_design_memory`, `check_design_values`, and `record_design_decision`. CLI commands such as `pairdraw tool call` and `pairdraw eval` count as the person running them: they only warn about values outside the memory, unless `pairdraw tool call --enforce-design-memory` asks to refuse.
+
 ### Diff
 
 Compare nodes and documents, and apply patches:
@@ -317,9 +330,9 @@ The CLI defaults the filesystem root to the home directory on Windows and the cu
 
 1. **Find or open a document** — `list_documents` for open tabs and their IDs; `open_file { path }` within the effective filesystem root (`list_recent_files` lists recently opened files there), or `new_document {}`. Pass `document_id` and `page_id` explicitly instead of relying on the active tab; `activate_document { document_id }` brings a tab to the front when the user should see it.
 2. **Query** — `get_page_tree`, `find_nodes`, `query_nodes`, `get_node`, `list_pages`, `get_current_page`.
-3. **Inspect** — `get_jsx`, `diff_jsx`, `diff_create`, `diff_visual`, `describe`, `export_image`, `export_svg`, `export_pdf`.
+3. **Inspect** — `get_jsx`, `diff_jsx`, `diff_create`, `diff_visual`, `describe`, `check_responsive`, `export_image`, `export_svg`, `export_pdf`.
 4. **Modify** — `render`, `batch_update`, `update_node`, `set_fill`, `set_layout`, `create_shape`, `import_svg`, etc. For a flowchart, write it as Mermaid and call `import_mermaid { mermaid }`: it lays out FigJam shapes, sections, and connectors without overlaps and returns each node's layer id, instead of placing shapes and connectors by hand. When layers you created overlap, call `arrange { ids }`: it spreads them apart and keeps each near where it was. `arrange` also packs screens (`mode: "pack"`) and lays shapes out along the connectors joining them (`mode: "flow"` for flows, `"tree"` for hierarchies, `"radial"` for mind maps, `"network"` for relationship maps).
-5. **Save/export** — `save_file`, `export_image`, `export_svg`, `export_pdf`, or CLI `export`.
+5. **Save/export** — `save_file`, `export_image`, `export_svg`, `export_pdf`, `export_video`, or CLI `export`.
 6. **Close** — `close_file { document_id, unsaved }` closes a document tab after the workflow. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; automation never prompts in the app.
 
 Each session keeps the document it edits, including after the person switches tabs. Home and a New file tab are not documents: an edit with none chosen yet opens a document tab and leaves the current tab in front. `open_file` owns a document only when that call opened it. `close_file` without `document_id` closes only a document this session opened. `save_file` without `document_id` saves the document this session is targeting, or the document in front. When that document has been closed, call `list_documents` and pass `document_id`, or call `new_document` or `open_file`. A new HTTP session starts with no document. An idle timeout of 15 minutes ends the previous session, and the next edit opens its own tab. Set `PAIRDRAW_SESSION` to run two CLI agents at once; otherwise CLI commands share one `cli` session.
@@ -349,9 +362,16 @@ Discover available tools and their arguments from the connected server or browse
 - **`describe`** — semantic analysis of role, visual style, layout, and design issues.
 - **`batch_update`** — apply multiple node updates efficiently.
 - **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables; `export_image` takes `quality` (1–100) for JPG and WEBP.
+- **`export_video`** — records the prototype from a start frame, following After delays and Dissolves (and scripted `clicks`) on a virtual clock, as MP4 (default), GIF, or WebM; check the returned `steps`, and pass `path` for the file. MP4 and WebM need the app's WebCodecs or, headless, `ffmpeg` on the path; otherwise ask for a GIF.
 - **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.
 - **`diff_changes`** — outside AI chat, call it with `mark: true`, then later without it to see what you or the designer changed since.
 - **`find_empty_space`** — a free spot of a given size beside existing content, before placing new frames.
+- **`create_variations` / `list_variations` / `pick_variation`** — versions of a layer to compare; the person keeps one with Use this, which replaces the original in place (same id, name, and spot). When asked for several versions of a layer:
+  1. Call `create_variations` once with the layer's id, a count from 1 to 8, and one short label per version naming the idea it tries.
+  2. Change each version in its own direction by editing the layers inside it: `batch_update`, `set_*`, or `render` with `parent_id` or `replace_id` inside the version.
+  3. Keep each version's root layer: a version whose root becomes another kind of layer (a frame where an instance was) cannot replace the original.
+  4. Check them together with one `export_image` of the set.
+  5. Leave the choice to the person; call `pick_variation` only when they ask you to pick or discard.
 - **`replace_matching_properties`** — swap a fill, text, or stroke color, stroke weight, radius, font family, style, or size everywhere on a page or selection; layers of read-only library components come back in `read_only`.
 - **`get_style`** — curated style directions for a design with no look yet, or when asked for a style or mood: call it with a `query` describing the request to list matches, then with an `id` for that direction's palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance. Adapt it; do not copy it verbatim.
 - **`rescale`** — scale layers with their text sizes, stroke weights, radii, effects, and spacing, as the Scale tool (K) does, around an `anchor` of their joint bounds; locked layers and layers inside instances come back in `skipped`; `node_resize` changes only the box.
@@ -377,6 +397,7 @@ Use the `render` tool for JSX strings. Use only the APIs exposed by the installe
 - Use `tree --depth 2` or `query_nodes` to avoid overwhelming output on large files.
 - Export specific nodes with `--node` for faster visual checks.
 - Use `export_image` after changes to verify visual quality.
+- Use `check_responsive { id, widths }` to lay out a copy of a frame at phone, tablet, and desktop widths: it returns one render per width and the text overflow, layers outside the frame, and overlapping siblings found there, without touching the document.
 - The running editor shows each MCP session as an agent at the layers its tools touch, and follows it while it works when the user has Follow agents on. Leave the user's selection and view alone unless they ask to be shown something.
 - Use `analyze colors --similar` to find near-duplicate colors.
 - Use `pairdraw tool call` for MCP tools without a dedicated CLI command, and `eval` for Figma Plugin API operations not covered by any tool.

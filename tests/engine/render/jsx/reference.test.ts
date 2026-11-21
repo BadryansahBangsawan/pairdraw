@@ -5,7 +5,7 @@ import { CODEGEN_PROMPT as BARREL_CODEGEN, CODEGEN_PROMPT } from '@pairdraw/core
 import { AUTHORING_EXAMPLES, JSX_REFERENCE } from '@pairdraw/design-jsx'
 import { pixelLength } from '@pairdraw/scene-graph/text'
 
-import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
+import { systemPrompt } from '@/app/ai/chat/system-prompt'
 
 import { getNodeOrThrow } from '#tests/helpers/assert'
 import { makeSceneGraph } from '#tests/helpers/scene'
@@ -88,7 +88,7 @@ test('shared bound example retains bindings and resolves the initial inherited m
 test('public exports and runtime prompts use the same authoring reference', () => {
   expect(BARREL_CODEGEN).toBe(CODEGEN_PROMPT)
   expect(CODEGEN_PROMPT).toContain(JSX_REFERENCE)
-  expect(SYSTEM_PROMPT).toContain(JSX_REFERENCE)
+  expect(systemPrompt()).toContain(JSX_REFERENCE)
   expect(CODEGEN_PROMPT.split(JSX_REFERENCE)).toHaveLength(2)
-  expect(SYSTEM_PROMPT.split(JSX_REFERENCE)).toHaveLength(2)
+  expect(systemPrompt().split(JSX_REFERENCE)).toHaveLength(2)
 })

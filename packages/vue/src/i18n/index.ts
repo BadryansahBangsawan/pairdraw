@@ -6,6 +6,7 @@ export {
   useAutomationMessages,
   useBrowserMessages,
   useChatContextMessages,
+  useChatUsageMessages,
   useCodeMessages,
   useCollaborationMessages,
   useCommandMessages,
@@ -13,6 +14,7 @@ export {
   useCommonMessages,
   useCredentialMessages,
   useDesignCheckMessages,
+  useDesignMemoryMessages,
   useDiagnosticsMessages,
   useEditorMessages,
   useExploreMessages,
@@ -37,7 +39,8 @@ export {
   useCloudMessages,
   useCloudPortalMessages,
   useVariableMessages,
-  useVariableTypeMessages
+  useVariableTypeMessages,
+  useVariationMessages
 } from '#vue/i18n/useI18n'
 export { i18n } from '#vue/i18n/create'
 export {

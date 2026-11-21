@@ -30,6 +30,7 @@ export const cloneNode = defineTool({
 
   description: 'Clone (duplicate) a node.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Node ID to clone'))
   }),

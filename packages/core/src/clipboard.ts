@@ -145,6 +145,7 @@ async function writeFigmaClipboardHTML(
   const blobs: Uint8Array[] = []
   const variableIds = new Map<string, GUID>()
   const modeIds = new Map<string, GUID>()
+  const propertyIdToGuid = new Map<string, GUID>()
   assignVariableGuids(
     graph,
     localIdCounter,
@@ -169,6 +170,7 @@ async function writeFigmaClipboardHTML(
         varIdToGuid: variableIds,
         assignedGuidValues,
         modeIdToGuid: modeIds,
+        propertyIdToGuid,
         slotContentRecords,
         runtime
       })
@@ -183,16 +185,26 @@ async function writeFigmaClipboardHTML(
   }
   for (const node of nodes) mark(node)
   const visitDependencies = (node: SceneNode): void => {
-    if (
-      node.type === 'INSTANCE' &&
-      node.componentId &&
-      !selected.has(node.componentId) &&
-      !dependencies.has(node.componentId)
-    ) {
-      const component = graph.getNode(node.componentId)
-      if (!component) throw new Error(`Missing clipboard component ${node.componentId}`)
-      dependencies.set(component.id, component)
-      visitDependencies(component)
+    if (node.type === 'INSTANCE' && node.componentId) {
+      // A nested instance's copy points at the component's own nested instance, not at a main
+      // component; follow the chain to the component it draws, as the export's symbolID does.
+      let componentId = node.componentId
+      const seen = new Set<string>()
+      let component = graph.getNode(componentId)
+      while (component?.type === 'INSTANCE' && component.componentId && !seen.has(component.id)) {
+        seen.add(component.id)
+        componentId = component.componentId
+        component = graph.getNode(componentId)
+      }
+      if (
+        component &&
+        (component.type === 'COMPONENT' || component.type === 'COMPONENT_SET') &&
+        !selected.has(component.id) &&
+        !dependencies.has(component.id)
+      ) {
+        dependencies.set(component.id, component)
+        visitDependencies(component)
+      }
     }
     for (const child of graph.getChildren(node.id)) visitDependencies(child)
   }
@@ -218,6 +230,7 @@ async function writeFigmaClipboardHTML(
         varIdToGuid: variableIds,
         assignedGuidValues,
         modeIdToGuid: modeIds,
+        propertyIdToGuid,
         slotContentRecords,
         runtime
       })

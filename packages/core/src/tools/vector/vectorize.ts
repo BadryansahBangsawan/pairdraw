@@ -40,6 +40,7 @@ export const vectorizeImage = defineTool({
   description:
     'Convert the image a layer shows (its topmost visible image fill, on a layer of any kind) into editable vector paths with the vectorize service the user set up in Settings. The original layer stays; the paths go in a new frame beside it, whose id is returned. It sends the image to that service with the user’s own key and can take a few minutes, so call it only when the user asks for vectors from an image.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     id: v.pipe(nodeIdInputSchema, v.description('Layer whose image fill to vectorize'))

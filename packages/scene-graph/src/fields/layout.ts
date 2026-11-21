@@ -24,6 +24,16 @@ export const AUTO_LAYOUT_FIELDS = [
   'gridRowGap'
 ] as const satisfies readonly (keyof SceneNode)[]
 
+/** How a layer sits in its parent: its constraints and its place in an auto layout or grid. */
+export const PARENT_LAYOUT_FIELDS = [
+  'horizontalConstraint',
+  'verticalConstraint',
+  'layoutPositioning',
+  'layoutGrow',
+  'layoutAlignSelf',
+  'gridPosition'
+] as const satisfies readonly (keyof SceneNode)[]
+
 /** Size limits a layer keeps however it is resized. */
 export const SIZE_CONSTRAINT_FIELDS = [
   'minWidth',

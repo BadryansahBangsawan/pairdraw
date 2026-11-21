@@ -122,8 +122,11 @@ type SlotSurfaceMatch = Expect<
 >
 const _slotSurfaceMatch: SlotSurfaceMatch = true
 
-// `Effect` here is Figma's plugin-typings union; Pairdraw reads and writes a subset of it.
-type EffectShapeMatch = Expect<Extends<FigmaNodeProxy['effects'][number], Effect>>
+// `Effect` here is Figma's plugin-typings union; Pairdraw reads and writes a subset of it. A noise
+// or texture reads back as live Figma returns it (desktop 126), without the blend mode and colour
+// its typings declare and its plugin API refuses for a noise.
+type ReadEffect = Exclude<FigmaNodeProxy['effects'][number], { type: 'NOISE' | 'TEXTURE' }>
+type EffectShapeMatch = Expect<Extends<ReadEffect, Effect>>
 const _effectShapeMatch: EffectShapeMatch = true
 
 // `Paint` here is Figma's plugin-typings union. `fills`, `strokes`, and `backgrounds` share one

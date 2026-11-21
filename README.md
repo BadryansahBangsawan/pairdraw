@@ -193,9 +193,9 @@ Pairdraw has no live peer-to-peer rooms: local documents have no Share link, and
 
 ## Why
 
-Figma is a closed platform that resists programmatic access: its MCP server is read-only, and automation outside the Plugin API breaks when it ships a point release. Your design files are in a proprietary binary format that only its software can fully read.
+Figma is a closed platform that resists programmatic access: its MCP server still only offers a beta that writes to the canvas through `use_figma`, and automation outside the Plugin API breaks when it ships a point release. Your design files are in a proprietary binary format that only its software can fully read.
 
-Pairdraw is the alternative: open source (MIT), local-first, reads .fig files natively, and every operation is scriptable.
+Pairdraw is the alternative: open source (MIT), local-first, no seat or usage-based billing, works with any agent, reads `.fig` files natively, and every operation is scriptable — on files you own.
 
 See the [roadmap](packages/docs/development/roadmap.md) for product direction and current Figma compatibility gaps.
 

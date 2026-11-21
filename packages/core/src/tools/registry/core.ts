@@ -1,4 +1,5 @@
 import { diffChanges, diffCreate, diffVisual, evalCode } from '#core/tools/analyze'
+import { checkResponsive } from '#core/tools/analyze/responsive'
 import { calc } from '#core/tools/calc'
 import { render } from '#core/tools/create'
 import { describe } from '#core/tools/describe'
@@ -19,7 +20,7 @@ import { batchUpdate, deleteNode, nodeResize, reparentNode } from '#core/tools/s
 import { viewportZoomToFit } from '#core/tools/vector'
 
 /**
- * Core tools registered by default in AI chat (26 tools, ~5K schema tokens).
+ * Core tools registered by default in AI chat (27 tools, ~5K schema tokens).
  * Covers 90%+ of design sessions: render, describe, modify, structure, and diff checks.
  */
 export const CORE_TOOLS: ToolDef[] = [
@@ -52,6 +53,7 @@ export const CORE_TOOLS: ToolDef[] = [
   diffCreate,
   diffJSX,
   diffVisual,
+  checkResponsive,
   calc,
   evalCode,
   viewportZoomToFit

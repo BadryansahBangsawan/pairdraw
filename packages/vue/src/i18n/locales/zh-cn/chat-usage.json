@@ -1,0 +1,16 @@
+{
+  "usageLabel": "令牌用量",
+  "turnTokens": "{tokens} 个令牌",
+  "turnTokensCost": "{tokens} 个令牌 · {cost}",
+  "chatTokens": "本聊天共 {tokens} 个令牌",
+  "chatTokensCost": "本聊天共 {tokens} 个令牌 · {cost}",
+  "usageInput": "输入",
+  "usageCachedInput": "缓存输入",
+  "usageOutput": "输出",
+  "usageReasoning": "推理",
+  "usageCost": "估算费用",
+  "usageTurns": "{count} 条回复",
+  "usageHint": "根据每条回复报告的令牌统计。费用是按模型标价估算的。",
+  "usageNoCost": "此模型未列出价格，因此仅显示令牌数。",
+  "usageAgentHint": "根据代理报告的令牌统计。编码代理没有美元价格。"
+}

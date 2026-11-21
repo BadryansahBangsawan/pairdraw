@@ -1,0 +1,18 @@
+{
+  "variations": "Variationen",
+  "variationsCount": "Variationen · {count}",
+  "variationsOf": "Variationen von {name}",
+  "previousVersion": "Vorherige Version",
+  "nextVersion": "Nächste Version",
+  "useThis": "Diese verwenden",
+  "useThisHint": "{name} durch diese Version ersetzen",
+  "selectVersion": "Wähle eine Version aus, um sie zu verwenden",
+  "goToOriginal": "Zum Original",
+  "discardAll": "Alle verwerfen",
+  "originalChanged": "Das Original hat sich geändert, seit diese erstellt wurden.",
+  "originalMissing": "Das Original ist nicht mehr da, daher kann keine Version es ersetzen.",
+  "originalInInstance": "Das Original liegt in einer Instanz, daher kann keine Version es ersetzen.",
+  "originalLocked": "Das Original ist gesperrt. Entsperre es, um eine Version zu verwenden.",
+  "originalNotEditable": "Das Original gehört zu einer Bibliothek, daher kann hier keine Version es ersetzen.",
+  "versionTypeDiffers": "Diese Version ist eine andere Art von Ebene als das Original und kann es daher nicht ersetzen."
+}

@@ -10,7 +10,9 @@ const database = createPostgresCloudDatabase({
   statementTimeoutMs: null
 })
 try {
-  const auth = createBetterAuthAdapter(config, database)
+  // The migration is what brings the schema up to date, so the adapter must not check it first:
+  // on a fresh database that check logs every auth table as missing.
+  const auth = createBetterAuthAdapter(config, database, undefined, { validateSchema: false })
   await migrateCloudDatabase(database, { run: auth.migrate, schemaVersion: auth.schemaVersion })
 } finally {
   await database.destroy()

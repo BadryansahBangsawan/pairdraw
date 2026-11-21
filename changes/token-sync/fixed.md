@@ -1,0 +1,1 @@
+- A watched stylesheet that changes no longer overwrites variable values edited on the canvas: only values changed in the file alone come in, as one undo step, and the rest wait for review.

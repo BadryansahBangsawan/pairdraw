@@ -1,11 +1,13 @@
 import type { Canvas, ImageFilter, MaskFilter, Path } from 'canvaskit-wasm'
 
 import { readEffectiveFigmaRawField } from '@pairdraw/fig'
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { NoiseEffect, SceneNode } from '@pairdraw/scene-graph'
+import { UNSET_NOISE } from '@pairdraw/scene-graph/constants'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { BLACK } from '#core/constants'
 
+import { renderFigmaNoiseEffects } from './noise/render'
 import type { SkiaRenderer } from './renderer'
 
 /**
@@ -87,8 +89,6 @@ export function applyClippedBlur(
   canvas.restore()
 }
 
-const MAX_RAW_NOISE_CELLS = 12_000
-
 interface RawNoiseEffect {
   type: 'NOISE'
   visible?: boolean
@@ -115,59 +115,56 @@ function rawNoiseEffects(node: SceneNode): RawNoiseEffect[] {
 }
 
 /**
- * Whether a node carries an effect a reduced-effects canvas leaves out, so a picture recorded on
- * one would not match an export.
+ * A layer's noise effects: the raw ones an imported file wrote, converted to the grain the scene
+ * graph models, or the modeled ones a layer created here carries. A grain's `seed` picks its
+ * pattern.
  */
+function noiseEffectsFor(node: SceneNode): NoiseEffect[] {
+  const raw = rawNoiseEffects(node)
+  if (raw.length > 0) return raw.map(noiseFromRaw)
+  return node.effects.flatMap((effect): NoiseEffect[] => {
+    if (!effect.visible || effect.type !== 'NOISE') return []
+    return [effect]
+  })
+}
+
+/** A raw `.fig` noise record as the grain the scene graph models. */
+function noiseFromRaw(effect: RawNoiseEffect): NoiseEffect {
+  return {
+    type: 'NOISE',
+    color: effect.color ?? BLACK,
+    visible: true,
+    noise: {
+      noiseType: effect.noiseType ?? UNSET_NOISE.noiseType,
+      noiseSize: effect.noiseSize ?? UNSET_NOISE.noiseSize,
+      density: effect.density ?? UNSET_NOISE.density,
+      secondaryColor: effect.secondaryColor,
+      opacity: effect.opacity
+    }
+  }
+}
+
+/** Whether a node carries an effect a reduced-effects canvas leaves out, so a picture recorded on
+ * one would not match an export. */
 export function hasReducibleEffects(node: SceneNode): boolean {
   return (
-    node.effects.some((effect) => effect.visible && effect.type === 'BACKGROUND_BLUR') ||
-    rawNoiseEffects(node).length > 0
+    node.effects.some(
+      (effect) => effect.visible && (effect.type === 'BACKGROUND_BLUR' || effect.type === 'NOISE')
+    ) || rawNoiseEffects(node).length > 0
   )
 }
 
-function seededNoise(seed: number): number {
-  const x = Math.sin(seed * 12.9898) * 43758.5453
-  return x - Math.floor(x)
-}
-
-function renderNoiseEffect(
-  r: SkiaRenderer,
-  canvas: Canvas,
-  node: SceneNode,
-  effect: RawNoiseEffect
-): void {
-  const density = Math.max(0, Math.min(1, effect.density ?? 0.3))
-  const requestedStep = Math.max(2, Math.round((effect.noiseSize?.x ?? 0.5) * 8))
-  const boundedStep = Math.ceil(Math.sqrt((node.width * node.height) / MAX_RAW_NOISE_CELLS))
-  const step = Math.max(requestedStep, boundedStep)
-  const color = effect.color ?? BLACK
-  const opacity = effect.opacity ?? color.a
-  const paint = new r.ck.Paint()
-  try {
-    paint.setAntiAlias(false)
-    canvas.save()
-    r.clipNodeShape(canvas, node)
-    for (let y = 0; y < node.height; y += step) {
-      for (let x = 0; x < node.width; x += step) {
-        const value = seededNoise((x + 1) * 73856093 + (y + 1) * 19349663)
-        if (value > density) continue
-        const alpha = Math.max(0, Math.min(1, opacity * (0.35 + value * 0.65)))
-        paint.setColor(r.ck.Color4f(color.r, color.g, color.b, alpha))
-        canvas.drawRect(
-          r.ck.LTRBRect(x, y, Math.min(node.width, x + 1), Math.min(node.height, y + 1)),
-          paint
-        )
-      }
-    }
-    canvas.restore()
-  } finally {
-    paint.delete()
-  }
-}
-
-/** Draws the raw Figma noise effects a node carries, which the scene graph does not model. */
+/**
+ * Draws a layer's noise effects: raw records from an imported file or the grains a layer created
+ * here carries, through Figma's statistics over cached tiles. The layer's shape clips the grain;
+ * whether the content covers each pixel is not measured, so a frame's grain shows across its box.
+ */
 export function renderNoiseEffects(r: SkiaRenderer, canvas: Canvas, node: SceneNode): void {
-  for (const effect of rawNoiseEffects(node)) {
-    renderNoiseEffect(r, canvas, node, effect)
-  }
+  renderFigmaNoiseEffects(
+    r,
+    canvas,
+    node,
+    (target) => r.clipNodeShape(target, node),
+    noiseEffectsFor(node)
+  )
 }

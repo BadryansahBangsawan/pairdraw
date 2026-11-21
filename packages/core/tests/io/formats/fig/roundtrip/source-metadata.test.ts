@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
+import { collectAllNodes } from '#core-tests/helpers/fig/traversal'
+
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { effectiveFigmaRawNodeFields, parseFigBuffer } from '@pairdraw/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
@@ -48,33 +50,51 @@ describe('fig roundtrip source metadata', () => {
     if (!root) return
 
     root.source.format = 'fig'
-    root.source.fig.rawNodeFields.strokeJoin = 'BEVEL'
-    root.source.fig.rawNodeFields.strokeWeight = 0
+    root.source.fig.rawNodeFields = {
+      ...root.source.fig.rawNodeFields,
+      strokeJoin: 'BEVEL'
+    }
+    root.source.fig.rawNodeFields = {
+      ...root.source.fig.rawNodeFields,
+      strokeWeight: 0
+    }
 
     page.source.format = 'fig'
     page.source.id = '4:463'
     page.source.orderKey = '~"'
-    page.source.fig.rawNodeFields.backgroundColor = {
-      r: 0.9750000238418579,
-      g: 0.9750000238418579,
-      b: 0.9750000238418579,
-      a: 1
-    }
-    page.source.fig.rawNodeFields.backgroundPaints = [
-      {
-        type: 'SOLID',
-        color: { r: 0.5, g: 0.75, b: 1, a: 1 },
-        opacity: 1,
-        visible: true,
-        blendMode: 'NORMAL'
+    page.source.fig.rawNodeFields = {
+      ...page.source.fig.rawNodeFields,
+      backgroundColor: {
+        r: 0.9750000238418579,
+        g: 0.9750000238418579,
+        b: 0.9750000238418579,
+        a: 1
       }
-    ]
+    }
+    page.source.fig.rawNodeFields = {
+      ...page.source.fig.rawNodeFields,
+      backgroundPaints: [
+        {
+          type: 'SOLID',
+          color: { r: 0.5, g: 0.75, b: 1, a: 1 },
+          opacity: 1,
+          visible: true,
+          blendMode: 'NORMAL'
+        }
+      ]
+    }
     page.guides = [
       { id: 'x', axis: 'x', position: 42 },
       { id: 'y', axis: 'y', position: 84 }
     ]
-    page.source.fig.rawNodeFields.strokeJoin = 'BEVEL'
-    page.source.fig.rawNodeFields.strokeWeight = 0
+    page.source.fig.rawNodeFields = {
+      ...page.source.fig.rawNodeFields,
+      strokeJoin: 'BEVEL'
+    }
+    page.source.fig.rawNodeFields = {
+      ...page.source.fig.rawNodeFields,
+      strokeWeight: 0
+    }
 
     const first = graph.createNode('COMPONENT', page.id, { name: 'icon/accessibility' })
     first.source.format = 'fig'
@@ -142,15 +162,18 @@ describe('fig roundtrip source metadata', () => {
     rect.source.id = '4:500'
     rect.source.fig.rawSize = { x: 80, y: 40 }
     rect.source.fig.rawTransform = { m00: 1, m01: 0, m02: 1, m10: 0, m11: 1, m12: 2 }
-    rect.source.fig.rawNodeFields.fillPaints = [
-      {
-        type: 'SOLID',
-        color: { r: 1, g: 0, b: 0, a: 1 },
-        opacity: 1,
-        visible: true,
-        blendMode: 'NORMAL'
-      }
-    ]
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      fillPaints: [
+        {
+          type: 'SOLID',
+          color: { r: 1, g: 0, b: 0, a: 1 },
+          opacity: 1,
+          visible: true,
+          blendMode: 'NORMAL'
+        }
+      ]
+    }
 
     graph.updateNode(rect.id, {
       x: 30,
@@ -227,9 +250,15 @@ describe('fig roundtrip source metadata', () => {
     const frame = graph.createNode('FRAME', page.id, { name: 'Cleared constraints' })
     frame.source.format = 'fig'
     frame.source.id = '4:501'
-    frame.source.fig.rawNodeFields.minSize = { value: { x: 120, y: 80 } }
-    frame.source.fig.rawNodeFields.maxSize = {
-      value: { x: 500, y: Number.POSITIVE_INFINITY }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      minSize: { value: { x: 120, y: 80 } }
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      maxSize: {
+        value: { x: 500, y: Number.POSITIVE_INFINITY }
+      }
     }
 
     const decoded = decodeExport(await exportFigFile(graph))
@@ -254,26 +283,59 @@ describe('fig roundtrip source metadata', () => {
     })
     text.source.format = 'fig'
     text.source.id = '4:502'
-    text.source.fig.rawNodeFields.leadingTrim = 'CAP_HEIGHT'
-    text.source.fig.rawNodeFields.textDecorationStyle = 'WAVY'
-    text.source.fig.rawNodeFields.textDecorationFillPaints = [
-      {
-        type: 'PATTERN',
-        color: { r: 1, g: 0, b: 0, a: 1 },
-        opacity: 1,
-        sourceNodeId: { sessionID: 4, localID: 900 }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      leadingTrim: 'CAP_HEIGHT'
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      textDecorationStyle: 'WAVY'
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      textDecorationFillPaints: [
+        {
+          type: 'PATTERN',
+          color: { r: 1, g: 0, b: 0, a: 1 },
+          opacity: 1,
+          sourceNodeId: { sessionID: 4, localID: 900 }
+        }
+      ]
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      textUnderlineOffset: { value: 2, units: 'PIXELS' }
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      textDecorationThickness: { value: 1.5, units: 'PIXELS' }
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      toggledOnOTFeatures: ['DLIG']
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      toggledOffOTFeatures: ['LIGA']
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      semanticWeight: 'BOLD'
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      semanticItalic: 'ITALIC'
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      emojiImageSet: 'NOTO'
+    }
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      derivedTextData: {
+        layoutSize: { x: 80, y: 20 },
+        derivedLines: [{ directionality: 'LTR' }]
       }
-    ]
-    text.source.fig.rawNodeFields.textUnderlineOffset = { value: 2, units: 'PIXELS' }
-    text.source.fig.rawNodeFields.textDecorationThickness = { value: 1.5, units: 'PIXELS' }
-    text.source.fig.rawNodeFields.toggledOnOTFeatures = ['DLIG']
-    text.source.fig.rawNodeFields.toggledOffOTFeatures = ['LIGA']
-    text.source.fig.rawNodeFields.semanticWeight = 'BOLD'
-    text.source.fig.rawNodeFields.semanticItalic = 'ITALIC'
-    text.source.fig.rawNodeFields.emojiImageSet = 'NOTO'
-    text.source.fig.rawNodeFields.derivedTextData = {
-      layoutSize: { x: 80, y: 20 },
-      derivedLines: [{ directionality: 'LTR' }]
     }
 
     const decoded = decodeExport(await exportFigFile(graph))
@@ -302,30 +364,42 @@ describe('fig roundtrip source metadata', () => {
     const frame = graph.createNode('FRAME', page.id, { name: 'Imported metadata frame' })
     frame.source.format = 'fig'
     frame.source.id = '4:505'
-    frame.source.fig.rawNodeFields.layoutGrids = [
-      {
-        type: 'MIN',
-        axis: 'X',
-        visible: true,
-        numSections: 12,
-        offset: 16,
-        sectionSize: 64,
-        gutterSize: 24,
-        color: { r: 1, g: 0, b: 0, a: 0.1 },
-        pattern: 'STRIPES'
-      }
-    ]
-    frame.source.fig.rawNodeFields.exportSettings = [
-      {
-        suffix: '@2x',
-        imageType: 'PNG',
-        constraint: { type: 'CONTENT_SCALE', value: 2 },
-        contentsOnly: true,
-        useAbsoluteBounds: false
-      }
-    ]
-    frame.source.fig.rawNodeFields.prototypeStartNodeID = { sessionID: 4, localID: 900 }
-    frame.source.fig.rawNodeFields.transitionInfo = { type: 'DISSOLVE', duration: 0.2 }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      layoutGrids: [
+        {
+          type: 'MIN',
+          axis: 'X',
+          visible: true,
+          numSections: 12,
+          offset: 16,
+          sectionSize: 64,
+          gutterSize: 24,
+          color: { r: 1, g: 0, b: 0, a: 0.1 },
+          pattern: 'STRIPES'
+        }
+      ]
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      exportSettings: [
+        {
+          suffix: '@2x',
+          imageType: 'PNG',
+          constraint: { type: 'CONTENT_SCALE', value: 2 },
+          contentsOnly: true,
+          useAbsoluteBounds: false
+        }
+      ]
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      prototypeStartNodeID: { sessionID: 4, localID: 900 }
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      transitionInfo: { type: 'DISSOLVE', duration: 0.2 }
+    }
 
     const decoded = decodeExport(await exportFigFile(graph))
     const exported = decoded.nodeChanges.find(
@@ -347,10 +421,22 @@ describe('fig roundtrip source metadata', () => {
     const frame = graph.createNode('FRAME', page.id, { name: 'Edited metadata frame' })
     frame.source.format = 'fig'
     frame.source.id = '4:506'
-    frame.source.fig.rawNodeFields.fillPaints = [{ type: 'SOLID' }]
-    frame.source.fig.rawNodeFields.layoutGrids = [{ type: 'MIN', axis: 'X', visible: true }]
-    frame.source.fig.rawNodeFields.exportSettings = [{ suffix: '@2x' }]
-    frame.source.fig.rawNodeFields.prototypeInteractions = [{ trigger: 'ON_CLICK' }]
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      fillPaints: [{ type: 'SOLID' }]
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      layoutGrids: [{ type: 'MIN', axis: 'X', visible: true }]
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      exportSettings: [{ suffix: '@2x' }]
+    }
+    frame.source.fig.rawNodeFields = {
+      ...frame.source.fig.rawNodeFields,
+      prototypeInteractions: [{ trigger: 'ON_CLICK' }]
+    }
 
     graph.updateNode(frame.id, {
       fills: [
@@ -389,30 +475,28 @@ describe('fig roundtrip source metadata', () => {
     })
     rect.source.format = 'fig'
     rect.source.id = '4:503'
-    rect.source.fig.rawNodeFields.effects = [
-      {
-        type: 'NOISE',
-        visible: true,
-        offset: { x: 0, y: 0 },
-        radius: 0,
-        spread: 0,
-        noiseSize: { x: 0.5, y: 0.5 },
-        noiseType: 'MONOTONE',
-        color: { r: 0, g: 0, b: 0, a: 1 },
-        density: 0.4
-      }
-    ]
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      effects: [
+        {
+          type: 'REPEAT',
+          visible: true,
+          offset: { x: 0, y: 0 },
+          radius: 3,
+          spread: 0,
+          color: { r: 0, g: 0, b: 0, a: 1 }
+        }
+      ]
+    }
 
     const decoded = decodeExport(await exportFigFile(graph))
     const exported = decoded.nodeChanges.find(
       (nodeChange) => nodeChange.guid && guidToString(nodeChange.guid) === '4:503'
     )
 
-    const noise = exported?.effects?.[0] as RawNoiseEffect | undefined
-    expect(noise?.type).toBe('NOISE')
-    expect(noise?.noiseType).toBe('MONOTONE')
-    expect(noise?.noiseSize).toEqual({ x: 0.5, y: 0.5 })
-    expect(noise?.density).toBeCloseTo(0.4)
+    const repeat = exported?.effects?.[0] as { type?: string; radius?: number } | undefined
+    expect(repeat?.type).toBe('REPEAT')
+    expect(repeat?.radius).toBe(3)
   })
 
   test('ignores raw unsupported effects when normalized effects are edited', () => {
@@ -421,19 +505,19 @@ describe('fig roundtrip source metadata', () => {
     const rect = graph.createNode('RECTANGLE', page.id, { name: 'Edited effect metadata' })
     rect.source.format = 'fig'
     rect.source.id = '4:504'
-    rect.source.fig.rawNodeFields.effects = [
-      {
-        type: 'NOISE',
-        visible: true,
-        offset: { x: 0, y: 0 },
-        radius: 0,
-        spread: 0,
-        noiseSize: { x: 0.5, y: 0.5 },
-        noiseType: 'MONOTONE',
-        color: { r: 0, g: 0, b: 0, a: 1 },
-        density: 0.4
-      }
-    ]
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      effects: [
+        {
+          type: 'REPEAT',
+          visible: true,
+          offset: { x: 0, y: 0 },
+          radius: 3,
+          spread: 0,
+          color: { r: 0, g: 0, b: 0, a: 1 }
+        }
+      ]
+    }
 
     graph.updateNode(rect.id, {
       effects: [
@@ -452,14 +536,79 @@ describe('fig roundtrip source metadata', () => {
     expect(rect.source.fig.rawNodeFields.effects).toBeDefined()
   })
 
+  test('models an imported noise effect, so an edit writes its grain', async () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const rect = graph.createNode('RECTANGLE', page.id, {
+      name: 'Noise modelled',
+      effects: [
+        {
+          type: 'NOISE',
+          color: { r: 0, g: 0, b: 0, a: 0.25 },
+          visible: true,
+          noise: { noiseType: 'MONOTONE', noiseSize: { x: 0.5, y: 0.5 }, density: 0.4 }
+        }
+      ]
+    })
+    rect.source.format = 'fig'
+    rect.source.id = '4:505'
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      effects: [
+        {
+          type: 'NOISE',
+          visible: true,
+          offset: { x: 0, y: 0 },
+          radius: 0,
+          spread: 0,
+          noiseSize: { x: 0.5, y: 0.5 },
+          noiseType: 'MONOTONE',
+          color: { r: 0, g: 0, b: 0, a: 1 },
+          density: 0.4
+        }
+      ]
+    }
+
+    graph.updateNode(rect.id, {
+      effects: [
+        {
+          type: 'NOISE',
+          color: { r: 0, g: 0, b: 0, a: 0.25 },
+          visible: true,
+          noise: { noiseType: 'MONOTONE', noiseSize: { x: 0.5, y: 0.5 }, density: 0.75 }
+        }
+      ]
+    })
+
+    const bytes = await exportFigFile(graph)
+    const exported = decodeExport(bytes).nodeChanges.find(
+      (nodeChange) => nodeChange.guid && guidToString(nodeChange.guid) === '4:505'
+    )
+    const noise = exported?.effects?.[0] as RawNoiseEffect | undefined
+    expect(noise?.type).toBe('NOISE')
+    expect(noise?.density).toBeCloseTo(0.75)
+
+    const restored = await parseFigFile(bytes.buffer as ArrayBuffer)
+    const reopened = collectAllNodes(restored).find((candidate) => candidate.name === 'Noise modelled')
+    expect(reopened?.effects).toMatchObject([
+      { type: 'NOISE', noise: { noiseType: 'MONOTONE', density: 0.75 } }
+    ])
+  })
+
   test('ignores raw geometry payloads when independent stroke weights are edited', () => {
     const graph = new SceneGraph()
     const page = graph.getPages()[0]
     const rect = graph.createNode('RECTANGLE', page.id, { name: 'Independent stroke metadata' })
     rect.source.format = 'fig'
     rect.source.id = '4:507'
-    rect.source.fig.rawNodeFields.fillGeometry = [{ windingRule: 'NONZERO', commands: [] }]
-    rect.source.fig.rawNodeFields.strokeGeometry = [{ windingRule: 'NONZERO', commands: [] }]
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      fillGeometry: [{ windingRule: 'NONZERO', commands: [] }]
+    }
+    rect.source.fig.rawNodeFields = {
+      ...rect.source.fig.rawNodeFields,
+      strokeGeometry: [{ windingRule: 'NONZERO', commands: [] }]
+    }
 
     graph.updateNode(rect.id, {
       independentStrokeWeights: true,
@@ -485,7 +634,10 @@ describe('fig roundtrip source metadata', () => {
     })
     text.source.format = 'fig'
     text.source.id = '4:501'
-    text.source.fig.rawNodeFields.fontVariations = [{ axisName: 'wght', value: 900 }]
+    text.source.fig.rawNodeFields = {
+      ...text.source.fig.rawNodeFields,
+      fontVariations: [{ axisName: 'wght', value: 900 }]
+    }
 
     graph.updateNode(text.id, { fontVariations: [{ axis: 'wght', value: 650 }] })
 
@@ -519,9 +671,12 @@ describe('fig roundtrip source metadata', () => {
     })
     vector.source.format = 'fig'
     vector.source.id = '4:465'
-    vector.source.fig.rawNodeFields.vectorData = {
-      normalizedSize: { x: 0, y: 0 },
-      vectorNetworkBlob: { __pairdrawFigmaBlob: rawVectorBlob }
+    vector.source.fig.rawNodeFields = {
+      ...vector.source.fig.rawNodeFields,
+      vectorData: {
+        normalizedSize: { x: 0, y: 0 },
+        vectorNetworkBlob: { __pairdrawFigmaBlob: rawVectorBlob }
+      }
     }
 
     const decoded = decodeExport(await exportFigFile(graph))

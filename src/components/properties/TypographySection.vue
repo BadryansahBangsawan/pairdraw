@@ -14,6 +14,7 @@ import {
   textLinkTargets,
   textLinkValue
 } from '@/app/editor/links'
+import { featureLabel } from '@/app/editor/tokens/feature-label'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import NumberField from '@/components/inputs/NumberField.vue'
@@ -83,11 +84,13 @@ const truncationOptions = computed(() => [
   { value: 'DISABLED', label: panels.value.truncationDisabled },
   { value: 'ENDING', label: panels.value.truncationEnding }
 ])
-const commonFeatures = computed(() => [
-  { tag: 'LIGA', label: panels.value.standardLigatures },
-  { tag: 'CALT', label: panels.value.contextualAlternates },
-  { tag: 'KERN', label: panels.value.kerning }
-])
+/** The features the selected font has, labelled as Figma names them; read in the template. */
+function featureOptions(available: readonly { tag: string }[]) {
+  return available.map((feature) => ({
+    tag: feature.tag,
+    label: featureLabel(panels.value, feature.tag)
+  }))
+}
 
 /** Empty when the text layers differ, so selects and segmented controls show no choice. */
 function picked<T>(value: MixedValue<T>): T | '' {
@@ -418,15 +421,19 @@ function picked<T>(value: MixedValue<T>): T | '' {
         </PanelFieldGroup>
       </div>
 
-      <div class="grid gap-2.5 border-t border-border pt-3">
+      <div
+        v-if="ctx.availableFeatures.value.length > 0"
+        class="grid gap-2.5 border-t border-border pt-3"
+        data-property="font-features"
+      >
         <label
-          v-for="feature in commonFeatures"
+          v-for="feature in featureOptions(ctx.availableFeatures.value)"
           :key="feature.tag"
           class="flex items-center justify-between gap-1.5 text-[11px] text-muted"
         >
           <span>{{ feature.label }}</span>
           <AppSwitch
-            :model-value="ctx.fontFeature(feature.tag) === true"
+            :model-value="ctx.featureState(feature.tag) === true"
             :label="feature.label"
             :data-property="`font-feature-${feature.tag.toLowerCase()}`"
             @update:model-value="ctx.actions.setFontFeature(feature.tag, $event)"

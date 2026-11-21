@@ -1,6 +1,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import * as v from 'valibot'
+import { toRaw } from 'vue'
 
 import { DEFAULT_SNAPPING_PREFERENCES, type SnappingPreferences } from '@pairdraw/core'
 import { COMMENT_SORTS, type CommentSort } from '@pairdraw/scene-graph/comments'
@@ -76,6 +77,23 @@ export interface NotificationPreferences {
   agentFailed: boolean
 }
 
+/** How the person's Design instructions meet Pairdraw's: added after them, or in their place. */
+export const DESIGN_PROMPT_MODES = ['add', 'replace'] as const
+export type DesignPromptMode = (typeof DESIGN_PROMPT_MODES)[number]
+
+/**
+ * The prompts the person wrote in place of Pairdraw's; null keeps the built-in one. The Design
+ * prompt is plain Markdown, which adds to the built-in instructions or replaces them; the others
+ * are Knap templates (`src/app/ai/prompts/`). No credentials live here: keys stay in the
+ * credential store, and a prompt holds only instructions.
+ */
+export interface PromptPreferences {
+  review: string | null
+  title: string | null
+  summary: string | null
+  design: { mode: DesignPromptMode; text: string }
+}
+
 export interface AppPreferences {
   appearance: { animations: AnimationPreference; accent: AccentPreference }
   chat: {
@@ -92,6 +110,10 @@ export interface AppPreferences {
     animateEdits: boolean
     /** Whether the built-in chat asks before each tool call that changes the document. */
     approveActions: boolean
+    /** Whether a long chat is compacted into a summary before the context fills up. */
+    compactAutomatically: boolean
+    /** Whether the chat shows each reply's token usage and the conversation's running cost. */
+    showTokenUsage: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -132,6 +154,7 @@ export interface AppPreferences {
   onboarding: {
     aiSetup: AISetupState
   }
+  prompts: PromptPreferences
   notifications: NotificationPreferences
 }
 
@@ -148,7 +171,11 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     // Edits play on the canvas unless the app's motion is off; Settings → AI turns them off.
     animateEdits: true,
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
-    approveActions: false
+    approveActions: false,
+    // A long chat summarizes itself before the window fills; Settings → AI turns it off.
+    compactAutomatically: true,
+    // The token and cost meter shows by default; Settings → AI turns it off.
+    showTokenUsage: true
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -172,7 +199,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   },
   toolbar: structuredClone(DEFAULT_TOOLBAR_LAYOUT),
   onboarding: { aiSetup: 'pending' },
-  notifications: { agentNeedsInput: true, agentFinished: false, agentFailed: false }
+  notifications: { agentNeedsInput: true, agentFinished: false, agentFailed: false },
+  prompts: { review: null, title: null, summary: null, design: { mode: 'add', text: '' } }
 }
 
 const STORAGE_KEY = 'pairdraw:preferences:v1'
@@ -223,7 +251,9 @@ const appPreferencesSchema = section(
       columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
       canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
       animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
-      approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
+      approveActions: v.fallback(v.boolean(), defaults.chat.approveActions),
+      compactAutomatically: v.fallback(v.boolean(), defaults.chat.compactAutomatically),
+      showTokenUsage: v.fallback(v.boolean(), defaults.chat.showTokenUsage)
     }),
     files: section({
       recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)
@@ -299,6 +329,15 @@ const appPreferencesSchema = section(
       agentNeedsInput: v.fallback(v.boolean(), defaults.notifications.agentNeedsInput),
       agentFinished: v.fallback(v.boolean(), defaults.notifications.agentFinished),
       agentFailed: v.fallback(v.boolean(), defaults.notifications.agentFailed)
+    }),
+    prompts: section({
+      review: v.fallback(v.nullable(v.string()), null),
+      title: v.fallback(v.nullable(v.string()), null),
+      summary: v.fallback(v.nullable(v.string()), null),
+      design: section({
+        mode: v.fallback(v.picklist(DESIGN_PROMPT_MODES), defaults.prompts.design.mode),
+        text: v.fallback(v.string(), defaults.prompts.design.text)
+      })
     })
   },
   REMOVED_KEYS.root
@@ -346,6 +385,15 @@ export function updateNotificationPreferences(changes: Partial<NotificationPrefe
   appPreferences.value = {
     ...appPreferences.value,
     notifications: { ...appPreferences.value.notifications, ...changes }
+  }
+}
+
+export function updatePromptPreferences(changes: Partial<PromptPreferences>): void {
+  // Raw, so the stored value holds plain objects rather than reactive views of them.
+  const current = toRaw(appPreferences.value)
+  appPreferences.value = {
+    ...current,
+    prompts: { ...current.prompts, design: { ...current.prompts.design }, ...changes }
   }
 }
 

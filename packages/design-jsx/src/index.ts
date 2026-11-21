@@ -63,9 +63,14 @@ export {
   foregroundBlur,
   innerShadow,
   layerBlur,
+  noise,
+  texture,
   type BlurEffectOptions,
   type EffectColor,
-  type ShadowEffectOptions
+  type NoiseEffectOptions,
+  type NoiseSize,
+  type ShadowEffectOptions,
+  type TextureEffectOptions
 } from './effects'
 
 export {

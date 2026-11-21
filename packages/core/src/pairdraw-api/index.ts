@@ -6,8 +6,14 @@ import {
   type BehaviourSpec
 } from '@pairdraw/scene-graph/behaviours'
 import type { OkHCLColor, OkHCLPayload } from '@pairdraw/scene-graph/color'
+import type { DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 import { parseVariableFormula } from '@pairdraw/scene-graph/variables'
 
+import {
+  describeDesignMemory,
+  type DesignMemoryReport,
+  type DesignValueVerdict
+} from '#core/design-memory'
 import { exposeInstanceSwap } from '#core/figma-api/components'
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api/index'
 import { writeVariableValue } from '#core/figma-api/variables'
@@ -29,22 +35,32 @@ import {
   type CommentHandle,
   type NewComment
 } from './comments'
+import { checkProposedDesignValues, recordDesignDecision } from './design-memory'
 import {
   readFillOkHCL,
   readLayoutDirection,
   readStrokeOkHCL,
   readTextDirection,
   writeFillOkHCL,
+  writeFontFeatures,
   writeLayoutDirection,
+  writeRangeFontFeatures,
   writeStrokeOkHCL,
   writeTextDirection
 } from './nodes'
 import { getStatus, listStatuses, setStatus, type StatusInfo } from './statuses'
 import { bindVariable, unbindVariable, type VariableRef } from './variables'
+import {
+  createVariationSet,
+  getVariationSet,
+  listVariationSets,
+  type VariationSetHandle
+} from './variations'
 
 export { BehaviourHandle, type NodeRef } from './behaviours'
 export type { StatusInfo } from './statuses'
 export type { VariableRef } from './variables'
+export { VariationSetHandle, type VariationSetInfo } from './variations'
 export {
   CommentHandle,
   DEFAULT_COMMENT_AUTHOR,
@@ -177,6 +193,56 @@ export class PairdrawAPI {
   }
 
   /**
+   * The document's design memory: the colors, fonts, sizes, spacing and radii agents may use,
+   * whether an off-system value is refused or warned about, the decisions written down, and the
+   * layers pinned as examples. Null when the document has none.
+   */
+  get designMemory(): DesignMemoryReport | null {
+    return describeDesignMemory(this.figma.graph)
+  }
+
+  /**
+   * Judge values before using them, such as `{ colors: ['#FF00AA'], spacing: [13] }`: each comes
+   * back `ok`, `warn`, `refuse` or `invalid`, with the nearest allowed value.
+   */
+  checkDesignValues(
+    proposal: Partial<Record<DesignMemoryGroup, readonly (string | number)[]>>
+  ): DesignValueVerdict[] {
+    return checkProposedDesignValues(this.figma.graph, proposal)
+  }
+
+  /**
+   * Write a decision down in the design memory, optionally pinning a layer that shows it as an
+   * example. The memory's allowed values stay as the person set them.
+   */
+  recordDesignDecision(text: string, example?: NodeRef): { decisions: number; examples: number } {
+    return recordDesignDecision(this.figma.graph, text, example)
+  }
+
+  /**
+   * Copy a layer `count` times (1 to 8) into a section of variations beside it, made the first
+   * time; `labels` name what each version tries, as in `V2 · Calmer palette`. On a version, it
+   * copies that version into its set. The original does not change.
+   */
+  createVariations(
+    node: NodeRef,
+    options: { count: number; labels?: readonly string[] }
+  ): { set: VariationSetHandle; versions: FigmaNodeProxy[] } {
+    const { set, created } = createVariationSet(this.figma, node, options)
+    return { set, versions: created }
+  }
+
+  /** The set of variations a layer belongs to, from its section, a version or a layer inside one. */
+  getVariations(node: NodeRef): VariationSetHandle | null {
+    return getVariationSet(this.figma, node)
+  }
+
+  /** The sets of variations on the current page. */
+  get variations(): VariationSetHandle[] {
+    return listVariationSets(this.figma, this.figma.currentPageId)
+  }
+
+  /**
    * Expose a swap on instances as one INSTANCE_SWAP property, offering the candidate components;
    * returns the layer that holds the property.
    */
@@ -238,5 +304,20 @@ export class PairdrawAPI {
 
   setTextDirection(node: NodeRef, direction: string): void {
     writeTextDirection(this.figma.graph, node, direction)
+  }
+
+  /** Merges OpenType feature toggles into the text's own, keeping the tags it does not name. */
+  setFontFeatures(node: NodeRef, features: Record<string, boolean>): void {
+    writeFontFeatures(this.figma.graph, node, features)
+  }
+
+  /** Merges OpenType feature toggles into a text range's own, keeping its other features. */
+  setRangeFontFeatures(
+    node: NodeRef,
+    start: number,
+    end: number,
+    features: Record<string, boolean>
+  ): void {
+    writeRangeFontFeatures(this.figma.graph, node, start, end, features)
   }
 }

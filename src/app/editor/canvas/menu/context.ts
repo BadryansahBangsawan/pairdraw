@@ -15,6 +15,7 @@ import {
   CANVAS_PROPERTIES_ACTIONS,
   CANVAS_REMOVE_BACKGROUND_TEST_ID,
   CANVAS_REPLACE_BACKGROUND_TEST_ID,
+  CANVAS_EXPLORE_VARIATIONS_TEST_ID,
   CANVAS_RUN_STICKY_PROMPT_TEST_ID,
   CANVAS_VECTORIZE_TEST_ID,
   type CanvasContextActionId,
@@ -38,6 +39,7 @@ type CanvasCopyLabels = {
   pasteProperties: string
   convertToVector: string
   runStickyAsPrompt: string
+  exploreVariations: string
 }
 
 function withoutStaticSelectionCommands(entries: readonly MenuEntry[]): MenuEntry[] {
@@ -164,6 +166,16 @@ export function useCanvasContextMenu(
     }
     const imageAI = imageAIEntry(actions, media.value)
     if (imageAI) entries.push({ separator: true }, imageAI)
+    if (actions.canExploreVariations()) {
+      entries.push(
+        { separator: true },
+        {
+          label: labels.value.exploreVariations,
+          testId: CANVAS_EXPLORE_VARIATIONS_TEST_ID,
+          action: actions.exploreVariations
+        }
+      )
+    }
     if (actions.canRunStickyPrompt()) {
       entries.push(
         { separator: true },

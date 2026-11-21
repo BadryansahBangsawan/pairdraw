@@ -1,0 +1,1 @@
+- A fresh Cloud database no longer logs every Better Auth table as missing while the migration step starts.

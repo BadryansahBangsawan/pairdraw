@@ -31,6 +31,7 @@ import { EMPTY_EXPORT_RUNTIME, type FigNodeChangeExportRuntime } from './export/
 import { applyFontFeaturesToKiwi } from './font/features'
 import { figmaStyleName } from './font/style'
 import { fillToKiwiPaint, safeColor } from './paint'
+import { hasUnmodeledEffects, remapEffectBindingsToRaw } from './plugin-data'
 import { exportTextData, fontVariationToKiwi } from './text/data-export'
 import { figmaLetterSpacing, figmaLineHeight } from './text/values'
 import {
@@ -454,8 +455,16 @@ function serializeVariableBindings(
   varIdToGuid?: Map<string, GUID>
 ): void {
   const entries = exportedVariableConsumptionEntries(node, graph, varIdToGuid)
+  // A record written from its raw effect list keys effect bindings by that list's positions.
+  const rawEffects = effectiveFigmaRawNodeFields(node).effects
+  const bindings = hasUnmodeledEffects(node)
+    ? remapEffectBindingsToRaw(
+        node.boundVariables,
+        Array.isArray(rawEffects) ? rawEffects : undefined
+      )
+    : node.boundVariables
   const roundtripBindings: Record<string, string> = {}
-  for (const [field, varId] of Object.entries(node.boundVariables)) {
+  for (const [field, varId] of Object.entries(bindings)) {
     const variable = graph.variables.get(varId)
     if (!variable) continue
     const varGuid = varIdToGuid?.get(varId) ?? stringToGuid(varId)

@@ -3,7 +3,11 @@ import { onMounted } from 'vue'
 import { useAIMessages } from '@pairdraw/vue/i18n'
 
 import { agentCommands } from '@/app/ai/agents/acp/commands'
-import { commandCandidates, referenceCandidates } from '@/app/ai/chat/references/candidates'
+import {
+  agentCommandCandidates,
+  chatCommandCandidates,
+  referenceCandidates
+} from '@/app/ai/chat/references/candidates'
 import { useAIChat } from '@/app/ai/chat/use'
 import { enabledSkills, refreshSkills } from '@/app/ai/skills/library'
 import { getActiveEditorStoreOrNull } from '@/app/editor/active-store'
@@ -37,8 +41,16 @@ export function useComposerCompletions() {
   return [
     commandCompletion(() => {
       const agentId = acpAgentId()
-      return commandCandidates(
-        agentId ? (agentCommands.value[agentId] ?? []) : null,
+      // `/review` asks the Review model whatever holds the chat, so it stands in for an agent's
+      // own command of that name.
+      const review = { name: 'review', description: ai.value.reviewCommand, hint: null }
+      if (agentId) {
+        const own = (agentCommands.value[agentId] ?? []).filter(({ name }) => name !== review.name)
+        return agentCommandCandidates([review, ...own])
+      }
+      const compact = { name: 'compact', description: ai.value.compactCommand, hint: null }
+      return chatCommandCandidates(
+        [review, compact],
         enabledSkills.value,
         skillMessages.description
       )

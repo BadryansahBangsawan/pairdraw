@@ -28,6 +28,7 @@ import {
   fontFaceRenderFamily,
   type FamilyFace
 } from '#core/text/font/faces'
+import { fontFeatureTags } from '#core/text/font/features'
 import { loadHarfBuzz } from '#core/text/font/harfbuzz'
 import { LocalFonts } from '#core/text/font/local'
 import { sameFontFile, SharedReads, withHarfBuzz } from '#core/text/font/reads'
@@ -82,6 +83,7 @@ export class FontManager {
     ArrayBuffer,
     { axes: FontAxis[]; instances: NamedInstance[] } | null
   >()
+  private featureTags = new WeakMap<ArrayBuffer, string[] | null>()
   private blockedNodeIds = new Set<string>()
   private fontProvider: TypefaceFontProvider | null = null
   private fontProviders = new Set<TypefaceFontProvider>()
@@ -606,6 +608,26 @@ export class FontManager {
       other ??= { data, ...variation }
     }
     return loaded ? other : undefined
+  }
+
+  /**
+   * The OpenType feature tags a family's loaded font has, from its GSUB feature list: `undefined`
+   * when no face of the family is loaded, `null` when its font has no GSUB table, else the tags
+   * (empty when the table lists none). The panel offers a feature only when the font has it.
+   */
+  familyFeatures(family: string): string[] | null | undefined {
+    let loaded = false
+    for (const [key, data] of this.loadedFamilies) {
+      if (!key.startsWith(`${family}|`)) continue
+      loaded = true
+      let tags = this.featureTags.get(data)
+      if (tags === undefined) {
+        tags = fontFeatureTags(data)
+        this.featureTags.set(data, tags)
+      }
+      if (tags !== null) return tags
+    }
+    return loaded ? null : undefined
   }
 
   /** Axis coordinates for `style` when the loaded face is a variable font, otherwise `null`. */

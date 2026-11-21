@@ -16,5 +16,7 @@
   "hand": "Main",
   "comment": "Commentaire",
   "zoom": "Zoom",
-  "scale": "Mettre à l'échelle"
+  "scale": "Mettre à l'échelle",
+  "eyedropper": "Pipette",
+  "eyedropperSample": "Prélever une couleur sur le canevas"
 }

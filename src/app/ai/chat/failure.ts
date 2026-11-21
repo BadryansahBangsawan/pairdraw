@@ -9,6 +9,7 @@ type AIChatFailureReason =
   | 'forbidden'
   | 'insufficient-credit'
   | 'cloud-credits-exhausted'
+  | 'context-limit'
   | 'model-not-found'
   | 'network'
   | 'output-limit'
@@ -83,6 +84,26 @@ export function isInsufficientCreditError(error: unknown): boolean {
   ].some((phrase) => text.includes(phrase))
 }
 
+/**
+ * The request held more than the model reads: HTTP 413, or the code and wording providers give a
+ * prompt past the context window (OpenAI `context_length_exceeded`, Anthropic "prompt is too
+ * long", Gemini's input token count).
+ */
+export function isContextLimitError(error: unknown): boolean {
+  if (providerErrorStatus(error) === 413) return true
+  const body = APICallError.isInstance(error) ? (error.responseBody ?? '') : ''
+  const text = `${normalizedErrorText(error)} ${body.toLowerCase()}`
+  return [
+    'context_length_exceeded',
+    'prompt is too long',
+    'maximum context length',
+    'context window',
+    'input token count',
+    'too many tokens',
+    'request_too_large'
+  ].some((phrase) => text.includes(phrase))
+}
+
 function statusFailureReason(status: number | null): AIChatFailureReason | null {
   if (status === 401) return 'authentication'
   if (status === 402) return 'insufficient-credit'
@@ -107,6 +128,7 @@ function transportFailureReason(error: unknown): AIChatFailureReason | null {
 }
 
 function failureReason(error: unknown): AIChatFailureReason {
+  if (isContextLimitError(error)) return 'context-limit'
   const transportReason = transportFailureReason(error)
   if (transportReason) return transportReason
   const statusReason = statusFailureReason(providerErrorStatus(error))

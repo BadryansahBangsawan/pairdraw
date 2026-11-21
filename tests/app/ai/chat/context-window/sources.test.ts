@@ -94,7 +94,8 @@ describe('what fills the context meter', () => {
         usedTokens: 1500,
         inputTokens: 1200,
         cachedInputTokens: 1000,
-        outputTokens: 300
+        outputTokens: 300,
+        firstRequestTokens: 1200
       })
     } finally {
       store.dispose()

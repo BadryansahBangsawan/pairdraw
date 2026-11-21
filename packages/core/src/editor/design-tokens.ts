@@ -1,4 +1,9 @@
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import {
+  readTokenSources,
+  tokenSourcesPluginData,
+  type TokenSource
+} from '@pairdraw/scene-graph/token-sources'
 
 // Not the format's barrel: the editor always loads this file, and the exporter is loaded on demand.
 import {
@@ -82,5 +87,39 @@ export function createDesignTokenActions(
     })
   }
 
-  return { importDesignTokens }
+  /**
+   * Brings linked code in as one undo step: the imports in order, then the document's links as
+   * `sources` gives them once the imports are applied, so undo takes back both.
+   */
+  function syncDesignTokens(
+    plans: readonly TokenImportPlan[],
+    sources: (graph: SceneGraph) => TokenSource[]
+  ): TokenImportResult[] {
+    return ctx.undo.runBatch('Sync design tokens', () => {
+      const results = plans.map((plan) => applyTokenImport({ ...target, graph: ctx.graph }, plan))
+      writeTokenSources(sources(ctx.graph), 'Sync design tokens')
+      ctx.requestRender()
+      return results
+    })
+  }
+
+  function writeTokenSources(sources: readonly TokenSource[], label: string) {
+    nodes.updateNodeWithUndo(
+      ctx.graph.rootId,
+      { pluginData: tokenSourcesPluginData(ctx.graph, sources) },
+      label
+    )
+  }
+
+  /** Forgets a link to code; the variables it brought in stay. */
+  function unlinkTokenSource(id: string) {
+    const sources = readTokenSources(ctx.graph)
+    if (!sources.some((source) => source.id === id)) return
+    writeTokenSources(
+      sources.filter((source) => source.id !== id),
+      'Unlink code'
+    )
+  }
+
+  return { importDesignTokens, syncDesignTokens, unlinkTokenSource }
 }

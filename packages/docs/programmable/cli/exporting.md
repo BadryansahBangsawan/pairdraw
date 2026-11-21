@@ -1,11 +1,11 @@
 ---
 title: Exporting
-description: Export document content to images, PDF, PowerPoint, draw.io, `.fig`, JSX, HTML, or Storybook stories, with font-substitution policies for raster and PDF output.
+description: Export document content to images, PDF, PowerPoint, draw.io, `.fig`, JSX, HTML, or Storybook stories, record a prototype as a video, with font-substitution policies for raster and PDF output.
 ---
 
 # Exporting
 
-Export designs from the terminal — raster images, vectors, PDF, editable PowerPoint, draw.io diagrams, `.fig` subsets, JSX code, HTML, or Storybook stories.
+Export designs from the terminal — raster images, vectors, PDF, editable PowerPoint, draw.io diagrams, `.fig` subsets, JSX code, HTML, Storybook stories, or a video of a prototype.
 
 The app in Pairdraw builds no longer offers PowerPoint or draw.io export; the CLI still writes both.
 
@@ -26,12 +26,34 @@ pairdraw export design.fig -f html --css tailwind    # export an HTML fragment w
 
 Options:
 
-- `-f` — format: `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook`
+- `-f` — format: `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook`; `mp4`, `gif`, or `webm` record a prototype ([Video Export](#video-export))
 - `-s` — export scale (default: `1`)
 - `-q` — quality: `0`–`100` (JPG/WEBP only)
 - `-o` — output path
 - `--page` — page name, or `--page-id` — page ID
 - `--node` — specific node ID
+
+## Video Export
+
+Record the page's prototype as a video: it plays from a top-level frame, follows each After delay interaction and its Dissolve on a clock of its own rather than in real time, and writes every frame, so the clip is the same on every run.
+
+```sh
+pairdraw export flow.fig -f gif --start "Hero 1"                 # flow.gif beside the file
+pairdraw export flow.fig -f mp4 --start "Hero 1" -o hero.mp4     # needs ffmpeg from a file
+pairdraw export -f mp4 --start "Hero 1" -o hero.mp4              # the running app encodes it
+pairdraw export app.fig -f gif --click 1.5:"Buy button" --click 3:Close
+```
+
+- `--start` — top-level frame name or ID to play from (default: the selected frame, or the page's first frame)
+- `--fps` — frames per second (default: `30`, or `15` for GIF, which plays at most `50`)
+- `-s` — the start frame's size in the video (default: `1`); `--max-edge` — the longest side in pixels (default: `1920`; a GIF is at most `960`)
+- `--max-duration` — seconds the clip may last at most (default: `30`, at most `120`)
+- `--tail` — seconds the last frame stays when the flow ends (default: `1`)
+- `--click` — `<seconds>:<layer name or ID>`, a click on a layer of the frame shown at that moment; repeat it for more clicks
+
+The clip ends when play returns to the start frame (a GIF then loops), when nothing else happens, or at `--max-duration`, and the command prints each step it recorded. A later frame of another shape is centred on the page color; an overlay shows over its frame behind a scrim.
+
+GIF works everywhere. MP4 (H.264) and WebM (VP9) are encoded with WebCodecs by the running app; from a file the CLI encodes them with `ffmpeg` when it is on the path with `libx264` and `libvpx-vp9`, and otherwise says which formats work. Agents record the same video through the MCP `export_video` tool.
 
 ## Font Substitution Policy
 
@@ -151,6 +173,26 @@ pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 It reads a file per mode grouped by folder, a resolver with the files it refers to, or a Tokens Studio file with `$themes`. Collections and modes with existing names, and variables and styles by name, are updated; the rest is added, and nothing is deleted. The result lists what was added, updated, and skipped, with the reason for each skip.
+
+### Checking tokens against code
+
+`--check` compares the variables with a stylesheet or a project folder and lists every token that differs, without changing the document. It exits with status 1 when anything differs, so a CI job can fail when the design and the code drift apart:
+
+```sh
+pairdraw tokens design.fig --check src/app.css
+pairdraw tokens design.fig --check . --json
+```
+
+A folder is read as `--project` reads it: Tailwind v4 `@theme`, shadcn/ui `:root` and `.dark`, and the stylesheet `components.json` names. Each line names the collection, variable, and mode, the value in code and on the canvas, and whether the token changed in code, on the canvas, on both, is new in code, or is gone from code. The `token_drift` tool reports the same for files passed as its arguments.
+
+`--sync` brings the code's changes into the document and remembers the link, with its path from the document's folder, so later checks and syncs know which side changed:
+
+```sh
+pairdraw tokens design.fig --sync src/app.css --write
+pairdraw tokens design.fig --sync src/app.css --conflicts code --write
+```
+
+A value changed only in code, and a token new in code, always comes in. A value also changed on the canvas since the last sync is left as it is and listed, unless `--conflicts code` takes the code's value or `--conflicts canvas` keeps the canvas value. A token gone from code keeps its variable. The `sync_tokens` tool does the same for files passed as its arguments, and the variables dialog's Pull does it for a linked stylesheet, opening a review for the values only a person can decide.
 
 ## Storybook Export
 

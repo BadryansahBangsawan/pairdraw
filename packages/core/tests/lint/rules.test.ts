@@ -295,7 +295,7 @@ describe('color-contrast over layers under the text', () => {
     expect(messages[0]?.data?.background).toBe('#E8ECEB')
   })
 
-  test('applies a layer\'s opacity after compositing its fills', () => {
+  test("applies a layer's opacity after compositing its fills", () => {
     // Black over white at half opacity is mid gray, not each fill at half strength.
     const fills = [...solid(WHITE), ...solid(BLACK)]
     const { graph, text } = card({ fills, opacity: 0.5 }, solid(WHITE))

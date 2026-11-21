@@ -27,19 +27,18 @@ export interface LoadedImports {
   opened: Map<string, OpenedImport>
 }
 
-const UNRESOLVED_REASONS: readonly ReadDocumentWarning['reason'][] = [
-  'no-file-access',
-  'unreadable'
-]
+type UnresolvedReason = Extract<ReadDocumentWarning, { kind: 'unresolved-imports' }>['reason']
+
+const UNRESOLVED_REASONS: readonly UnresolvedReason[] = ['no-file-access', 'unreadable']
 
 /** The imports a document opened without, by why. */
 export class UnresolvedImports {
-  readonly #paths: Record<ReadDocumentWarning['reason'], Set<string>> = {
+  readonly #paths: Record<UnresolvedReason, Set<string>> = {
     'no-file-access': new Set(),
     unreadable: new Set()
   }
 
-  add(reason: ReadDocumentWarning['reason'], path: string): void {
+  add(reason: UnresolvedReason, path: string): void {
     this.#paths[reason].add(path)
   }
 

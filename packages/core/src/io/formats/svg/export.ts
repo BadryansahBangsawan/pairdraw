@@ -8,13 +8,13 @@ import { computeContentBounds } from '#core/io/formats/raster'
 import {
   nextDefId,
   formatSolidColor,
-  createFilterDef,
   resolveFill,
   solidFillOpacity,
   SVG_STROKE_CAP,
   SVG_STROKE_JOIN,
   SVG_BLEND_MODE
 } from './defs'
+import { createFilterDef } from './effects'
 import {
   round,
   geometryBlobToSVGPath,
@@ -31,6 +31,8 @@ export { geometryBlobToSVGPath, nodeOutlinePath, type OutlineNode } from './path
 
 import type { SceneGraph, SceneNode, Fill, Stroke, VectorNetwork } from '@pairdraw/scene-graph'
 import { looseSegments, regionSVGPaths } from '@pairdraw/scene-graph/vector-network'
+
+import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
 
 import { arrowHeadElements, openPathElements, vectorArrowHeads } from './arrows'
 import type { SVGExportContext, SVGFontAlias } from './defs'
@@ -128,6 +130,27 @@ function vectorShapeElements(
   } else if (node.vectorNetwork) {
     elements.push(...networkElements(node, node.vectorNetwork, common))
   }
+  elements.push(...vectorStrokeTail(node, strokeAttrs))
+  return withVectorFallback(elements, node, common)
+}
+
+/** The empty vector's fallback shape, after both paints have contributed their elements. */
+function withVectorFallback(
+  elements: SVGNode[],
+  node: SceneNode,
+  common: Record<string, string | number | undefined>
+): SVGNode[] {
+  return elements.length > 0
+    ? elements
+    : [svg('rect', { width: round(node.width), height: round(node.height), ...common })]
+}
+
+/** The stored stroke geometry and arrowheads both vector paints share after their outlines. */
+function vectorStrokeTail(
+  node: SceneNode,
+  strokeAttrs: Record<string, string | number | undefined>
+): SVGNode[] {
+  const elements: SVGNode[] = []
   if (node.strokeGeometry.length > 0 && strokeAttrs.stroke && strokeAttrs.stroke !== 'none') {
     for (const geo of node.strokeGeometry) {
       const d = geometryBlobToSVGPath(geo.commandsBlob)
@@ -144,9 +167,34 @@ function vectorShapeElements(
     }
   }
   if (node.vectorNetwork) elements.push(...vectorArrowHeads(node, node.vectorNetwork, strokeAttrs))
-  return elements.length > 0
-    ? elements
-    : [svg('rect', { width: round(node.width), height: round(node.height), ...common })]
+  return elements
+}
+
+/** A vector layer's outlines as strokes alone, for a second stroke over the painted fills. */
+function vectorStrokeElements(
+  node: SceneNode,
+  strokeAttrs: Record<string, string | number | undefined>
+): SVGNode[] {
+  const elements: SVGNode[] = []
+  const common: Record<string, string | number | undefined> = { fill: 'none', ...strokeAttrs }
+  if (node.fillGeometry.length > 0) {
+    for (const geo of node.fillGeometry) {
+      const d = geometryBlobToSVGPath(geo.commandsBlob)
+      if (d) {
+        elements.push(
+          svg('path', {
+            d,
+            'fill-rule': geo.windingRule === 'EVENODD' ? 'evenodd' : undefined,
+            ...common
+          })
+        )
+      }
+    }
+  } else if (node.vectorNetwork) {
+    elements.push(...networkElements(node, node.vectorNetwork, common))
+  }
+  elements.push(...vectorStrokeTail(node, strokeAttrs))
+  return withVectorFallback(elements, node, common)
 }
 
 /** A line's dashes stretched along it as the canvas lays them, half a dash at each end. */
@@ -164,7 +212,8 @@ function nodeShapeElements(
   fillAttr: string | null,
   fillOpacity: number | undefined,
   strokeAttrs: Record<string, string | number | undefined>,
-  ctx: SVGExportContext
+  ctx: SVGExportContext,
+  stroke?: Stroke
 ): SVGNode[] {
   const common: Record<string, string | number | undefined> = {
     fill: fillAttr ?? 'none',
@@ -190,12 +239,12 @@ function nodeShapeElements(
 
     case 'LINE': {
       // Where the canvas strokes it: to one side of the line, with its caps inside its length.
-      const stroke = node.strokes.find((item) => item.visible)
+      const lineStroke = stroke ?? node.strokes.find((item) => item.visible)
       const {
         network,
         from: start,
         to: end
-      } = lineStrokePath(node, stroke?.weight ?? 0, stroke?.cap ?? node.strokeCap)
+      } = lineStrokePath(node, lineStroke?.weight ?? 0, lineStroke?.cap ?? node.strokeCap)
       return [
         svg('line', {
           x1: round(start.x),
@@ -204,9 +253,9 @@ function nodeShapeElements(
           y2: round(end.y),
           fill: 'none',
           ...strokeAttrs,
-          ...lineDashAttrs(stroke, Math.hypot(end.x - start.x, end.y - start.y))
+          ...lineDashAttrs(lineStroke, Math.hypot(end.x - start.x, end.y - start.y))
         }),
-        ...arrowHeadElements(node, network, stroke, strokeAttrs)
+        ...arrowHeadElements(node, network, lineStroke, strokeAttrs)
       ]
     }
 
@@ -298,7 +347,7 @@ function buildGroupAttrs(
     attrs.style = `mix-blend-mode: ${blend}`
   }
 
-  const filterDef = createFilterDef(node.effects, ctx)
+  const filterDef = createFilterDef(node, ctx)
   if (filterDef) {
     ctx.defs.push(filterDef.node)
     attrs.filter = `url(#${filterDef.id})`
@@ -314,12 +363,10 @@ function buildGroupAttrs(
 }
 
 function buildSVGStrokeAttrs(
-  visibleStrokes: Stroke[],
+  stroke: Stroke,
   node: SceneNode,
   ctx: SVGExportContext
 ): Record<string, string | number | undefined> {
-  if (visibleStrokes.length === 0) return {}
-  const stroke = visibleStrokes[0]
   const cap = stroke.cap ?? node.strokeCap
   const attrs: Record<string, string | number | undefined> = {
     // Opacity 1 keeps the color opaque. Display P3 must not also keep color alpha here, or a
@@ -380,33 +427,63 @@ function hasPathLevelFills(node: SceneNode): boolean {
   return node.type === 'VECTOR' && node.fillGeometry.some((geometry) => geometry.fills?.length)
 }
 
+/** One stroke at its own weight over the fills: a centred one on the outline, an aligned one around it. */
+function strokeElements(
+  node: SceneNode,
+  stroke: Stroke,
+  strokeAttrs: Record<string, string | number | undefined>,
+  ctx: SVGExportContext
+): SVGNode[] {
+  const aligned = hasPathLevelFills(node) ? null : alignedStroke(node, stroke)
+  if (aligned) {
+    return [
+      ...alignedStrokeElement(node, aligned, strokeAttrs, ctx),
+      ...(node.type === 'SHAPE_WITH_TEXT'
+        ? shapeWithTextDetailElements(node, strokeAttrs, ctx)
+        : [])
+    ]
+  }
+  if (node.type === 'VECTOR') return vectorStrokeElements(node, strokeAttrs)
+  return nodeShapeElements(node, null, undefined, strokeAttrs, ctx, stroke)
+}
+
+/**
+ * The fills and the strokes over them. The first stroke joins the fill's own element as before;
+ * every later visible stroke is drawn in layer order, without painting the fill again.
+ */
 function buildShapeChildren(
   node: SceneNode,
   visibleFills: Fill[],
   fillAttr: string | null,
   fillOpacity: number | undefined,
-  strokeAttrs: Record<string, string | number | undefined>,
+  strokeAttrs: Record<string, string | number | undefined>[],
   visibleStrokes: Stroke[],
   ctx: SVGExportContext
 ): SVGNode[] {
-  const aligned = hasPathLevelFills(node) ? null : alignedStroke(node, visibleStrokes[0])
-  if (!aligned) {
-    return fillAndStrokeElements(
-      node,
-      visibleFills,
-      fillAttr,
-      fillOpacity,
-      strokeAttrs,
-      visibleStrokes.length,
-      ctx
-    )
+  if (visibleStrokes.length === 0) {
+    return fillAndStrokeElements(node, visibleFills, fillAttr, fillOpacity, {}, 0, ctx)
   }
-  // The fill goes as it is, and the stroke over it inside or outside the outline.
-  return [
-    ...fillAndStrokeElements(node, visibleFills, fillAttr, fillOpacity, {}, 0, ctx),
-    ...alignedStrokeElement(node, aligned, strokeAttrs, ctx),
-    ...(node.type === 'SHAPE_WITH_TEXT' ? shapeWithTextDetailElements(node, strokeAttrs, ctx) : [])
-  ]
+  const first = visibleStrokes[0]
+  const firstAttrs = strokeAttrs[0]
+  const elements = alignedStroke(node, first)
+    ? // The fill goes as it is, and the stroke over it inside or outside the outline.
+      [
+        ...fillAndStrokeElements(node, visibleFills, fillAttr, fillOpacity, {}, 0, ctx),
+        ...strokeElements(node, first, firstAttrs, ctx)
+      ]
+    : fillAndStrokeElements(
+        node,
+        visibleFills,
+        fillAttr,
+        fillOpacity,
+        firstAttrs,
+        visibleStrokes.length,
+        ctx
+      )
+  for (let index = 1; index < visibleStrokes.length; index++) {
+    elements.push(...strokeElements(node, visibleStrokes[index], strokeAttrs[index], ctx))
+  }
+  return elements
 }
 
 function fillAndStrokeElements(
@@ -479,6 +556,139 @@ function exportedFill(
   }
 }
 
+/**
+ * A mask layer's definition: an alpha or luminance `<mask>`, or a `<clipPath>` for an outline
+ * mask. The rendered layer carries its own position, opacity, and filters into the mask.
+ */
+function maskWire(
+  mask: SceneNode,
+  ctx: SVGExportContext
+): { attribute: 'mask' | 'clip-path'; id: string } {
+  const content = renderNode(mask, ctx)
+  if (mask.maskType === 'VECTOR') {
+    const id = nextDefId(ctx, 'clip')
+    ctx.defs.push(svg('clipPath', { id, clipPathUnits: 'userSpaceOnUse' }, content ?? undefined))
+    return { attribute: 'clip-path', id }
+  }
+  const id = nextDefId(ctx, 'mask')
+  const attrs: Record<string, string | number | undefined> = {
+    id,
+    maskContentUnits: 'userSpaceOnUse'
+  }
+  if (mask.maskType === 'ALPHA') attrs['mask-type'] = 'alpha'
+  ctx.defs.push(svg('mask', attrs, content ?? undefined))
+  return { attribute: 'mask', id }
+}
+
+/**
+ * The children as the canvas draws them: a run of visible masks masks the siblings that follow
+ * it, until the next mask, and the mask layers themselves never draw on their own.
+ */
+function maskedChildNodes(childNodes: SceneNode[], ctx: SVGExportContext): SVGNode[] {
+  const content: SVGNode[] = []
+  let masks: Array<{ attribute: 'mask' | 'clip-path'; id: string }> = []
+  let afterMask = false
+  for (const child of childNodes) {
+    if (child.visible && child.isMask) {
+      const wire = maskWire(child, ctx)
+      masks = afterMask ? [...masks, wire] : [wire]
+      afterMask = true
+      continue
+    }
+    const rendered = renderNode(child, ctx)
+    afterMask = false
+    if (!rendered) continue
+    let wrapped = rendered
+    for (const wire of masks) wrapped = svg('g', { [wire.attribute]: `url(#${wire.id})` }, wrapped)
+    content.push(wrapped)
+  }
+  return content
+}
+
+/** A boolean's live result path in the paints its fills and strokes give it. */
+function booleanPathElements(
+  node: SceneNode,
+  d: string,
+  visibleFills: Fill[],
+  fillAttr: string | null,
+  fillOpacity: number | undefined,
+  strokeAttrs: Array<Record<string, string | number | undefined>>,
+  visibleStrokes: Stroke[],
+  ctx: SVGExportContext
+): SVGNode[] {
+  const common = { d, 'fill-rule': 'evenodd' as const }
+  // A centred first stroke joins the fill element, as a shape's does; every later stroke, and
+  // every inside or outside stroke, is drawn over the result outline on its own. An unset
+  // alignment strokes the centred way, as `alignedStroke` treats it.
+  const centered = (stroke: Stroke): boolean =>
+    stroke.align !== 'INSIDE' && stroke.align !== 'OUTSIDE'
+  const firstJoins = visibleStrokes.length > 0 && centered(visibleStrokes[0])
+  const joined = firstJoins ? strokeAttrs[0] : {}
+  const elements =
+    visibleFills.length <= 1
+      ? [
+          svg('path', {
+            ...common,
+            fill: fillAttr ?? 'none',
+            'fill-opacity': fillOpacity,
+            ...joined
+          })
+        ]
+      : visibleFills.map((fill, index) =>
+          svg('path', {
+            ...common,
+            fill: resolveFill(fill, node, ctx) ?? 'none',
+            'fill-opacity': solidFillOpacity(fill, ctx.colorSpace),
+            ...(index === visibleFills.length - 1 ? joined : {})
+          })
+        )
+
+  for (let index = firstJoins ? 1 : 0; index < visibleStrokes.length; index++) {
+    const stroke = visibleStrokes[index]
+    const attrs = strokeAttrs[index]
+    elements.push(
+      ...(centered(stroke)
+        ? [svg('path', { d, fill: 'none', ...attrs })]
+        : alignedStrokeElement(node, stroke, attrs, ctx, d))
+    )
+  }
+  return elements
+}
+
+/** A boolean made in Pairdraw draws its computed result path instead of its operands. */
+function renderBooleanNode(
+  node: SceneNode,
+  ctx: SVGExportContext,
+  paint: {
+    groupAttrs: Record<string, string | number | undefined>
+    visibleFills: Fill[]
+    fillAttr: string | null
+    fillOpacity: number | undefined
+    strokeAttrs: Array<Record<string, string | number | undefined>>
+    visibleStrokes: Stroke[]
+  }
+): SVGNode | null {
+  if (node.type !== 'BOOLEAN_OPERATION' || node.fillGeometry.length > 0 || !ctx.booleanPath) {
+    return null
+  }
+  const d = ctx.booleanPath(ctx.graph, node)
+  if (!d) return null
+  return svg(
+    'g',
+    paint.groupAttrs,
+    ...booleanPathElements(
+      node,
+      d,
+      paint.visibleFills,
+      paint.fillAttr,
+      paint.fillOpacity,
+      paint.strokeAttrs,
+      paint.visibleStrokes,
+      ctx
+    )
+  )
+}
+
 function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
   if (!node.visible) return null
 
@@ -503,11 +713,20 @@ function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
   // `currentColor` has no alpha. Display P3 normally bakes solid opacity into the color, which a
   // tint throws away, so a tinted solid keeps `fill-opacity` in every color space.
   const fillOpacity = ownFill ? solidFillOpacity(ownFill, ctx.colorSpace, tintedFill) : fill.opacity
-  const ownStrokes = buildSVGStrokeAttrs(visibleStrokes, node, ctx)
-  const strokeAttrs =
-    ownStrokes.stroke && tint.includes('stroke')
-      ? { ...ownStrokes, stroke: CURRENT_COLOR }
-      : ownStrokes
+  const strokeAttrs = visibleStrokes.map((stroke) => {
+    const attrs = buildSVGStrokeAttrs(stroke, node, ctx)
+    return tint.includes('stroke') ? { ...attrs, stroke: CURRENT_COLOR } : attrs
+  })
+
+  const booleanDrawn = renderBooleanNode(node, ctx, {
+    groupAttrs,
+    visibleFills,
+    fillAttr,
+    fillOpacity,
+    strokeAttrs,
+    visibleStrokes
+  })
+  if (booleanDrawn) return booleanDrawn
 
   const children: (SVGNode | null)[] = buildShapeChildren(
     node,
@@ -519,12 +738,7 @@ function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
     ctx
   )
 
-  const childNodes = ctx.graph.getChildren(node.id)
-  const childContent: SVGNode[] = []
-  for (const child of childNodes) {
-    const rendered = renderNode(child, ctx)
-    if (rendered) childContent.push(rendered)
-  }
+  const childContent = maskedChildNodes(ctx.graph.getChildren(node.id), ctx)
 
   if (clipId && childContent.length > 0) {
     children.push(svg('g', { 'clip-path': `url(#${clipId})` }, ...childContent))
@@ -566,6 +780,11 @@ export interface SVGExportOptions {
    * file under. Text in an aliased face is written in that family at normal weight and style.
    */
   fontAlias?: SVGFontAlias
+  /**
+   * The live result path of a boolean operation made in Pairdraw, which stores none. Left out,
+   * such a boolean draws its box and its operands, as an archive-less reader sees it.
+   */
+  booleanPath?: BooleanPathResolver
 }
 
 export function renderNodesToSVG(
@@ -587,7 +806,8 @@ export function renderNodesToSVG(
     graph,
     colorSpace: options.colorSpace ?? 'srgb',
     textLayout: options.textLayout,
-    fontAlias: options.fontAlias
+    fontAlias: options.fontAlias,
+    booleanPath: options.booleanPath
   }
 
   const contentNodes: SVGNode[] = []
@@ -643,10 +863,22 @@ export function renderNodeSVGElement(
   {
     idPrefix,
     colorSpace = 'srgb',
-    tint
-  }: Pick<SVGExportContext, 'tint'> & { idPrefix: string; colorSpace?: RenderColorSpace }
+    tint,
+    booleanPath
+  }: Pick<SVGExportContext, 'tint' | 'booleanPath'> & {
+    idPrefix: string
+    colorSpace?: RenderColorSpace
+  }
 ): SVGNode | null {
-  const ctx: SVGExportContext = { defs: [], defIdCounter: 0, graph, colorSpace, idPrefix, tint }
+  const ctx: SVGExportContext = {
+    defs: [],
+    defIdCounter: 0,
+    graph,
+    colorSpace,
+    idPrefix,
+    tint,
+    booleanPath
+  }
   const drawn = renderNode({ ...node, x: 0, y: 0, rotation: 0, opacity: 1 }, ctx)
   if (!drawn) return null
   // A straight line has no height or width, but its stroke still needs a viewport to draw in.

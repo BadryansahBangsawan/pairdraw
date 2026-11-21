@@ -14,6 +14,7 @@ import {
 } from './coordinate'
 import { cloneNodeProps, type NodeCloneMode } from './copy'
 import { normalizeEffects } from './effects'
+import { shareEmptyNodeValues } from './empty-values'
 import { bindNodeEvents } from './events'
 import { TRANSFORM_FIELDS } from './fields/geometry'
 import { LAYOUT_AFFECTING_KEYS } from './fields/layout'
@@ -24,6 +25,8 @@ import * as Instances from './instances'
 import { LayoutWrites } from './layout/writes'
 import Matrix from './matrix'
 import { CONTAINER_TYPES, createDefaultNode } from './node-defaults'
+import { withPluginData } from './plugin-data/field'
+import { PAIRDRAW_PLUGIN_DATA } from './plugin-data/fields'
 import { updateNodePreview, type NodePreviewObserver } from './preview'
 import type { Color, Rect, Vector } from './primitives'
 /* eslint-disable max-lines -- SceneGraph is the facade over the domain modules */
@@ -727,6 +730,7 @@ export class SceneGraph {
       this.scopeDepths.sourceMetadata === 0 && !this.isApplyingDerivedLayout
     )
     Object.assign(node, changes)
+    shareEmptyNodeValues(node, Object.keys(changes))
     if (changes.fills) removeStaleBindings(node, 'fills', changes)
     if (changes.strokes) removeStaleBindings(node, 'strokes', changes)
     // A bound paint written keeps what it was given until its variable's color changes.
@@ -870,8 +874,23 @@ export class SceneGraph {
       }
     }
 
-    for (const childId of Array.from(node.childIds)) {
-      this.deleteNode(childId)
+    this.deleteSubtree(node)
+  }
+
+  /**
+   * Deletes `node` and its layers, children first. Their parent goes with them, so its child
+   * list is emptied once instead of being filtered for each child, which kept deleting a frame
+   * of thousands of layers quadratic. The list is emptied before the children go, so a listener
+   * of a child's deletion never finds it still listed.
+   */
+  private deleteSubtree(node: SceneNode): void {
+    const { id, childIds } = node
+    node.childIds = []
+    for (const childId of childIds) {
+      const child = this.nodes.get(childId)
+      if (!child) continue
+      this.willChangeNode(child)
+      this.deleteSubtree(child)
     }
 
     if (node.type === 'INSTANCE' && node.componentId) this.unindexInstance(node.componentId, id)
@@ -959,6 +978,14 @@ export class SceneGraph {
     if (props.source) props.source = { ...props.source, id: null, orderKey: null }
     // A copy is a new design nobody has reviewed: Figma's duplicate and clone() drop the status.
     props.status = null
+    // A stand-in mark names one layer's place in a version of a design; a copy is not that.
+    if (props.pluginData) {
+      props.pluginData = withPluginData(
+        props.pluginData,
+        PAIRDRAW_PLUGIN_DATA.variationStandIn,
+        undefined
+      )
+    }
     const clone = this.createNode(src.type, parentId, { ...props, ...overrides })
     Variables.copyAppliedBoundPaints(src, clone)
     copies.set(src.id, clone.id)

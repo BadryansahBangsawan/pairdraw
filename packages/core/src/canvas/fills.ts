@@ -7,7 +7,9 @@ import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { setPaintBlendMode } from './blend'
 import { makeDiamondGradient } from './gradients/diamond'
+import { adjustedImageShader, hasImageAdjustments } from './images/adjustments'
 import { previewEdge } from './images/previews'
+import { drawOffOutputGrid, landsOnOutputPixels, makeImageShader } from './images/sampling'
 import type { SkiaRenderer } from './renderer'
 import { drawUserShaderFill } from './shaders/draw'
 import { drawOutline, withNodeOutline } from './shapes'
@@ -290,7 +292,9 @@ function applyPatternFill(
   const layout = patternTileLayout(source, fill)
   let picture
   try {
-    picture = recordPatternSource(r, source, graph, layout, patternStack)
+    picture = drawOffOutputGrid(r, () =>
+      recordPatternSource(r, source, graph, layout, patternStack)
+    )
   } finally {
     patternStack.delete(source.id)
   }
@@ -476,6 +480,7 @@ function setImageShader(
   r: SkiaRenderer,
   fill: Fill,
   node: SceneNode,
+  graph: SceneGraph,
   img: Image,
   paint: Paint,
   preview?: { originalWidth: number; originalHeight: number }
@@ -490,21 +495,20 @@ function setImageShader(
     imgH,
     preview && { width: preview.originalWidth, height: preview.originalHeight }
   )
-  const tileMode = scaleMode === 'FIT' ? r.ck.TileMode.Decal : r.ck.TileMode.Clamp
-  const shader =
-    scaleMode === 'TILE'
-      ? img.makeShaderCubic(r.ck.TileMode.Repeat, r.ck.TileMode.Repeat, 1 / 3, 1 / 3, localMatrix)
-      : img.makeShaderOptions(
-          tileMode,
-          tileMode,
-          r.ck.FilterMode.Linear,
-          r.ck.MipmapMode.Linear,
-          localMatrix
-        )
+  const image = makeImageShader(
+    r,
+    img,
+    scaleMode,
+    localMatrix,
+    landsOnOutputPixels(r, node, graph, localMatrix)
+  )
+  let shader = image
   try {
+    if (hasImageAdjustments(fill.filters)) shader = adjustedImageShader(r, image, fill.filters)
     paint.setShader(shader)
   } finally {
-    shader.delete()
+    if (shader !== image) shader.delete()
+    image.delete()
   }
   return true
 }
@@ -519,7 +523,7 @@ export function applyImageFill(
   const hash = fill.imageHash
   if (!hash) return false
   const live = r.liveImages.get(hash)
-  if (live?.surface === r.surface) return setImageShader(r, fill, node, live.image, paint)
+  if (live?.surface === r.surface) return setImageShader(r, fill, node, graph, live.image, paint)
   const preview = r.viewportImageRendering
     ? // eslint-disable-next-line pairdraw/no-zoom-in-scene-drawing -- picks the preview resolution, not a size; preview mode draws the scene uncached on every frame.
       r.imagePreviews.get(graph, hash, previewEdge(node, r.zoom, r.dpr))
@@ -542,7 +546,7 @@ export function applyImageFill(
   }
 
   try {
-    return setImageShader(r, fill, node, img, paint, preview?.preview)
+    return setImageShader(r, fill, node, graph, img, paint, preview?.preview)
   } finally {
     if (temporary) img.delete()
   }

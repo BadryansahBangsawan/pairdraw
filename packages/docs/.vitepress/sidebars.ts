@@ -40,6 +40,7 @@ export const userGuideSidebar = (
       { text: labels.browser, link: '/user-guide/browser' },
       { text: labels.script, link: '/user-guide/script-layers' },
       { text: labels.snapshot, link: '/user-guide/page-snapshots' },
+      { text: labels.variations, link: '/user-guide/variations' },
     ],
   },
   {

@@ -1,5 +1,6 @@
 import { expect, mock, test } from 'bun:test'
 
+import { videoExportOpen } from '@/app/document/export/video/open'
 import { setActiveEditorStore } from '@/app/editor/active-store'
 import { createEditorStore } from '@/app/editor/session/create'
 import { createSharedEditorMenuActions } from '@/app/shell/menu/actions/editor'
@@ -12,4 +13,13 @@ test('View → Variables… opens the variables dialog from the native menu as f
   expect(store.state.variablesOpen).toBe(false)
   actions.variables?.()
   expect(store.state.variablesOpen).toBe(true)
+})
+
+test('File → Export prototype as video… opens the video dialog of the document on screen', () => {
+  const store = createEditorStore()
+  setActiveEditorStore(store)
+  const actions: Partial<Record<string, () => void>> = createSharedEditorMenuActions(mock())
+  expect(videoExportOpen(store).value).toBe(false)
+  actions['export-video']?.()
+  expect(videoExportOpen(store).value).toBe(true)
 })

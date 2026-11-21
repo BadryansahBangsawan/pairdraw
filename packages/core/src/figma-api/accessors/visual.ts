@@ -1,4 +1,4 @@
-import type { SceneNode, ShadowEffect, Stroke } from '@pairdraw/scene-graph'
+import type { Effect, SceneNode, ShaderEffect, Stroke } from '@pairdraw/scene-graph'
 import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
 import { independentCornerChanges } from '@pairdraw/scene-graph/variables'
 
@@ -118,7 +118,9 @@ export function installVisualNodeProxyAccessors(
         // A shader effect has no Figma plugin-API form yet (`UNSUPPORTED_EFFECT_TYPES`).
         return Object.freeze(
           raw(this, internals)
-            .effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+            .effects.filter(
+              (effect): effect is Exclude<Effect, ShaderEffect> => effect.type !== 'SHADER'
+            )
             .map(toFigmaEffect)
         )
       },

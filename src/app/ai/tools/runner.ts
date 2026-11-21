@@ -1,4 +1,9 @@
 import { executeAtomicTool, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
+import {
+  createDesignGuard,
+  DesignMemoryRefusalError,
+  type DesignMemoryMode
+} from '@pairdraw/core/design-memory'
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { isAtomicTool, toolChangesDocument, toolFailure, type ToolDef } from '@pairdraw/core/tools'
 import type { SceneMutationImpact } from '@pairdraw/scene-graph/mutation-impact'
@@ -57,6 +62,11 @@ export interface EditorToolCall {
   signal?: AbortSignal
   /** False once the call's document closed, so a late edit is not drawn. */
   isLive?: () => boolean
+  /**
+   * How the document's design memory answers the call: `refuse`, the default, for agents, or
+   * `warn` for a call a person made, such as a CLI command, which it never undoes.
+   */
+  designMemory?: DesignMemoryMode
 }
 
 const STOPPED_BEFORE_CALL = 'Stopped before this call ran; nothing was changed.'
@@ -148,6 +158,13 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
       recorded.change = change
     }
   }
+  // Calls here are agents' and automation's, never edits in the editor, so the document's
+  // design memory judges what they changed: an off-system value it refuses puts the edit back.
+  const guard = createDesignGuard(store.graph, {
+    content: def.content,
+    args,
+    mode: call.designMemory
+  })
   try {
     if (isAtomicTool(def)) {
       // An atomic tool commits its own step at once; loading its fonts after is not part of it.
@@ -155,18 +172,29 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
         executeAtomicTool(store, figma, def, args, {
           label: prefix,
           signal: call.signal,
-          isLive: call.isLive
+          isLive: call.isLive,
+          verify: guard.verifyFields
         })
       )
       await loadAtomicToolFonts(store, figma, args, { isLive: call.isLive })
-      return result
+      return guard.annotate(result)
     }
     // A structural call that throws part way is put back whole, as an atomic tool's is, unless
     // the room wrote to the document while it ran.
-    return await store.recordEditAsync(
-      { ...options, rollbackOnThrow: true, canRollBack: noOutsideWritesSince(store) },
+    const result = await store.recordEditAsync(
+      {
+        ...options,
+        rollbackOnThrow: true,
+        canRollBack: noOutsideWritesSince(store),
+        verify: guard.verifyChange
+      },
       () => execute(call, pageId)
     )
+    return guard.annotate(result)
+  } catch (error) {
+    // The edit is already put back; the agent reads why, and the chat offers to allow the values.
+    if (error instanceof DesignMemoryRefusalError) return error.toResult()
+    throw error
   } finally {
     if (reply && recorded.change) {
       await recordReplyCall(call, reply, recorded.change, undoBefore, viewPageId)

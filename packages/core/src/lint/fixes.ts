@@ -2,7 +2,7 @@ import { isEmptyObject } from 'es-toolkit'
 
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
-import { paintBindingTarget } from '@pairdraw/scene-graph/variables'
+import { isNumericVariableBindingField, paintBindingTarget } from '@pairdraw/scene-graph/variables'
 
 import type { LintFix, LintMessage } from './types'
 import { ownsComponentTree } from './utils'
@@ -44,11 +44,20 @@ export function safeFixes(messages: readonly LintMessage[]): LintFixRequest[] {
 }
 
 /**
- * Binding is safe only while the paint still shows the variable's color: a paint edited since
- * the lint run would change appearance, so its fix is skipped.
+ * Binding is safe only while the paint still shows the variable's color, or the field still holds
+ * the variable's number: one edited since the lint run would change appearance, so its fix is
+ * skipped.
  */
 function canBind(graph: SceneGraph, node: SceneNode, path: string, variableId: string): boolean {
   if (node.boundVariables[path] === variableId) return false
+  if (isNumericVariableBindingField(path)) {
+    // A text style supplies the layer's type values; the binding belongs on the style.
+    if (path === 'fontSize' && node.textStyleId) return false
+    const value: unknown = Reflect.get(node, path)
+    return (
+      typeof value === 'number' && value === graph.resolveNumberVariableForNode(node.id, variableId)
+    )
+  }
   const target = paintBindingTarget(path)
   if (!target) return false
   const paint = node[target.list].at(target.index)

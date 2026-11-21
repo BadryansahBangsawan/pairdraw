@@ -23,12 +23,16 @@ import { numberInRange, outputBesideInput } from '#cli/options'
 
 import { applyExportFontPolicy, exportFontRoots, FONT_POLICIES } from './font-policy'
 import { exportStorybookFromFile } from './storybook'
+import { exportVideo, VIDEO_EXPORT_FORMATS } from './video'
+import { writeAndLog } from './write'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 // Storybook writes a folder of stories, so it stays a CLI command beside the IO formats.
 const FORMAT_IDS = [...io.listExportFormats('node').map((format) => format.id), 'storybook']
 const ALL_FORMATS = new Set(FORMAT_IDS.map((id) => id.toUpperCase()))
 const FORMAT_LIST = `${FORMAT_IDS.slice(0, -1).join(', ')}, or ${FORMAT_IDS.at(-1)}`
+// A video records the prototype through `export_video`, so it is not an IO format either.
+const VIDEO_FORMAT_LIST = [...VIDEO_EXPORT_FORMATS].map((id) => id.toLowerCase()).join(', ')
 
 function formatSupportsScale(format: string): boolean {
   return io.getFormat(format.toLowerCase())?.exportOptions?.scale ?? false
@@ -64,14 +68,6 @@ interface ExportArgs {
   height: string
   'document-id'?: string
   'page-id'?: string
-}
-
-async function writeAndLog(path: string, content: string | Uint8Array) {
-  // The files an export names sit next to its own, so its folder has to exist before the file.
-  await mkdir(dirname(path), { recursive: true })
-  await writeFileAtomic(path, content, { symlink: 'follow' })
-  const size = typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : content.length
-  console.log(ok(`Exported ${path} (${(size / 1024).toFixed(1)} KB)`))
 }
 
 /**
@@ -316,7 +312,7 @@ export default defineCommand({
     format: {
       type: 'string',
       alias: 'f',
-      description: `Export format: ${FORMAT_IDS.join(', ')} (default: png)`,
+      description: `Export format: ${FORMAT_IDS.join(', ')}; a prototype video: ${VIDEO_FORMAT_LIST} (default: png)`,
       default: 'png'
     },
     scale: { type: 'string', alias: 's', description: 'Export scale (default: 1)', default: '1' },
@@ -398,6 +394,28 @@ export default defineCommand({
       default: 'warn'
     },
     thumbnail: { type: 'boolean', description: 'Export page thumbnail instead of full render' },
+    start: {
+      type: 'string',
+      description:
+        'Video: top-level frame name or ID to play from (default: the selected or first frame)'
+    },
+    fps: { type: 'string', description: 'Video: frames per second (default: 30, or 15 for GIF)' },
+    'max-edge': {
+      type: 'string',
+      description: 'Video: longest width or height in pixels (default: 1920, or 960 for GIF)'
+    },
+    'max-duration': {
+      type: 'string',
+      description: 'Video: seconds the clip may last at most (default: 30)'
+    },
+    tail: {
+      type: 'string',
+      description: 'Video: seconds the last frame stays when the flow ends (default: 1)'
+    },
+    click: {
+      type: 'string',
+      description: 'Video: a click to run, <seconds>:<layer name or ID>; repeat for more'
+    },
     width: { type: 'string', description: 'Thumbnail width (default: 1920)', default: '1920' },
     height: { type: 'string', description: 'Thumbnail height (default: 1080)', default: '1080' }
   },
@@ -407,8 +425,12 @@ export default defineCommand({
     if (format !== 'STORYBOOK' && args._.length > 1) {
       throw new Error(`Unexpected argument: ${args._.slice(1).join(' ')}`)
     }
+    if (VIDEO_EXPORT_FORMATS.has(format)) {
+      await exportVideo(format, args)
+      return
+    }
     if (!ALL_FORMATS.has(format)) {
-      printError(`Invalid format "${args.format}". Use ${FORMAT_LIST}.`)
+      printError(`Invalid format "${args.format}". Use ${FORMAT_LIST}, or ${VIDEO_FORMAT_LIST}.`)
       process.exit(1)
     }
 

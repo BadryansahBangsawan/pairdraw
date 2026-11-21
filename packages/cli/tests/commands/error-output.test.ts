@@ -2,6 +2,7 @@ import { describe, expect, setDefaultTimeout, test } from 'bun:test'
 import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { stripVTControlCharacters } from 'node:util'
 
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 
@@ -17,7 +18,12 @@ async function cli(args: string[], env?: Record<string, string>) {
     new Response(proc.stdout).text(),
     new Response(proc.stderr).text()
   ])
-  return { stdout: stdout.trim(), stderr: stderr.trim(), exitCode: await proc.exited }
+  // CI forces color; the contract is the text, so drop the terminal styling before matching.
+  return {
+    stdout: stripVTControlCharacters(stdout).trim(),
+    stderr: stripVTControlCharacters(stderr).trim(),
+    exitCode: await proc.exited
+  }
 }
 
 const stackLine = /^\s+at /m

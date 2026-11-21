@@ -3,6 +3,7 @@ import { aiMessageDefaults, aiMessages } from '#vue/i18n/messages/ai'
 import { automationMessageDefaults, automationMessages } from '#vue/i18n/messages/automation'
 import { browserMessageDefaults, browserMessages } from '#vue/i18n/messages/browser'
 import { chatContextMessageDefaults, chatContextMessages } from '#vue/i18n/messages/chat-context'
+import { chatUsageMessageDefaults, chatUsageMessages } from '#vue/i18n/messages/chat-usage'
 import { cloudMessageDefaults, cloudMessages } from '#vue/i18n/messages/cloud/editor'
 import { cloudPortalMessageDefaults, cloudPortalMessages } from '#vue/i18n/messages/cloud/portal'
 import { codeMessageDefaults, codeMessages } from '#vue/i18n/messages/code'
@@ -15,6 +16,7 @@ import { commentMessageDefaults, commentMessages } from '#vue/i18n/messages/comm
 import { commonMessageDefaults, commonMessages } from '#vue/i18n/messages/common'
 import { credentialsMessageDefaults, credentialsMessages } from '#vue/i18n/messages/credentials'
 import { designCheckMessageDefaults, designCheckMessages } from '#vue/i18n/messages/design-check'
+import { designMemoryMessageDefaults, designMemoryMessages } from '#vue/i18n/messages/design-memory'
 import { diagnosticsMessageDefaults, diagnosticsMessages } from '#vue/i18n/messages/diagnostics'
 import { editorMessageDefaults, editorMessages } from '#vue/i18n/messages/editor'
 import { exploreMessageDefaults, exploreMessages } from '#vue/i18n/messages/explore'
@@ -41,6 +43,7 @@ import {
   variableTypeMessageDefaults,
   variableTypeMessages
 } from '#vue/i18n/messages/variables/types'
+import { variationMessageDefaults, variationMessages } from '#vue/i18n/messages/variations'
 
 export {
   agentMessages,
@@ -48,6 +51,7 @@ export {
   automationMessages,
   browserMessages,
   chatContextMessages,
+  chatUsageMessages,
   codeMessages,
   collaborationMessages,
   commandMessages,
@@ -55,6 +59,7 @@ export {
   commonMessages,
   credentialsMessages,
   designCheckMessages,
+  designMemoryMessages,
   diagnosticsMessages,
   editorMessages,
   exploreMessages,
@@ -79,7 +84,8 @@ export {
   cloudMessages,
   cloudPortalMessages,
   variablesMessages,
-  variableTypeMessages
+  variableTypeMessages,
+  variationMessages
 }
 
 export const messageDefaults = {
@@ -88,6 +94,7 @@ export const messageDefaults = {
   automation: automationMessageDefaults,
   browser: browserMessageDefaults,
   chatContext: chatContextMessageDefaults,
+  chatUsage: chatUsageMessageDefaults,
   code: codeMessageDefaults,
   collaboration: collaborationMessageDefaults,
   commands: commandMessageDefaults,
@@ -95,6 +102,7 @@ export const messageDefaults = {
   common: commonMessageDefaults,
   credentials: credentialsMessageDefaults,
   designCheck: designCheckMessageDefaults,
+  designMemory: designMemoryMessageDefaults,
   diagnostics: diagnosticsMessageDefaults,
   editor: editorMessageDefaults,
   explore: exploreMessageDefaults,
@@ -119,5 +127,6 @@ export const messageDefaults = {
   cloud: cloudMessageDefaults,
   cloudPortal: cloudPortalMessageDefaults,
   variables: variablesMessageDefaults,
-  variableTypes: variableTypeMessageDefaults
+  variableTypes: variableTypeMessageDefaults,
+  variations: variationMessageDefaults
 } as const

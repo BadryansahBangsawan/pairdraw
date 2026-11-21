@@ -25,6 +25,7 @@ export interface SidebarLabels {
   prototype: string
   plugins: string
   snapshot: string
+  variations: string
   designSystem: string
   pairdrawCloud: string
   cloudStorage: string
@@ -192,6 +193,7 @@ export const EN: SidebarLabels = {
   prototype: 'Playing a Prototype',
   plugins: 'Plugins',
   snapshot: 'Page Snapshots',
+  variations: 'Variations',
   designSystem: 'Building a Design System',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud Storage',
@@ -231,6 +233,7 @@ export const DE: SidebarLabels = {
   prototype: 'Prototyp abspielen',
   plugins: 'Plugins',
   snapshot: 'Seiten-Snapshots',
+  variations: 'Variationen',
   designSystem: 'Ein Designsystem aufbauen',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud-Speicher',
@@ -270,6 +273,7 @@ export const IT: SidebarLabels = {
   prototype: 'Riprodurre un prototipo',
   plugins: 'Plugin',
   snapshot: 'Istantanee di pagina',
+  variations: 'Variazioni',
   designSystem: 'Creare un design system',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Archiviazione cloud',
@@ -309,6 +313,7 @@ export const FR: SidebarLabels = {
   prototype: 'Lire un prototype',
   plugins: 'Extensions',
   snapshot: 'Captures de page',
+  variations: 'Variations',
   designSystem: 'Créer un design system',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Stockage cloud',
@@ -348,6 +353,7 @@ export const ES: SidebarLabels = {
   prototype: 'Reproducir un prototipo',
   plugins: 'Complementos',
   snapshot: 'Capturas de página',
+  variations: 'Variaciones',
   designSystem: 'Crear un sistema de diseño',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Almacenamiento en la nube',
@@ -387,6 +393,7 @@ export const PL: SidebarLabels = {
   prototype: 'Odtwarzanie prototypu',
   plugins: 'Wtyczki',
   snapshot: 'Zrzuty stron',
+  variations: 'Wariacje',
   designSystem: 'Budowanie design systemu',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Przechowywanie w chmurze',
@@ -426,6 +433,7 @@ export const RU: SidebarLabels = {
   prototype: 'Воспроизведение прототипа',
   plugins: 'Плагины',
   snapshot: 'Снимки страниц',
+  variations: 'Вариации',
   designSystem: 'Создание дизайн-системы',
   pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Облачное хранилище',

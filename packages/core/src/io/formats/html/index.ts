@@ -7,19 +7,25 @@ import {
 } from '@pairdraw/dom-css/export'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
-import type { ExportAsset, HTMLExportOptions } from '#core/io/types'
+import type { ExportAsset, HTMLExportOptions, IOContext } from '#core/io/types'
 import { exportWebFontFaceAssets } from '#core/text/web-font/assets'
 
 import { vectorElement } from './vectors'
 
-function designDocument(
+async function designDocument(
   graph: SceneGraph,
   nodeIds: string[],
-  options: HTMLExportOptions
-): DesignDocument {
+  options: HTMLExportOptions,
+  context?: IOContext
+): Promise<DesignDocument> {
+  const { booleanPathResolver, needsBooleanPaths } = await import('#core/io/formats/boolean-path')
+  const booleanPath = needsBooleanPaths(graph)
+    ? await booleanPathResolver(context?.canvasKit, context?.renderer)
+    : undefined
   // Layer names help find a layer in the markup; IDs only matter to tools that link back.
   const projection = {
-    vectorElement,
+    vectorElement: (vectorGraph: SceneGraph, node: Parameters<typeof vectorElement>[1]) =>
+      vectorElement(vectorGraph, node, booleanPath),
     includeLayerNames: options.layerNames ?? true,
     includeSourceIds: options.layerIds ?? false
   }
@@ -36,9 +42,10 @@ export async function renderNodesToHTML(
   graph: SceneGraph,
   nodeIds: string[],
   options: HTMLExportOptions = {},
-  fileName?: string
+  fileName?: string,
+  context?: IOContext
 ): Promise<{ html: string; assets: ExportAsset[] }> {
-  const bundle = await exportHTMLBundle(designDocument(graph, nodeIds, options), {
+  const bundle = await exportHTMLBundle(await designDocument(graph, nodeIds, options, context), {
     html: options.html,
     style: options.style,
     assets: options.assets,

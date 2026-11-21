@@ -112,4 +112,14 @@ describe('MCP tool file output', () => {
     expect(inline.content[0].type).toBe('text')
     expect(inline.content[0].text).toContain(result.base64)
   })
+
+  test('export_video writes its file', async () => {
+    const gif = new TextEncoder().encode('GIF89a test')
+    const result = { mimeType: 'image/gif', base64: fromUint8Array(gif), byteLength: 11 }
+    const { root, call } = await server({ export_video: result })
+
+    const written = await call('export_video', { path: 'out/hero.gif' })
+    expect(written.isError).toBeFalsy()
+    expect(new Uint8Array(await readFile(join(root, 'out/hero.gif')))).toEqual(gif)
+  })
 })

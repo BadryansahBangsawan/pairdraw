@@ -16,6 +16,7 @@ type CanvasMenuCommand =
   | 'selection.moveToPageWhenAvailable'
   | 'selection.arrangeWhenAvailable'
   | 'selection.cropImageWhenAvailable'
+  | 'selection.duplicateAsVariationWhenAvailable'
 
 type CanvasMenuGroup = readonly CanvasMenuCommand[]
 
@@ -33,7 +34,7 @@ export type CanvasMenuOptions = {
 }
 
 const CANVAS_MENU_GROUPS = [
-  ['selection.duplicate', 'selection.delete'],
+  ['selection.duplicate', 'selection.duplicateAsVariationWhenAvailable', 'selection.delete'],
   [
     'selection.moveToPageWhenAvailable',
     'selection.bringForward',
@@ -146,6 +147,10 @@ function conditionalCommand(command: CanvasMenuCommand, options: CanvasMenuOptio
       const item = options.commandMenuItem('selection.cropImage')
       return item.disabled === false ? [item] : []
     }
+    case 'selection.duplicateAsVariationWhenAvailable':
+      return options.selection.canCreateVariations.value
+        ? [options.commandMenuItem('selection.duplicateAsVariation')]
+        : []
     case 'selection.ungroupWhenGroup':
       return options.selection.isGroup.value ? [options.commandMenuItem('selection.ungroup')] : []
     default:

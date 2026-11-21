@@ -439,6 +439,14 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `boolean_intersect` | Boolean intersection                |
 | `boolean_exclude`   | Boolean exclusion                   |
 
+### Variations
+
+| Tool                | Description |
+| ------------------- | ----------- |
+| `create_variations` | Copy a layer 1 to 8 times as labelled versions side by side in a section beside it, or copy a version into its set |
+| `list_variations`   | List the set holding a layer, or every set on the current page, with its original and versions |
+| `pick_variation`    | Keep one version in place of the original, which keeps its id, name, and place, or discard them all; only when the person asks |
+
 ### Vector Path
 
 | Tool              | Description                                                                                                                                                                                 |
@@ -458,6 +466,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `export_html`  | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
 | `export_svg`   | Export nodes as SVG markup                                                                                                                                                                                                                                                                                                                         |
 | `export_pdf`   | Export nodes as a vector PDF: `mode` `single` (default), one page per frame (`frames`), or one page per design page (`pages`); `embed_fonts` embeds each face the text uses so the text stays selectable                                                                                                                                           |
+| `export_video` | Record the prototype as Play shows it, from `start` (a top-level frame), following After delays, their Dissolves, and scripted `clicks` on a virtual clock; returns the file and the `steps` it recorded. `format` `mp4` (H.264, default), `gif`, or `webm` (VP9) where the app can encode it; `fps`, `scale`, `maxEdge`, `maxDuration`, `tail`; `path` writes the file |
 
 ### Viewport
 
@@ -483,6 +492,8 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `unbind_variable`      | Remove a variable binding from a node property                                               |
 | `import_design_tokens` | Import W3C design token files as variables, text styles, and effect styles, updating by name |
 | `design_to_tokens`     | Write variables as CSS custom properties, a Tailwind v4 theme, or W3C design token files     |
+| `token_drift`          | Compare tokens in code with the variables, and optionally list layers with raw token values  |
+| `sync_tokens`          | Bring changes from code into the variables and remember the link; canvas edits are kept      |
 
 ### Analyze
 
@@ -495,6 +506,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `lint`                    | Check accessibility and consistency issues, with fixes and suggestions                                          |
 | `lint_fix`                | Apply safe lint fixes, and optionally the first suggestion of each finding                                      |
 | `analyze_overlaps`        | Find layers that overlap or overflow, most severe first                                                         |
+| `check_responsive`        | Lay out a copy of a frame at several widths and report warnings, without changing the document                   |
 | `design_to_component_map` | List components with their variants, props, and instance counts, the screens, and how they depend on each other |
 
 ### Diff
@@ -523,6 +535,16 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `get_statuses` | List the document's statuses and the sections, frames, components, and instances that show one, optionally only one status |
 | `set_status`   | Give a layer one of the document's statuses by name, or clear it                                                           |
+
+### Design memory
+
+| Tool                     | Description                                                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `get_design_memory`      | Read the colors, fonts, font sizes, spacing and radii the document allows, how each is enforced, its decisions and its examples |
+| `check_design_values`    | Check values before using them: each is ok, warned, refused or invalid, with the nearest allowed value                           |
+| `record_design_decision` | Write a decision down in the memory and optionally pin a frame that shows it; it cannot change what the memory allows             |
+
+An edit by an agent that brings in a color or font the design memory does not allow is undone, and its error names the nearest allowed values; so is a variable or style it creates or changes with such a value, and any change to the memory beyond appending decisions and pinning examples. Values kept on layers the call duplicates, groups, flattens or converts are not refused, and Pairdraw's defaults for new layers only warn; a value the call writes is judged even when the document already uses it elsewhere. A variable an agent rescopes is judged on what its new scopes let in. Off-scale font sizes, spacing and radii go through, and the result carries a `design_memory` warning. People's own edits, including CLI commands, are never refused; the Lint tab lists them.
 
 ### Navigation
 

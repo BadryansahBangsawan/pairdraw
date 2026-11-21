@@ -4,6 +4,7 @@ import { nodeToXPath } from '@pairdraw/core/xpath'
 
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'
+import { exploreVariationsOf } from '@/app/ai/explore/variations'
 import type { EditorStore } from '@/app/editor/active-store'
 import {
   pasteClipboardToReplace,
@@ -139,6 +140,18 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
     copyXPath,
     copyAsPNG,
     copyAsHTML,
+    /** Whether the selection is one layer the chat can make versions of, beside it. */
+    canExploreVariations: () => {
+      void store.state.sceneVersion
+      const [id, ...rest] = ids()
+      return (
+        !!id && rest.length === 0 && acceptsDocumentPrompts(store) && store.canCreateVariations(id)
+      )
+    },
+    exploreVariations: () => {
+      const [id] = ids()
+      if (id) exploreVariationsOf(store, id)
+    },
     canRunStickyPrompt: () => stickyPromptText() !== null,
     runStickyPrompt,
     canVectorizeImage: () => {

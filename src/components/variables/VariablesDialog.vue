@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useFileDialog } from '@vueuse/core'
 import { DialogTitle } from 'reka-ui'
-import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
+import { computed, defineAsyncComponent, provide, ref, shallowRef, watch } from 'vue'
 
 import type { DesignTokenBundle } from '@pairdraw/core/io/formats/design-tokens'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { createTokenCopy } from '@/app/editor/tokens/copy'
+import { recordTokenCSSLink, tokenCSSLink } from '@/app/editor/tokens/css-sync'
 import {
   DESIGN_TOKEN_FILE_ACCEPT,
   exportDesignTokenArchive,
@@ -19,8 +20,11 @@ import { useDocumentShortcuts } from '@/app/shell/keyboard/document'
 import { toast } from '@/app/shell/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { AppDialogClose, AppDialogRoot } from '@/components/ui/dialog'
+import { TOKEN_DRIFT } from '@/components/variables/drift'
 import TokenCSSSyncMenu from '@/components/variables/TokenCSSSyncMenu.vue'
 import TokensPanel from '@/components/variables/TokensPanel.vue'
+import TokenSyncStatus from '@/components/variables/TokenSyncStatus.vue'
+import { useTokenCSSDrift } from '@/components/variables/useTokenCSSDrift'
 
 const store = useEditorStore()
 const open = computed({
@@ -41,8 +45,13 @@ const copyTokens = createTokenCopy(store)
 const TokenImportDialog = defineAsyncComponent(
   () => import('@/components/variables/TokenImportDialog.vue')
 )
+const TokenSyncReviewDialog = defineAsyncComponent(
+  () => import('@/components/variables/TokenSyncReviewDialog.vue')
+)
 const importBundle = shallowRef<DesignTokenBundle | null>(null)
 const importOpen = ref(false)
+/** Whether the preview is of the linked stylesheet, which the document records once imported. */
+const importFromLink = ref(false)
 
 function reportFailure(error: unknown) {
   toast.error(
@@ -62,6 +71,7 @@ function importFiles(files: readonly File[]) {
     const sources = await readDesignTokenFiles(files)
     const { readDesignTokens } = await import('@pairdraw/core/io/formats/design-tokens')
     if (request !== importRequest) return
+    importFromLink.value = false
     importBundle.value = readDesignTokens(sources)
     importOpen.value = true
   })().catch((error: unknown) => {
@@ -100,8 +110,19 @@ watch(
 /** A linked stylesheet's custom properties, previewed in the same import dialog. */
 function previewCSS(bundle: DesignTokenBundle) {
   importRequest++
+  importFromLink.value = true
   importBundle.value = bundle
   importOpen.value = true
+}
+
+// The rows and the status follow the linked stylesheet while the dialog is open.
+const { drift: tokenDrift, byVariable } = useTokenCSSDrift(store, open)
+provide(TOKEN_DRIFT, byVariable)
+const linkedFile = computed(() => tokenCSSLink(store).value?.name ?? '')
+const reviewOpen = ref(false)
+
+function onImported() {
+  if (importFromLink.value) recordTokenCSSLink(store).catch(reportFailure)
 }
 
 function exportTokens() {
@@ -128,7 +149,8 @@ function exportTokens() {
         >
           <icon-lucide-file-input class="size-3.5" />
         </IconButton>
-        <TokenCSSSyncMenu @preview="previewCSS" />
+        <TokenSyncStatus :drift="tokenDrift" :file="linkedFile" @review="reviewOpen = true" />
+        <TokenCSSSyncMenu @preview="previewCSS" @review="reviewOpen = true" />
         <IconButton
           :label="expanded ? variables.collapse : variables.expand"
           data-test-id="variables-expand"
@@ -145,6 +167,8 @@ function exportTokens() {
       v-model:open="importOpen"
       :bundle="importBundle"
       @choose-folder="tokenFolder.open()"
+      @imported="onImported"
     />
+    <TokenSyncReviewDialog v-model:open="reviewOpen" :drift="tokenDrift ?? []" :file="linkedFile" />
   </AppDialogRoot>
 </template>

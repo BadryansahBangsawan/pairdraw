@@ -16,6 +16,7 @@ export const importMermaid = defineTool({
   description:
     'Import a Mermaid flowchart (`flowchart` or `graph`) as editable FigJam layers, laid out automatically so nothing overlaps: each node a shape with text in its Mermaid shape, each subgraph a section, and each edge an elbowed connector joined to the layers it links, with its arrowheads, dotted or thick line, and label. classDef, class, and style fills, strokes, and text colours carry over. Without x and y the diagram goes to the right of what the parent already holds. Returns the layer id of every node and subgraph and the connector id of every edge, by Mermaid id.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   input: v.strictObject({
     mermaid: v.pipe(
       v.string(),

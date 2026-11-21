@@ -47,7 +47,7 @@ Zawartość kart „Design” i „Kod” zależy od zaznaczenia; obok nich jest
 Pairdraw używa Skia przez CanvasKit WASM — tego samego silnika graficznego co Figma:
 
 - gradienty liniowe, radialne, kątowe i diamentowe;
-- wypełnienia obrazami z różnymi trybami skalowania;
+- wypełnienia obrazami z różnymi trybami skalowania i regulacjami (ekspozycja, kontrast, nasycenie, temperatura, odcień, światła, cienie);
 - efekty z pamięcią podręczną dla każdego obiektu;
 - łuki, częściowe elipsy i pierścienie;
 - pomijanie obiektów poza widokiem i ponowne użycie pędzli;

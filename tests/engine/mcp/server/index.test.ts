@@ -1164,6 +1164,23 @@ describe('app call deadlines', () => {
     }
   })
 
+  test('a long read such as a video recording gets the edit deadline', async () => {
+    const ctx = await createTestClient([], 'document', {
+      rpcTimeoutMs: 100,
+      documentRPCTimeoutMs: 5_000
+    })
+    try {
+      ctx.browser.delays.set('tool', 400)
+      const result = await ctx.client.callTool({ name: 'export_video', arguments: {} })
+
+      // The app's own answer arrives, not the read deadline's timeout.
+      expect(resultText(result)).not.toContain('timed out')
+      expect(resultText(result)).toContain('This page has no frames to play')
+    } finally {
+      await ctx.close()
+    }
+  })
+
   test('a read sent while an edit runs waits for it instead of timing out', async () => {
     const ctx = await createTestClient([], 'document', {
       rpcTimeoutMs: 100,

@@ -236,6 +236,7 @@ export class FigmaNodeProxy {
   declare textStyleId: string | symbol
   declare fillStyleId: string | symbol
   declare textDecoration: SceneNode['textDecoration'] | symbol
+  declare readonly openTypeFeatures: Record<string, boolean> | symbol
   declare maxLines: number | null
   declare listSpacing: number | symbol
   declare paragraphSpacing: number | symbol

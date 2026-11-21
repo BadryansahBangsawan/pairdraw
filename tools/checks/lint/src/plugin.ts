@@ -13,6 +13,7 @@ import { noHandRolledBase64Rule } from '#lint/rules/quality/base64.ts'
 import { preferEsToolkitRule } from '#lint/rules/quality/es-toolkit.ts'
 import { noUnvalidatedJSONParseRule } from '#lint/rules/quality/json-parse.ts'
 import { noModuleMockingRule } from '#lint/rules/quality/module-mocking.ts'
+import { noNodeCollectionWriteRule } from '#lint/rules/quality/node-collection-write.ts'
 import { noReduceAccumulatorCopyRule } from '#lint/rules/quality/reduce-accumulator-copy.ts'
 import { noUnknownTailwindClassesRule } from '#lint/rules/quality/tailwind-classes.ts'
 import { valibotSchemaConventionsRule } from '#lint/rules/quality/valibot-schemas.ts'
@@ -512,6 +513,7 @@ const plugin = {
     'no-unvalidated-json-parse': noUnvalidatedJSONParseRule,
     'prefer-es-toolkit': preferEsToolkitRule,
     'no-module-mocking': noModuleMockingRule,
+    'no-node-collection-write': noNodeCollectionWriteRule,
     'no-reduce-accumulator-copy': noReduceAccumulatorCopyRule,
     'no-widen-then-assert': noWidenThenAssertRule,
     'no-sibling-domain-prefixed-files': noSiblingDomainPrefixedFiles,

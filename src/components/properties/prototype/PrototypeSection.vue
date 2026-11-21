@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   PrototypeNodeAction,
   PrototypeReaction,
@@ -9,7 +10,9 @@ import type {
 } from '@pairdraw/scene-graph'
 import { useI18n } from '@pairdraw/vue/i18n'
 
-import { actionChoice, primaryAction, type ActionChoice } from '@/app/editor/prototype/reactions'
+import { openVideoExport } from '@/app/document/export/video/open'
+import { useEditorStore } from '@/app/editor/active-store'
+import { actionChoice, type ActionChoice } from '@/app/editor/prototype/reactions'
 import { usePrototype } from '@/app/editor/prototype/use'
 import NumberField from '@/components/inputs/NumberField.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -17,6 +20,7 @@ import PanelSection from '@/components/ui/panel/PanelSection.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 
 const { panels } = useI18n()
+const store = useEditorStore()
 const {
   reactions,
   targets,
@@ -69,6 +73,14 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
         @click="play"
       >
         <icon-lucide-play class="size-3.5" />
+      </IconButton>
+      <IconButton
+        v-if="targets.length > 0"
+        :label="panels.prototypeExportVideo"
+        data-property="prototype-export-video"
+        @click="openVideoExport(store)"
+      >
+        <icon-lucide-clapperboard class="size-3.5" />
       </IconButton>
       <IconButton
         :label="panels.prototypeAddInteraction"

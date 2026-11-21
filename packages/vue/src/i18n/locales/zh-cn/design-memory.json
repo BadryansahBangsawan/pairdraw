@@ -1,0 +1,70 @@
+{
+  "designMemory": "设计记忆",
+  "editDesignMemory": "编辑设计记忆…",
+  "createFromDocument": "从此文档创建",
+  "emptyHint": "智能体在此文档中必须遵循的颜色、字体和间距。",
+  "colorCount": {
+    "many": "{count} 种颜色"
+  },
+  "fontCount": {
+    "many": "{count} 种字体"
+  },
+  "sizeCount": {
+    "many": "{count} 种字号"
+  },
+  "decisionCount": {
+    "many": "{count} 条决定"
+  },
+  "exampleCount": {
+    "many": "{count} 个示例"
+  },
+  "rules": "规则",
+  "decisions": "决定",
+  "examples": "示例",
+  "colors": "颜色",
+  "fonts": "字体",
+  "fontSizes": "字号",
+  "spacing": "间距",
+  "radius": "圆角半径",
+  "fromSystem": "包含变量和样式",
+  "fromSystemCount": {
+    "many": "来自变量和样式的 {count} 个值"
+  },
+  "enforcement": "当智能体使用其他值时",
+  "refuse": "撤销该编辑",
+  "warn": "警告",
+  "off": "关闭",
+  "notChecked": "尚未允许任何值，因此不检查",
+  "addValue": "添加值",
+  "pickColor": "选择颜色",
+  "moreValues": "另外 {count} 个",
+  "removeValue": "移除 {value}",
+  "newDecision": "写下智能体应遵循的决定",
+  "addDecision": "添加决定",
+  "removeDecision": "移除决定",
+  "byAgent": "智能体",
+  "noDecisionsYet": "还没有决定",
+  "noDecisions": "写下智能体应遵循的选择，例如哪种颜色用于主要操作。",
+  "editDecision": "编辑决定",
+  "moveUp": "上移",
+  "moveDown": "下移",
+  "noExamplesYet": "还没有示例",
+  "noExamples": "选择一个展示正确设计的画框，并将其固定为示例。",
+  "pinExample": "固定为示例",
+  "unpinExample": "取消固定示例",
+  "showExample": "显示",
+  "removeExample": "移除示例",
+  "missingExample": "已不在文档中",
+  "learn": "从所选内容学习",
+  "learnHeading": "所选内容使用的值",
+  "learnHint": "只使用过一次的值默认不勾选。",
+  "uses": {
+    "many": "使用 {count} 次"
+  },
+  "addChecked": "添加已勾选的值",
+  "nothingToLearn": "所选内容没有使用记忆尚未允许的值。",
+  "deleteMemory": "删除设计记忆",
+  "allow": "允许 {value}",
+  "allowed": "已允许 {value}",
+  "refused": "已被设计记忆撤销"
+}

@@ -85,6 +85,11 @@ export function createKeyboardActions({
       store.setRotationPreview(null)
       return
     }
+    // Esc leaves the eyedropper without touching the selection or a waiting color picker.
+    if (store.state.activeTool === 'EYEDROPPER') {
+      store.setTool('SELECT')
+      return
+    }
     if (store.state.imageEdit) {
       // Escape during a crop or reframe drag only puts the layer back, which the canvas does;
       // the image stays open, as in Figma.

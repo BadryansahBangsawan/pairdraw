@@ -213,16 +213,17 @@ describe('development MCP restart wiring', () => {
   })
 
   test('giving up names how many restarts were used', async () => {
-    vi.useFakeTimers()
+    // Real timers: the plugin's restart waits are the life of this test, and its start path also
+    // waits on real work (mkdir, a readiness line over a pipe). A fake clock cannot drive that
+    // work, so advancing it can strand a start the platform has not reached yet.
     const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const gate = trackChildren()
     try {
       const plugin = await startPlugin(gate.spawn)
 
-      for (const delay of [5, 10, 20]) {
-        const next = gate.spawned(gate.children.length + 1)
+      for (const count of [2, 3, 4]) {
+        const next = gate.spawned(count)
         crash(gate.children.at(-1))
-        vi.advanceTimersByTime(delay)
         await next
         await acceptHealth()
       }
@@ -230,9 +231,9 @@ describe('development MCP restart wiring', () => {
 
       expect(reportedAttempts(logged.mock.calls)).toEqual([3])
       expect(gate.children).toHaveLength(4)
-      const armed = vi.getTimerCount()
-      vi.advanceTimersByTime(1000)
-      await awaitSpawnIfTimerFired(armed, gate, 5)
+      // Past the wait a fourth attempt would take (the policy's third wait is 20 ms), so a
+      // restart that was wrongly still planned would have started by now.
+      await Bun.sleep(100)
       expect(gate.children).toHaveLength(4)
       await stopPlugin(plugin)
     } finally {

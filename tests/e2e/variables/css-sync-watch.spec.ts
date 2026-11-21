@@ -85,3 +85,33 @@ test('watching pulls an external change, off leaves later changes alone', async 
   await expect(output).not.toContainText(/#123456/i)
   editor.canvas.assertNoErrors()
 })
+
+test('a watched change never overwrites a value edited on the canvas', async () => {
+  await stubStylesheet(
+    ['/* App theme */', ':root {', '  --brand: #ff5b2e;', '  --gap: 8px;', '}', ''].join('\n')
+  )
+  const dialog = await openVariables()
+  await linkAndConfirm(dialog)
+  await setWatching(dialog, true)
+
+  // The designer changes the brand color; the developer changes the gap and the brand color.
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const brand = [...store.graph.variables.values()].find((entry) => entry.name === 'brand')
+    if (!brand) throw new Error('No brand')
+    const [collection] = store.graph.variableCollections.values()
+    if (!collection) throw new Error('No collection')
+    store.updateVariableValue(brand.id, collection.defaultModeId, { r: 0, g: 0, b: 1, a: 1 })
+  })
+  await changeStylesheet('/* App theme */\n:root {\n  --brand: #00ff00;\n  --gap: 12px;\n}\n')
+
+  const output = dialog.getByTestId('token-output')
+  await expect(async () => {
+    await expect(output).toContainText(/--gap: 12px/i)
+  }).toPass()
+  await expect(output).toContainText(/--brand: #0000ff/i)
+  await expect(
+    editor.page.locator('[data-slot="toast"]').filter({ hasText: 'Review them in Variables.' })
+  ).toBeVisible()
+})

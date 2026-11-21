@@ -1,0 +1,1 @@
+- Noise and texture values a damaged `.fig` stores out of range are held within Figma's limits on import, so a NaN density no longer stops rendering.

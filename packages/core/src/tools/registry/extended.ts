@@ -9,7 +9,13 @@ import {
   lint,
   lintFix
 } from '#core/tools/analyze'
-import { designToComponentMap, designToTokens, importDesignTokens } from '#core/tools/codegen'
+import {
+  designToComponentMap,
+  designToTokens,
+  importDesignTokens,
+  syncTokens,
+  tokenDrift
+} from '#core/tools/codegen'
 import { addComment, getComments, replyToComment, resolveComment } from '#core/tools/comments'
 import {
   createComponent,
@@ -33,6 +39,11 @@ import {
   searchIconsTool,
   setBehaviour
 } from '#core/tools/create'
+import {
+  checkDesignValuesTool,
+  getDesignMemory,
+  recordDesignDecisionTool
+} from '#core/tools/design-memory'
 import {
   generateImage,
   generateSVG,
@@ -79,8 +90,10 @@ import { getStatuses, setStatus } from '#core/tools/statuses'
 import {
   arrangeNodes,
   cloneNode,
+  createVariationsTool,
   flattenNodes,
   groupNodes,
+  listVariations,
   nodeAncestors,
   nodeBindings,
   nodeBounds,
@@ -89,6 +102,7 @@ import {
   nodeReplaceWith,
   nodeToComponent,
   nodeTree,
+  pickVariation,
   renameNode,
   ungroupNode
 } from '#core/tools/structure'
@@ -116,6 +130,7 @@ import {
   exportImage,
   exportPDF,
   exportSVG,
+  exportVideo,
   pathFlip,
   pathGet,
   pathMove,
@@ -150,6 +165,9 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   resolveComment,
   getStatuses,
   setStatus,
+  getDesignMemory,
+  checkDesignValuesTool,
+  recordDesignDecisionTool,
   getFontStatus,
   listFonts,
   listAvailableFonts,
@@ -212,6 +230,10 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   nodeBindings,
   nodeReplaceWith,
   arrangeNodes,
+  // Variations: versions of a layer side by side, one of which can replace it
+  createVariationsTool,
+  listVariations,
+  pickVariation,
   // Variables
   listVariables,
   listCollections,
@@ -241,6 +263,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   exportSVG,
   exportPDF,
   exportImage,
+  exportVideo,
   exportHTML,
   // Analyze & diff
   analyzeColors,
@@ -257,5 +280,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   // Codegen
   designToTokens,
   importDesignTokens,
+  tokenDrift,
+  syncTokens,
   designToComponentMap
 ]

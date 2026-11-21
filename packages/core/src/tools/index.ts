@@ -7,6 +7,7 @@ export type {
   ComponentCatalogLibraryAsset
 } from './component-catalog'
 export { getHTMLToolHost, registerHTMLToolHost, type HTMLToolHost } from './html-host'
+export { getVideoEncoder, registerVideoEncoder } from './video-host'
 export { getScriptToolHost, registerScriptToolHost, type ScriptToolHost } from './script/host'
 export { SCRIPT_EXAMPLES, type ScriptExampleName } from './script/examples'
 export { ALL_TOOLS, CORE_TOOLS, EXTENDED_TOOLS } from './registry'

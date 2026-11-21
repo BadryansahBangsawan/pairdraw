@@ -28,6 +28,7 @@ export function expectFills<T>(fills: readonly T[] | symbol, label = 'fills'): r
  */
 export function shadowEffectAt(effects: readonly Effect[], index = 0): ShadowEffect {
   const effect = expectDefined(effects[index], `effect ${index}`)
-  if (effect.type === 'SHADER') throw new Error(`effect ${index} was expected to be a shadow`)
+  if (effect.type === 'SHADER' || effect.type === 'NOISE' || effect.type === 'TEXTURE')
+    throw new Error(`effect ${index} was expected to be a shadow`)
   return effect
 }

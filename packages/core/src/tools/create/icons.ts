@@ -99,6 +99,7 @@ export const insertIcon = defineTool({
   description:
     'Insert one or more vector icons onto the canvas. Pass a single name or multiple names to batch-insert into the same parent. If already cached by fetch_icons — instant, no network request. Material Symbols icons (material-symbols-outlined, -rounded, -sharp) take weight, fill, grade, and optical_size; the icon keeps them when swapped.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     names: v.optional(

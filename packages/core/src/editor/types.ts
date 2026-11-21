@@ -57,6 +57,8 @@ export type Tool =
   | 'ZOOM'
   /** Figma's K: handles scale layers with their text, strokes, effects, and spacing. */
   | 'SCALE'
+  /** Figma's I: samples the colour the document shows at the pointer into the selection. */
+  | 'EYEDROPPER'
 
 /** The gradient whose handles the canvas shows while its paint picker is open. */
 export interface GradientEdit {

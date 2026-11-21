@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Le rayon d’angle doit venir de l’échelle des rayons ou d’une variable.",
   "ruleNoHardcodedColors": "Couleur non liée",
   "ruleNoHardcodedColorsHelp": "Cette couleur correspond à une variable de couleur. Liez-la pour que les changements de thème et de palette atteignent ce calque.",
+  "ruleNoUnboundTokenValues": "Valeur de token non liée",
+  "ruleNoUnboundTokenValuesHelp": "Ce rayon, cet espacement ou cette taille de police correspond à un token. Liez-le pour que les changements du token atteignent ce calque.",
   "detailStrokeColor": "Contour : {variable}",
   "bindVariable": "Lier à {variable}",
   "bindAll": "Tout lier ({count})",
@@ -80,5 +82,15 @@
   "ruleNoMixedStyles": "Styles de texte mélangés",
   "ruleNoMixedStylesHelp": "Plusieurs styles dans un même calque de texte se cassent facilement à l’édition.",
   "ruleNoDetachedInstances": "Ressemble à un composant",
-  "ruleNoDetachedInstancesHelp": "Ce cadre ressemble à un élément réutilisable. Utilisez une instance de composant."
+  "ruleNoDetachedInstancesHelp": "Ce cadre ressemble à un élément réutilisable. Utilisez une instance de composant.",
+  "ruleDesignMemoryColors": "Couleur hors de la mémoire de design",
+  "ruleDesignMemoryColorsHelp": "Utilisez une couleur que la mémoire de design autorise, ou autorisez celle-ci.",
+  "ruleDesignMemoryFonts": "Police hors de la mémoire de design",
+  "ruleDesignMemoryFontsHelp": "Utilisez une police que la mémoire de design autorise, ou autorisez celle-ci.",
+  "ruleDesignMemoryFontSizes": "Taille de police hors de la mémoire de design",
+  "ruleDesignMemoryFontSizesHelp": "Utilisez une taille de police de la mémoire de design, ou autorisez celle-ci.",
+  "ruleDesignMemorySpacing": "Espacement hors de la mémoire de design",
+  "ruleDesignMemorySpacingHelp": "Utilisez un espacement de la mémoire de design, ou autorisez celui-ci.",
+  "ruleDesignMemoryRadius": "Rayon hors de la mémoire de design",
+  "ruleDesignMemoryRadiusHelp": "Utilisez un rayon d’angle de la mémoire de design, ou autorisez celui-ci."
 }

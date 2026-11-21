@@ -18,7 +18,6 @@ import { releaseFigPopulationWorker } from '#core/kiwi/fig/population/client'
 import { releaseOriginalFigArchive } from '#core/kiwi/fig/session/original-archive'
 import { installTextMeasurer } from '#core/layout'
 import { createLayoutRunner } from '#core/layout/mutations'
-import { emitNavigationTrace } from '#core/profiler'
 import { TextEditor } from '#core/text/editor'
 import { fontManager } from '#core/text/font/manager'
 import { fontResolver } from '#core/text/resolver'
@@ -39,6 +38,7 @@ import { createConnectorDrawActions, createConnectorEndpointActions } from './co
 import { createConnectorLineActions } from './connectors/line'
 import { createConnectorRouting } from './connectors/routing'
 import { createConnectorStyleActions } from './connectors/style'
+import { createDesignMemoryActions } from './design-memory'
 import { createDesignTokenActions } from './design-tokens'
 import { createDocumentSettingsActions } from './document-settings'
 import { createFigCompressionActions } from './fig-compression'
@@ -52,6 +52,7 @@ import { createLineEndActions } from './line-ends'
 import { createNodeActions } from './nodes'
 import { createPageActions } from './pages'
 import { createReadOnlyActions, guardReadOnly, guardUndo } from './read-only'
+import { createRenderRequests } from './render-requests'
 import { createScaleActions } from './scale'
 import { createSelectionActions } from './selection'
 import { createShaderActions } from './shaders/actions'
@@ -77,6 +78,7 @@ import type {
 } from './types'
 import { createUndoActions } from './undo'
 import { createVariableActions } from './variables'
+import { createVariationActions } from './variations'
 import { createVectorizeActions } from './vectorize'
 import { createViewportActions, NO_VIEWPORT_INSETS } from './viewport'
 import { createCanvasViewActions, offeredTool, resolveEditorProfile } from './views'
@@ -156,46 +158,13 @@ export function createEditor(options?: EditorOptions) {
     return events.on(event, handler)
   }
 
-  function requestRender() {
-    state.renderVersion++
-    state.sceneVersion++
-    state.canvasVersion++
-    emitNavigationTrace('render:requested', {
-      kind: 'render',
-      renderVersion: state.renderVersion,
-      sceneVersion: state.sceneVersion
-    })
-    emitEditorEvent('render:requested', {
-      renderVersion: state.renderVersion,
-      sceneVersion: state.sceneVersion
-    })
-  }
-
-  /**
-   * The caret or selection of the edited text moved: the canvas repaints its overlay and the
-   * views that follow the selection update, without the document counting as changed.
-   */
-  function textSelectionChanged() {
-    state.textSelectionVersion++
-    requestRepaint()
-  }
-
-  function requestRefresh() {
-    state.sceneVersion++
-  }
-
-  function requestRepaint() {
-    state.renderVersion++
-    emitNavigationTrace('render:requested', {
-      kind: 'repaint',
-      renderVersion: state.renderVersion,
-      sceneVersion: state.sceneVersion
-    })
-    emitEditorEvent('repaint:requested', {
-      renderVersion: state.renderVersion,
-      sceneVersion: state.sceneVersion
-    })
-  }
+  const {
+    requestRender,
+    requestRefresh,
+    requestRepaint,
+    textSelectionChanged,
+    setNavigationPhase
+  } = createRenderRequests(state, emitEditorEvent)
 
   /** Track an actual live edit independently of history batching. Release is idempotent. */
   function beginInteractiveEdit() {
@@ -204,31 +173,6 @@ export function createEditor(options?: EditorOptions) {
     requestRepaint()
     return () => {
       if (interactiveEdits.delete(token)) requestRepaint()
-    }
-  }
-
-  function setNavigationPhase(phase: EditorState['navigation']['phase'], inputAt = 0) {
-    const previous = { ...state.navigation }
-    const active = phase === 'pan' || phase === 'zoom' || phase === 'momentum'
-    const wasActive =
-      previous.phase === 'pan' || previous.phase === 'zoom' || previous.phase === 'momentum'
-    state.navigation = {
-      phase,
-      generation: active && !wasActive ? previous.generation + 1 : previous.generation,
-      lastInputAt: inputAt || previous.lastInputAt
-    }
-    if (
-      state.navigation.phase !== previous.phase ||
-      state.navigation.generation !== previous.generation ||
-      state.navigation.lastInputAt !== previous.lastInputAt
-    ) {
-      emitNavigationTrace('navigation:phase', {
-        phase: state.navigation.phase,
-        previousPhase: previous.phase,
-        generation: state.navigation.generation,
-        lastInputAt: state.navigation.lastInputAt
-      })
-      emitEditorEvent('navigation:changed', state.navigation, previous)
     }
   }
 
@@ -353,6 +297,8 @@ export function createEditor(options?: EditorOptions) {
   const shapesWithText = createShapeWithTextActions(ctx, nodes)
   const generatedText = createGeneratedTextActions(ctx, nodes)
   const statuses = createStatusActions(ctx)
+  const designMemory = createDesignMemoryActions(ctx)
+  const variations = createVariationActions(ctx)
   const figCompression = createFigCompressionActions(ctx)
   createConnectorRouting(ctx)
   const connectorDrawing = createConnectorDrawActions(ctx)
@@ -577,6 +523,9 @@ export function createEditor(options?: EditorOptions) {
     getShownStatus: statuses.getShownStatus,
     setStatus: statuses.setStatus,
     setStatusWorkflow: statuses.setStatusWorkflow,
+    ...designMemory,
+    // Variations: copies of a layer side by side, one of which can replace it
+    ...variations,
     ...connectorDrawing,
     ...connectorEndpoints,
     ...connectorLines,

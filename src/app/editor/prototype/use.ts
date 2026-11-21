@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 
+import { framesOnPage } from '@pairdraw/core/prototype'
 import type {
   PrototypeReaction,
   PrototypeTransitionType,
@@ -10,7 +11,6 @@ import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 
-import { framesOnPage } from './frames'
 import type { ActionChoice } from './reactions'
 import {
   createReaction,

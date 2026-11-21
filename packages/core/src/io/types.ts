@@ -44,16 +44,35 @@ export interface ReadDocumentInput {
 }
 
 /** Something a document names that reading it could not bring in; it opens without it. */
-export interface ReadDocumentWarning {
-  kind: 'unresolved-imports'
-  /**
-   * Why: the host gives no access to files beside the document, as a browser does, or the files
-   * could not be read or are not documents of the format.
-   */
-  reason: 'no-file-access' | 'unreadable'
-  /** The paths the document names them with. */
-  paths: string[]
-}
+export type ReadDocumentWarning =
+  | {
+      kind: 'unresolved-imports'
+      /**
+       * Why: the host gives no access to files beside the document, as a browser does, or the
+       * files could not be read or are not documents of the format.
+       */
+      reason: 'no-file-access' | 'unreadable'
+      /** The paths the document names them with. */
+      paths: string[]
+    }
+  | {
+      /** Variables a document references that it does not define, which read as their fallbacks. */
+      kind: 'unknown-variable'
+      /** The variable names as the document writes them, without the `$`. */
+      names: string[]
+    }
+  | {
+      /** Image files a paint names that the host opened the document without. */
+      kind: 'missing-image'
+      /** The URLs as the document writes them. */
+      urls: string[]
+    }
+  | {
+      /** Node types this reader does not know, which read as placeholder frames. */
+      kind: 'unknown-node'
+      /** The type names as the document writes them. */
+      types: string[]
+    }
 
 export interface ReadDocumentResult {
   graph: SceneGraph

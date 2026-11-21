@@ -14,6 +14,7 @@ import { useConversationPins } from '@/app/ai/chat/pins/use'
 import { useAIChat } from '@/app/ai/chat/use'
 import { getActiveEditorStore } from '@/app/editor/active-store'
 import { openSettingsDialog } from '@/app/settings/dialog'
+import ChatUsageTotal from '@/components/chat/usage/ChatUsageTotal.vue'
 
 import ChatContextMeter from './ChatContextMeter.vue'
 import ChatContextPins from './ChatContextPins.vue'
@@ -78,6 +79,7 @@ function openVisionSettings() {
 
 <template>
   <ChatContextMeter :meter="meter" />
+  <ChatUsageTotal :messages="messages" />
   <ChatContextPins
     v-model:open="pinsOpen"
     :pins="pins.pins.value"

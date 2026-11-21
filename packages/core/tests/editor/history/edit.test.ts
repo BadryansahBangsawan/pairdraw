@@ -129,10 +129,14 @@ describe('recordEditAsync', () => {
         async () => editor.graph.updateNode(card.id, { x: edit + 1 })
       )
     }
-    await Bun.sleep(0)
-    Bun.gc(true)
-
     expect(firstChange.ref).toBeDefined()
+    // A WeakRef target stays alive until the job that used it ends, so one GC turn is not enough
+    // to observe a trimmed step being freed; collect over a few turns, as a slow runner needs.
+    for (let turn = 0; turn < 50 && firstChange.ref?.deref() !== undefined; turn++) {
+      Bun.gc(true)
+      await Bun.sleep(1)
+    }
+    Bun.gc(true)
     expect(firstChange.ref?.deref()).toBeUndefined()
   })
 })

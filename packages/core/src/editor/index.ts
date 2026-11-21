@@ -28,6 +28,7 @@ export {
   selectionColorsShown,
   type SelectionColor
 } from './selection/colors'
+export { DOCUMENT_COLOR_LIMIT, documentColors, type DocumentColor } from './document-colors'
 export {
   copyEditorViewState,
   createDefaultEditorViewState,
@@ -37,7 +38,9 @@ export { createDefaultEditorState, createEditor } from './create'
 export { syncEditedComponents } from './component-sync'
 export { executeAtomicTool } from './history/atomic-tool'
 export {
+  applyDocumentChange,
   isEmptyDocumentChange,
+  recordDocumentChange,
   touchedTopLevelIds,
   type DocumentChange
 } from './history/document-change'
@@ -89,6 +92,14 @@ export { opacityFromBuffer } from './nodes'
 export { layerTypeOptions, type LayerType } from './structure/layer-type'
 export type { NodePreview } from './node-preview'
 export { BOARD_TOOL_SHORTCUTS, BOARD_TOOLS, EDITOR_TOOLS, TOOL_SHORTCUTS } from './tool-registry'
+export {
+  applySampledColor,
+  eyedropperChanges,
+  sampleSceneColor,
+  sampleScenePixels,
+  scenePixelColor
+} from './eyedropper'
+export type { EyedropperTarget, ScenePixels } from './eyedropper'
 export {
   DEFAULT_SCALE_ANCHOR,
   isScaleAnchor,

@@ -122,6 +122,12 @@
       "import": "./dist/css/index.js",
       "default": "./dist/css/index.js"
     },
+    "./design-memory": {
+      "types": "./dist/design-memory/index.d.ts",
+      "bun": "./src/design-memory/index.ts",
+      "import": "./dist/design-memory/index.js",
+      "default": "./dist/design-memory/index.js"
+    },
     "./effects": {
       "types": "./dist/effects.d.ts",
       "bun": "./src/effects.ts",
@@ -392,6 +398,12 @@
       "import": "./dist/text/picture.js",
       "default": "./dist/text/picture.js"
     },
+    "./token-sources": {
+      "types": "./dist/token-sources/index.d.ts",
+      "bun": "./src/token-sources/index.ts",
+      "import": "./dist/token-sources/index.js",
+      "default": "./dist/token-sources/index.js"
+    },
     "./transfer": {
       "types": "./dist/transfer/index.d.ts",
       "bun": "./src/transfer/index.ts",
@@ -421,6 +433,12 @@
       "bun": "./src/variant-properties.ts",
       "import": "./dist/variant-properties.js",
       "default": "./dist/variant-properties.js"
+    },
+    "./variations": {
+      "types": "./dist/variations/index.d.ts",
+      "bun": "./src/variations/index.ts",
+      "import": "./dist/variations/index.js",
+      "default": "./dist/variations/index.js"
     },
     "./vector-network": {
       "types": "./dist/vector-network.d.ts",

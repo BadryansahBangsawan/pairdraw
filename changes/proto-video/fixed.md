@@ -1,0 +1,1 @@
+- Prototype play crossfades a Dissolve for its own duration, after a delay as well as on a click, and counts the next After delay from when the transition ends, as Figma does.

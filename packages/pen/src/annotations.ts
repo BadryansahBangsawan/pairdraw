@@ -30,6 +30,9 @@ const ANNOTATION_COLORS: Readonly<Record<string, Color>> = {
   context: STICKY_COLORS.gray
 }
 
+/** The annotation type names, which the reader knows even though they map to stickies. */
+export const ANNOTATION_TYPES: readonly string[] = Object.keys(ANNOTATION_COLORS)
+
 export function isAnnotation(pen: Pick<PenNode, 'type'>): boolean {
   return Object.hasOwn(ANNOTATION_COLORS, pen.type)
 }

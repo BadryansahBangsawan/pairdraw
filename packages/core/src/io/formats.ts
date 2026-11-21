@@ -338,15 +338,22 @@ export const svgFormat: IOFormatAdapter<'svg'> = {
   mimeTypes: ['image/svg+xml'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: { ...FIXED_SIZE_EXPORT, colorSpace: true },
-  async exportContent(request, options?: SVGExportOptions) {
+  async exportContent(request, options?: SVGExportOptions, context?: IOContext) {
     const target = resolveExportNodes(request)
     if (!target) throw new Error('Nothing to export')
     const { renderNodesToLaidOutSVG } = await import('./formats/svg/text/layout')
+    const { booleanPathResolver, needsBooleanPaths } = await import('./formats/boolean-path')
+    // A boolean made in Pairdraw stores no result path; the export computes it from the operands.
+    const booleanPath = needsBooleanPaths(request.graph)
+      ? await booleanPathResolver(context?.canvasKit, context?.renderer)
+      : undefined
     const data = await renderNodesToLaidOutSVG(
       request.graph,
       target.pageId,
       target.nodeIds,
-      options
+      { ...options, booleanPath },
+      context?.canvasKit,
+      context?.renderer
     )
     if (!data) throw new Error('Nothing to export')
     return {
@@ -398,11 +405,19 @@ export const pdfFormat: IOFormatAdapter<'pdf'> = {
   mimeTypes: ['application/pdf'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request, options?: PDFFormatExportOptions) {
+  async exportContent(request, options?: PDFFormatExportOptions, context?: IOContext) {
     const specs = await pdfPageSpecs(request, options)
     // Embedded, as Figma embeds every face its PDFs draw.
     const { exportPDFDocument } = await import('./formats/pdf/document')
-    const data = (await exportPDFDocument(request.graph, specs, { embedFonts: true }))?.data
+    const data = (
+      await exportPDFDocument(
+        request.graph,
+        specs,
+        { embedFonts: true },
+        context?.canvasKit,
+        context?.renderer
+      )
+    )?.data
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'pdf',
@@ -462,13 +477,39 @@ export const jsxFormat: IOFormatAdapter<'jsx'> = {
   mimeTypes: ['text/plain', 'text/jsx'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request): Promise<ExportResult> {
+  async exportContent(request, _options?: unknown, context?: IOContext): Promise<ExportResult> {
     const nodeId = ensureSingleNode(request.target)
     // A page or a document exports its top-level layers, as Tailwind JSX does.
     const target = nodeId ? null : resolveExportNodes(request)
+    const { booleanPathResolver, needsBooleanPaths } = await import('./formats/boolean-path')
+    const authored = needsBooleanPaths(request.graph)
+      ? [...request.graph.getAllNodes()].filter(
+          (node) => node.type === 'BOOLEAN_OPERATION' && node.fillGeometry.length === 0
+        )
+      : []
+    const restore: (() => void)[] = []
+    if (authored.length > 0) {
+      const { parseSVGPath } = await import('@pairdraw/scene-graph/parse-path')
+      const booleanPath = await booleanPathResolver(context?.canvasKit, context?.renderer)
+      for (const node of authored) {
+        const d = booleanPath(request.graph, node)
+        if (!d) continue
+        const network = parseSVGPath(d, 'EVENODD', { includeOpenRegions: true })
+        const carrier = node as typeof node & { vectorNetwork?: typeof network }
+        const previous = carrier.vectorNetwork
+        carrier.vectorNetwork = network
+        restore.push(() => {
+          carrier.vectorNetwork = previous
+        })
+      }
+    }
     let data = ''
-    if (nodeId) data = sceneNodeToJSX(nodeId, request.graph)
-    else if (target) data = selectionToJSX(target.nodeIds, request.graph)
+    try {
+      if (nodeId) data = sceneNodeToJSX(nodeId, request.graph)
+      else if (target) data = selectionToJSX(target.nodeIds, request.graph)
+    } finally {
+      for (const undo of restore) undo()
+    }
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'jsx',
@@ -489,7 +530,7 @@ export const htmlFormat: IOFormatAdapter<'html'> = {
   mimeTypes: ['text/html'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request, options?: HTMLExportOptions) {
+  async exportContent(request, options?: HTMLExportOptions, context?: IOContext) {
     const target = resolveExportNodes(request)
     if (!target) throw new Error('Nothing to export')
     const { renderNodesToHTML } = await import('./formats/html')
@@ -497,7 +538,8 @@ export const htmlFormat: IOFormatAdapter<'html'> = {
       request.graph,
       target.nodeIds,
       options,
-      request.fileName
+      request.fileName,
+      context
     )
     return {
       format: 'html',
@@ -519,12 +561,18 @@ export const tailwindJSXFormat: IOFormatAdapter<'tailwind-jsx'> = {
   mimeTypes: ['text/plain', 'text/jsx'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request) {
+  async exportContent(request, _options?: unknown, context?: IOContext) {
     const target = resolveExportNodes(request)
     if (!target) throw new Error('Nothing to export')
     const { sceneNodesToTailwindJSX } = await import('@pairdraw/dom-css/export')
     const { vectorElement } = await import('#core/io/formats/html/vectors')
-    const data = sceneNodesToTailwindJSX(request.graph, target.nodeIds, { vectorElement })
+    const { booleanPathResolver, needsBooleanPaths } = await import('./formats/boolean-path')
+    const booleanPath = needsBooleanPaths(request.graph)
+      ? await booleanPathResolver(context?.canvasKit, context?.renderer)
+      : undefined
+    const data = sceneNodesToTailwindJSX(request.graph, target.nodeIds, {
+      vectorElement: (graph, node) => vectorElement(graph, node, booleanPath)
+    })
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'tailwind-jsx',

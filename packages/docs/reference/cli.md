@@ -138,7 +138,7 @@ pairdraw tokens app.fig --project ./app --write
 
 ## export
 
-Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories. The app does not offer PowerPoint or draw.io export; the CLI does.
+Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories, or record the page's prototype as an MP4, GIF, or WebM video. The app does not offer PowerPoint or draw.io export; the CLI does.
 
 ```sh
 pairdraw export [file] [options]
@@ -146,7 +146,7 @@ pairdraw export [file] [options]
 
 | Option | Alias | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook` |
+| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook`; `mp4`, `gif`, and `webm` record the prototype |
 | `--output` | `-o` | Output file path (default: `<name>.<format>`); a directory for `storybook` (default: `<name>-stories`) |
 | `--scale` | `-s` | Export scale (default: 1) |
 | `--quality` | `-q` | Quality 0–100, JPG/WEBP only (default: 90) |
@@ -164,6 +164,20 @@ pairdraw export [file] [options]
 | `--thumbnail` | | Export a page thumbnail fitted to `--width` and `--height`; PNG, JPG, or WEBP. Cannot combine with `--node` (a thumbnail is a whole page) |
 | `--width` | | Thumbnail width (default: 1920) |
 | `--height` | | Thumbnail height (default: 1080) |
+| `--start` | | Video: top-level frame name or ID to play from (default: the selected or the page's first frame) |
+| `--fps` | | Video: frames per second (default: 30, or 15 for GIF; GIF plays at most 50) |
+| `--max-edge` | | Video: longest width or height in pixels (default: 1920, or 960 for GIF); `--scale` sets the start frame's size below it |
+| `--max-duration` | | Video: seconds the clip may last at most (default: 30, at most 120) |
+| `--tail` | | Video: seconds the last frame stays when the flow ends (default: 1) |
+| `--click` | | Video: a click to run, `<seconds>:<layer name or ID>`; repeat it for more clicks |
+
+A video plays the prototype from its start frame as Play does, following each After delay and its Dissolve on a virtual clock rather than in real time, so the clip is the same on every run. It ends when play returns to the start frame (the GIF then loops), when nothing else happens, or at `--max-duration`. The command prints each step it recorded. MP4 (H.264) and WebM (VP9) are encoded with WebCodecs in the running app; from a file the CLI encodes them with `ffmpeg` when it is on the path (with `libx264` and `libvpx-vp9`), and otherwise records only GIF:
+
+```sh
+pairdraw export hero.fig -f gif --start "Hero 1" -o hero.gif
+pairdraw export -f mp4 --start "Hero 1" -o hero.mp4      # app mode
+pairdraw export app.fig -f gif --click 1.5:"Buy button" --click 3:Close
+```
 
 ## libraries
 
@@ -225,6 +239,14 @@ pairdraw eval [file] [options]
 | `--preview-scale` | | Preview scale from 0.1 to 4 (default: 1); the longest edge stays within 1280 pixels |
 | `--json` | | Output as JSON |
 | `--quiet` | `-q` | Suppress output |
+
+## design-memory
+
+Show the document's design memory: the colors, fonts, font sizes, spacing, and corner radii agents may use and how each is enforced, its decisions, and its examples. See [Analyzing Designs](/programmable/cli/analyzing#design-memory).
+
+```sh
+pairdraw design-memory [file] [--json]
+```
 
 ## analyze colors
 
@@ -420,6 +442,7 @@ pairdraw tool call <name> [file] [options]
 |--------|-------|-------------|
 | `--args` | | Tool arguments as a JSON object |
 | `--args-file` | | Read arguments from a JSON file, or `-` for stdin |
+| `--enforce-design-memory` | | Fail the call and write nothing when it uses a color or font the document's design memory refuses; without it, such values are warnings in the result |
 | `--write` | `-w` | Headless: write changes back to the input file |
 | `--output` | `-o` | Headless: write changes to a different file |
 | `--preview-output` | | Write a PNG of the current page after the tool changes the document |

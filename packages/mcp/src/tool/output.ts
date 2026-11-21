@@ -231,7 +231,8 @@ const FILE_OUTPUTS: Record<
   get_jsx: (result) => (typeof result.jsx === 'string' ? result.jsx : null),
   export_image: (result) =>
     typeof result.base64 === 'string' ? toUint8Array(result.base64) : null,
-  export_pdf: (result) => (typeof result.base64 === 'string' ? toUint8Array(result.base64) : null)
+  export_pdf: (result) => (typeof result.base64 === 'string' ? toUint8Array(result.base64) : null),
+  export_video: (result) => (typeof result.base64 === 'string' ? toUint8Array(result.base64) : null)
 }
 
 /** Whether a tool's `path` argument names a file it writes, rather than data of its own. */

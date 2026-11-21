@@ -33,7 +33,8 @@ const KIND_ICONS: Record<ChatReferenceKind, Component> = {
   page: IconFile,
   skill: IconBookOpen,
   element: IconCrosshair,
-  citation: IconQuote
+  citation: IconQuote,
+  command: IconSquareSlash
 }
 
 const SECTION_RANK: Record<ChatReferenceKind, number> = {
@@ -41,7 +42,8 @@ const SECTION_RANK: Record<ChatReferenceKind, number> = {
   page: 1,
   skill: 2,
   element: 3,
-  citation: 4
+  citation: 4,
+  command: 5
 }
 
 /** Element marks are not offered from `@`; a page section name keeps the record total. */

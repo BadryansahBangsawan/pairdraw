@@ -12,6 +12,7 @@ export type SettingsSection =
   | 'ai'
   | 'tools'
   | 'skills'
+  | 'prompts'
   | 'services'
   | 'mcp'
   | 'usage'

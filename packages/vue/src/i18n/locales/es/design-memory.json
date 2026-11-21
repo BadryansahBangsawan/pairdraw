@@ -1,0 +1,77 @@
+{
+  "designMemory": "Memoria de diseño",
+  "editDesignMemory": "Editar memoria de diseño…",
+  "createFromDocument": "Crear a partir de este documento",
+  "emptyHint": "Colores, fuentes y espaciados que los agentes deben respetar en este documento.",
+  "colorCount": {
+    "one": "{count} color",
+    "many": "{count} colores"
+  },
+  "fontCount": {
+    "one": "{count} fuente",
+    "many": "{count} fuentes"
+  },
+  "sizeCount": {
+    "one": "{count} tamaño de fuente",
+    "many": "{count} tamaños de fuente"
+  },
+  "decisionCount": {
+    "one": "{count} decisión",
+    "many": "{count} decisiones"
+  },
+  "exampleCount": {
+    "one": "{count} ejemplo",
+    "many": "{count} ejemplos"
+  },
+  "rules": "Reglas",
+  "decisions": "Decisiones",
+  "examples": "Ejemplos",
+  "colors": "Colores",
+  "fonts": "Fuentes",
+  "fontSizes": "Tamaños de fuente",
+  "spacing": "Espaciado",
+  "radius": "Radio de esquina",
+  "fromSystem": "Incluir variables y estilos",
+  "fromSystemCount": {
+    "one": "{count} valor de variables y estilos",
+    "many": "{count} valores de variables y estilos"
+  },
+  "enforcement": "Cuando un agente usa otro valor",
+  "refuse": "Deshacer la edición",
+  "warn": "Avisar",
+  "off": "Desactivado",
+  "notChecked": "Aún no hay nada permitido, así que no se comprueba",
+  "addValue": "Añadir valor",
+  "pickColor": "Elegir un color",
+  "moreValues": "{count} más",
+  "removeValue": "Quitar {value}",
+  "newDecision": "Escribe una decisión que deban seguir los agentes",
+  "addDecision": "Añadir decisión",
+  "removeDecision": "Quitar decisión",
+  "byAgent": "Agente",
+  "noDecisionsYet": "Aún no hay decisiones",
+  "noDecisions": "Anota las decisiones que deben seguir los agentes, como qué color marca la acción principal.",
+  "editDecision": "Editar decisión",
+  "moveUp": "Subir",
+  "moveDown": "Bajar",
+  "noExamplesYet": "Aún no hay ejemplos",
+  "noExamples": "Selecciona un marco que muestre el diseño bien hecho y fíjalo como ejemplo.",
+  "pinExample": "Fijar como ejemplo",
+  "unpinExample": "Dejar de fijar",
+  "showExample": "Mostrar",
+  "removeExample": "Quitar ejemplo",
+  "missingExample": "Ya no está en el documento",
+  "learn": "Aprender de la selección",
+  "learnHeading": "Valores que usa la selección",
+  "learnHint": "Los valores usados una sola vez empiezan sin marcar.",
+  "uses": {
+    "one": "{count} uso",
+    "many": "{count} usos"
+  },
+  "addChecked": "Añadir valores marcados",
+  "nothingToLearn": "La selección no usa valores que la memoria no permita ya.",
+  "deleteMemory": "Eliminar memoria de diseño",
+  "allow": "Permitir {value}",
+  "allowed": "{value} permitido",
+  "refused": "Deshecho por la memoria de diseño"
+}

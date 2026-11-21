@@ -96,7 +96,23 @@ export function createMockRenderer(overrides: Partial<SkiaRenderer> = {}): SkiaR
       ColorFilter: {
         MakeBlend: mock(() => ({ delete: () => undefined })),
         MakeMatrix: mock(() => ({ delete: () => undefined }))
-      }
+      },
+      // The noise effect compiles a grain shader over tile images; a test needs the shape of
+      // both, not their pixels.
+      RuntimeEffect: {
+        Make: mock(() => ({
+          getUniformCount: () => 1,
+          getUniformFloatCount: () => 2,
+          getUniform: () => ({ slot: 0, columns: 1, rows: 2, isInteger: false }),
+          getUniformName: () => 'cell',
+          makeShaderWithChildren: mock(() => ({ delete: () => undefined }))
+        }))
+      },
+      MakeImage: mock(() => ({
+        makeShaderOptions: mock(() => ({ delete: () => undefined })),
+        makeShaderCubic: mock(() => ({ delete: () => undefined })),
+        delete: () => undefined
+      }))
     },
     auxFill: {
       setColor: mock(() => undefined),
@@ -181,6 +197,11 @@ export function createMockRenderer(overrides: Partial<SkiaRenderer> = {}): SkiaR
       get: mock(() => null),
       set: mock(() => undefined)
     },
+    noiseTileCache: {
+      get: mock(() => null),
+      set: mock(() => undefined)
+    },
+    noiseGrainEffect: null,
     isRectangularType: mock(() => true),
     worldViewport: { x: 0, y: 0, w: 1000, h: 1000 },
     ...overrides

@@ -1,7 +1,10 @@
 import { getToolName, isToolUIPart } from 'ai'
 import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
-import { isEmptyObject } from 'es-toolkit'
+import { isEmptyObject, uniqBy } from 'es-toolkit'
 import { isValid } from 'js-base64'
+import * as v from 'valibot'
+
+import { DESIGN_MEMORY_GROUPS, type DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 
 export type ChatMessagePart = UIMessagePart<UIDataTypes, UITools>
 export type ToolCallPart = Extract<ChatMessagePart, { toolCallId: string }>
@@ -46,6 +49,20 @@ const SUMMARY_FIELDS = ['name', 'query', 'text', 'question', 'path', 'id'] as co
 
 /** A one-line description of what a call does, read from its (possibly partial) input. */
 export function toolSummary(part: ToolCallPart): string {
+  // Made versions read by their names, which say what each one tries.
+  if (
+    part.type === 'tool-create_variations' &&
+    part.state === 'output-available' &&
+    isRecord(part.output)
+  ) {
+    const { versions } = part.output
+    const names = Array.isArray(versions)
+      ? versions.flatMap((version) =>
+          isRecord(version) && typeof version.name === 'string' ? [version.name] : []
+        )
+      : []
+    if (names.length > 0) return truncate(names.join(', '))
+  }
   const input = part.input
   if (!isRecord(input)) return ''
   if (typeof input.jsx === 'string') return jsxSummary(input.jsx)
@@ -72,14 +89,14 @@ export function toolNodeIds(part: ToolCallPart): string[] {
   const ids = new Set<string>()
   const { input } = part
   if (isRecord(input)) {
-    for (const key of ['id', 'ids', 'replace_id', 'parent_id', 'parentId']) {
+    for (const key of ['id', 'ids', 'replace_id', 'parent_id', 'parentId', 'set_id']) {
       for (const id of stringIds(input[key])) ids.add(id)
     }
   }
   if (part.state === 'output-available' && isRecord(part.output)) {
     const { output } = part
     if (typeof output.deleted !== 'string') {
-      for (const key of ['id', 'ids', 'selection', 'results', 'created']) {
+      for (const key of ['id', 'ids', 'selection', 'results', 'created', 'set_id', 'versions']) {
         for (const id of stringIds(output[key])) ids.add(id)
       }
     }
@@ -92,6 +109,30 @@ export function toolErrorText(part: ToolCallPart): string | null {
   if (part.state !== 'output-available' || !isRecord(part.output)) return null
   const { error } = part.output
   return typeof error === 'string' ? error : null
+}
+
+const designRefusalSchema = v.object({
+  design_memory: v.object({
+    refused: v.array(
+      v.object({
+        group: v.picklist(DESIGN_MEMORY_GROUPS),
+        value: v.union([v.string(), v.number()])
+      })
+    )
+  })
+})
+
+/** The values the document's design memory refused in the call, each once, to offer to allow. */
+export function toolDesignRefusals(
+  part: ToolCallPart
+): { group: DesignMemoryGroup; value: string | number }[] {
+  if (part.state !== 'output-available') return []
+  const parsed = v.safeParse(designRefusalSchema, part.output)
+  if (!parsed.success) return []
+  return uniqBy(
+    parsed.output.design_memory.refused.map(({ group, value }) => ({ group, value })),
+    ({ group, value }) => `${group}:${value}`
+  )
 }
 
 /** An image the tool returned for the model, such as `export_image`, as a data URL. */

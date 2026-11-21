@@ -1,0 +1,16 @@
+{
+  "usageLabel": "トークン使用量",
+  "turnTokens": "{tokens} トークン",
+  "turnTokensCost": "{tokens} トークン · {cost}",
+  "chatTokens": "このチャットで {tokens} トークン",
+  "chatTokensCost": "このチャットで {tokens} トークン · {cost}",
+  "usageInput": "入力",
+  "usageCachedInput": "キャッシュされた入力",
+  "usageOutput": "出力",
+  "usageReasoning": "推論",
+  "usageCost": "推定コスト",
+  "usageTurns": "{count} 件の返信",
+  "usageHint": "各返信が報告したトークンから集計しています。コストはモデルの定価に基づく概算です。",
+  "usageNoCost": "このモデルの価格は登録されていないため、トークンのみを表示します。",
+  "usageAgentHint": "エージェントが報告したトークンから集計しています。コーディングエージェントにドル建ての価格はありません。"
+}

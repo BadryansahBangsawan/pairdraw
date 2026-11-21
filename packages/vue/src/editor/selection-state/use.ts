@@ -61,6 +61,13 @@ export function useSelectionState() {
     return editor.canConvertToFrame(id)
   })
 
+  /** Whether the selection is one layer that can be copied into a set of variations. */
+  const canCreateVariations = useSceneComputed(() => {
+    if (selectedIds.value.size !== 1) return false
+    const [id] = selectedIds.value
+    return editor.canCreateVariations(id)
+  })
+
   /** Whether the selection holds layers the Auto Arrange layouts take. */
   const canAutoArrange = useSceneComputed(() => editor.canAutoArrangeNodes([...selectedIds.value]))
 
@@ -78,6 +85,7 @@ export function useSelectionState() {
     canCreateComponentSet,
     canCreateSlot,
     canConvertToFrame,
+    canCreateVariations,
     canAutoArrange
   }
 }

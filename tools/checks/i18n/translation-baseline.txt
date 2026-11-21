@@ -13,6 +13,7 @@ de:automation.status
 de:automation.version
 de:chatContext.styleKitFontsPlaceholder
 de:chatContext.styleKitName
+de:chatUsage.usageReasoning
 de:code.editorDesignLabel
 de:code.sourceDesignJSX
 de:code.sourceHTML
@@ -22,6 +23,7 @@ de:code.styling
 de:code.stylingCSS
 de:code.stylingTailwind
 de:common.ok
+de:designMemory.byAgent
 de:diagnostics.categoryMCP
 de:diagnostics.categoryRenderer
 de:diagnostics.durationMs
@@ -53,6 +55,9 @@ de:panels.maskTypeAlpha
 de:panels.maxHeightShort
 de:panels.minHeightShort
 de:panels.missingLibraryUsage
+de:panels.noiseDuo
+de:panels.noiseMono
+de:panels.noiseMulti
 de:panels.position
 de:panels.radialGradient
 de:panels.radius
@@ -88,6 +93,8 @@ es:ai.notifyTitle
 es:automation.statusError
 es:chatContext.contextUsageTokens
 es:chatContext.styleKitFontsPlaceholder
+es:chatUsage.turnTokens
+es:chatUsage.turnTokensCost
 es:code.editorDesignLabel
 es:code.sourceDesignJSX
 es:code.sourceHTML
@@ -110,6 +117,7 @@ es:panels.framePresetCategoryFigmaCommunity
 es:panels.kerning
 es:panels.localLibraries
 es:panels.missingLibraryUsage
+es:panels.noiseMono
 es:panels.radialGradient
 es:panels.stickyColor
 es:panels.textCaseOriginal
@@ -135,6 +143,8 @@ fr:automation.version
 fr:chatContext.styleKitColorNamePlaceholder
 fr:chatContext.styleKitFontsPlaceholder
 fr:chatContext.styleKitNotes
+fr:chatUsage.turnTokens
+fr:chatUsage.turnTokensCost
 fr:code.editorDesignLabel
 fr:code.sourceDesignJSX
 fr:code.sourceHTML
@@ -144,6 +154,7 @@ fr:code.stylingCSS
 fr:code.stylingTailwind
 fr:collaboration.microphone
 fr:common.ok
+fr:designMemory.byAgent
 fr:diagnostics.categoryDocument
 fr:diagnostics.categoryMCP
 fr:diagnostics.durationMs
@@ -174,7 +185,10 @@ fr:panels.document
 fr:panels.documentation
 fr:panels.export
 fr:panels.framePresetCategoryFigmaCommunity
+fr:panels.fractions
+fr:panels.unicase
 fr:panels.image
+fr:panels.imageSaturation
 fr:panels.libraryDestination
 fr:panels.maskTypeAlpha
 fr:panels.maskTypeLuminance
@@ -182,6 +196,10 @@ fr:panels.maxHeightShort
 fr:panels.minHeightShort
 fr:panels.missingLibraryUsage
 fr:panels.nestedInstance
+fr:panels.noiseDuo
+fr:panels.noiseMono
+fr:panels.noiseMulti
+fr:panels.texture
 fr:panels.page
 fr:panels.pages
 fr:panels.position
@@ -222,6 +240,8 @@ it:ai.notifyTitle
 it:chatContext.contextInput
 it:chatContext.contextOutput
 it:chatContext.styleKitFontsPlaceholder
+it:chatUsage.usageInput
+it:chatUsage.usageOutput
 it:code.editorDesignLabel
 it:code.sourceDesignJSX
 it:code.sourceHTML
@@ -253,6 +273,11 @@ it:panels.behaviourMax
 it:panels.behaviourStateHover
 it:panels.behaviourStateFocus
 it:panels.missingLibraryUsage
+it:panels.noiseDuo
+it:panels.noiseMono
+it:panels.noiseMulti
+it:panels.texture
+it:panels.unicase
 it:panels.shader
 it:panels.variableModeAuto
 it:panels.variableModeAutoMixed
@@ -300,6 +325,7 @@ pl:code.sourceReact
 pl:code.stylingCSS
 pl:code.stylingTailwind
 pl:common.ok
+pl:designMemory.byAgent
 pl:diagnostics.categoryAI
 pl:diagnostics.categoryMCP
 pl:diagnostics.categoryRenderer
@@ -317,6 +343,9 @@ pl:panels.framePresetCategoryTablet
 pl:panels.kerning
 pl:panels.behaviourMin
 pl:panels.missingLibraryUsage
+pl:panels.noiseDuo
+pl:panels.noiseMono
+pl:panels.noiseMulti
 pl:panels.shader
 pl:settings.mcp
 pl:settings.media
@@ -612,3 +641,16 @@ fr:panels.prototype
 fr:panels.prototypeAction
 fr:panels.prototypeDestination
 fr:panels.prototypeAnimation
+de:panels.prototypeVideoFormat
+de:panels.prototypeVideoFps
+es:panels.prototypeVideoFps
+fr:panels.prototypeVideoFormat
+it:panels.prototypeVideoFps
+ja:panels.prototypeVideoFps
+pl:panels.prototypeVideoFormat
+zh-cn:panels.prototypeVideoFps
+es:settings.prompts
+de:settings.prompts
+fr:settings.prompts
+de:variables.syncKeepCode
+fr:variables.syncKeepCode

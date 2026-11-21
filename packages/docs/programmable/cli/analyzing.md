@@ -54,6 +54,17 @@ Finds repeated node patterns that could be extracted into components:
      size: 48×48, structure: Instance > [Frame]
 ```
 
+## Design Memory
+
+A document's design memory lists the colors, fonts, font sizes, spacing, and corner radii agents may use there, whether an edit with another value is undone or warned about, the decisions written down, and the frames pinned as examples. People set it in the Design panel with nothing selected:
+
+```sh
+pairdraw design-memory design.fig
+pairdraw design-memory design.fig --json
+```
+
+`pairdraw lint` reports layers whose values break it. A person runs the CLI, so `pairdraw tool call` and `pairdraw eval` never undo an edit for the memory: values outside it come back as `design_memory` warnings (for `eval`, on stderr), and the command exits 0. Pass `--enforce-design-memory` to fail the call and write nothing when it uses a color or font the memory refuses, as in a CI check. `pairdraw agent` runs refuse such edits, as agents in the app are refused.
+
 ## JSON Output
 
 All analyze commands support `--json` for machine-readable output:

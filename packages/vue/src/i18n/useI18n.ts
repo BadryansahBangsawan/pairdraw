@@ -10,6 +10,7 @@ import {
   automationMessages,
   browserMessages,
   chatContextMessages,
+  chatUsageMessages,
   codeMessages,
   collaborationMessages,
   commandMessages,
@@ -17,6 +18,7 @@ import {
   commonMessages,
   credentialsMessages,
   designCheckMessages,
+  designMemoryMessages,
   diagnosticsMessages,
   editorMessages,
   exploreMessages,
@@ -41,7 +43,8 @@ import {
   cloudMessages,
   cloudPortalMessages,
   variablesMessages,
-  variableTypeMessages
+  variableTypeMessages,
+  variationMessages
 } from '#vue/i18n/messages'
 
 export function useI18nNamespace<MessagesStore extends Store>(messages: MessagesStore) {
@@ -53,6 +56,7 @@ export const useAIMessages = () => useI18nNamespace(aiMessages)
 export const useAutomationMessages = () => useI18nNamespace(automationMessages)
 export const useBrowserMessages = () => useI18nNamespace(browserMessages)
 export const useChatContextMessages = () => useI18nNamespace(chatContextMessages)
+export const useChatUsageMessages = () => useI18nNamespace(chatUsageMessages)
 export const useCodeMessages = () => useI18nNamespace(codeMessages)
 export const useCollaborationMessages = () => useI18nNamespace(collaborationMessages)
 export const useCommandMessages = () => useI18nNamespace(commandMessages)
@@ -60,6 +64,7 @@ export const useCommentMessages = () => useI18nNamespace(commentMessages)
 export const useCommonMessages = () => useI18nNamespace(commonMessages)
 export const useCredentialMessages = () => useI18nNamespace(credentialsMessages)
 export const useDesignCheckMessages = () => useI18nNamespace(designCheckMessages)
+export const useDesignMemoryMessages = () => useI18nNamespace(designMemoryMessages)
 export const useDiagnosticsMessages = () => useI18nNamespace(diagnosticsMessages)
 export const useEditorMessages = () => useI18nNamespace(editorMessages)
 export const useExploreMessages = () => useI18nNamespace(exploreMessages)
@@ -85,6 +90,7 @@ export const useCloudMessages = () => useI18nNamespace(cloudMessages)
 export const useCloudPortalMessages = () => useI18nNamespace(cloudPortalMessages)
 export const useVariableMessages = () => useI18nNamespace(variablesMessages)
 export const useVariableTypeMessages = () => useI18nNamespace(variableTypeMessages)
+export const useVariationMessages = () => useI18nNamespace(variationMessages)
 
 /** Compatibility aggregate. New code should import the narrow domain composable. */
 export function useI18n() {
@@ -113,6 +119,7 @@ export function useI18n() {
     updates: useUpdateMessages(),
     variables: useVariableMessages(),
     variableTypes: useVariableTypeMessages(),
+    variations: useVariationMessages(),
     locale: useStore(locale) as Ref<Locale>,
     availableLocales: AVAILABLE_LOCALES,
     localeLabels: LOCALE_LABELS,

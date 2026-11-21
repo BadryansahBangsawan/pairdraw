@@ -26,6 +26,11 @@ export interface HistoryRuntime<TChat extends HistoryChat> {
   restoreProfile(profileId: string): void
   /** What a model profile runs on, or null when it no longer exists. */
   profileBackend(profileId: string): ConversationMeta['backend'] | null
+  /**
+   * A title for a conversation once its first reply is in, or null to keep the one taken from
+   * its first message. Left out, conversations are never named.
+   */
+  title?(messages: UIMessage[]): Promise<string | null>
 }
 
 export interface ConversationMeta {

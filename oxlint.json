@@ -437,6 +437,7 @@
     "pairdraw/no-hand-rolled-base64": "error",
     "pairdraw/prefer-es-toolkit": "error",
     "pairdraw/no-module-mocking": "error",
+    "pairdraw/no-node-collection-write": "error",
     "pairdraw/no-reduce-accumulator-copy": "error",
     "pairdraw/no-widen-then-assert": "error"
   },

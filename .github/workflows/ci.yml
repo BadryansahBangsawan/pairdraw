@@ -276,6 +276,10 @@ jobs:
       - name: Generate desktop brand assets
         run: bun run generate:icons --target desktop
 
+      # The release build compiles the icon through this shim (build.yml); the step below calls
+      # it with stdin closed, as tauri-bundler under Node does, so the shim is what passes here.
+      - uses: ./.github/actions/actool-stdin
+
       - name: Compile the icon catalog with actool
         run: |
           set -euo pipefail
@@ -298,7 +302,7 @@ jobs:
             --development-region en \
             --target-device mac \
             --minimum-deployment-target 26.0 \
-            --platform macosx 2>&1 | tee "$work/actool.log"
+            --platform macosx <&- 2>&1 | tee "$work/actool.log"
           if grep -qE 'com\.apple\.actool\.errors|error:' "$work/actool.log"; then
             echo "::error title=macOS icon::actool reported catalog errors"
             cat "$work/actool.log"
@@ -343,6 +347,19 @@ jobs:
 
       - name: Build shared Core test dependency
         run: bun --filter @pairdraw/core build
+
+      # The PDF export test runs Core's dist under Node, which resolves workspace packages
+      # through dist rather than Bun's source condition.
+      - name: Build Node test dependencies
+        if: matrix.group == 'core'
+        run: |
+          bun --filter @pairdraw/kiwi build
+          bun --filter @pairdraw/scene-graph build
+          bun --filter @pairdraw/fig build
+
+      - name: Build MCP test dependency
+        if: matrix.group == 'app'
+        run: bun --filter @pairdraw/mcp build
 
       - name: Run ${{ matrix.group }} unit tests
         run: bun tools/dev/unit-tests/src/run.ts "${{ matrix.group }}"
@@ -414,7 +431,21 @@ jobs:
 
   result:
     name: CI result
-    needs: [changes, commit-messages, documentation, source-quality, package-quality, repository-quality, storybook, native-test-contracts, macos-icon, unit-tests, cloud-tests, cloud-storage]
+    needs:
+      [
+        changes,
+        commit-messages,
+        documentation,
+        source-quality,
+        package-quality,
+        repository-quality,
+        storybook,
+        native-test-contracts,
+        macos-icon,
+        unit-tests,
+        cloud-tests,
+        cloud-storage
+      ]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 3

@@ -22,7 +22,8 @@ function coreToolDescriptor(def: ToolDef): ToolDescriptor {
     effect: coreToolEffect(def),
     availability: coreToolAvailability(def),
     capabilities: coreToolCapabilities(def),
-    enabled: true
+    enabled: true,
+    ...(def.execution.kind === 'async' && def.execution.long ? { long: true } : {})
   }
 }
 

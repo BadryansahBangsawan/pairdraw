@@ -51,4 +51,19 @@ describe('the bridge tool handler', () => {
 
     expect(reply).toEqual({ ok: true, result: { id: '9:9', name: 'Card' } })
   })
+
+  test('refuses design memory breaks for agents, and only warns the CLI that asks for it', async () => {
+    const modes: unknown[] = []
+    const handler = createAutomationToolHandler(
+      () => asDouble<never>({}),
+      async (call) => {
+        modes.push(call.designMemory)
+        return { ok: true }
+      }
+    )
+    await handler(target(), { name: 'get_node', args: { id: '1:1' } })
+    await handler(target(), { name: 'get_node', args: { id: '1:1' }, designMemory: 'warn' })
+    await handler(target(), { name: 'get_node', args: { id: '1:1' }, designMemory: 'other' })
+    expect(modes).toEqual(['refuse', 'warn', 'refuse'])
+  })
 })

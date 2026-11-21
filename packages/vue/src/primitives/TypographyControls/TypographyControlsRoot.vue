@@ -26,7 +26,7 @@ const actions = {
   setVerticalAlign: ctx.setVerticalAlign,
   setTextCase: ctx.setTextCase,
   setTruncation: ctx.setTruncation,
-  setFontFeature: ctx.setFontFeature,
+  setFontFeature: ctx.features.set,
   setListType: ctx.setListType,
   setHangingList: ctx.setHangingList,
   previewParagraphSpacing: ctx.previewParagraphSpacing,
@@ -61,6 +61,8 @@ const actions = {
     :list-type="ctx.listType"
     :axes="ctx.axes"
     :optical-size-auto="ctx.opticalSizeAuto"
+    :available-features="ctx.features.available"
+    :feature-state="ctx.features.state"
     :actions="actions"
   />
 </template>

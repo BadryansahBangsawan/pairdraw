@@ -43,6 +43,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./prototype": {
+      "types": "./dist/prototype/index.d.ts",
+      "import": "./dist/prototype/index.js",
+      "default": "./dist/prototype/index.js"
+    },
     "./geometry": {
       "types": "./dist/geometry/index.d.ts",
       "import": "./dist/geometry/index.js",
@@ -109,6 +114,11 @@
       "import": "./dist/library/index.js",
       "default": "./dist/library/index.js"
     },
+    "./design-memory": {
+      "types": "./dist/design-memory/index.d.ts",
+      "import": "./dist/design-memory/index.js",
+      "default": "./dist/design-memory/index.js"
+    },
     "./lint": {
       "types": "./dist/lint/index.d.ts",
       "import": "./dist/lint/index.js",
@@ -138,6 +148,11 @@
       "types": "./dist/io/formats/html/layers.d.ts",
       "import": "./dist/io/formats/html/layers.js",
       "default": "./dist/io/formats/html/layers.js"
+    },
+    "./io/formats/video": {
+      "types": "./dist/io/formats/video/index.d.ts",
+      "import": "./dist/io/formats/video/index.js",
+      "default": "./dist/io/formats/video/index.js"
     },
     "./io/formats/raster": {
       "types": "./dist/io/formats/raster/index.d.ts",
@@ -185,6 +200,12 @@
       "import": "./dist/node/fs.js",
       "default": "./dist/node/fs.js"
     },
+    "./node/video": {
+      "bun": "./src/node/video.ts",
+      "types": "./dist/node/video.d.ts",
+      "import": "./dist/node/video.js",
+      "default": "./dist/node/video.js"
+    },
     "./node/design-system": {
       "bun": "./src/node/design-system.ts",
       "types": "./dist/node/design-system.d.ts",
@@ -225,12 +246,14 @@
     "es-toolkit": "^1.52.0",
     "fflate": "^0.8.3",
     "fontoxpath": "^3.34.0",
+    "gifenc": "^1.0.3",
     "happy-dom": "^20.14.6",
     "harfbuzzjs": "1.6.4",
     "js-base64": "^3.9.3",
     "jsep": "^1.4.0",
     "jsondiffpatch": "^0.7.6",
     "jspdf": "^4.2.1",
+    "mediabunny": "^1.66.2",
     "nanoevents": "^9.1.0",
     "ofetch": "^1.5.1",
     "opencc-js": "1.4.2",

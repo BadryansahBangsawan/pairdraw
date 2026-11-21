@@ -16,5 +16,7 @@
   "hand": "Dłoń",
   "comment": "Komentarz",
   "zoom": "Powiększenie",
-  "scale": "Skalowanie"
+  "scale": "Skalowanie",
+  "eyedropper": "Zakraplacz",
+  "eyedropperSample": "Pobierz kolor z kanwy"
 }

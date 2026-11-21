@@ -1,13 +1,54 @@
 import type { Ref } from 'vue'
 
 import type { Editor } from '@pairdraw/core'
-import type { Effect, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
+import type {
+  Effect,
+  NoiseEffectParams,
+  SceneNode,
+  ShadowEffect,
+  TextureEffectParams
+} from '@pairdraw/scene-graph'
+import {
+  BLACK,
+  DEFAULT_NOISE,
+  DEFAULT_NOISE_COLOR,
+  DEFAULT_TEXTURE,
+  UNSET_NOISE,
+  UNSET_TEXTURE
+} from '@pairdraw/scene-graph/constants'
 import { copyEffects } from '@pairdraw/scene-graph/copy'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useI18n } from '#vue/i18n/useI18n.js'
 
 type EffectType = Effect['type']
+
+/**
+ * One change to an effect: values to merge, or a function that reads the layer's own effect and
+ * returns only what it changes, so every selected layer keeps its other values.
+ */
+export type EffectChange = Partial<Effect> | ((current: Effect) => Partial<Effect>)
+
+/** A noise value change that keeps every other grain value the layer has. */
+export function noiseChange(changes: Partial<NoiseEffectParams>): EffectChange {
+  return (current) => {
+    const noise = current.type === 'NOISE' ? current.noise : UNSET_NOISE
+    return { noise: { ...noise, ...changes } }
+  }
+}
+
+/** A texture value change that keeps every other grain value the layer has. */
+export function textureChange(changes: Partial<TextureEffectParams>): EffectChange {
+  return (current) => {
+    const texture = current.type === 'TEXTURE' ? current.texture : UNSET_TEXTURE
+    return { texture: { ...texture, ...changes } }
+  }
+}
+
+/** A change of a noise's type, which also keeps the grain square. */
+export function noiseTypeChange(type: NoiseEffectParams['noiseType']): EffectChange {
+  return noiseChange({ noiseType: type })
+}
 
 const { panels } = useI18n()
 
@@ -17,8 +58,13 @@ const EFFECT_LABELS: Record<string, string> = {
   LAYER_BLUR: panels.value.layerBlur,
   BACKGROUND_BLUR: panels.value.backgroundBlur,
   FOREGROUND_BLUR: panels.value.foregroundBlur,
+  NOISE: panels.value.noise,
+  TEXTURE: panels.value.texture,
   SHADER: panels.value.shader
 }
+
+/** Radius of a shadow or blur that does not set one. */
+const DEFAULT_EFFECT_RADIUS = 8
 
 /** The code a new layer shader starts from: it tints the layer it sits on. */
 const DEFAULT_SHADER_SOURCE = `uniform sampler2D layer; /* @object */
@@ -66,18 +112,19 @@ export function createEffectEditActions(
   editor: Editor,
   effectsBeforeScrub: Ref<Map<string, EffectEditSnapshot> | null>
 ) {
-  function apply(nodes: readonly SceneNode[], index: number, changes: Partial<Effect>) {
+  function apply(nodes: readonly SceneNode[], index: number, change: EffectChange) {
     for (const node of nodes) {
       const effects = [...node.effects]
       const current = effects.at(index)
       if (!current) continue
+      const changes = typeof change === 'function' ? change(current) : change
       effects[index] = { ...current, ...changes } as Effect
       editor.updateNode(node.id, { effects })
     }
     editor.requestRender()
   }
 
-  function scrubEffect(nodes: readonly SceneNode[], index: number, changes: Partial<Effect>) {
+  function scrubEffect(nodes: readonly SceneNode[], index: number, change: EffectChange) {
     if (nodes.length === 0) return
     effectsBeforeScrub.value ??= new Map(
       nodes.map((node) => [
@@ -85,14 +132,14 @@ export function createEffectEditActions(
         { effects: copyEffects(node.effects), effectStyleId: node.effectStyleId }
       ])
     )
-    apply(nodes, index, changes)
+    apply(nodes, index, change)
   }
 
-  function commitEffect(nodes: readonly SceneNode[], index: number, changes: Partial<Effect>) {
+  function commitEffect(nodes: readonly SceneNode[], index: number, change: EffectChange) {
     if (nodes.length === 0) return
     const previous = effectsBeforeScrub.value
     effectsBeforeScrub.value = null
-    apply(nodes, index, changes)
+    apply(nodes, index, change)
     if (!previous) return
     editor.undo.runBatch('Change effect', () => {
       for (const node of nodes) {
@@ -110,6 +157,51 @@ export function createEffectEditActions(
   return { scrubEffect, commitEffect }
 }
 
+/**
+ * `type` as a complete effect, keeping what every kind can carry. A shadow blurs away from the
+ * layer and a blur is centred on it, so switching between the two rewrites the geometry; a noise
+ * or texture starts where Figma's effects panel starts one.
+ */
+function effectOfType(type: EffectType, previous: Effect): Effect {
+  const blendMode = previous.blendMode
+  const visible = previous.visible
+  if (type === 'SHADER') {
+    return { type, source: DEFAULT_SHADER_SOURCE, uniforms: {}, visible, blendMode }
+  }
+  if (type === 'NOISE') {
+    return {
+      type,
+      color: { ...DEFAULT_NOISE_COLOR },
+      visible,
+      blendMode,
+      noise: { ...DEFAULT_NOISE, noiseSize: { ...DEFAULT_NOISE.noiseSize } }
+    }
+  }
+  if (type === 'TEXTURE') {
+    return {
+      type,
+      color: { ...BLACK },
+      radius: DEFAULT_TEXTURE.noiseSize.x,
+      visible,
+      blendMode,
+      texture: { ...DEFAULT_TEXTURE, noiseSize: { ...DEFAULT_TEXTURE.noiseSize } }
+    }
+  }
+  const radius =
+    previous.type === 'SHADER' || previous.type === 'NOISE'
+      ? DEFAULT_EFFECT_RADIUS
+      : previous.radius
+  return {
+    type,
+    color: previous.type === 'SHADER' ? { ...BLACK } : { ...previous.color },
+    radius,
+    spread: 0,
+    offset: isShadow(type) ? { x: 0, y: 4 } : { x: 0, y: 0 },
+    visible,
+    blendMode
+  }
+}
+
 export function createEffectControlActions(expandedIndex: Ref<number | null>) {
   function updateType(
     patch: (index: number, changes: Partial<Effect>) => void,
@@ -119,26 +211,8 @@ export function createEffectControlActions(expandedIndex: Ref<number | null>) {
   ) {
     if (!node) return
     const previous = node.effects[index]
-    if (type === 'SHADER') {
-      patch(
-        index,
-        previous.type === 'SHADER'
-          ? { type }
-          : { type, source: DEFAULT_SHADER_SOURCE, uniforms: {} }
-      )
-      return
-    }
-    // A shadow blurs away from the layer; a blur is centred on it. Switching between the two
-    // always rewrites the geometry, so the moment the type changes the offsets match it.
-    const shadow = isShadow(type)
-    const wasShadow = previous.type !== 'SHADER' && isShadow(previous.type)
-    let geometry: Partial<ShadowEffect> = {}
-    if (shadow !== wasShadow) {
-      geometry = shadow
-        ? { offset: { x: 0, y: 4 }, spread: 0 }
-        : { offset: { x: 0, y: 0 }, spread: 0 }
-    }
-    patch(index, { ...geometry, type })
+    if (type === previous.type) return
+    patch(index, effectOfType(type, previous))
   }
 
   function updateColor(

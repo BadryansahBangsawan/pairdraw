@@ -14,6 +14,7 @@ import comments from './comments.json'
 import common from './common.json'
 import credentials from './credentials.json'
 import designCheck from './design-check.json'
+import designMemory from './design-memory.json'
 import diagnostics from './diagnostics.json'
 import editor from './editor.json'
 import explore from './explore.json'
@@ -37,6 +38,7 @@ import tools from './tools.json'
 import updates from './updates.json'
 import variables from './variables/panel.json'
 import variableTypes from './variables/types.json'
+import variations from './variations.json'
 
 export default {
   agents,
@@ -53,6 +55,7 @@ export default {
   common,
   credentials,
   designCheck,
+  designMemory,
   diagnostics,
   editor,
   explore,
@@ -75,5 +78,6 @@ export default {
   tools,
   updates,
   variables,
-  variableTypes
+  variableTypes,
+  variations
 } satisfies ComponentsJSON

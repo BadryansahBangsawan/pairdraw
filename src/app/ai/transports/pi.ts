@@ -8,6 +8,7 @@ import type {
 } from '@pairdraw/harness'
 
 import { spawnHarnessProcess, type HarnessProcess } from '@/app/ai/agents/pi/process'
+import { turnUsageFromReported } from '@/app/ai/chat/usage/aggregate'
 import { createReplyStream, type ReplyStream } from '@/app/ai/reply/stream'
 
 interface PendingRequest {
@@ -237,6 +238,8 @@ export class HarnessChatTransport implements ChatTransport<UIMessage> {
           if (pending) emit(pending, ...mapEvent(message.event, pending))
           if (pending && message.event.type === 'finish' && message.event.usage) {
             this.onUsage?.(message.event.usage)
+            const usage = turnUsageFromReported(message.event.usage)
+            if (usage) emit(pending, { type: 'message-metadata', messageMetadata: { usage } })
           }
         } else {
           const pending = this.pending.get(message.id)

@@ -1,5 +1,5 @@
 import type { Vector } from './primitives'
-import type { Effect, ShaderEffect, ShadowEffect } from './types'
+import type { Effect, ShadowEffect } from './types'
 
 const SHADOW_OFFSET: Vector = { x: 0, y: 4 }
 const BLUR_OFFSET: Vector = { x: 0, y: 0 }
@@ -8,6 +8,9 @@ const BLUR_OFFSET: Vector = { x: 0, y: 0 }
 type ShadowInput = Omit<ShadowEffect, 'offset'> & {
   offset?: Partial<Vector> | null
 }
+
+/** An effect as a caller may pass it, before its geometry is made finite. */
+type EffectInput = Effect | ShadowInput
 
 function fallbackOffset(type: ShadowEffect['type']): Vector {
   return type === 'DROP_SHADOW' || type === 'INNER_SHADOW' ? SHADOW_OFFSET : BLUR_OFFSET
@@ -41,6 +44,11 @@ function isStoredShadow(effect: ShadowInput): effect is ShadowEffect {
   )
 }
 
+/** An effect that carries geometry of its own, which has to be finite to render. */
+function isOffsetEffect(effect: EffectInput): effect is ShadowInput {
+  return effect.type !== 'SHADER' && effect.type !== 'NOISE' && effect.type !== 'TEXTURE'
+}
+
 function withFiniteOffset(effect: ShadowInput): Effect {
   const offset = finiteOffset(effect)
   if (!offset) {
@@ -50,19 +58,20 @@ function withFiniteOffset(effect: ShadowInput): Effect {
   return { ...effect, offset }
 }
 
-function isStoredEffect(effect: ShaderEffect | ShadowInput): effect is Effect {
-  return effect.type === 'SHADER' || isStoredShadow(effect)
+function isStoredEffect(effect: EffectInput): effect is Effect {
+  return !isOffsetEffect(effect) || isStoredShadow(effect)
 }
 
 /**
  * Shadows and blurs keep a finite offset. A drop or inner shadow missing one uses `{x: 0, y: 4}`,
- * the same default as `dropShadow()` and `set_effects`; a blur uses `{x: 0, y: 0}`. Shader effects
- * are left alone. An array that is already valid is returned as itself.
+ * the same default as `dropShadow()` and `set_effects`; a blur uses `{x: 0, y: 0}`. Shader, noise,
+ * and texture effects carry no offset and are left alone. An array that is already valid is
+ * returned as itself.
  */
-export function normalizeEffects(effects: (ShaderEffect | ShadowInput)[]): Effect[] {
+export function normalizeEffects(effects: EffectInput[]): Effect[] {
   let next: Effect[] | null = null
   for (const [index, effect] of effects.entries()) {
-    const normalized = effect.type === 'SHADER' ? effect : withFiniteOffset(effect)
+    const normalized = isOffsetEffect(effect) ? withFiniteOffset(effect) : effect
     if (normalized === effect) {
       if (next && isStoredEffect(effect)) next.push(effect)
       continue

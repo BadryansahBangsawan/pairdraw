@@ -96,7 +96,8 @@ test('the macOS icon guard runs for the brand generator and the desktop icon wir
     'tools/generate/brand/src/desktop.ts',
     'assets/brand/main.svg',
     'desktop/tauri.conf.json',
-    '.github/workflows/ci.yml'
+    '.github/workflows/ci.yml',
+    '.github/actions/actool-stdin/action.yml'
   ]) {
     expect(touchesIconGuard([path])).toBe(true)
   }

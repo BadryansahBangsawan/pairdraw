@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { effectScope, nextTick, ref } from 'vue'
 
+import { shownFrame, type PlaySession } from '@pairdraw/core/prototype'
 import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
-import { shownFrame, type PlaySession } from '@/app/editor/prototype/session'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { createEditorStore } from '@/app/editor/session'
 
@@ -71,6 +71,8 @@ function installTimerProbe() {
   }) as typeof window.clearTimeout
   return {
     prototypeTimers: () => [...armed.values()].filter((entry) => entry.ms === DELAY_MS),
+    armedFor: (ms: number) =>
+      [...armed.values()].filter((entry) => entry.ms === ms && !entry.cleared),
     restore: () => {
       window.setTimeout = realSet
       window.clearTimeout = realClear
@@ -124,6 +126,57 @@ describe('prototype play timeouts', () => {
     scope.stop()
     captured.fn()
     expect(shown(stage.session.value)).toBe(START)
+    store.dispose()
+  })
+})
+
+describe('prototype play transitions on a timeout', () => {
+  let restore: (() => void) | null = null
+
+  afterEach(() => {
+    restore?.()
+    restore = null
+  })
+
+  test('count the next frame’s delay from when its dissolve ends, as Figma does', async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const dissolveToTarget: PrototypeReaction = {
+      ...timeoutToTarget,
+      actions: [
+        {
+          type: 'NODE',
+          nodeId: TARGET,
+          navigation: 'NAVIGATE',
+          transition: { type: 'DISSOLVE', duration: 0.5 },
+          overlayPosition: 'CENTER'
+        }
+      ]
+    }
+    const back: PrototypeReaction = {
+      ...timeoutToTarget,
+      id: '9:2',
+      actions: [{ type: 'BACK' }]
+    }
+    const graph = documentWith(false)
+    graph.updateNode(START, { prototypeReactions: [dissolveToTarget] })
+    graph.updateNode(TARGET, { prototypeReactions: [back] })
+    const store = createEditorStore(graph)
+    store.startPlay()
+    const scope = effectScope()
+    const stage = scope.run(() => usePrototypeStage(store, ref<HTMLCanvasElement | null>(null)))
+    if (!stage) throw new Error('Play stage did not start')
+    await nextTick()
+
+    const [first] = probe.prototypeTimers()
+    if (!first) throw new Error('The start frame armed no timeout')
+    first.fn()
+    await nextTick()
+
+    expect(shown(stage.session.value)).toBe(TARGET)
+    expect(probe.armedFor(DELAY_MS + 500)).toHaveLength(1)
+
+    scope.stop()
     store.dispose()
   })
 })

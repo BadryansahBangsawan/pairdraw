@@ -1,3 +1,5 @@
+import { omit } from 'es-toolkit'
+
 import type { SceneNode, StyleRun, TextAlignVertical, TextAutoResize } from '@pairdraw/scene-graph'
 import { parseFontStyle, type FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
 import { percentLength, pixelLength } from '@pairdraw/scene-graph/text'
@@ -86,7 +88,7 @@ export function applyTextProps(
     })
     // The bound name is the pen-only one no font is registered under, so a later reconcile
     // would restore a family nothing draws with. The bundled face owns the family now.
-    delete node.boundVariables.fontFamily
+    node.boundVariables = omit(node.boundVariables, ['fontFamily'])
   }
   node.textAlignHorizontal = TEXT_ALIGN[pen.textAlign ?? 'left'] ?? 'LEFT'
   node.textAlignVertical = TEXT_ALIGN_VERTICAL[pen.textAlignVertical ?? 'top'] ?? 'TOP'

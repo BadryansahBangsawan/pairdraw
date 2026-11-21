@@ -18,6 +18,8 @@ import {
   COMPONENT_SET_DASH_GAP,
   COMPONENT_SET_BORDER_WIDTH,
   EFFECT_FILTER_CACHE_ENTRIES,
+  NOISE_TILE_CACHE_ENTRIES,
+  TEXTURE_NOISE_CACHE_ENTRIES,
   IS_BROWSER
 } from '#core/constants'
 import type { EditorState } from '#core/editor/types'
@@ -125,6 +127,21 @@ export class SkiaRenderer {
     maxEntries: EFFECT_FILTER_CACHE_ENTRIES,
     dispose: (filter) => filter.delete()
   })
+  /**
+   * A noise effect's level and colour tiles, about 4 MB each. Bounded: a density or seed slider
+   * would otherwise keep a tile per step of a drag.
+   */
+  noiseTileCache = new ResourceCache<string, Image>({
+    maxEntries: NOISE_TILE_CACHE_ENTRIES,
+    dispose: (image) => image.delete()
+  })
+  /** The compiled grain shader, made on the first noise drawn. */
+  noiseGrainEffect: RuntimeEffect | null = null
+  /** A texture's displacement tiles, 256 KB each, kept by grain size and seed. */
+  textureNoiseCache = new ResourceCache<string, Image>({
+    maxEntries: TEXTURE_NOISE_CACHE_ENTRIES,
+    dispose: (image) => image.delete()
+  })
   _tmpColor = new Float32Array(4)
   _tmpRect = new Float32Array(4)
   textFont: Font | null = null
@@ -154,6 +171,11 @@ export class SkiaRenderer {
    * with the surface whose GL context holds its texture.
    */
   readonly liveImages = new Map<string, { image: Image; surface: Surface }>()
+  /**
+   * A raster export drawn finer than its pixels, and where world space lands on those pixels.
+   * An image that lands on them 1:1 is sampled nearest, as Figma keeps it sharp.
+   */
+  supersampledOutput: { outputFromWorld: number[] } | null = null
   viewportImageRendering = false
   imageMemoryGraph: SceneGraph | null = null
   imageMemoryPage: string | null = null
@@ -419,8 +441,13 @@ export class SkiaRenderer {
   effectOverflow(node: SceneNode): number {
     let expand = 0
     for (const e of node.effects) {
-      // A shader effect has no radius, spread, or offset of its own.
-      if (!e.visible || e.type === 'SHADER') continue
+      // A shader effect has no radius, spread, or offset of its own, and a noise stays inside
+      // the layer. A clipped texture does too; an unclipped one moves the edges out by its radius.
+      if (!e.visible || e.type === 'SHADER' || e.type === 'NOISE') continue
+      if (e.type === 'TEXTURE') {
+        if (!e.texture.clipToShape) expand = Math.max(expand, e.radius)
+        continue
+      }
       const blur = e.radius
       const spread = e.spread
       const ox = Math.abs(e.offset.x)

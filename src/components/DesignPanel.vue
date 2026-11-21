@@ -35,6 +35,8 @@ import { usePropertyBinding } from './properties/component-properties/usePropert
 import VariantAuthoringSection from './properties/component-properties/variant/VariantAuthoringSection.vue'
 import ConnectorSection from './properties/connector/ConnectorSection.vue'
 import ConstraintsSection from './properties/constraints/ConstraintsSection.vue'
+import DesignMemorySection from './properties/design-memory/DesignMemorySection.vue'
+import DesignMemorySelectionSection from './properties/design-memory/DesignMemorySelectionSection.vue'
 import DocumentSection from './properties/DocumentSection.vue'
 import EffectsSection from './properties/EffectsSection.vue'
 import ExportSection from './properties/ExportSection.vue'
@@ -64,6 +66,7 @@ import TextContentControl from './properties/text-content/TextContentControl.vue
 import TextContentSection from './properties/text-content/TextContentSection.vue'
 import TypographySection from './properties/TypographySection.vue'
 import VariablesSection from './properties/VariablesSection.vue'
+import VariationsSection from './properties/variations/VariationsSection.vue'
 
 const store = useEditorStore()
 const libraryService = useLibraryService()
@@ -299,6 +302,7 @@ const { panels, rename: renameMessages } = useI18n()
         </template>
       </PanelHeader>
 
+      <VariationsSection />
       <TextContentSection v-if="node.type === 'TEXT'" :node-id="node.id" />
       <StatusSection />
       <ScriptSection v-if="node.type === 'SCRIPT'" :node-id="node.id" />
@@ -348,6 +352,7 @@ const { panels, rename: renameMessages } = useI18n()
 
       <ExportSection />
       <AgentNotesSection />
+      <DesignMemorySelectionSection />
       <BrowserNodeSection />
     </div>
   </RetainedPanel>
@@ -360,6 +365,7 @@ const { panels, rename: renameMessages } = useI18n()
     <PageSection />
     <VariablesSection @open-dialog="openVariablesDialog(store)" />
     <StatusesSection />
+    <DesignMemorySection />
     <DocumentSection />
     <ExportSection />
   </div>

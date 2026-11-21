@@ -1,13 +1,6 @@
 import { fromUint8Array } from 'js-base64'
 
-import type {
-  Effect,
-  Fill,
-  FontVariation,
-  SceneGraph,
-  SceneNode,
-  ShadowEffect
-} from '@pairdraw/scene-graph'
+import type { Fill, FontVariation, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   colorToHex,
   colorToDisplayCSS,
@@ -22,6 +15,7 @@ import {
 import { imageMimeType } from '@pairdraw/scene-graph/images'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
+import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
 import type { FontFaceRef } from '#core/text/font/faces'
 
 import { svg, type SVGNode } from './node'
@@ -55,6 +49,8 @@ export interface SVGExportContext {
   /** Measured line breaks. Without them, only explicit newlines start a new baseline. */
   textLayout?: SVGTextLayout
   fontAlias?: SVGFontAlias
+  /** The live result path of a boolean made in Pairdraw, which stores none. */
+  booleanPath?: BooleanPathResolver
 }
 
 export function nextDefId(ctx: SVGExportContext, prefix: string): string {
@@ -216,70 +212,6 @@ function createImagePattern(
         preserveAspectRatio: fill.imageScaleMode === 'FIT' ? 'xMidYMid meet' : 'xMidYMid slice'
       })
     )
-  }
-}
-
-export function createFilterDef(
-  effects: Effect[],
-  ctx: SVGExportContext
-): { id: string; node: SVGNode } | null {
-  // SVG has no shader effect; a shader is a raster the format cannot carry.
-  const visible = effects.filter((e): e is ShadowEffect => e.visible && e.type !== 'SHADER')
-  if (visible.length === 0) return null
-
-  const id = nextDefId(ctx, 'fx')
-  const primitives: SVGNode[] = []
-
-  for (const effect of visible) {
-    if (effect.type === 'DROP_SHADOW') {
-      const stdDev = round(effect.radius / 2)
-      primitives.push(
-        svg('feDropShadow', {
-          dx: round(effect.offset.x),
-          dy: round(effect.offset.y),
-          stdDeviation: stdDev,
-          'flood-color': formatColor(effect.color, 1, ctx.colorSpace),
-          'flood-opacity': round(effect.color.a)
-        })
-      )
-    } else if (effect.type === 'INNER_SHADOW') {
-      const sid = `${id}_is`
-      const stdDev = round(effect.radius / 2)
-      primitives.push(
-        svg('feGaussianBlur', { in: 'SourceAlpha', stdDeviation: stdDev, result: `${sid}_blur` }),
-        svg('feOffset', {
-          dx: round(effect.offset.x),
-          dy: round(effect.offset.y),
-          result: `${sid}_off`
-        }),
-        svg('feComposite', {
-          in: 'SourceAlpha',
-          in2: `${sid}_off`,
-          operator: 'out',
-          result: `${sid}_inv`
-        }),
-        svg('feFlood', {
-          'flood-color': formatColor(effect.color, 1, ctx.colorSpace),
-          'flood-opacity': round(effect.color.a)
-        }),
-        svg('feComposite', { in2: `${sid}_inv`, operator: 'in', result: `${sid}_shadow` }),
-        svg('feComposite', {
-          in: `${sid}_shadow`,
-          in2: 'SourceGraphic',
-          operator: 'over'
-        })
-      )
-    } else {
-      const stdDev = round(effect.radius / 2)
-      primitives.push(svg('feGaussianBlur', { stdDeviation: stdDev }))
-    }
-  }
-
-  if (primitives.length === 0) return null
-
-  return {
-    id,
-    node: svg('filter', { id }, ...primitives)
   }
 }
 

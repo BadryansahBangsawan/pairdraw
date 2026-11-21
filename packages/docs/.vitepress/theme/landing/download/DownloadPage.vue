@@ -11,7 +11,7 @@ import PlatformFiles from './PlatformFiles.vue'
 import { data as releases } from './releases.data'
 import { useVisitorSystem } from './visitor'
 
-import '../landing.css'
+import './download.css'
 
 /** The copy of the page's locale, imported by that locale's `download.md`. */
 const { messages } = defineProps<{ messages: LandingMessages }>()

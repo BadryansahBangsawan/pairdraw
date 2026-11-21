@@ -9,7 +9,6 @@ import type {
   VariableCollection
 } from '@pairdraw/scene-graph'
 import { withLiveComments } from '@pairdraw/scene-graph/comments'
-import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
 import {
   createSceneMutationImpact,
   recordSceneMutations
@@ -18,6 +17,7 @@ import {
 import type { EditorContext } from '#core/editor/types'
 import { computeAllLayouts } from '#core/layout'
 
+import { captureNode } from './capture'
 import { diffFields, type FieldChanges } from './diff'
 
 type Side = 'before' | 'after'
@@ -134,21 +134,6 @@ function restoreLayer(graph: SceneGraph, update: LayerUpdate, side: Side): void 
   graph.restoreNodeProperties(update.id, changes, update.fields?.absent[side] ?? [])
 }
 
-/**
- * A copy that keeps the layer's values as they are now. Values are replaced, never written into
- * (`materialize-instance.ts` in `@pairdraw/fig`), so sharing them is safe; the graph edits
- * child lists, source metadata, and override maps in place, so those are copied.
- */
-function captureNode(node: SceneNode): SceneNode {
-  const { source, instanceOverrides } = node
-  return {
-    ...node,
-    childIds: [...node.childIds],
-    source: { ...source, fig: { ...source.fig, rawNodeFields: { ...source.fig.rawNodeFields } } },
-    instanceOverrides: cloneInstanceOverrideState(instanceOverrides)
-  }
-}
-
 /** Copies a page's layers not copied yet; a layer moved in from another page keeps its copy. */
 function capturePage(graph: SceneGraph, pageId: string, captured: Map<string, SceneNode>): void {
   const stack = [pageId]
@@ -199,7 +184,10 @@ function recordLayer(
   if (!previous) {
     if (current) change.created.push(structuredClone(current))
   } else if (!current) {
-    change.deleted.push(structuredClone(previous))
+    // `previous` is this edit's own copy, made before the layer changed (`captureNode`), and the
+    // layer it copies is gone; restoring it copies it again, so the record stays as it is.
+    // Copying it here too cost a deep clone per layer, which made deleting thousands slow.
+    change.deleted.push(previous)
   } else {
     const update = diffLayer(id, previous, current)
     if (update) change.updated.push(update)

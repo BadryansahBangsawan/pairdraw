@@ -62,7 +62,8 @@ export const ICON_GUARD_INPUTS = [
   'tools/generate/brand/',
   'assets/brand/',
   'desktop/tauri.conf.json',
-  '.github/workflows/ci.yml'
+  '.github/workflows/ci.yml',
+  '.github/actions/actool-stdin/'
 ] as const
 
 /** Whether a change reaches the macOS icon guard's inputs (`touchesInput`). */

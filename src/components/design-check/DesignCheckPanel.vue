@@ -3,6 +3,8 @@ import { computed, useTemplateRef } from 'vue'
 
 import { useDesignCheckMessages } from '@pairdraw/vue/i18n'
 
+import { useEditorStore } from '@/app/editor/active-store'
+import { allowDesignMemoryValue } from '@/app/editor/design-memory/actions'
 import { turnOffDesignCheckRule } from '@/app/settings/preferences/apply'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
@@ -11,7 +13,7 @@ import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
 import DesignCheckRulesMenu from './DesignCheckRulesMenu.vue'
 import IssueGroup from './IssueGroup.vue'
 import SeverityFilters from './SeverityFilters.vue'
-import type { DesignCheckScope } from './types'
+import type { DesignCheckScope, IssueRowView } from './types'
 import { designCheck } from './ui'
 import { useDesignCheckPanel } from './useDesignCheckPanel'
 
@@ -23,6 +25,12 @@ const { active, initialScope = 'page' } = defineProps<{
 
 const messages = useDesignCheckMessages()
 const styles = designCheck()
+const store = useEditorStore()
+
+/** Lets agents use a finding's value from now on; the check runs again with the change. */
+function allowFinding({ group, value }: NonNullable<IssueRowView['allowance']>) {
+  allowDesignMemoryValue(store, group, value)
+}
 const list = useTemplateRef<HTMLElement>('list')
 
 const {
@@ -100,6 +108,7 @@ const scopeModel = computed({
         @open-row="(row) => void check.openIssue(row.issue)"
         @hover-row="hoverRow"
         @fix="(row) => row.action && check.applyFixes([row.action.request])"
+        @allow="(row) => row.allowance && allowFinding(row.allowance)"
         @fix-all="check.applyFixes(group.fixes)"
         @turn-off="turnOffDesignCheckRule(group.ruleId)"
         @show-more="showMoreRows(group.ruleId)"

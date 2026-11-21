@@ -1,0 +1,23 @@
+name: Give actool an open stdin
+
+description: >-
+  Put an actool shim first on PATH that runs Xcode's actool with stdin on /dev/null, and stop any
+  ibtoold a failed run left behind. The Tauri CLI runs inside Node, which marks inherited
+  descriptors close-on-exec, so tauri-bundler starts actool with fd 0 closed and actool crashes
+  compiling an Icon Composer icon ("attempt to insert nil object"; tauri-apps/tauri#15315, fixed
+  upstream by #15991, not released yet).
+
+runs:
+  using: composite
+  steps:
+    - name: Put the actool shim on PATH
+      shell: bash
+      run: |
+        set -euo pipefail
+        shim="$RUNNER_TEMP/actool-stdin"
+        mkdir -p "$shim"
+        printf '#!/bin/sh\nexec xcrun actool "$@" </dev/null\n' > "$shim/actool"
+        chmod +x "$shim/actool"
+        echo "$shim" >> "$GITHUB_PATH"
+        # A crashed actool leaves ibtoold running, and later actool calls reuse it and keep failing.
+        pkill -x ibtoold || true

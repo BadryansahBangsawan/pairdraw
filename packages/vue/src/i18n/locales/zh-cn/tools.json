@@ -16,5 +16,7 @@
   "hand": "抓手",
   "comment": "评论",
   "zoom": "缩放",
-  "scale": "等比缩放"
+  "scale": "等比缩放",
+  "eyedropper": "吸管",
+  "eyedropperSample": "从画布拾取颜色"
 }

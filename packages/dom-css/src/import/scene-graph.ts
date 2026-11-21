@@ -3,6 +3,7 @@ import { isValid, toUint8Array } from 'js-base64'
 
 import {
   SceneGraph,
+  type Effect,
   type Fill,
   type ImageScaleMode,
   type SceneNode,
@@ -51,9 +52,10 @@ const IMAGE_SOURCE_URL_KEY = 'image-source-url'
  * by half its blur length, which the canvas draws from the radius that gives that sigma.
  */
 function cssShadows(value: string | undefined) {
-  return parseCSSShadows(value).map((effect) =>
-    effect.type === 'SHADER' ? effect : { ...effect, radius: blurRadiusForSigma(effect.radius / 2) }
-  )
+  return parseCSSShadows(value).map((effect): Effect => {
+    if (effect.type !== 'DROP_SHADOW' && effect.type !== 'INNER_SHADOW') return effect
+    return { ...effect, radius: blurRadiusForSigma(effect.radius / 2) }
+  })
 }
 
 export interface DesignDocumentToSceneGraphOptions {
@@ -365,11 +367,10 @@ function applyImageFill(
   const bytes = bytesFromDataURL(source)
   if (!bytes) {
     if (source) {
-      node.pluginData.push({
-        pluginId: DOM_CSS_PLUGIN_ID,
-        key: IMAGE_SOURCE_URL_KEY,
-        value: source
-      })
+      node.pluginData = [
+        ...node.pluginData,
+        { pluginId: DOM_CSS_PLUGIN_ID, key: IMAGE_SOURCE_URL_KEY, value: source }
+      ]
     }
     return
   }

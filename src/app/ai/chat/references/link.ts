@@ -3,7 +3,7 @@
  * `pairdraw:` scheme: `[Hero](pairdraw://node/12:34)`. People insert them from the
  * composer and the model cites what it touched with them; the chat shows them as chips.
  */
-export type ChatReferenceKind = 'node' | 'page' | 'skill' | 'element' | 'citation'
+export type ChatReferenceKind = 'node' | 'page' | 'skill' | 'element' | 'citation' | 'command'
 
 export interface ChatReference {
   kind: ChatReferenceKind
@@ -25,7 +25,8 @@ const KINDS: ReadonlySet<string> = new Set<ChatReferenceKind>([
   'page',
   'skill',
   'element',
-  'citation'
+  'citation',
+  'command'
 ])
 
 /** A link whose label holds no unescaped `]` or line break and whose URL has no space. */

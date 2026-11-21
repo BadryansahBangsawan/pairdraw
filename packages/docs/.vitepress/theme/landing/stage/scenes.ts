@@ -42,7 +42,7 @@ function chapterSection(store: EditorStore, chapter: TourChapter): SceneNode {
 }
 
 /** The layer a chapter is about, by the name the tour gives it. */
-export function chapterSubject(store: EditorStore, chapter: TourChapter): SceneNode {
+function chapterSubject(store: EditorStore, chapter: TourChapter): SceneNode {
   const section = chapterSection(store, chapter)
   const subject = store.graph.getChildren(section.id).find((node) => node.name === chapter.subject)
   if (!subject) throw new Error(`"${section.name}" has no "${chapter.subject}"`)
@@ -102,26 +102,6 @@ function isolateChapter(store: EditorStore, tourChapter: TourChapter, subject: S
   })
 }
 
-/** The layer each stage framed, so a stage can return to it after changing the document. */
-const framed = new WeakMap<EditorStore, { id: string; insets: FrameInsets }>()
-
-/**
- * Frame `node` and remember it as what the stage shows. A stage that builds on the document,
- * such as a recorded AI turn or a terminal command, comes back here rather than fitting the
- * whole tour into view.
- */
-export function frameStage(store: EditorStore, node: SceneNode, insets: FrameInsets = {}): void {
-  framed.set(store, { id: node.id, insets })
-  frameNode(store, node, insets)
-}
-
-/** Frame what the stage showed again, at its size now. */
-export function reframeStage(store: EditorStore): void {
-  const stage = framed.get(store)
-  const node = stage ? store.graph.getNode(stage.id) : undefined
-  if (stage && node) frameNode(store, node, stage.insets)
-}
-
 /** Opens the tour on one chapter's subject, with nothing else in view. */
 async function chapter(
   store: EditorStore,
@@ -131,7 +111,7 @@ async function chapter(
   await openTour(store)
   const subject = chapterSubject(store, tourChapter)
   isolateChapter(store, tourChapter, subject)
-  frameStage(store, subject, { preview: options.preview, toolbar: options.toolbar })
+  frameNode(store, subject, { preview: options.preview, toolbar: options.toolbar })
   const selected = options.select?.(subject)
   if (selected) store.select([selected])
   if (options.preview) store.startPlay()
@@ -155,65 +135,13 @@ function descendant(store: EditorStore, node: SceneNode, name: string): string |
   return layerNamed(store, node.childIds, name) ?? undefined
 }
 
-/** The first layer on the current page with `name`. */
-export function findByName(store: EditorStore, name: string): string | null {
-  const page = store.graph.getChildren(store.state.currentPageId).map((node) => node.id)
-  return layerNamed(store, page, name)
-}
-
-/**
- * Opens the layer tree down to `depth`, where 0 is the page's top-level layers. The tree opens
- * the ancestors of whatever is selected and keeps them open, so selecting the layers at that
- * depth and then nothing leaves them showing, with no selection on the canvas.
- */
-function revealLayers(store: EditorStore, depth: number): void {
-  let level = store.graph.getChildren(store.state.currentPageId).map((node) => node.id)
-  for (let current = 0; current < depth; current++) {
-    level = level.flatMap((id) => store.graph.getNode(id)?.childIds ?? [])
-  }
-  store.select(level)
-  store.clearSelection()
-}
-
-/** The whole tour in the layer tree, its chapters open, and the first one on the canvas. */
-async function figma(store: EditorStore): Promise<void> {
-  await openTour(store)
-  frameNode(store, chapterSection(store, CHAPTERS.hello))
-  revealLayers(store, 1)
-}
-
 export type SceneBuilder = (store: EditorStore) => Promise<void>
 
 export const SCENES = {
-  figma,
-  // The main player's cover selected: a rectangle large enough to show its corner handles on
-  // hover, in a row of instances that each bring their own cover through the artwork slot.
-  slots: (store) =>
-    chapter(store, CHAPTERS.slots, {
-      toolbar: true,
-      select: (players) => {
-        const main = store.graph.getNode(players.childIds[0] ?? '')
-        return main ? descendant(store, main, 'Cover') : undefined
-      }
-    }),
-  // The players as they are, for scripts that restyle and extend them.
-  players: (store) => chapter(store, CHAPTERS.slots),
   // The hero in preview: its background moves and the player is a working control.
   hero: (store) =>
     chapter(store, CHAPTERS.hello, {
       preview: true,
       select: (s) => descendant(store, s, 'Player')
-    }),
-  // The hero still, beside which the recorded AI turn adds a card.
-  heroStill: (store) => chapter(store, CHAPTERS.hello),
-  modes: (store) => chapter(store, CHAPTERS.modes),
-  controls: (store) => chapter(store, CHAPTERS.controls, { toolbar: true }),
-  shaders: (store) =>
-    chapter(store, CHAPTERS.shaders, {
-      preview: true,
-      select: (s) => descendant(store, s, 'Shader')
-    }),
-  // The sign-in card selected, so the Lint tab lists its planted problems alone.
-  lint: (store) => chapter(store, CHAPTERS.lint, { select: (card) => card.id }),
-  code: (store) => chapter(store, CHAPTERS.code, { select: (s) => s.id })
+    })
 } satisfies Record<string, SceneBuilder>

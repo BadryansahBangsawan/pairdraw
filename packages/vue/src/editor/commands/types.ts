@@ -10,6 +10,7 @@ export type EditorCommandId =
   | 'selection.selectNextSibling'
   | 'selection.selectPreviousSibling'
   | 'selection.duplicate'
+  | 'selection.duplicateAsVariation'
   | 'selection.delete'
   | 'selection.group'
   | 'selection.frameSelection'

@@ -5,7 +5,10 @@ import type { SceneGraph, VariableValue } from '@pairdraw/scene-graph'
 import type { PlannedCollection, PlannedValue, TokenImportPlan } from './index'
 
 /** The value a planned one sets, or undefined where it points at a variable the import adds. */
-function plannedValue(plan: TokenImportPlan, value: PlannedValue): VariableValue | undefined {
+export function plannedValue(
+  plan: TokenImportPlan,
+  value: PlannedValue
+): VariableValue | undefined {
   if (value.kind === 'literal') return value.value
   const { target } = value
   if (target.kind === 'variable') return { aliasId: target.variableId }

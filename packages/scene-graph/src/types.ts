@@ -279,7 +279,7 @@ export interface Stroke extends Fill {
   dashPattern?: number[]
 }
 
-export type Effect = ShadowEffect | ShaderEffect
+export type Effect = ShadowEffect | ShaderEffect | NoiseEffect | TextureEffect
 
 export interface ShadowEffect {
   type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' | 'BACKGROUND_BLUR' | 'FOREGROUND_BLUR'
@@ -290,6 +290,50 @@ export interface ShadowEffect {
   visible: boolean
   blendMode?: BlendMode
   showShadowBehindNode?: boolean
+}
+
+/**
+ * A Noise effect's grain, in Figma's plugin terms: `MONOTONE` grains in the effect's colour,
+ * `DUOTONE` in it and `secondaryColor`, `MULTITONE` in many colours at `opacity`. `noiseSize` is a
+ * grain's size in px, which Figma keeps within 0 to 100, and `density` how much of the layer the
+ * grains cover, 0 to 1. `seed` picks the pattern; Figma's plugin API neither shows nor sets it.
+ */
+export interface NoiseEffectParams {
+  noiseType: NoiseType
+  noiseSize: Vector
+  density: number
+  secondaryColor?: Color
+  opacity?: number
+  seed?: number
+}
+
+/**
+ * A Texture effect's grain, which roughens the layer's edges: `noiseSize` is the grain's size in
+ * px, within 0 to 100 as Figma keeps it, and `clipToShape` keeps the roughened layer inside its
+ * own outline. The effect's `radius` is how far the grain moves the edges. `.fig` files name the
+ * effect `GRAIN`.
+ */
+export interface TextureEffectParams {
+  noiseSize: Vector
+  clipToShape: boolean
+  seed?: number
+}
+
+export interface NoiseEffect {
+  type: 'NOISE'
+  color: Color
+  visible: boolean
+  blendMode?: BlendMode
+  noise: NoiseEffectParams
+}
+
+export interface TextureEffect {
+  type: 'TEXTURE'
+  color: Color
+  radius: number
+  visible: boolean
+  blendMode?: BlendMode
+  texture: TextureEffectParams
 }
 
 /** A layer post-processed by shader code the user wrote; the layer is the `pencil:object` sample. */

@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Eckenradien sollten aus der Radiusskala oder einer Variablen stammen.",
   "ruleNoHardcodedColors": "Ungebundene Farbe",
   "ruleNoHardcodedColorsHelp": "Diese Farbe entspricht einer Farbvariablen. Binde sie, damit Änderungen an Theme und Palette diese Ebene erreichen.",
+  "ruleNoUnboundTokenValues": "Ungebundener Token-Wert",
+  "ruleNoUnboundTokenValuesHelp": "Dieser Radius, Abstand oder diese Schriftgröße entspricht einem Token. Binde ihn, damit Änderungen am Token diese Ebene erreichen.",
   "detailStrokeColor": "Kontur: {variable}",
   "bindVariable": "An {variable} binden",
   "bindAll": "Alle {count} binden",
@@ -80,5 +82,15 @@
   "ruleNoMixedStyles": "Gemischte Textstile",
   "ruleNoMixedStylesHelp": "Mehrere Stile in einer Textebene gehen beim Bearbeiten leicht kaputt.",
   "ruleNoDetachedInstances": "Sieht wie eine Komponente aus",
-  "ruleNoDetachedInstancesHelp": "Dieser Rahmen sieht wie ein wiederverwendbares Element aus. Verwende eine Komponenteninstanz."
+  "ruleNoDetachedInstancesHelp": "Dieser Rahmen sieht wie ein wiederverwendbares Element aus. Verwende eine Komponenteninstanz.",
+  "ruleDesignMemoryColors": "Farbe außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryColorsHelp": "Verwende eine Farbe, die das Design-Gedächtnis erlaubt, oder erlaube diese.",
+  "ruleDesignMemoryFonts": "Schrift außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryFontsHelp": "Verwende eine Schrift, die das Design-Gedächtnis erlaubt, oder erlaube diese.",
+  "ruleDesignMemoryFontSizes": "Schriftgröße außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryFontSizesHelp": "Verwende eine Schriftgröße aus dem Design-Gedächtnis oder erlaube diese.",
+  "ruleDesignMemorySpacing": "Abstand außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemorySpacingHelp": "Verwende einen Abstand aus dem Design-Gedächtnis oder erlaube diesen.",
+  "ruleDesignMemoryRadius": "Radius außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryRadiusHelp": "Verwende einen Eckenradius aus dem Design-Gedächtnis oder erlaube diesen."
 }

@@ -1,0 +1,18 @@
+{
+  "variations": "方案",
+  "variationsCount": "方案 · {count}",
+  "variationsOf": "{name} 的方案",
+  "previousVersion": "上一个版本",
+  "nextVersion": "下一个版本",
+  "useThis": "使用此版本",
+  "useThisHint": "用此版本替换 {name}",
+  "selectVersion": "选择一个版本以使用它",
+  "goToOriginal": "转到原图层",
+  "discardAll": "全部舍弃",
+  "originalChanged": "创建这些方案后，原图层已更改。",
+  "originalMissing": "原图层已不存在，因此没有版本可以替换它。",
+  "originalInInstance": "原图层位于实例中，因此没有版本可以替换它。",
+  "originalLocked": "原图层已锁定。请解锁后再使用版本。",
+  "originalNotEditable": "原图层属于某个库，因此无法在此处用任何版本替换它。",
+  "versionTypeDiffers": "此版本与原图层的图层类型不同，因此无法替换它。"
+}

@@ -34,7 +34,7 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | — | Sticky note (FigJam) | ✅ (toolbar, after Text; <kbd>N</kbd> stays Zoom to Next Frame) |
 | — | Connector (FigJam) | ✅ (toolbar, hidden by default) |
 | <kbd>C</kbd> | Comment | ✅ |
-| <kbd>I</kbd> | Eyedropper | 🔲 |
+| <kbd>I</kbd> | Eyedropper | ✅ |
 
 On a board you already have, <kbd>S</kbd> places a sticky note, <kbd>R</kbd> a shape, and <kbd>X</kbd> a connector, as in FigJam. Pairdraw does not create new boards.
 

@@ -12,6 +12,9 @@ import {
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
+import { openTypeFeaturesPatch } from '#core/figma-api/accessors/text/opentype'
+import { assertTextRange } from '#core/figma-api/text/style'
+import { styleRunsWithPatch } from '#core/text/character-style'
 
 import { nodeOf, type NodeRef } from './behaviours'
 
@@ -81,4 +84,39 @@ export function readTextDirection(graph: SceneGraph, ref: NodeRef): TextDirectio
 
 export function writeTextDirection(graph: SceneGraph, ref: NodeRef, value: string): void {
   editNode(graph, nodeOf(graph, ref), { textDirection: direction(value) })
+}
+
+/**
+ * Merges OpenType features into a text's own: the given tags replace their entries, the rest
+ * stay, as the panel's feature switches do. Figma's plugin API only reads a node's features;
+ * this is the write path the tools and the panel share.
+ */
+export function writeFontFeatures(
+  graph: SceneGraph,
+  ref: NodeRef,
+  features: Record<string, boolean>
+): void {
+  const node = nodeOf(graph, ref)
+  const merged = new Map(node.fontFeatures.map((feature) => [feature.tag, feature.enabled]))
+  for (const [tag, enabled] of Object.entries(features)) merged.set(tag.toUpperCase(), enabled)
+  editNode(graph, node, {
+    fontFeatures: [...merged].map(([tag, enabled]) => ({ tag, enabled }))
+  })
+}
+
+/**
+ * Merges OpenType features into a text range's own, keeping the features its characters already
+ * had. Figma's plugin API has no range feature setter, so this lives on `pairdraw`.
+ */
+export function writeRangeFontFeatures(
+  graph: SceneGraph,
+  ref: NodeRef,
+  start: number,
+  end: number,
+  features: Record<string, boolean>
+): void {
+  const node = nodeOf(graph, ref)
+  assertTextRange('setRangeFontFeatures', node, start, end)
+  const patch = openTypeFeaturesPatch('setRangeFontFeatures', node, start, features)
+  editNode(graph, node, { styleRuns: styleRunsWithPatch(node, start, end, patch) })
 }

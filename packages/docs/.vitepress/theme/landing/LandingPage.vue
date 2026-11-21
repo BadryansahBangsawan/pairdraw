@@ -1,38 +1,47 @@
 <script setup lang="ts">
-import { FEATURE_KINDS } from './content/features'
 import { provideLandingMessages, type LandingMessages } from './content/messages'
-import AgentList from './sections/AgentList.vue'
+import { useVisitorSystem } from './download/visitor'
+import AgentsSection from './sections/AgentsSection.vue'
 import ClosingSection from './sections/ClosingSection.vue'
-import CloudSection from './sections/CloudSection.vue'
-import CommandList from './sections/CommandList.vue'
-import FeatureSection from './sections/FeatureSection.vue'
+import FaqSection from './sections/FaqSection.vue'
+import FeaturesSection from './sections/FeaturesSection.vue'
 import HeroSection from './sections/HeroSection.vue'
-import OwnershipSection from './sections/OwnershipSection.vue'
-import RoadmapSection from './sections/RoadmapSection.vue'
+import HowItWorksSection from './sections/HowItWorksSection.vue'
+import PrivacySection from './sections/PrivacySection.vue'
+import ScriptingSection from './sections/ScriptingSection.vue'
+import SiteFooter from './sections/SiteFooter.vue'
+import SiteToolbar from './sections/SiteToolbar.vue'
+import { provideDownloadDialog } from './ui/download-dialog'
+import DownloadDialog from './ui/DownloadDialog.vue'
 
+import '@fontsource-variable/bricolage-grotesque/opsz.css'
+import '@fontsource-variable/geist-mono/wght.css'
 import './landing.css'
 
-/** The copy of the page's locale, imported by that locale's `index.md`. */
+/**
+ * The landing page, drawn as frames on Pairdraw's own canvas. Its toolbar stands in for the docs
+ * navigation, which the locale's `index.md` turns off.
+ */
 const { messages } = defineProps<{ messages: LandingMessages }>()
 provideLandingMessages(messages)
+const downloads = provideDownloadDialog()
+const system = useVisitorSystem()
 </script>
 
 <template>
-  <div class="landing">
-    <HeroSection />
-    <!-- Blocks alternate sides, so the page reads as a zigzag rather than a column. -->
-    <FeatureSection
-      v-for="(kind, index) in FEATURE_KINDS"
-      :key="kind"
-      :kind="kind"
-      :flipped="index % 2 === 1"
-    >
-      <AgentList v-if="kind === 'ai'" />
-      <CommandList v-else-if="kind === 'script'" />
-    </FeatureSection>
-    <OwnershipSection />
-    <CloudSection />
-    <RoadmapSection />
-    <ClosingSection />
+  <div class="landing-home">
+    <SiteToolbar />
+    <main>
+      <HeroSection :system="system" />
+      <HowItWorksSection />
+      <FeaturesSection />
+      <AgentsSection />
+      <ScriptingSection />
+      <PrivacySection />
+      <FaqSection />
+      <ClosingSection :system="system" />
+    </main>
+    <SiteFooter />
+    <DownloadDialog v-model:open="downloads" :system="system" />
   </div>
 </template>

@@ -90,7 +90,8 @@ describe('penFormat.readDocument — imports', () => {
       asked
     )
     const { graph, warnings } = await io.readDocument(open('screens/checkout.pen', screen))
-    expect(warnings).toBeUndefined()
+    // The screen's own fill names a variable no imported library defines; its components draw.
+    expect(warnings).toEqual([{ kind: 'unknown-variable', names: ['ui:color-primary'] }])
     expect([...asked].sort()).toEqual(['library/base.lib.pen', 'library/ui.lib.pen'])
     const cta = getNodeOrThrow(graph, 'cta')
     expect(cta.componentId).toBe('ui:button')

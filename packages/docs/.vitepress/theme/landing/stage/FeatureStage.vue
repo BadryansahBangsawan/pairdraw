@@ -6,9 +6,9 @@ import { defineAsyncComponent, ref, watch } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import type { StageKind } from '../posters'
 import { STAGES } from './definitions'
 import { prepareEngine } from './engine-assets'
-import type { SingleStageKind } from './kinds'
 import StageCanvas from './StageCanvas.vue'
 import { useDocsAppearance } from './useDocsAppearance'
 import { useStageDocument } from './useStageDocument'
@@ -21,7 +21,7 @@ const StagePreviewControls = defineAsyncComponent(() => import('./StagePreviewCo
 /** Stages mount a screen ahead of the viewport, so a block is live before it scrolls in. */
 const MOUNT_MARGIN = '100% 0px'
 
-const { kind } = defineProps<{ kind: SingleStageKind }>()
+const { kind } = defineProps<{ kind: StageKind }>()
 /** `start`: it begins loading as it nears the viewport. `ready`: its scene is on screen. */
 const emit = defineEmits<{ start: []; ready: [] }>()
 const definition = STAGES[kind]

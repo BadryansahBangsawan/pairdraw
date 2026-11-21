@@ -1,0 +1,18 @@
+{
+  "variations": "Wariacje",
+  "variationsCount": "Wariacje · {count}",
+  "variationsOf": "Wariacje: {name}",
+  "previousVersion": "Poprzednia wersja",
+  "nextVersion": "Następna wersja",
+  "useThis": "Użyj tej",
+  "useThisHint": "Zastąp {name} tą wersją",
+  "selectVersion": "Zaznacz wersję, aby jej użyć",
+  "goToOriginal": "Przejdź do oryginału",
+  "discardAll": "Odrzuć wszystkie",
+  "originalChanged": "Oryginał zmienił się od czasu ich utworzenia.",
+  "originalMissing": "Oryginału już nie ma, więc żadna wersja nie może go zastąpić.",
+  "originalInInstance": "Oryginał jest w instancji, więc żadna wersja nie może go zastąpić.",
+  "originalLocked": "Oryginał jest zablokowany. Odblokuj go, aby użyć wersji.",
+  "originalNotEditable": "Oryginał należy do biblioteki, więc żadna wersja nie może go tu zastąpić.",
+  "versionTypeDiffers": "Ta wersja jest innym rodzajem warstwy niż oryginał, więc nie może go zastąpić."
+}

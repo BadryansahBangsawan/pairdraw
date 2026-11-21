@@ -1,0 +1,84 @@
+{
+  "designMemory": "Pamięć projektu",
+  "editDesignMemory": "Edytuj pamięć projektu…",
+  "createFromDocument": "Utwórz z tego dokumentu",
+  "emptyHint": "Kolory, fonty i odstępy, których agenci muszą przestrzegać w tym dokumencie.",
+  "colorCount": {
+    "one": "{count} kolor",
+    "few": "{count} kolory",
+    "many": "{count} kolorów"
+  },
+  "fontCount": {
+    "one": "{count} font",
+    "few": "{count} fonty",
+    "many": "{count} fontów"
+  },
+  "sizeCount": {
+    "one": "{count} rozmiar fontu",
+    "few": "{count} rozmiary fontu",
+    "many": "{count} rozmiarów fontu"
+  },
+  "decisionCount": {
+    "one": "{count} decyzja",
+    "few": "{count} decyzje",
+    "many": "{count} decyzji"
+  },
+  "exampleCount": {
+    "one": "{count} przykład",
+    "few": "{count} przykłady",
+    "many": "{count} przykładów"
+  },
+  "rules": "Reguły",
+  "decisions": "Decyzje",
+  "examples": "Przykłady",
+  "colors": "Kolory",
+  "fonts": "Fonty",
+  "fontSizes": "Rozmiary fontu",
+  "spacing": "Odstępy",
+  "radius": "Promień narożnika",
+  "fromSystem": "Uwzględnij zmienne i style",
+  "fromSystemCount": {
+    "one": "{count} wartość ze zmiennych i stylów",
+    "few": "{count} wartości ze zmiennych i stylów",
+    "many": "{count} wartości ze zmiennych i stylów"
+  },
+  "enforcement": "Gdy agent użyje innej wartości",
+  "refuse": "Cofnij edycję",
+  "warn": "Ostrzeż",
+  "off": "Wyłączone",
+  "notChecked": "Nic nie jest jeszcze dozwolone, więc nic nie jest sprawdzane",
+  "addValue": "Dodaj wartość",
+  "pickColor": "Wybierz kolor",
+  "moreValues": "i {count} więcej",
+  "removeValue": "Usuń {value}",
+  "newDecision": "Zapisz decyzję, której agenci mają przestrzegać",
+  "addDecision": "Dodaj decyzję",
+  "removeDecision": "Usuń decyzję",
+  "byAgent": "Agent",
+  "noDecisionsYet": "Brak decyzji",
+  "noDecisions": "Zapisz wybory, których agenci mają przestrzegać, np. jaki kolor oznacza główną akcję.",
+  "editDecision": "Edytuj decyzję",
+  "moveUp": "Przenieś wyżej",
+  "moveDown": "Przenieś niżej",
+  "noExamplesYet": "Brak przykładów",
+  "noExamples": "Zaznacz ramkę, która pokazuje dobrze zrobiony projekt, i przypnij ją jako przykład.",
+  "pinExample": "Przypnij jako przykład",
+  "unpinExample": "Odepnij przykład",
+  "showExample": "Pokaż",
+  "removeExample": "Usuń przykład",
+  "missingExample": "Nie ma już w dokumencie",
+  "learn": "Ucz się z zaznaczenia",
+  "learnHeading": "Wartości używane w zaznaczeniu",
+  "learnHint": "Wartości użyte tylko raz są odznaczone.",
+  "uses": {
+    "one": "{count} użycie",
+    "few": "{count} użycia",
+    "many": "{count} użyć"
+  },
+  "addChecked": "Dodaj zaznaczone wartości",
+  "nothingToLearn": "Zaznaczenie nie używa wartości, których pamięć jeszcze nie dopuszcza.",
+  "deleteMemory": "Usuń pamięć projektu",
+  "allow": "Zezwól na {value}",
+  "allowed": "Dozwolono {value}",
+  "refused": "Cofnięte przez pamięć projektu"
+}

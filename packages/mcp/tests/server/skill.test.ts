@@ -173,7 +173,16 @@ describe('MCP agent skill', () => {
     for (const options of [
       {},
       { scope: 'selection' as const },
-      { disabledTools: ['read_skill', 'list_documents', 'undo', 'redo', 'get_codegen_prompt'] }
+      {
+        disabledTools: [
+          'read_skill',
+          'list_documents',
+          'undo',
+          'redo',
+          'get_codegen_prompt',
+          'get_design_memory'
+        ]
+      }
     ]) {
       const client = await connect(options)
       const instructions = expectDefined(client.getInstructions(), 'server instructions')
@@ -183,6 +192,11 @@ describe('MCP agent skill', () => {
       // The resources stay on, so the skill is always reachable through them.
       expect(instructions.slice(0, 512)).toContain(skillResourceURI('SKILL.md'))
     }
+  })
+
+  test('instructions point agents at the design memory when the tool is exposed', async () => {
+    const client = await connect()
+    expect(client.getInstructions()).toContain('get_design_memory')
   })
 
   test('app chats get no skill paragraph; their prompt already carries the reference', async () => {

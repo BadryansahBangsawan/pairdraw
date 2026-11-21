@@ -5,6 +5,7 @@ import { behaviourSchema } from '../behaviours/schema'
 import { browserNodeSchema } from '../browser-node/schema'
 import type { OkHCLPayload } from '../color/okhcl'
 import { commentThreadsSchema } from '../comments/schema'
+import { designMemorySchema } from '../design-memory/schema'
 import { clampExportQuality, isExportFormatId, type ExportFormatId } from '../export-format'
 import { clampExportScale } from '../export-scale'
 import { FIG_COMPRESSIONS } from '../fig-compression'
@@ -13,6 +14,7 @@ import type { Color, Rect, Vector } from '../primitives'
 import { scriptNodeSchema } from '../script/schema'
 import { shaderPaintSchema } from '../shaders/schema'
 import { nodeStatusSchema, statusWorkflowSchema } from '../statuses/schema'
+import { tokenSourcesSchema } from '../token-sources/schema'
 import {
   MODE_ATTRIBUTE_PATTERN,
   TOKEN_UNITS,
@@ -25,6 +27,7 @@ import {
   type TextDirection,
   type TokenUnit
 } from '../types'
+import { variationSetSchema, variationStandInSchema } from '../variations/schema'
 import {
   jsonPluginDataField,
   textPluginDataField,
@@ -249,6 +252,10 @@ export const PAIRDRAW_PLUGIN_DATA = {
   comments: jsonPluginDataField('comments', 'bookkeeping', commentThreadsSchema),
   /** The statuses layers can be in, on the DOCUMENT node. */
   statuses: jsonPluginDataField('statuses', 'bookkeeping', statusWorkflowSchema),
+  /** The code the document's variables are linked to, on the DOCUMENT node. */
+  tokenSources: jsonPluginDataField('tokenSources', 'bookkeeping', tokenSourcesSchema),
+  /** The design rules agents follow in the document, on the DOCUMENT node. */
+  designMemory: jsonPluginDataField('designMemory', 'bookkeeping', designMemorySchema),
   /** How tightly the document's `.fig` data is compressed, on the DOCUMENT node. */
   figCompression: textPluginDataField('figCompression', 'bookkeeping', FIG_COMPRESSIONS),
   /** A layer's status, any state of the workflow; Figma's `sectionStatusInfo` knows only two. */
@@ -289,7 +296,17 @@ export const PAIRDRAW_PLUGIN_DATA = {
    * A snapshot of one page: its address, viewport, and when it was refreshed. The picture is
    * the layer's image fill. An address that is not an http or https page does not decode.
    */
-  browserNode: jsonPluginDataField('browserNode', 'content', browserNodeSchema)
+  browserNode: jsonPluginDataField('browserNode', 'content', browserNodeSchema),
+  /**
+   * On a section, that its children are variations of another layer: which one, and how that
+   * layer looked when they were made. A copy of the section is an ordinary section.
+   */
+  variationSet: jsonPluginDataField('variationSet', 'bookkeeping', variationSetSchema),
+  /**
+   * On a layer of a version, the main component or component set of the original it stands in
+   * for, so a pick keeps that component rather than pairing it by name.
+   */
+  variationStandIn: jsonPluginDataField('variationStandIn', 'bookkeeping', variationStandInSchema)
 } satisfies Record<string, PluginDataKey>
 
 const NOT_CONTENT = Object.values(PAIRDRAW_PLUGIN_DATA).filter((field) => field.role !== 'content')

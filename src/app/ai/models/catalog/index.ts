@@ -47,6 +47,8 @@ type ModelsDevModel = {
   release_date?: unknown
   modalities?: { output?: unknown }
   limit?: { output?: unknown; context?: unknown }
+  /** List price per million tokens, as models.dev lists it; cache_read is the cached-input rate. */
+  cost?: { input?: unknown; output?: unknown; cache_read?: unknown }
   /** Overrides the provider's API for this model, such as `{ npm: '@ai-sdk/anthropic' }`. */
   provider?: { npm?: unknown }
 }
@@ -68,6 +70,13 @@ const modelsDevCatalogSchema = v.record(
           limit: v.optional(
             v.looseObject({ output: v.optional(v.unknown()), context: v.optional(v.unknown()) })
           ),
+          cost: v.optional(
+            v.looseObject({
+              input: v.optional(v.unknown()),
+              output: v.optional(v.unknown()),
+              cache_read: v.optional(v.unknown())
+            })
+          ),
           provider: v.optional(v.looseObject({ npm: v.optional(v.unknown()) }))
         })
       )
@@ -78,6 +87,23 @@ const modelsDevCatalogSchema = v.record(
 function normalizedStatus(status: unknown): ModelOption['status'] {
   if (status === 'beta' || status === 'deprecated') return status
   return 'active'
+}
+
+/** A model's price per million tokens from its catalog cost, or null without both rates. */
+function modelPricing(cost: ModelsDevModel['cost']): ModelOption['pricing'] | null {
+  const input = cost?.input
+  const output = cost?.output
+  if (typeof input !== 'number' || typeof output !== 'number') return null
+  if (!Number.isFinite(input) || !Number.isFinite(output) || input < 0 || output < 0) return null
+  const pricing: NonNullable<ModelOption['pricing']> = {
+    inputPerMTok: input,
+    outputPerMTok: output
+  }
+  const cacheRead = cost?.cache_read
+  if (typeof cacheRead === 'number' && Number.isFinite(cacheRead) && cacheRead >= 0) {
+    pricing.cacheReadPerMTok = cacheRead
+  }
+  return pricing
 }
 
 function normalizeModel(id: string, model: ModelsDevModel): ModelOption {
@@ -95,6 +121,8 @@ function normalizeModel(id: string, model: ModelsDevModel): ModelOption {
     normalized.recommendedMaxOutputTokens = Math.min(128_000, Math.max(1024, output))
   }
   if (typeof model.release_date === 'string') normalized.releaseDate = model.release_date
+  const pricing = modelPricing(model.cost)
+  if (pricing) normalized.pricing = pricing
   return normalized
 }
 
@@ -224,6 +252,15 @@ export async function resolveModelContextWindow(
 ): Promise<number | null> {
   const context = (await findModelsDevModel(providerID, modelID, fetcher))?.limit?.context
   return typeof context === 'number' && Number.isFinite(context) && context > 0 ? context : null
+}
+
+/** The model's list price per million tokens, as models.dev lists it, or null when unknown. */
+export async function resolveModelPricing(
+  providerID: AIProviderID,
+  modelID: string,
+  fetcher?: typeof fetch
+): Promise<ModelOption['pricing'] | null> {
+  return modelPricing((await findModelsDevModel(providerID, modelID, fetcher))?.cost)
 }
 
 export function resetModelsDevCatalogForTests(): void {

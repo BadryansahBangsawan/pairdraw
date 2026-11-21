@@ -2,6 +2,7 @@ import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promi
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { POSTER_PAGE } from '#docs-config/theme/landing/posters'
 import { capturePosters } from '#landing-posters/capture'
 import { landingPosterFingerprint } from '#landing-posters/fingerprint'
 import { parseShard, posterFiles, posterTargets, shardTargets } from '#landing-posters/targets'
@@ -25,8 +26,8 @@ function argumentAfter(flag: string): string | null {
 }
 
 /**
- * Adds stage stills to a production docs build. The build names the fingerprint in each landing
- * page's data; this captures the stills from that build unless the cache already holds them for
+ * Adds stage stills to a production docs build. The build names the fingerprint in the data of
+ * each page with a stage; this captures the stills from that build unless the cache already holds them for
  * the fingerprint, then copies them into the build. `--force` captures again.
  *
  * CI spreads the capture over runners: `--shard 2/4` captures only that part of the pages into
@@ -37,8 +38,8 @@ async function main(): Promise<void> {
   const root = await resolveWorkspaceRoot(fileURLToPath(import.meta.url))
   const fingerprint = await landingPosterFingerprint(root)
   const dist = join(root, DIST)
-  const landing = await readFile(join(dist, 'index.html'), 'utf8').catch(() => '')
-  if (!landing.includes(fingerprint)) {
+  const page = await readFile(join(dist, `${POSTER_PAGE}.html`), 'utf8').catch(() => '')
+  if (!page.includes(fingerprint)) {
     throw new Error(
       `The docs build in ${DIST} does not reference landing posters ${fingerprint}. ` +
         'Build it with PAIRDRAW_LANDING_POSTERS=1 (docs build:production) from the same sources.'

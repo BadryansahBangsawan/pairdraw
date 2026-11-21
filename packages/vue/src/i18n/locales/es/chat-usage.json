@@ -1,0 +1,16 @@
+{
+  "usageLabel": "Uso de tokens",
+  "turnTokens": "{tokens} tokens",
+  "turnTokensCost": "{tokens} tokens · {cost}",
+  "chatTokens": "{tokens} tokens en este chat",
+  "chatTokensCost": "{tokens} tokens · {cost} en este chat",
+  "usageInput": "Entrada",
+  "usageCachedInput": "Entrada en caché",
+  "usageOutput": "Salida",
+  "usageReasoning": "Razonamiento",
+  "usageCost": "Coste estimado",
+  "usageTurns": "{count} respuestas",
+  "usageHint": "Contado a partir de los tokens que informó cada respuesta. El coste es una estimación al precio de lista del modelo.",
+  "usageNoCost": "No hay un precio registrado para este modelo, así que solo se muestran los tokens.",
+  "usageAgentHint": "Contado a partir de los tokens que informó el agente. Los agentes de código no tienen un precio en dólares."
+}

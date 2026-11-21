@@ -26,7 +26,15 @@ export type ToolCapability =
 
 export type ToolExecution =
   | { kind: 'sync'; mutation: 'none' | 'view' | 'properties' | 'document' }
-  | { kind: 'async'; mutation: 'none' | 'view' | 'document' }
+  | {
+      kind: 'async'
+      mutation: 'none' | 'view' | 'document'
+      /**
+       * The call can run for a long time even when it only reads, such as recording a video, so
+       * bridges give it the deadline they give an edit.
+       */
+      long?: boolean
+    }
 
 export type ToolInterface = 'mcp' | 'ai' | 'webmcp'
 export type ToolExposure = Partial<Record<ToolInterface, boolean>>
@@ -39,6 +47,14 @@ interface ToolMetadata {
   exposure: ToolExposure
   capabilities: readonly ToolCapability[]
   availability: 'default' | 'eval'
+  /**
+   * What a call's values come from, for the document's design memory:
+   * - `imported`: outside content, such as a web page, an SVG, a photo or a library component,
+   *   whose colors and type are its own, so the memory warns about them rather than refusing;
+   * - `copied`: the layers the call names, which it copies or converts with their values, such
+   *   as a clone, a group or a boolean, so values those layers already had are not new.
+   */
+  content?: 'imported' | 'copied'
 }
 
 export interface ToolDef extends ToolMetadata {

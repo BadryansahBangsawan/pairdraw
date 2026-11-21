@@ -13,6 +13,13 @@ export const modelOptionsSchema = v.array(
     recommendedMaxOutputTokens: v.optional(v.number()),
     releaseDate: v.optional(v.string()),
     status: v.optional(v.picklist(['active', 'beta', 'deprecated'])),
-    minReasoningEffort: v.optional(v.picklist(REASONING_EFFORTS))
+    minReasoningEffort: v.optional(v.picklist(REASONING_EFFORTS)),
+    pricing: v.optional(
+      v.object({
+        inputPerMTok: v.number(),
+        outputPerMTok: v.number(),
+        cacheReadPerMTok: v.optional(v.number())
+      })
+    )
   })
 ) satisfies v.GenericSchema<unknown, ModelOption[]>

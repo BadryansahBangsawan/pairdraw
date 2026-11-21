@@ -1,7 +1,13 @@
 import { countBy } from 'es-toolkit/array'
 import { isEmptyObject, isPlainObject } from 'es-toolkit/predicate'
 
-import type { Effect, ShadowEffect, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type {
+  Effect,
+  SceneGraph,
+  SceneNode,
+  ShaderEffect,
+  ShadowEffect
+} from '@pairdraw/scene-graph'
 import { lineHeightPixels, textLengthPixels } from '@pairdraw/scene-graph/text'
 
 import { toFigmaEffect } from '#core/figma-api/effects'
@@ -167,7 +173,9 @@ function shadowToken(node: SceneNode): DesignToken | undefined {
           $extensions: {
             [PAIRDRAW_EXTENSION]: {
               effects: node.effects
-                .filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+                .filter(
+                  (effect): effect is Exclude<Effect, ShaderEffect> => effect.type !== 'SHADER'
+                )
                 .map(toFigmaEffect)
             }
           }

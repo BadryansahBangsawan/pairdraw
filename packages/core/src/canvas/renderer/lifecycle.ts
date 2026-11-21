@@ -1,3 +1,4 @@
+import { releaseImageAdjustments } from '#core/canvas/images/adjustments'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { clearSubtreePictureCache } from '#core/canvas/renderer/state'
 import { fontManager } from '#core/text/font/manager'
@@ -36,6 +37,7 @@ function releaseRuntimeEffects(r: SkiaRenderer): void {
   r.linearBurnBlender = null
   r.linearDodgeBlender?.delete()
   r.linearDodgeBlender = null
+  releaseImageAdjustments(r.ck)
 }
 
 export function destroyRenderer(r: SkiaRenderer): void {
@@ -85,6 +87,10 @@ export function destroyRenderer(r: SkiaRenderer): void {
   r.effectLayerPaint.delete()
   r.imageFilterCache.clear()
   r.maskFilterCache.clear()
+  r.noiseTileCache.clear()
+  r.textureNoiseCache.clear()
+  r.noiseGrainEffect?.delete()
+  r.noiseGrainEffect = null
   for (const pic of r.nodePictureCache.values()) pic?.delete()
   r.nodePictureCache.clear()
   r.labelParagraphCache.clear()

@@ -1,0 +1,18 @@
+{
+  "variations": "Déclinaisons",
+  "variationsCount": "Déclinaisons · {count}",
+  "variationsOf": "Déclinaisons de {name}",
+  "previousVersion": "Version précédente",
+  "nextVersion": "Version suivante",
+  "useThis": "Utiliser celle-ci",
+  "useThisHint": "Remplacer {name} par cette version",
+  "selectVersion": "Sélectionnez une version pour l’utiliser",
+  "goToOriginal": "Aller à l’original",
+  "discardAll": "Tout supprimer",
+  "originalChanged": "L’original a changé depuis la création de ces déclinaisons.",
+  "originalMissing": "L’original n’existe plus : aucune version ne peut le remplacer.",
+  "originalInInstance": "L’original est dans une instance : aucune version ne peut le remplacer.",
+  "originalLocked": "L’original est verrouillé. Déverrouillez-le pour utiliser une version.",
+  "originalNotEditable": "L’original appartient à une bibliothèque : aucune version ne peut le remplacer ici.",
+  "versionTypeDiffers": "Cette version est un autre type de calque que l’original : elle ne peut pas le remplacer."
+}

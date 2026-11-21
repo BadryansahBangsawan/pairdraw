@@ -210,10 +210,11 @@ function buildServerContext(options: ServerOptions) {
     }
   })
   const toolDescriptors = applyToolPolicy(createToolDescriptors(mcpRoot !== null), toolPolicy)
-  // A tool that writes, and eval or a save, may draw a page, so it gets the longer deadline;
-  // a read sent while one runs waits with it rather than failing at the read deadline.
+  // A tool that writes, a long one such as a video recording, and eval or a save may draw a page,
+  // so they get the longer deadline; a read sent while one runs waits with it rather than failing
+  // at the read deadline.
   const writeTools = new Set(
-    toolDescriptors.filter((tool) => tool.effect === 'write').map((tool) => tool.name)
+    toolDescriptors.filter((tool) => tool.effect === 'write' || tool.long).map((tool) => tool.name)
   )
   const writesDocument = (body: RPCJSONObject): boolean => {
     const command = typeof body.command === 'string' ? body.command : ''

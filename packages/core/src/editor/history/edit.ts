@@ -42,6 +42,13 @@ export interface RecordEditOptions {
    * back after it threw changed nothing.
    */
   onRecorded?: (change: DocumentChange) => void
+  /**
+   * Judges what the edit changed once it finished without throwing. An error it returns fails
+   * the edit: with `rollbackOnThrow` the edit is put back and the error thrown, as the design
+   * memory refuses an agent's off-system values. When the edit cannot be put back, its step is
+   * recorded and nothing is thrown, so the caller reports the error some other way.
+   */
+  verify?: (change: DocumentChange) => Error | null
 }
 
 function unchanged(pageId: string): DocumentChange {
@@ -157,11 +164,13 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
   if (awaits) keepOpenRecorder(ctx, recorder)
   // A synchronous edit runs alone; one that awaits shares the document while it waits.
   const othersWrote = awaits ? watchOtherWrites(ctx) : () => false
-  const finish = (failed: boolean) => {
+  const finish = (threw: boolean) => {
     if (awaits) releaseOpenRecorder(ctx, recorder)
     const others = othersWrote()
     const change = recorder.finish()
     const empty = isEmptyDocumentChange(change)
+    const refusal = !threw && !empty && options.verify ? options.verify(change) : null
+    const failed = threw || refusal !== null
     if (
       failed &&
       options.rollbackOnThrow &&
@@ -171,6 +180,7 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
       rollBack(ctx, graph, change)
     ) {
       options.onRecorded?.(unchanged(pageId))
+      if (refusal) throw refusal
       return
     }
     // An edit that changed nothing, such as a read-only script, leaves no empty step behind.

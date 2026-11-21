@@ -61,7 +61,8 @@ describe('bindVariable emits node:updated event', () => {
 /** Variables whose only color matches the tests' 50% gray paint. */
 const GRAY_VARIABLES = {
   counts: { COLOR: 1, FLOAT: 0, STRING: 0, BOOLEAN: 0 },
-  colorsByHex: new Map([['#808080', { id: 'v1', name: 'Gray' }]])
+  colorsByHex: new Map([['#808080', { id: 'v1', name: 'Gray' }]]),
+  numbersByField: new Map()
 }
 
 describe('no-hardcoded-colors lint checks indexed bindings', () => {
@@ -249,7 +250,7 @@ describe('bindVariable validation', () => {
     })
     const n = getNodeOrThrow(graph, node.id)
     // Set top-level dead data first
-    n.boundVariables['fills'] = 'v-color'
+    n.boundVariables = { ...n.boundVariables, fills: 'v-color' }
     // Now set a proper indexed binding — should auto-remove top-level
     graph.bindVariable(node.id, 'fills/0/color', 'v-color')
     expect(n.boundVariables['fills']).toBeUndefined()

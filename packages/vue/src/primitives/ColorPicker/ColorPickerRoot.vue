@@ -8,6 +8,7 @@ import type { Color } from '@pairdraw/scene-graph/primitives'
 import { useRetainedPopup } from '#vue/lifecycle/retention/popup'
 
 import { usePickerGesture, type PickerCancelCause } from './gesture'
+import { pickerOutsideHandlers, type PickerKeepOpen } from './outside'
 
 export interface ColorPickerUI {
   content?: string
@@ -18,7 +19,8 @@ const {
   color,
   label = 'Edit color',
   ui,
-  escapeReverts = false
+  escapeReverts = false,
+  keepOpen
 } = defineProps<{
   color: Color
   label?: string
@@ -28,6 +30,8 @@ const {
    * the colour it opened with. Otherwise Escape keeps the edit, as Figma's picker does.
    */
   escapeReverts?: boolean
+  /** Whether a press outside the picker should leave it open, such as one that samples the canvas. */
+  keepOpen?: PickerKeepOpen
 }>()
 
 const emit = defineEmits<{
@@ -59,6 +63,8 @@ const gesture = usePickerGesture({
   }
 })
 const { open: popupOpen, portalActive } = useRetainedPopup(undefined, () => onOpenChange(false))
+
+const outside = pickerOutsideHandlers(() => keepOpen)
 
 let openColor: Color = { ...color }
 
@@ -100,6 +106,8 @@ function onEscapeKeyDown() {
         side="left"
         data-picker-content
         @escape-key-down="onEscapeKeyDown"
+        @pointer-down-outside="outside.onPointerDownOutside"
+        @focus-outside="outside.onFocusOutside"
       >
         <slot :color="color" :update="update" />
       </PopoverContent>

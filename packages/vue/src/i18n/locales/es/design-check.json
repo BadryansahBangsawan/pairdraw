@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "El radio de esquina debe salir de la escala de radios o de una variable.",
   "ruleNoHardcodedColors": "Color sin vincular",
   "ruleNoHardcodedColorsHelp": "Este color coincide con una variable de color. Vincúlalo para que los cambios de tema y paleta lleguen a esta capa.",
+  "ruleNoUnboundTokenValues": "Valor de token sin vincular",
+  "ruleNoUnboundTokenValuesHelp": "Este radio, espaciado o tamaño de fuente coincide con un token. Vincúlalo para que los cambios del token lleguen a esta capa.",
   "detailStrokeColor": "Trazo: {variable}",
   "bindVariable": "Vincular a {variable}",
   "bindAll": "Vincular las {count}",
@@ -80,5 +82,15 @@
   "ruleNoMixedStyles": "Estilos de texto mezclados",
   "ruleNoMixedStylesHelp": "Varios estilos en una capa de texto se rompen fácilmente al editar.",
   "ruleNoDetachedInstances": "Parece un componente",
-  "ruleNoDetachedInstancesHelp": "Este marco parece un elemento reutilizable. Usa una instancia de componente."
+  "ruleNoDetachedInstancesHelp": "Este marco parece un elemento reutilizable. Usa una instancia de componente.",
+  "ruleDesignMemoryColors": "Color fuera de la memoria de diseño",
+  "ruleDesignMemoryColorsHelp": "Usa un color que permita la memoria de diseño, o permite este.",
+  "ruleDesignMemoryFonts": "Fuente fuera de la memoria de diseño",
+  "ruleDesignMemoryFontsHelp": "Usa una fuente que permita la memoria de diseño, o permite esta.",
+  "ruleDesignMemoryFontSizes": "Tamaño de fuente fuera de la memoria de diseño",
+  "ruleDesignMemoryFontSizesHelp": "Usa un tamaño de fuente de la memoria de diseño, o permite este.",
+  "ruleDesignMemorySpacing": "Espaciado fuera de la memoria de diseño",
+  "ruleDesignMemorySpacingHelp": "Usa un espaciado de la memoria de diseño, o permite este.",
+  "ruleDesignMemoryRadius": "Radio fuera de la memoria de diseño",
+  "ruleDesignMemoryRadiusHelp": "Usa un radio de esquina de la memoria de diseño, o permite este."
 }

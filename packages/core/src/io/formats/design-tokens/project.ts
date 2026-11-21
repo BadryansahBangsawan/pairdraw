@@ -171,15 +171,48 @@ function manifestChoice(
   }
 }
 
+/**
+ * The stylesheets a project folder's tokens come from: the one `components.json` names, or every
+ * stylesheet that declares custom properties. Paths that leave the folder and JavaScript config
+ * are reported, not read.
+ */
+export function designSystemStylesheets(folder: DesignSystemFolder): {
+  stylesheets: DesignSystemSourceFile[]
+  issues: DesignSystemIssue[]
+  manifestPath?: string
+} {
+  const issues = [...folder.issues]
+  const files = confineFiles(folder, issues)
+  const manifest = manifestChoice(files, issues)
+  return {
+    stylesheets: stylesheets(files, manifest.stylesheet, issues),
+    issues,
+    manifestPath: manifest.path
+  }
+}
+
+/**
+ * One stylesheet of a project as a token bundle, read against the document as it is now. A
+ * shadcn/ui `:root` and `.dark` pair becomes Light and Dark modes; the bundle's issues are noted.
+ */
+export function readDesignSystemStylesheet(
+  graph: SceneGraph,
+  file: DesignSystemSourceFile,
+  issues: DesignSystemIssue[]
+): DesignTokenBundle {
+  const bundle = readCSSDesignTokens(graph, file.text, { file: file.path })
+  renameShadcnModes(bundle)
+  for (const issue of bundle.issues) addIssue(issues, issue)
+  return bundle
+}
+
 function importStylesheetFile(
   graph: SceneGraph,
   pageId: string,
   file: DesignSystemSourceFile,
   issues: DesignSystemIssue[]
 ): { collectionIds: string[]; variableIds: string[] } {
-  const bundle = readCSSDesignTokens(graph, file.text, { file: file.path })
-  renameShadcnModes(bundle)
-  for (const issue of bundle.issues) addIssue(issues, issue)
+  const bundle = readDesignSystemStylesheet(graph, file, issues)
   const plan = planTokenImport(graph, bundle, defaultTokenImportOptions(graph, bundle))
   for (const skip of plan.skipped) {
     addIssue(issues, {
@@ -201,20 +234,18 @@ export function importDesignSystemFiles(
   graph: SceneGraph,
   folder: DesignSystemFolder
 ): DesignSystemImportResult {
-  const issues = [...folder.issues]
-  const files = confineFiles(folder, issues)
-  const manifest = manifestChoice(files, issues)
-  if (manifest.path || folder.componentsPath) {
+  const { stylesheets: files, issues, manifestPath } = designSystemStylesheets(folder)
+  if (manifestPath || folder.componentsPath) {
     addIssue(issues, {
       kind: 'components-not-imported',
-      path: manifest.path ?? folder.componentsPath ?? 'components.json'
+      path: manifestPath ?? folder.componentsPath ?? 'components.json'
     })
   }
 
   const pageId = graph.getPages()[0]?.id ?? graph.rootId
   const collectionIds: string[] = []
   const variableIds: string[] = []
-  for (const file of stylesheets(files, manifest.stylesheet, issues)) {
+  for (const file of files) {
     const imported = importStylesheetFile(graph, pageId, file, issues)
     collectionIds.push(...imported.collectionIds)
     variableIds.push(...imported.variableIds)

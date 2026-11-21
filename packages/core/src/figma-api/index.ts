@@ -771,6 +771,16 @@ export class FigmaAPI implements NodeProxyHost {
   }
 
   exportImage?: (nodeIds: string[], options: ExportImageOptions) => Promise<Uint8Array | null>
+  /**
+   * Renders nodes of a graph other than the open document's, such as a copy a tool resized, so
+   * checking a variant leaves the document and its undo history untouched.
+   */
+  exportGraphImage?: (
+    graph: SceneGraph,
+    pageId: string,
+    nodeIds: string[],
+    options: ExportImageOptions
+  ) => Promise<Uint8Array | null>
   /** Where icon tools search and fetch icons; hosts may pass a self-hosted or bundled set. */
   icons: IconProvider = defaultIcons
   rasterCodec?: RasterCodec

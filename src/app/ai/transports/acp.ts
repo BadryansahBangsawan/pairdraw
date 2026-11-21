@@ -27,7 +27,8 @@ import {
 import { linkOwnTools } from '@/app/ai/agents/acp/tools'
 import { agentHost } from '@/app/ai/agents/host/current'
 import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
-import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
+import { systemPrompt } from '@/app/ai/chat/system-prompt'
+import { turnUsageFromReported, type TurnUsage } from '@/app/ai/chat/usage/aggregate'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
 import { AgentStartupTimeoutError, raceStartup } from '@/app/ai/transports/deadline'
 import { forgetChatAgent, nameChatAgent } from '@/app/automation/agents'
@@ -236,7 +237,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     }
 
     const carriesContext = !this.sentContext
-    const promptText = carriesContext ? `${SYSTEM_PROMPT}\n\n${text}` : text
+    const promptText = carriesContext ? `${systemPrompt()}\n\n${text}` : text
     this.sentContext = true
 
     const { connection, sessionId } = this.session
@@ -250,12 +251,13 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         const store = this.store
         const run = store ? startAgentRun(store, session.chat) : null
 
-        function finish(reason: 'stop' | 'other' | 'error', errorText?: string) {
+        function finish(reason: 'stop' | 'other' | 'error', errorText?: string, usage?: TurnUsage) {
           if (closed) return
           closed = true
           if (store && run) endRun(store, run)
           if (errorText) controller.enqueue({ type: 'error', errorText })
           for (const chunk of mapper.end()) controller.enqueue(chunk)
+          if (usage) controller.enqueue({ type: 'message-metadata', messageMetadata: { usage } })
           controller.enqueue({ type: 'finish-step' })
           controller.enqueue({ type: 'finish', finishReason: reason })
           session.onUpdate = null
@@ -301,8 +303,14 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
           })
           // The prompt answers once the agent's turn is over; nothing else ends the reply.
           .then((result) => {
-            if (result.usage) this.onUsage?.(agentTurnUsage(result.usage, session.model))
-            finish(result.stopReason === 'end_turn' ? 'stop' : 'other')
+            const turn = result.usage ? agentTurnUsage(result.usage, session.model) : null
+            if (turn) this.onUsage?.(turn)
+            const usage = turn ? turnUsageFromReported(turn) : null
+            finish(
+              result.stopReason === 'end_turn' ? 'stop' : 'other',
+              undefined,
+              usage ?? undefined
+            )
             return undefined
           })
           .catch((e) => {

@@ -44,6 +44,7 @@ export const menuMessageDefaults = {
   insertScript: 'Insert Script…',
   placeImage: 'Place image…',
   exportFramesToPDF: 'Export frames to PDF…',
+  exportPrototypeVideo: 'Export prototype as video…',
   /** The kind of file Place image's desktop dialog lists. */
   imageFiles: 'Images',
   rulers: 'Rulers',
@@ -95,6 +96,7 @@ export const menuMessageDefaults = {
   convertToVector: 'Convert to vector',
   /** Sends the selected sticky notes' text to the document's AI chat. */
   runStickyAsPrompt: 'Run sticky as prompt',
+  exploreVariations: 'Variations…',
   booleanOperations: 'Boolean operations',
   arrangeAlignLeft: 'Align left',
   arrangeAlignCenter: 'Align center',

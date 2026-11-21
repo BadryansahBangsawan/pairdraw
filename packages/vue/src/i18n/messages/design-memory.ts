@@ -1,0 +1,66 @@
+import { count, params } from '@nanostores/i18n'
+
+import { i18n } from '#vue/i18n/create'
+
+export const designMemoryMessageDefaults = {
+  designMemory: 'Design memory',
+  editDesignMemory: 'Edit design memory…',
+  createFromDocument: 'Create from this document',
+  emptyHint: 'Colors, fonts, and spacing that agents must follow in this document.',
+  colorCount: count({ one: '{count} color', many: '{count} colors' }),
+  fontCount: count({ one: '{count} font', many: '{count} fonts' }),
+  sizeCount: count({ one: '{count} font size', many: '{count} font sizes' }),
+  decisionCount: count({ one: '{count} decision', many: '{count} decisions' }),
+  exampleCount: count({ one: '{count} example', many: '{count} examples' }),
+  rules: 'Rules',
+  decisions: 'Decisions',
+  examples: 'Examples',
+  colors: 'Colors',
+  fonts: 'Fonts',
+  fontSizes: 'Font sizes',
+  spacing: 'Spacing',
+  radius: 'Corner radius',
+  fromSystem: 'Include variables and styles',
+  fromSystemCount: count({
+    one: '{count} value from variables and styles',
+    many: '{count} values from variables and styles'
+  }),
+  enforcement: 'When an agent uses another value',
+  refuse: 'Undo the edit',
+  warn: 'Warn',
+  off: 'Off',
+  notChecked: 'Nothing allowed yet, so this is not checked',
+  addValue: 'Add value',
+  pickColor: 'Pick a color',
+  moreValues: params('+{count} more'),
+  removeValue: params('Remove {value}'),
+  newDecision: 'Write a decision agents should follow',
+  addDecision: 'Add decision',
+  removeDecision: 'Remove decision',
+  byAgent: 'Agent',
+  noDecisionsYet: 'No decisions yet',
+  editDecision: 'Edit decision',
+  moveUp: 'Move up',
+  moveDown: 'Move down',
+  noDecisions:
+    'Write down choices agents should follow, such as which color marks the main action.',
+  noExamplesYet: 'No examples yet',
+  noExamples: 'Select a frame that shows the design done right and pin it as an example.',
+  pinExample: 'Pin as example',
+  unpinExample: 'Unpin example',
+  showExample: 'Show',
+  removeExample: 'Remove example',
+  missingExample: 'No longer in the document',
+  learn: 'Learn from selection',
+  learnHeading: 'Values the selection uses',
+  learnHint: 'Values used only once start unchecked.',
+  uses: count({ one: '{count} use', many: '{count} uses' }),
+  addChecked: 'Add checked values',
+  nothingToLearn: 'The selection uses no values the memory does not already allow.',
+  deleteMemory: 'Delete design memory',
+  allow: params('Allow {value}'),
+  allowed: params('{value} allowed'),
+  refused: 'Undone by the design memory'
+} as const
+
+export const designMemoryMessages = i18n('designMemory', designMemoryMessageDefaults)

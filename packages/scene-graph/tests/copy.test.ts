@@ -82,7 +82,7 @@ describe('copy helpers — mutation isolation', () => {
       visible: true
     }
     const copy = copyEffect(original)
-    if (copy.type === 'SHADER') throw new Error('a shadow copies as a shadow')
+    if (copy.type !== 'DROP_SHADOW') throw new Error('a shadow copies as a shadow')
     copy.offset.x = 100
     copy.color.a = 1
     expect(original.offset.x).toBe(4)

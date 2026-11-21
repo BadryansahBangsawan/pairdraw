@@ -13,6 +13,7 @@ export interface Preset {
 export const recommended: Preset = {
   rules: {
     'no-hardcoded-colors': 'info',
+    'no-unbound-token-values': 'info',
     'no-default-names': 'info',
     'prefer-auto-layout': 'info',
     'consistent-spacing': 'info',
@@ -44,6 +45,7 @@ export const accessibility: Preset = {
     'touch-target-size': 'error',
     'min-text-size': 'error',
     'no-hardcoded-colors': 'off',
+    'no-unbound-token-values': 'off',
     'no-default-names': 'off',
     'prefer-auto-layout': 'off',
     'consistent-spacing': 'off',

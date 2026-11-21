@@ -1,0 +1,1 @@
+- SVG, HTML, and Tailwind exports draw every visible stroke of a layer, in order, instead of only its first.

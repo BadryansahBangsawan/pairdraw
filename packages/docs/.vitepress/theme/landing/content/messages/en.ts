@@ -1,257 +1,298 @@
 import type { LandingMessages } from './types'
 
 export const en: LandingMessages = {
-  hero: {
-    title: 'Design without the lock‑in.',
-    lede: 'An open-source design editor that opens your Figma files, runs on your machine, and lets you or your AI agent drive every layer.',
-    download: 'Download',
-    github: 'GitHub'
+  nav: {
+    label: 'Pairdraw',
+    home: 'Pairdraw, back to the top',
+    howItWorks: 'How it works',
+    features: 'Features',
+    agents: 'Agents',
+    scripting: 'Scripting',
+    faq: 'FAQ',
+    docs: 'Docs',
+    github: 'GitHub',
+    download: 'Download'
   },
-  loading: 'Loading editor',
+  hero: {
+    frame: 'Hero',
+    kicker: 'Open-source design editor, MIT licensed',
+    title: 'Design next to your agent.',
+    lede: 'Pairdraw opens your .fig and .pen files and lets an AI agent draw on the same canvas, while you keep editing.',
+    download: 'Download for {platform}',
+    downloadAny: 'Download Pairdraw',
+    github: 'View on GitHub',
+    finePrint: 'Free for macOS, Windows, and Linux. Bring your own model or coding agent.',
+    prompt: 'Write the hero headline: “Design next to your agent.” Keep it on two lines.',
+    status: {
+      reading: '{agent} is reading the page',
+      adding: '{agent} is adding H1',
+      writing: '{agent} is writing H1'
+    },
+    comment: 'Keep the headline on two lines.',
+    reply: 'Set it to 890 wide, so it breaks after “to”.',
+    now: 'now',
+    measure: 'W 890 × H 280',
+    layers: 'Layers',
+    layer: {
+      frame: { name: 'Hero frame', detail: 'Frame, 1200 × 980' },
+      heading: {
+        name: 'H1',
+        adding: '{agent} is adding it',
+        writing: '{agent} is writing it',
+        detail: '{agent} is resizing it'
+      },
+      comment: { name: 'Comment', detail: '{human}, 1 reply' },
+      lead: { name: 'Lead', detail: 'Text, 24 px' }
+    },
+    pause: 'Pause the animation',
+    play: 'Play the animation'
+  },
+  how: {
+    title: 'From one sentence to layers you can edit.',
+    lede: 'The agent reaches the canvas through Pairdraw’s MCP server and edits the file you have open. Nothing is exported, pasted, or rebuilt.',
+    steps: [
+      {
+        title: 'Ask in chat',
+        detail:
+          'Describe the screen in the chat, on Home, or in the prompt under the canvas. Use your own API key or a coding agent already on your computer.'
+      },
+      {
+        title: 'Watch it draw',
+        detail:
+          'Layers trace in one after another while the frame being worked on shimmers. A notice counts what changed once the agent stops.'
+      },
+      {
+        title: 'Edit the result',
+        detail:
+          'What the agent drew is ordinary layers in your file. Select them, change them, or ask for another pass. Each turn can be undone.'
+      }
+    ],
+    frames: ['1  Ask in chat', '2  Watch it draw', '3  Edit the result'],
+    request: 'Add a Goals screen with a savings ring and three goals.',
+    reading: 'Reading Budget app.fig, page 1',
+    placeholder: 'Ask for changes to Goals',
+    send: 'Send',
+    card: {
+      title: 'Goals',
+      amount: '$2,400',
+      saved: 'of $3,500 saved',
+      goals: [
+        { title: 'New laptop', detail: '$900 / $1,400' },
+        { title: 'Bali trip', detail: '$1,100 / $1,500' },
+        { title: 'Emergency', detail: '$400 / $600' }
+      ]
+    },
+    progress: '{count} of {total} layers',
+    props: { title: 'Savings ring', ring: 'Ring', size: 'Size' },
+    toast: '{count} layers added',
+    undo: 'Undo'
+  },
   features: {
-    figma: {
-      title: 'Open what you already have',
-      detail:
-        'Pairdraw reads .fig files directly: pages, components, instances, variables, and auto layout arrive as editable layers, and you can save back to .fig. Paste SVG or open HTML and CSS, and they become layers too, laid out as a browser lays them out.',
-      hint: 'This is the app’s own tour, a real .fig file. Open a chapter in the layers and click around.'
-    },
-    design: {
-      title: 'Design with real tools',
-      detail:
-        'Auto layout, constraints, fills, strokes, effects, and typography, with the controls where you expect them. Components take slots, so an instance keeps the design and brings its own content. Everything is undoable, and nothing waits on a server.',
-      hint: 'Hover the selected cover and drag a corner to round it. The other players bring their own covers through the Artwork slot.'
-    },
-    interactive: {
-      title: 'Components that work',
-      detail:
-        'Give a component a behaviour, such as a switch, checkbox, slider, tabs, or text field, and preview runs it as a real Reka UI control. Variants become its states, and the same components export to Storybook with controls you can click.',
-      hint: 'This canvas is in preview: press play, drag the progress bar, toggle shuffle. Leave preview to edit.'
-    },
-    tokens: {
-      title: 'Variables are design tokens',
-      detail:
-        'Colours, spacing, and type live in collections with modes and are edited as tokens. Exported code writes bound values as CSS custom properties, so the code uses the same names as the design.',
-      hint: 'Each player reads the Theme collection in its own mode. Change a token’s value and both follow.'
-    },
-    shaders: {
-      title: 'Fills that move',
-      detail:
-        'A shader is a fill like any other: pick one in the fill picker, stack effects, tune their sliders, or paste a preset from shaders.com. Files keep a still of it, so they open anywhere, and preview plays it.',
-      hint: 'This canvas is in preview, so the shaders move. Leave preview, select a square, and open its fill.'
-    },
-    linting: {
-      title: 'Linting',
-      detail:
-        'Pairdraw checks the design as you work: contrast, text too small to read, default names, hidden and empty layers, stray groups. The Lint tab lists every problem, many come with a fix you apply in one click, and the same rules run in the CLI and for agents.',
-      hint: 'Hover an issue to find its layer, or apply a fix from the list.'
+    title: 'A complete editor, with every tool open to the agent.',
+    lede: 'What you can do by hand, the agent can call. You both work on the same layers, in the same file.',
+    frame: 'Features, click a layer to switch',
+    list: 'Layers',
+    tabs: {
+      ai: {
+        label: 'AI builds designs',
+        title: 'AI builds designs',
+        detail:
+          'Describe what you want in the chat, on Home, or in the prompt under the canvas. {count} tools create and change the layers.'
+      },
+      browser: {
+        label: 'Built-in browser',
+        title: 'Built-in browser',
+        detail:
+          'Open a page in its own window, import the page or one element as layers, and let the chat read and click it with your approval.'
+      },
+      controls: {
+        label: 'Working controls',
+        title: 'Working controls',
+        detail:
+          'Give a component a Reka UI behaviour such as a switch, slider, or tabs, and try it live with real inputs and keyboard.'
+      },
+      prototypes: {
+        label: 'Prototypes',
+        title: 'Prototypes',
+        detail:
+          'Link frames with click or after-delay interactions, then play them on the canvas with instant or dissolve transitions.'
+      },
+      layout: {
+        label: 'Auto layout and CSS Grid',
+        title: 'Auto layout and CSS Grid',
+        detail:
+          'Flex and grid layout with padding, gap, alignment, and tracks that resize as the content changes.'
+      }
     },
     ai: {
-      title: 'Design with AI, on your keys',
-      detail:
-        'Ask in plain language and the agent edits the document with the same tools you use, previewing its work on the canvas as it streams. Connect any provider with your own key, or bring the coding agent you already use.',
-      hint: 'A recorded turn plays through the real agent loop. Watch the canvas build as it streams.'
+      prompt: 'Design a settings screen with notification toggles and a sign-out button.',
+      settings: 'Settings',
+      alerts: 'Budget alerts',
+      summary: 'Weekly summary',
+      signIn: 'New sign-in',
+      signOut: 'Sign out'
     },
-    collab: {
-      title: 'Work together, with people and agents',
-      detail:
-        'Keep a document on your team’s Cloud server and everyone who opens it edits it live, with cursors, follow mode, and comments pinned to layers. AI agents show their cursors on the same canvas, so you watch them build as they stream.',
-      hint: 'Both screens are yours to use. Drag a layer on one and watch it move on the other, then ask the agent.'
+    browser: {
+      url: 'https://example.com/pricing',
+      import: 'Import as layers',
+      imported: 'Imported as layers'
     },
-    code: {
-      title: 'From design to code',
-      detail:
-        'Every selection is a Vue or React component, with variants as props and Reka UI or Radix behind the interactive ones, or HTML, Tailwind, and design JSX with variables written as tokens. Components export as Storybook stories, and design JSX stays linked to the canvas: edit it and the canvas follows.',
-      hint: 'Switch to React, HTML, or design JSX, or select another layer.'
+    controls: {
+      period: 'Billing period',
+      monthly: 'Monthly',
+      yearly: 'Yearly',
+      limit: 'Budget limit',
+      roundUp: 'Round up',
+      notify: 'Notify me'
     },
-    script: {
-      title: 'Script everything',
-      detail:
-        'The pairdraw CLI works on a file with no app running, or drives the app you have open. Inspect a document, query it with XPath, lint it, export it, or run Figma plugin code against it with eval. The MCP server gives agents the same reach over stdio or HTTP.',
-      hint: 'Run a command and watch the canvas.'
+    prototypes: {
+      overview: 'Overview',
+      budgets: 'Budgets',
+      action: 'See budgets',
+      back: 'Back'
     },
-    sdk: {
-      title: 'Build it into your own product',
-      detail:
-        'Pairdraw is a toolkit as much as an app: a framework-neutral engine, a headless Vue SDK, and separate packages for the scene graph and file formats. Embed a canvas in your product, render and check designs in CI, or build a different editor on the same engine. Every canvas on this page is that SDK running inside a documentation site.',
-      hint: 'The code beside the canvas is all it takes to mount one.'
+    layout: {
+      alignment: 'Alignment',
+      vertical: ['Top', 'Middle', 'Bottom'],
+      horizontal: ['left', 'center', 'right']
     }
   },
   agents: {
-    heading: 'Works with',
-    rest: 'and any MCP client'
+    title: 'Bring the agent you already use.',
+    lede: 'It runs on your own subscription and reaches the canvas through the editor’s MCP server. Connect installs the adapter and signs the agent in, step by step.',
+    frame: 'Monthly report, 5 agents on the canvas',
+    report: 'Monthly report',
+    month: 'Nov',
+    server: 'Pairdraw MCP server',
+    connect: { before: 'In the browser, run', after: 'and open the link it prints.' }
   },
-  commands: {
-    cli: '{count} commands',
-    mcp: '{count} MCP tools',
-    mcpDetail:
-      'Create, style, lay out, inspect, and export, each one also available to the built-in agent.'
+  scripting: {
+    title: 'Script every part of it.',
+    lede: 'The document the agent edits is open to your scripts too. Every command supports --json.',
+    items: [
+      {
+        title: 'CLI',
+        detail:
+          'Inspect, query, export, convert, and lint .fig and .pen files without opening the editor.'
+      },
+      {
+        title: 'MCP server',
+        detail:
+          'Connect Claude Code, Cursor, or any MCP client to the running app or to files on disk.'
+      },
+      {
+        title: 'Vue SDK',
+        detail: 'Headless primitives and composables for building an editor of your own.'
+      }
+    ],
+    terminal: 'Terminal'
   },
-  ownership: {
-    title: 'Your files stay yours',
+  privacy: {
+    frame: 'Privacy',
+    title: 'Pairdraw sends no usage data.',
+    lede: 'No daily ping, analytics, or usage statistics. The privacy page lists what the app connects to and when.',
+    link: 'Read the privacy page',
     items: [
       {
         title: 'Local first',
-        detail: 'Documents are files on your disk. No account, no server, no internet required.'
+        detail: 'Documents stay on your computer unless you put them on a server.'
       },
       {
-        title: 'Your storage',
-        detail: 'Sync through your own S3-compatible bucket when you want it.'
+        title: 'Your keys',
+        detail: 'Bring your own key, or let the chat use a coding agent you already run.'
       },
       {
-        title: 'Open formats',
-        detail: 'Export to .fig, PDF, SVG, HTML, and JSX. Leaving is always possible.'
-      },
-      {
-        title: 'MIT licensed',
-        detail: 'The editor, the rendering engine, the .fig codec, and the CLI.'
+        title: 'Cloud you run',
+        detail: 'To edit together, keep the document on a Pairdraw Cloud server your team runs.'
       }
     ]
   },
-  roadmap: {
-    title: 'Roadmap',
-    more: 'Full roadmap',
-    shipped: {
-      label: 'Shipped',
-      entries: [
-        { title: 'Interactive components and preview' },
-        { title: 'Variables as design tokens' },
-        { title: 'Linting with one-click fixes' },
-        { title: 'AI agents as collaborators, with follow mode' },
-        { title: 'Revert, regenerate, and edit AI turns' },
-        { title: 'Code linked to canvas layers' },
-        { title: 'Visual diff and patch' },
-        { title: 'Comments pinned to layers' },
-        { title: 'Vue and React components in the Code tab' },
-        { title: 'SVG and HTML import as editable layers' },
-        { title: 'Shader fills' },
-        { title: 'W3C design tokens' },
-        { title: 'A guided tour of the editor' },
-        { title: 'Lists and styles for any range of text' },
-        { title: 'Version history for Cloud documents' }
-      ]
-    },
-    now: {
-      label: 'Now',
-      entries: [
-        {
-          title: 'Storybook from real components',
-          detail: 'Stories that render Reka UI for Vue and Radix UI for React.'
-        },
-        {
-          title: 'Component authoring',
-          detail: 'Faster variant editing and canvas selection inside components.'
-        }
-      ]
-    },
-    next: {
-      label: 'Next',
-      lead: {
-        title: 'Self-hosted Pairdraw',
-        detail:
-          'The whole workspace inside your own network: sync, sharing, comments, and team libraries without sending a file to anyone else.',
-        features: [
-          { title: 'Your storage', detail: 'Documents stay in your bucket, in your region.' },
-          {
-            title: 'Your identity',
-            detail: 'Sign-in through your OIDC or SSO provider, with roles.'
-          },
-          {
-            title: 'Your network',
-            detail: 'A collaboration relay that works behind your firewall.'
-          },
-          {
-            title: 'Your operations',
-            detail: 'Guided deployment, upgrades, backups, and retention.'
-          }
-        ]
-      },
-      entries: [
-        {
-          title: 'Retention and audit',
-          detail: 'Retention controls for versions and a record of document and membership changes.'
-        }
-      ],
-      cloud: {
-        title: 'Pairdraw Cloud',
-        detail:
-          'An optional server you run for your team: live sync, sharing, comments, and team libraries.'
-      }
-    },
-    later: {
-      label: 'Later',
-      entries: [
-        { title: 'Governed design systems', detail: 'Propose, review, publish, and migrate.' },
-        {
-          title: 'Embeddable editor',
-          detail: 'Put the editor on this page into your own product.'
-        }
-      ]
-    }
-  },
-  cloud: {
-    badge: 'Self-hosted',
-    title: 'Pairdraw Cloud',
-    lede: 'Your team’s design workspace on a server you run. Everyone edits the same files live, shares them by invitation or link, and designs with the AI your server offers. Pairdraw does not host it for you, and your files stay open: export them as .fig whenever you like.',
-    features: [
+  faq: {
+    title: 'Questions',
+    lede: 'Anything else is in the {docs}, or open an issue on {github}.',
+    docs: 'docs',
+    github: 'GitHub',
+    items: [
       {
-        title: 'Real-time team sync',
-        detail: 'Every change reaches every teammate as it happens, on any device.'
+        question: 'Is Pairdraw free?',
+        answer:
+          'Yes. Pairdraw is MIT licensed. Pairdraw Cloud, the optional server, is licensed under Apache 2.0.'
       },
       {
-        title: 'Share links and comments',
-        detail: 'Send a link to review a design and discuss it right on the canvas.'
+        question: 'Which platforms can I use?',
+        answer:
+          'macOS 13 or later, Windows 10 or later, and Linux with WebKitGTK 2.40 or later. The web app runs from a checkout of the repository.'
       },
       {
-        title: 'Version history',
-        detail: 'Named versions and autosaves, with restore and a link to any version.'
+        question: 'Do I need an API key?',
+        answer:
+          'No. Use your own key for the major providers, or let the chat use a coding agent already on your computer.'
       },
       {
-        title: 'AI on your server',
-        detail: 'Members use the models your server offers, with credits instead of their own keys.'
+        question: 'Can it open my Figma files?',
+        answer:
+          'Pairdraw reads and writes native .fig files, opens supported .pen documents, and copies and pastes layers between apps.'
       },
       {
-        title: 'Accounts and roles',
-        detail: 'Email, Google, or Apple sign-in, approval of new accounts, and workspace roles.'
+        question: 'What does the app send home?',
+        answer:
+          'Nothing about how you use it: no daily ping, analytics, or usage statistics. The privacy page lists every connection.'
       }
     ]
   },
   closing: {
-    title: 'Take your designs with you.',
-    download: 'Download Pairdraw',
-    docs: 'Read the docs'
+    frame: 'Download',
+    title: 'Your files. Your agent. One canvas.',
+    you: 'You',
+    platforms: {
+      mac: 'Apple Silicon and Intel',
+      windows: 'Windows 10 or later',
+      linux: 'WebKitGTK 2.40 or later'
+    },
+    updates: 'Installed copies update themselves from the app.'
   },
+  overlay: {
+    title: 'Download Pairdraw',
+    version: 'Version {version}. Free and MIT licensed.',
+    close: 'Close',
+    platforms: {
+      mac: 'Apple Silicon and Intel, macOS 13 or later',
+      windows: 'x64 and ARM64, Windows 10 or later',
+      linux: 'x64 and ARM64, WebKitGTK 2.40+'
+    },
+    note: 'Installed copies update themselves from the app. The build is not signed yet, so open it the first time with right-click, then Open.',
+    allFiles: 'Every file, with checksums',
+    unavailable:
+      'The list of downloads could not be loaded. Every file is on the releases page on GitHub.'
+  },
+  footer: {
+    tagline: 'An open-source design editor where you and an AI agent draw on the same canvas.',
+    product: 'Product',
+    roadmap: 'Roadmap',
+    changelog: 'Changelog',
+    cloud: 'Pairdraw Cloud',
+    docs: 'Docs',
+    gettingStarted: 'Getting started',
+    cli: 'CLI reference',
+    mcp: 'MCP server',
+    sdk: 'Vue SDK',
+    community: 'Community',
+    issues: 'Issues',
+    security: 'Report a security problem',
+    legal: 'Legal',
+    mit: 'MIT license',
+    apache: 'Apache 2.0 for Cloud',
+    privacy: 'Privacy',
+    license: 'Pairdraw is MIT licensed. Pairdraw Cloud is licensed under Apache 2.0.',
+    language: 'Language'
+  },
+  loading: 'Loading editor',
   clipboard: {
     copy: 'Copy',
     copied: 'Copied'
   },
   stage: {
-    activate: 'Try it live',
-    terminal: {
-      tree: 'Layer tree',
-      restyle: 'Recolor the accent',
-      addPlayer: 'Add a player',
-      selection: 'Selection',
-      export: 'Tailwind export'
-    },
-    ai: {
-      recorded: 'Recorded turn',
-      play: 'Play',
-      replay: 'Replay',
-      request: 'Add an Up next queue beside the player.',
-      reasoning:
-        'The player sits alone in the hero frame, which lays its children out in a row, so a card added there lands right beside it. I’ll bind the card’s background, radius, and text colors to the Theme variables the player uses, so it switches between dark and light with it, and list three tracks, each with a small cover, a title, and an artist.',
-      reply:
-        'Added an **Up next** card beside the player with three tracks. Its colors and radius come from the Theme variables, so it follows the player between dark and light.'
-    },
-    collab: {
-      you: 'You',
-      yourScreen: 'Your screen',
-      theirScreen: 'Sam’s screen',
-      askAgent: 'Ask the agent'
-    },
-    sdk: {
-      install: 'Install'
-    }
+    activate: 'Try it live'
   },
   download: {
     title: 'Download Pairdraw',

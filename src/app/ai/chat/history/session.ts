@@ -23,7 +23,8 @@ export function createHistorySession<TChat extends HistoryChat = HistoryChat>(
   let generation = 0
   let stopWatch: (() => void) | undefined
 
-  function attach(next: TChat, flush: () => Promise<void>): void {
+  /** `replied` is told each time the chat finishes a reply. */
+  function attach(next: TChat, flush: () => Promise<void>, replied?: () => void): void {
     if (live.value === next) return
     stopWatch?.()
     live.value = next
@@ -43,8 +44,11 @@ export function createHistorySession<TChat extends HistoryChat = HistoryChat>(
     const stopMessages = watch(() => [...next.messages], saveSoon)
     const stopStatus = watch(
       () => next.status,
-      () => {
-        if (next.status === 'submitted') interrupted = false
+      (status, before) => {
+        if (status === 'submitted') interrupted = false
+        // A reply stopped by closing the conversation is not one to name it from.
+        if (status === 'ready' && before === 'streaming' && live.value === next && !interrupted)
+          replied?.()
         save()
       }
     )

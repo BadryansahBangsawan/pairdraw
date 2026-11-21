@@ -76,13 +76,14 @@ describe('APP_MENU_SCHEMA', () => {
     expect(ids).toEqual(['check-updates', 'about'])
   })
 
-  test('places images and exports frames to PDF from the File menu', () => {
+  test('places images, exports frames to PDF, and records the prototype from the File menu', () => {
     const fileMenu = APP_MENU_SCHEMA.find((group) => group.label === 'File')
     const ids = (fileMenu ? actionItems(fileMenu.items) : []).map((entry) =>
       'type' in entry ? '' : entry.id
     )
     expect(ids).toContain('place-image')
     expect(ids).toContain('export-pdf')
+    expect(ids).toContain('export-video')
   })
 
   // As in Figma, files are browsed on Home and in a New tab, so the File menu creates and saves.

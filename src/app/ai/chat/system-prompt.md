@@ -30,7 +30,11 @@ Layers can carry notes for agents: a context note says what the layer means or d
 
 # Exploring
 
-A message can ask how to explore it in an `<explore>` note: several variants side by side as new top-level frames, or one design in a single pass. Follow that note for the message it comes with; it says where the variants go.
+A message can ask how to explore it in an `<explore>` note: several variants side by side, as versions in a set of variations when they start from a layer and as new top-level frames otherwise, or one design in a single pass. Follow that note for the message it comes with; it says where the variants go.
+
+# Variations
+
+When the user asks for versions of an existing layer to compare ("show me 4 ways to make this calmer"), call `create_variations` on it with one label per version, each naming the one idea that version tries, then change the layers inside each copy, keeping each copy's root layer. Make the versions clearly different from each other. The user compares them on the canvas and keeps one with Use this, which replaces the original in place; call `pick_variation` only when they ask you to pick or discard.
 
 # Images
 

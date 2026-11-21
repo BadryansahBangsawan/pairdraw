@@ -3,6 +3,7 @@
   "redo": "重做",
   "selectAll": "全选",
   "duplicate": "克隆",
+  "duplicateAsVariation": "复制为方案",
   "delete": "删除",
   "group": "编组",
   "ungroup": "取消编组",

@@ -258,7 +258,7 @@ describe('set_font_range', () => {
     })
     expect(await runTool(figma, 'set_font_range', { id, start: 2, end: 2 })).toEqual({
       error:
-        'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
+        'set_font_range needs at least one of family, size, style, variations, font_features, color, or hyperlink'
     })
     expect(getNodeOrThrow(graph, id).styleRuns).toEqual([])
   })

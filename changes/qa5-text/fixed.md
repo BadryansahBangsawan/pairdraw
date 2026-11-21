@@ -1,0 +1,1 @@
+- A truncating text keeps its box inside auto layout instead of collapsing to zero, so a hugging frame sizes to it.

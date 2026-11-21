@@ -492,7 +492,14 @@ function configureTextLeafWithoutMeasurer(
     }
     return
   }
-  if (child.textAutoResize !== 'HEIGHT') return
+  if (child.textAutoResize !== 'HEIGHT') {
+    // A truncating text keeps the box it has, as Figma clips it to that box.
+    if (child.width > 0 && child.height > 0) {
+      yogaChild.setWidth(child.width)
+      yogaChild.setHeight(child.height)
+    }
+    return
+  }
 
   const growsWidth = configureGrowingText(yogaChild, child, parent, fixedDerivedMainAxis)
   const isRow = parent.layoutMode === 'HORIZONTAL'
@@ -524,7 +531,8 @@ function configureChildAsLeaf(
 
   const isText = child.type === 'TEXT'
   const textMeasurer = getTextMeasurer()
-  const needsMeasureFunc = isText && textMeasurer && child.textAutoResize !== 'NONE'
+  // A truncating or fixed text keeps its box, so Yoga measures only text that grows.
+  const needsMeasureFunc = isText && textMeasurer && growsText(child)
 
   const fixedDerivedMainAxis = isRow
     ? derivedGrowingLeafFitsParent(graph, parent, child, 'width')
@@ -554,6 +562,11 @@ function configureChildAsLeaf(
 
   applyLockedAspectRatio(yogaChild, child, parent)
   applyMinMaxConstraints(yogaChild, child)
+}
+
+/** Whether layout measures a text to size it, which only the two growing modes need. */
+function growsText(node: SceneNode): boolean {
+  return node.textAutoResize === 'WIDTH_AND_HEIGHT' || node.textAutoResize === 'HEIGHT'
 }
 
 function configureTextLeaf(

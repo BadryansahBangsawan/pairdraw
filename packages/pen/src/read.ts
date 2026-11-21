@@ -43,6 +43,8 @@ export interface PenReadOptions {
    * component no import has reads as a placeholder.
    */
   imports?: PenImports
+  /** Called with a variable a layer references that the document does not define. */
+  onUnknownVariable?(name: string): void
 }
 
 function collectComponents(nodes: PenNode[], components: Map<string, PenNode>): void {
@@ -109,7 +111,9 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
   const imports: PenImports = options.imports ?? new Map()
   const build: Build = {
     graph,
-    ctx: buildVarContext(graph, withImports(doc, imports)),
+    ctx: buildVarContext(graph, withImports(doc, imports), (name) =>
+      options.onUnknownVariable?.(name)
+    ),
     images: createImageStore(graph, options.images),
     shaders: options.shaders,
     icons: options.icons,

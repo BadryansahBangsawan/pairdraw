@@ -13,7 +13,7 @@ import {
 } from '@pairdraw/pen'
 
 import { defaultIcons, drawIcon, type IconData, type IconProvider } from '#core/icons'
-import type { IOFormatAdapter, ReadDocumentInput } from '#core/io/types'
+import type { IOFormatAdapter, ReadDocumentInput, ReadDocumentWarning } from '#core/io/types'
 import { layoutAuthoredNodes } from '#core/layout'
 
 import { loadPenFonts } from './fonts'
@@ -21,6 +21,16 @@ import { loadPenImports, readImportedImage, UnresolvedImports, type OpenedImport
 
 /** The size icons are fetched at; each is scaled to the box it is drawn in. */
 const PEN_ICON_SIZE = 24
+
+/** How many names one warning lists, so a broken document cannot flood the host's notice. */
+const WARNING_NAMES = 10
+
+/** One warning for the names found, capped, or none when nothing was found. */
+function warningList(names: ReadonlySet<string>): ReadDocumentWarning[] {
+  return names.size > 0
+    ? [{ kind: 'unknown-variable', names: [...names].slice(0, WARNING_NAMES) }]
+    : []
+}
 
 /**
  * The path a percent-encoded image URL names, decoded one step at a time: a step that would become
@@ -149,7 +159,9 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     // The libraries it imports, whose components it uses draw as library components; what the host
     // cannot read draws as placeholders the warnings tell the host about.
     const unresolved = new UnresolvedImports()
+    const unknownVariables = new Set<string>()
     const { imports, opened } = await loadPenImports(doc, input, unresolved)
+    const importsIncomplete = unresolved.warnings().length > 0
     const assets = penAssets(withUsedImports(doc, imports))
     const [images, shaders, icons, fonts] = await Promise.all([
       loadPenImages(assets.images, input, opened),
@@ -165,13 +177,21 @@ export const penFormat: IOFormatAdapter<'pen'> = {
       icons,
       fonts,
       imports,
+      onUnknownVariable: (name) => {
+        // A variable of a library that opened without its own imports is covered by that warning.
+        if (name.includes(':') && importsIncomplete) return
+        unknownVariables.add(name)
+      },
       layout: (target) =>
         layoutAuthoredNodes(
           target,
           target.getPages(true).map((page) => page.id)
         )
     })
-    const warnings = unresolved.warnings()
+    const warnings: ReadDocumentWarning[] = [
+      ...unresolved.warnings(),
+      ...warningList(unknownVariables)
+    ]
     return warnings.length > 0
       ? { graph, sourceFormat: 'pen', warnings }
       : { graph, sourceFormat: 'pen' }

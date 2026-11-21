@@ -35,6 +35,9 @@ const notificationMessageDefaults = {
   importedLibrariesUnreadable: params(
     'Couldn’t open the libraries “{name}” imports ({paths}), so their components show as placeholders.'
   ),
+  unknownVariables: params(
+    'Layers reference variables the document does not define ({names}); they use their fallback values.'
+  ),
   viewDiagnostics: 'View diagnostics',
   importedDOMCSS: 'Imported DOM/CSS document.',
   importDOMCSSFailed: params('Could not import DOM/CSS: {error}'),

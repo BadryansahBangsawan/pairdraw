@@ -10,6 +10,7 @@
   "importedLibrariesNeedDesktop": "ブラウザでは「{name}」がインポートしているライブラリ（{paths}）を開けないため、そのコンポーネントはプレースホルダーとして表示されます。表示するにはデスクトップアプリでファイルを開いてください。",
   "importedLibrariesNeedOpenDialog": "ドロップしたファイルでは「{name}」がインポートしているライブラリ（{paths}）を開けないため、そのコンポーネントはプレースホルダーとして表示されます。表示するには「ファイル > 開く…」で開いてください。",
   "importedLibrariesUnreadable": "「{name}」がインポートしているライブラリ（{paths}）を開けなかったため、そのコンポーネントはプレースホルダーとして表示されます。",
+  "unknownVariables": "レイヤーがドキュメントで定義されていない変数を参照しています（{names}）。フォールバック値が使われます。",
   "viewDiagnostics": "診断を表示",
   "importedDOMCSS": "DOM/CSS ドキュメントをインポートしました。",
   "importDOMCSSFailed": "DOM/CSS をインポートできませんでした: {error}",

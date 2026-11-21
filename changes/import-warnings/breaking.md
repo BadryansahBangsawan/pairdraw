@@ -1,0 +1,1 @@
+- `ReadDocumentWarning` from `@pairdraw/core/io` is now a discriminated union with `unknown-variable`, `missing-image`, and `unknown-node` arms beside `unresolved-imports`; code that switches exhaustively on `kind` or reads `paths`/`reason` without narrowing must handle the new arms.

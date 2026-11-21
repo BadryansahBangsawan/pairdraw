@@ -101,6 +101,10 @@ export function reportReadWarnings(
 ): void {
   const messages = notificationMessages.get()
   for (const warning of warnings ?? []) {
+    if (warning.kind === 'unknown-variable') {
+      toast.warning(messages.unknownVariables({ names: warning.names.join(', ') }))
+      continue
+    }
     const params = { name: documentName, paths: warning.paths.join(', ') }
     if (warning.reason === 'unreadable') toast.warning(messages.importedLibrariesUnreadable(params))
     // On the desktop only a file dropped in comes without a path to read its libraries beside.

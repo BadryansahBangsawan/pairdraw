@@ -10,6 +10,7 @@
   "importedLibrariesNeedDesktop": "Il browser non può aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto. Apri il file nell’app desktop per vederli.",
   "importedLibrariesNeedOpenDialog": "Un file trascinato non può aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto. Aprilo con File > Apri… per vederli.",
   "importedLibrariesUnreadable": "Impossibile aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto.",
+  "unknownVariables": "I livelli fanno riferimento a variabili che il documento non definisce ({names}); usano i valori di riserva.",
   "viewDiagnostics": "Mostra diagnostica",
   "importedDOMCSS": "Documento DOM/CSS importato.",
   "importDOMCSSFailed": "Impossibile importare DOM/CSS: {error}",

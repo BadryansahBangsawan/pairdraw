@@ -44,16 +44,23 @@ export interface ReadDocumentInput {
 }
 
 /** Something a document names that reading it could not bring in; it opens without it. */
-export interface ReadDocumentWarning {
-  kind: 'unresolved-imports'
-  /**
-   * Why: the host gives no access to files beside the document, as a browser does, or the files
-   * could not be read or are not documents of the format.
-   */
-  reason: 'no-file-access' | 'unreadable'
-  /** The paths the document names them with. */
-  paths: string[]
-}
+export type ReadDocumentWarning =
+  | {
+      kind: 'unresolved-imports'
+      /**
+       * Why: the host gives no access to files beside the document, as a browser does, or the
+       * files could not be read or are not documents of the format.
+       */
+      reason: 'no-file-access' | 'unreadable'
+      /** The paths the document names them with. */
+      paths: string[]
+    }
+  | {
+      /** Variables a document references that it does not define, which read as their fallbacks. */
+      kind: 'unknown-variable'
+      /** The variable names as the document writes them, without the `$`. */
+      names: string[]
+    }
 
 export interface ReadDocumentResult {
   graph: SceneGraph

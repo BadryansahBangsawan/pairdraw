@@ -1,7 +1,7 @@
 import { readdir, readFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { List, ListItem, Root, RootContent } from 'mdast'
+import type { List, ListItem, Node, Parent, Root, RootContent } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
 import { ALLOWED_CATEGORIES, headingText, sectionEnd } from './validate'
@@ -53,6 +53,38 @@ export interface FragmentReadResult {
 const isFragmentCategory = (name: string): name is FragmentCategory =>
   Object.hasOwn(FRAGMENT_CATEGORIES, name)
 
+/**
+ * A bullet appended to a file whose last line has no trailing newline lands on that line, after
+ * its period: `First note.- Second note.` The text after the marker is the next bullet, so it
+ * opens like one, which keeps prose such as `e.g.- ` from matching.
+ */
+const JOINED_BULLET = /[.!?][-*+]\s+(?:[A-Z]|`|\[|["'“‘]|\d)/g
+
+function inlineCodeRanges(node: Node): Array<[number, number]> {
+  const start = node.position?.start.offset
+  const end = node.position?.end.offset
+  if (node.type === 'inlineCode') {
+    return start === undefined || end === undefined ? [] : [[start, end]]
+  }
+  if (!('children' in node)) return []
+  return (node as Parent).children.flatMap(inlineCodeRanges)
+}
+
+/** The line a joined bullet starts on, or null when no bullet in `item` holds one. */
+function joinedBulletLine(source: string, item: ListItem): number | null {
+  const start = item.position?.start.offset
+  const end = item.position?.end.offset
+  if (start === undefined || end === undefined) return null
+  const raw = source.slice(start, end)
+  const code = inlineCodeRanges(item)
+  for (const match of raw.matchAll(JOINED_BULLET)) {
+    const at = start + match.index
+    if (code.some(([from, to]) => at >= from && at < to)) continue
+    return (item.position?.start.line ?? 0) + raw.slice(0, match.index).split('\n').length - 1
+  }
+  return null
+}
+
 /** The bullets of one fragment file: one unordered list, each item a sentence ending in a period. */
 export function parseFragmentBullets(
   source: string,
@@ -66,6 +98,14 @@ export function parseFragmentBullets(
     return { bullets: [], errors }
   }
   const bullets = lists[0].children.map((item) => listItemMarkdown(source, item))
+  for (const item of lists[0].children) {
+    const joined = joinedBulletLine(source, item)
+    if (joined !== null) {
+      errors.push(
+        `${path} line ${joined}: two bullets are joined on one line; end a bullet with a newline.`
+      )
+    }
+  }
   for (const bullet of bullets) {
     if (!bullet.endsWith('.')) errors.push(`${path}: end every bullet with a period: ${bullet}`)
   }

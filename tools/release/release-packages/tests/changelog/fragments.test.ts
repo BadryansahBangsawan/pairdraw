@@ -24,6 +24,37 @@ describe('changelog fragments', () => {
     ])
   })
 
+  test('refuse two bullets joined on one line', () => {
+    const { errors } = parseFragmentBullets(
+      '- Add the first note.\n- Add the second note.- Add the third note.\n',
+      'changes/42/added.md'
+    )
+
+    expect(errors).toEqual([
+      'changes/42/added.md line 2: two bullets are joined on one line; end a bullet with a newline.'
+    ])
+  })
+
+  test('refuse a joined bullet that opens with inline code', () => {
+    const { errors } = parseFragmentBullets(
+      '- Keep `tree` honest.- `pairdraw export --page` keeps `--page-id`.\n',
+      'changes/42/fixed.md'
+    )
+
+    expect(errors).toEqual([
+      'changes/42/fixed.md line 1: two bullets are joined on one line; end a bullet with a newline.'
+    ])
+  })
+
+  test('leave a bullet that quotes a joined marker as prose', () => {
+    const { errors } = parseFragmentBullets(
+      '- Keep `e.g.- ` inside code and prose like e.g.- as it is.\n',
+      'changes/42/added.md'
+    )
+
+    expect(errors).toEqual([])
+  })
+
   test('refuse headings, prose outside a list, and bullets without a closing period', () => {
     expect(
       parseFragmentBullets('### Added\n\n- Add it.\n', 'changes/1/added.md').errors

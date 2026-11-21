@@ -1,6 +1,6 @@
 [package]
 name = "pairdraw"
-version = "0.19.0-beta.1"
+version = "0.19.0"
 description = "Pairdraw desktop app"
 authors = ["Badryansah Bangsawan"]
 edition = "2021"

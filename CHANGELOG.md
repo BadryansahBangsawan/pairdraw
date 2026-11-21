@@ -2,11 +2,9 @@
 
 ## Unreleased
 
-## 0.19.0-beta.1 — 2026-11-21
+## 0.19.0 — 2026-11-21
 
-This is a pre-release that lists changes since 0.18.0: npm packages are published under the `next` tag, and installed apps on the stable release do not update to it. Linux package managers see `0.19.0-beta.1` as newer than `0.19.0`, so `.deb` and `.rpm` users should remove the beta before installing the final 0.19.0.
-
-Pairdraw 0.19.0-beta.1 moves the properties panel into the left sidebar as the Design tab, opens large `.fig` files faster and in less memory, lets agents read and write prototype connections, hardens Cloud access, and fixes a long list of round-trip, layout, text, component, desktop, collaboration, CLI, and export problems.
+Pairdraw 0.19.0 moves the properties panel into the left sidebar as the Design tab, opens large `.fig` files faster and in less memory, lets agents read and write prototype connections, hardens Cloud access, and fixes a long list of round-trip, layout, text, component, desktop, collaboration, CLI, and export problems. Pairdraw 0.16.1 and later offer this release in the app.
 
 ### Breaking changes
 

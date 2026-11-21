@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/scene-graph",
-  "version": "0.19.0-beta.1",
+  "version": "0.19.0",
   "description": "The framework-neutral Pairdraw design document model: node types, geometry, variables, instances, and hit testing.",
   "keywords": [
     "pairdraw",

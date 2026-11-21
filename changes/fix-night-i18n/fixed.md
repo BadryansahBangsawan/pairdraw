@@ -1,0 +1,2 @@
+- The German landing page speaks informally, matching the app, and its disk-image download is described correctly.
+- The Russian landing page calls auto layout `Автораскладка`, and Spanish video export uses the same “Tras un retardo” trigger name as the Prototype panel.

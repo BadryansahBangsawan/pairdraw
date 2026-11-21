@@ -16,15 +16,15 @@ export const de: LandingMessages = {
   hero: {
     frame: 'Hero',
     kicker: 'Open-Source-Design-Editor, MIT-lizenziert',
-    title: 'Design neben Ihrem Agenten.',
-    lede: 'Pairdraw öffnet Ihre .fig- und .pen-Dateien und lässt einen KI-Agenten auf derselben Leinwand zeichnen, während Sie weiter bearbeiten.',
+    title: 'Design neben deinem Agenten.',
+    lede: 'Pairdraw öffnet deine .fig- und .pen-Dateien und lässt einen KI-Agenten auf derselben Leinwand zeichnen, während du weiter bearbeitest.',
     download: 'Für {platform} herunterladen',
     downloadAny: 'Pairdraw herunterladen',
     github: 'Auf GitHub ansehen',
     finePrint:
-      'Kostenlos für macOS, Windows und Linux. Mit Ihrem eigenen Modell oder Coding-Agenten.',
+      'Kostenlos für macOS, Windows und Linux. Mit deinem eigenen Modell oder Coding-Agenten.',
     prompt:
-      'Schreib die Hero-Überschrift: „Design neben Ihrem Agenten.“ Halte sie auf zwei Zeilen.',
+      'Schreib die Hero-Überschrift: „Design neben deinem Agenten.“ Halte sie auf zwei Zeilen.',
     status: {
       reading: '{agent} liest die Seite',
       adding: '{agent} fügt H1 hinzu',
@@ -50,13 +50,13 @@ export const de: LandingMessages = {
     play: 'Animation abspielen'
   },
   how: {
-    title: 'Von einem Satz zu Ebenen, die Sie bearbeiten können.',
-    lede: 'Der Agent erreicht die Leinwand über den MCP-Server von Pairdraw und bearbeitet die Datei, die Sie geöffnet haben. Nichts wird exportiert, eingefügt oder nachgebaut.',
+    title: 'Von einem Satz zu Ebenen, die du bearbeiten kannst.',
+    lede: 'Der Agent erreicht die Leinwand über den MCP-Server von Pairdraw und bearbeitet die Datei, die du geöffnet hast. Nichts wird exportiert, eingefügt oder nachgebaut.',
     steps: [
       {
         title: 'Im Chat fragen',
         detail:
-          'Beschreiben Sie den Bildschirm im Chat, auf der Startseite oder im Eingabefeld unter der Leinwand. Nutzen Sie Ihren eigenen API-Schlüssel oder einen Coding-Agenten, der schon auf Ihrem Computer ist.'
+          'Beschreib den Bildschirm im Chat, auf der Startseite oder im Eingabefeld unter der Leinwand. Nutze deinen eigenen API-Schlüssel oder einen Coding-Agenten, der schon auf deinem Computer ist.'
       },
       {
         title: 'Beim Zeichnen zusehen',
@@ -66,7 +66,7 @@ export const de: LandingMessages = {
       {
         title: 'Ergebnis bearbeiten',
         detail:
-          'Was der Agent gezeichnet hat, sind normale Ebenen in Ihrer Datei. Wählen Sie sie aus, ändern Sie sie oder bitten Sie um einen weiteren Durchgang. Jeder Schritt lässt sich rückgängig machen.'
+          'Was der Agent gezeichnet hat, sind normale Ebenen in deiner Datei. Wähle sie aus, ändere sie oder bitte um einen weiteren Durchgang. Jeder Schritt lässt sich rückgängig machen.'
       }
     ],
     frames: ['1  Im Chat fragen', '2  Beim Zeichnen zusehen', '3  Ergebnis bearbeiten'],
@@ -91,7 +91,7 @@ export const de: LandingMessages = {
   },
   features: {
     title: 'Ein vollständiger Editor, in dem jedes Werkzeug auch dem Agenten offensteht.',
-    lede: 'Was Sie von Hand tun können, kann der Agent aufrufen. Sie arbeiten beide an denselben Ebenen, in derselben Datei.',
+    lede: 'Was du von Hand tun kannst, kann der Agent aufrufen. Du und der Agent arbeiten an denselben Ebenen, in derselben Datei.',
     frame: 'Funktionen, zum Wechseln eine Ebene anklicken',
     list: 'Ebenen',
     tabs: {
@@ -99,25 +99,25 @@ export const de: LandingMessages = {
         label: 'KI erstellt Designs',
         title: 'KI erstellt Designs',
         detail:
-          'Beschreiben Sie im Chat, auf der Startseite oder im Eingabefeld unter der Leinwand, was Sie möchten. {count} Werkzeuge erstellen und ändern die Ebenen.'
+          'Beschreib im Chat, auf der Startseite oder im Eingabefeld unter der Leinwand, was du möchtest. {count} Werkzeuge erstellen und ändern die Ebenen.'
       },
       browser: {
         label: 'Integrierter Browser',
         title: 'Integrierter Browser',
         detail:
-          'Öffnen Sie eine Seite in einem eigenen Fenster, importieren Sie die Seite oder ein Element als Ebenen und lassen Sie den Chat sie mit Ihrer Zustimmung lesen und anklicken.'
+          'Öffne eine Seite in einem eigenen Fenster, importiere die Seite oder ein Element als Ebenen und lass den Chat sie mit deiner Zustimmung lesen und anklicken.'
       },
       controls: {
         label: 'Funktionierende Steuerelemente',
         title: 'Funktionierende Steuerelemente',
         detail:
-          'Geben Sie einer Komponente ein Reka-UI-Verhalten wie Schalter, Schieberegler oder Tabs und probieren Sie es live mit echten Eingaben und Tastatur aus.'
+          'Gib einer Komponente ein Reka-UI-Verhalten wie Schalter, Schieberegler oder Tabs und probiere es live mit echten Eingaben und Tastatur aus.'
       },
       prototypes: {
         label: 'Prototypen',
         title: 'Prototypen',
         detail:
-          'Verbinden Sie Rahmen mit Interaktionen bei Klick oder nach Verzögerung und spielen Sie sie auf der Leinwand mit sofortigem oder überblendetem Übergang ab.'
+          'Verbinde Rahmen mit Interaktionen bei Klick oder nach Verzögerung und spiele sie auf der Leinwand mit sofortigem oder überblendetem Übergang ab.'
       },
       layout: {
         label: 'Auto-Layout und CSS Grid',
@@ -161,20 +161,20 @@ export const de: LandingMessages = {
     }
   },
   agents: {
-    title: 'Bringen Sie den Agenten mit, den Sie schon nutzen.',
-    lede: 'Er läuft über Ihr eigenes Abonnement und erreicht die Leinwand über den MCP-Server des Editors. „Verbinden“ installiert den Adapter und meldet den Agenten Schritt für Schritt an.',
+    title: 'Bring den Agenten mit, den du schon nutzt.',
+    lede: 'Er läuft über dein eigenes Abonnement und erreicht die Leinwand über den MCP-Server des Editors. „Verbinden“ installiert den Adapter und meldet den Agenten Schritt für Schritt an.',
     frame: 'Monatsbericht, 5 Agenten auf der Leinwand',
     report: 'Monatsbericht',
     month: 'Nov.',
     server: 'Pairdraw-MCP-Server',
     connect: {
-      before: 'Führen Sie im Browser',
-      after: 'aus und öffnen Sie den Link, den der Befehl ausgibt.'
+      before: 'Führe im Browser',
+      after: 'aus und öffne den Link, den der Befehl ausgibt.'
     }
   },
   scripting: {
     title: 'Alles lässt sich skripten.',
-    lede: 'Das Dokument, das der Agent bearbeitet, steht auch Ihren Skripten offen. Jeder Befehl unterstützt --json.',
+    lede: 'Das Dokument, das der Agent bearbeitet, steht auch deinen Skripten offen. Jeder Befehl unterstützt --json.',
     items: [
       {
         title: 'CLI',
@@ -184,7 +184,7 @@ export const de: LandingMessages = {
       {
         title: 'MCP-Server',
         detail:
-          'Verbinden Sie Claude Code, Cursor oder einen beliebigen MCP-Client mit der laufenden App oder mit Dateien auf der Festplatte.'
+          'Verbinde Claude Code, Cursor oder einen beliebigen MCP-Client mit der laufenden App oder mit Dateien auf der Festplatte.'
       },
       {
         title: 'Vue SDK',
@@ -201,23 +201,23 @@ export const de: LandingMessages = {
     items: [
       {
         title: 'Lokal zuerst',
-        detail: 'Dokumente bleiben auf Ihrem Computer, es sei denn, Sie legen sie auf einen Server.'
+        detail: 'Dokumente bleiben auf deinem Computer, es sei denn, du legst sie auf einen Server.'
       },
       {
-        title: 'Ihre Schlüssel',
+        title: 'Deine Schlüssel',
         detail:
-          'Verwenden Sie Ihren eigenen Schlüssel oder lassen Sie den Chat einen Coding-Agenten nutzen, den Sie schon verwenden.'
+          'Nimm deinen eigenen Schlüssel oder lass den Chat einen Coding-Agenten nutzen, den du schon verwendest.'
       },
       {
-        title: 'Ihre eigene Cloud',
+        title: 'Deine eigene Cloud',
         detail:
-          'Um gemeinsam zu bearbeiten, legen Sie das Dokument auf einen Server mit Pairdraw Cloud, den Ihr Team betreibt.'
+          'Um gemeinsam zu bearbeiten, leg das Dokument auf einen Server mit Pairdraw Cloud, den dein Team betreibt.'
       }
     ]
   },
   faq: {
     title: 'Fragen',
-    lede: 'Alles Weitere steht in der {docs}, oder eröffnen Sie ein Issue auf {github}.',
+    lede: 'Alles Weitere steht in der {docs}, oder eröffne ein Issue auf {github}.',
     docs: 'Dokumentation',
     github: 'GitHub',
     items: [
@@ -234,7 +234,7 @@ export const de: LandingMessages = {
       {
         question: 'Brauche ich einen API-Schlüssel?',
         answer:
-          'Nein. Verwenden Sie Ihren eigenen Schlüssel für die großen Anbieter oder lassen Sie den Chat einen Coding-Agenten nutzen, der schon auf Ihrem Computer ist.'
+          'Nein. Nimm deinen eigenen Schlüssel für die großen Anbieter oder lass den Chat einen Coding-Agenten nutzen, der schon auf deinem Computer ist.'
       },
       {
         question: 'Kann es meine Figma-Dateien öffnen?',
@@ -244,14 +244,14 @@ export const de: LandingMessages = {
       {
         question: 'Was sendet die App nach Hause?',
         answer:
-          'Nichts darüber, wie Sie sie nutzen: kein täglicher Ping, keine Analytics, keine Nutzungsstatistiken. Die Datenschutzseite listet jede Verbindung auf.'
+          'Nichts darüber, wie du sie nutzt: kein täglicher Ping, keine Analytics, keine Nutzungsstatistiken. Die Datenschutzseite listet jede Verbindung auf.'
       }
     ]
   },
   closing: {
     frame: 'Download',
-    title: 'Ihre Dateien. Ihr Agent. Eine Leinwand.',
-    you: 'Sie',
+    title: 'Deine Dateien. Dein Agent. Eine Leinwand.',
+    you: 'Du',
     platforms: {
       mac: 'Apple Silicon und Intel',
       windows: 'Windows 10 oder neuer',
@@ -268,14 +268,14 @@ export const de: LandingMessages = {
       windows: 'x64 und ARM64, Windows 10 oder neuer',
       linux: 'x64 und ARM64, WebKitGTK 2.40+'
     },
-    note: 'Installierte Versionen aktualisieren sich selbst aus der App. Der Build ist noch nicht signiert, öffnen Sie ihn deshalb beim ersten Mal per Rechtsklick und dann „Öffnen“.',
+    note: 'Installierte Versionen aktualisieren sich selbst aus der App. Der Build ist noch nicht signiert, öffne ihn deshalb beim ersten Mal per Rechtsklick und dann „Öffnen“.',
     allFiles: 'Alle Dateien, mit Prüfsummen',
     unavailable:
-      'Die Liste der Downloads konnte nicht geladen werden. Alle Dateien finden Sie auf der Release-Seite auf GitHub.'
+      'Die Liste der Downloads konnte nicht geladen werden. Alle Dateien findest du auf der Release-Seite auf GitHub.'
   },
   footer: {
     tagline:
-      'Ein Open-Source-Design-Editor, in dem Sie und ein KI-Agent auf derselben Leinwand zeichnen.',
+      'Ein Open-Source-Design-Editor, in dem du und ein KI-Agent auf derselben Leinwand zeichnen.',
     product: 'Produkt',
     roadmap: 'Roadmap',
     changelog: 'Änderungsprotokoll',
@@ -310,7 +310,7 @@ export const de: LandingMessages = {
     forPlatform: 'Für {platform} herunterladen',
     moreFiles: 'Weitere Downloads für {platform}',
     releaseNotes: 'Versionshinweise',
-    yourSystem: 'Ihr System',
+    yourSystem: 'Dein System',
     arch: {
       appleSilicon: 'Apple Silicon',
       intel: 'Intel',
@@ -318,7 +318,7 @@ export const de: LandingMessages = {
       arm: 'ARM'
     },
     formats: {
-      dmg: 'Image-Datei',
+      dmg: 'Datenträgerabbild',
       zip: 'App im ZIP-Archiv',
       exe: 'Installationsprogramm',
       msi: 'Für verwaltete Installationen',
@@ -332,7 +332,7 @@ export const de: LandingMessages = {
     checksums: 'SHA-256-Prüfsummen',
     onGitHub: 'Release auf GitHub',
     unavailable:
-      'Die Liste der Downloads konnte nicht geladen werden. Alle Dateien finden Sie auf der Release-Seite auf GitHub.',
+      'Die Liste der Downloads konnte nicht geladen werden. Alle Dateien findest du auf der Release-Seite auf GitHub.',
     others: {
       title: 'Weitere Wege',
       cli: {
@@ -342,17 +342,17 @@ export const de: LandingMessages = {
       },
       source: {
         title: 'Aus dem Quellcode',
-        detail: 'Bauen Sie die App selbst mit Bun und Rust.',
+        detail: 'Baue die App selbst mit Bun und Rust.',
         action: 'Build-Anleitung'
       }
     },
     beta: {
       badge: 'Beta',
-      title: 'Probieren Sie, was kommt',
+      title: 'Probiere, was kommt',
       lede: 'Betas bringen die Funktionen der nächsten Version früher, bevor sie alle erreichen.',
       caveats: [
-        'Eine App mit der stabilen Version aktualisiert sich nicht auf eine Beta; installieren Sie die Beta, um sie zu testen.',
-        'Entfernen Sie unter Linux eine mit .deb oder .rpm installierte Beta, bevor Sie die finale Version installieren.',
+        'Eine App mit der stabilen Version aktualisiert sich nicht auf eine Beta; installiere die Beta, um sie zu testen.',
+        'Entferne unter Linux eine mit .deb oder .rpm installierte Beta, bevor du die finale Version installierst.',
         'Die Betas von CLI und SDK liegen auf npm unter dem Tag next.'
       ],
       notes: 'Was ist neu'

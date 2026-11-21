@@ -22,11 +22,7 @@ export function fitEnclosingGroupsWithUndo(ctx: EditorContext, parentIds: Iterab
     ...[...fit.before.keys()].map((id) => ctx.graph.getNode(id)?.parentId),
     ...fit.removed.map(({ node }) => node.parentId)
   ])
-  const layoutAround = () => {
-    for (const parentId of new Set(fittedParents)) {
-      if (parentId) ctx.runLayoutForNode(parentId)
-    }
-  }
+  const layoutAround = () => ctx.runLayoutForParents(fittedParents)
   layoutAround()
   ctx.undo.push({
     label: 'Fit groups',

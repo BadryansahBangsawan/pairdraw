@@ -7,7 +7,6 @@ import { assertNodeEditable } from '#core/editor/capabilities'
 import { prepareSlotEdits } from '#core/editor/components/slots'
 import { fitEnclosingGroupsWithUndo } from '#core/editor/structure/group/bounds'
 import type { EditorContext } from '#core/editor/types'
-import { computeLayout } from '#core/layout'
 
 export function createStructureReorderActions(ctx: EditorContext) {
   function doReorderChild(nodeId: string, parentId: string, insertIndex: number) {
@@ -23,8 +22,7 @@ export function createStructureReorderActions(ctx: EditorContext) {
     }
 
     ctx.graph.insertChildAt(nodeId, parentId, insertIndex)
-    computeLayout(ctx.graph, parentId)
-    ctx.runLayoutForNode(parentId)
+    ctx.runLayoutForParents([parentId])
   }
 
   function reorderInAutoLayout(nodeId: string, parentId: string, insertIndex: number) {
@@ -54,12 +52,7 @@ export function createStructureReorderActions(ctx: EditorContext) {
       inverse: () => {
         ctx.graph.insertChildAt(nodeId, origParentId, origIndex >= 0 ? origIndex : 0)
         ctx.graph.updateNode(nodeId, { x: origX, y: origY })
-        computeLayout(ctx.graph, origParentId)
-        ctx.runLayoutForNode(origParentId)
-        if (origParentId !== parentId) {
-          computeLayout(ctx.graph, parentId)
-          ctx.runLayoutForNode(parentId)
-        }
+        ctx.runLayoutForParents([origParentId, parentId])
       }
     })
     fitEnclosingGroupsWithUndo(ctx, [origParentId])
@@ -90,8 +83,9 @@ export function createStructureReorderActions(ctx: EditorContext) {
     const place = () => {
       if (reparents) ctx.graph.reparentNode(nodeId, newParentId)
       ctx.graph.insertChildAt(nodeId, newParentId, insertIndex)
-      ctx.runLayoutForNode(newParentId)
-      if (reparents) ctx.runLayoutForNode(origParentId)
+      // A new parent can change what the layer inherits, such as its layout direction.
+      if (reparents) ctx.runLayoutForNode(nodeId)
+      ctx.runLayoutForParents([newParentId, origParentId])
     }
     place()
 
@@ -101,8 +95,8 @@ export function createStructureReorderActions(ctx: EditorContext) {
       inverse: () => {
         ctx.graph.insertChildAt(nodeId, origParentId, origIndex)
         ctx.graph.updateNode(nodeId, origPlace)
-        ctx.runLayoutForNode(origParentId)
-        if (reparents) ctx.runLayoutForNode(newParentId)
+        if (reparents) ctx.runLayoutForNode(nodeId)
+        ctx.runLayoutForParents([origParentId, newParentId])
       }
     })
     // Groups the layer left or joined fit their layers; a stacking change can move a group's box
@@ -123,7 +117,7 @@ export function createStructureReorderActions(ctx: EditorContext) {
       if (ctx.graph.getNode(parentId)?.childIds[index] === childId) continue
       ctx.graph.insertChildAt(childId, parentId, index)
     }
-    ctx.runLayoutForNode(parentId)
+    ctx.runLayoutForParents([parentId])
     ctx.requestRender()
   }
 

@@ -48,6 +48,7 @@ function setup() {
     getRenderer: () => null,
     getRenderers: () => [],
     runLayoutForNode: () => undefined,
+    runLayoutForParents: () => undefined,
     runMutationWithLayout: async (operation) => operation(),
     getCk: () => null,
     loadFont: async () => null,

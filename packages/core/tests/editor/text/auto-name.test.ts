@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
+import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 import type { CanvasKit } from 'canvaskit-wasm'
 
 import { iconify } from '@pairdraw/core/icons'
@@ -10,7 +11,6 @@ import { UndoManager } from '@pairdraw/scene-graph/undo'
 import { createStructureActions } from '#core/editor/structure'
 import { createTextActions } from '#core/editor/text'
 import type { EditorContext, EditorState } from '#core/editor/types'
-import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 
 function setup() {
   const graph = new SceneGraph()
@@ -40,6 +40,7 @@ function setup() {
     getRenderer: () => null,
     getRenderers: () => [],
     runLayoutForNode: () => undefined,
+    runLayoutForParents: () => undefined,
     runMutationWithLayout: async (operation) => operation(),
     getCk: () => null,
     loadFont: async () => null,

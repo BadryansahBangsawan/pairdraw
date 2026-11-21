@@ -87,7 +87,7 @@ export function outlineStrokeSelected(
   })
   const parentIds = new Set(plan.map((entry) => entry.parentId))
   const prevSelection = new Set(ctx.state.selectedIds)
-  for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+  ctx.runLayoutForParents(parentIds)
   ctx.setSelectedIds(new Set(madeIds))
 
   // Groups around the outlines fit them, which can reach past the layers they replace, in the
@@ -121,7 +121,7 @@ function pushOutlineUndo(
     forward: () => {
       for (const { node } of plan) ctx.graph.deleteNode(node.id)
       restoreAt(ctx, made)
-      for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+      ctx.runLayoutForParents(parentIds)
       ctx.setSelectedIds(new Set(madeIds))
     },
     inverse: () => {
@@ -135,7 +135,7 @@ function pushOutlineUndo(
           snapshot
         }))
       )
-      for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+      ctx.runLayoutForParents(parentIds)
       ctx.setSelectedIds(new Set(prevSelection))
     }
   })

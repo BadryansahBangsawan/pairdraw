@@ -257,7 +257,9 @@ export function createEditor(options?: EditorOptions) {
   }
 
   const graphReads = createGraphReadActions(() => _graph)
-  const { runLayoutForNode, runMutationWithLayout } = createLayoutRunner(() => _graph)
+  const { runLayoutForNode, runLayoutForParents, runMutationWithLayout } = createLayoutRunner(
+    () => _graph
+  )
   const pendingTextLayout = createPendingTextLayout({
     getGraph: () => _graph,
     runLayoutForNode,
@@ -316,6 +318,7 @@ export function createEditor(options?: EditorOptions) {
     setActiveTool,
     setNavigationPhase,
     runLayoutForNode,
+    runLayoutForParents,
     runMutationWithLayout,
     subscribeToGraph
   }
@@ -508,6 +511,7 @@ export function createEditor(options?: EditorOptions) {
 
     // Graph reads
     runLayoutForNode,
+    runLayoutForParents,
     runMutationWithLayout,
     ...graphReads,
 

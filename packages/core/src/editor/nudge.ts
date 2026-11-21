@@ -57,7 +57,7 @@ export function createNudgeActions(ctx: EditorContext) {
 
   function applyOrder(parentId: string, order: readonly string[]) {
     order.forEach((id, index) => ctx.graph.insertChildAt(id, parentId, index))
-    ctx.runLayoutForNode(parentId)
+    ctx.runLayoutForParents([parentId])
   }
 
   function commitReorder() {

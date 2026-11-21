@@ -315,16 +315,19 @@ function buildGroupAttrs(
 
 function buildSVGStrokeAttrs(
   visibleStrokes: Stroke[],
-  colorSpace: 'srgb' | 'display-p3',
-  nodeCap: SceneNode['strokeCap']
+  node: SceneNode,
+  ctx: SVGExportContext
 ): Record<string, string | number | undefined> {
   if (visibleStrokes.length === 0) return {}
   const stroke = visibleStrokes[0]
-  const cap = stroke.cap ?? nodeCap
+  const cap = stroke.cap ?? node.strokeCap
   const attrs: Record<string, string | number | undefined> = {
     // Opacity 1 keeps the color opaque. Display P3 must not also keep color alpha here, or a
     // viewer multiplies it by stroke-opacity; the canvas paints stroke.opacity alone.
-    stroke: formatSolidColor(stroke.color, 1, colorSpace),
+    stroke:
+      stroke.type === 'SOLID'
+        ? formatSolidColor(stroke.color, 1, ctx.colorSpace)
+        : (resolveFill(stroke, node, ctx) ?? formatSolidColor(stroke.color, 1, ctx.colorSpace)),
     'stroke-width': round(stroke.weight)
   }
   if (stroke.opacity < 1) attrs['stroke-opacity'] = round(stroke.opacity)
@@ -500,7 +503,7 @@ function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
   // `currentColor` has no alpha. Display P3 normally bakes solid opacity into the color, which a
   // tint throws away, so a tinted solid keeps `fill-opacity` in every color space.
   const fillOpacity = ownFill ? solidFillOpacity(ownFill, ctx.colorSpace, tintedFill) : fill.opacity
-  const ownStrokes = buildSVGStrokeAttrs(visibleStrokes, ctx.colorSpace, node.strokeCap)
+  const ownStrokes = buildSVGStrokeAttrs(visibleStrokes, node, ctx)
   const strokeAttrs =
     ownStrokes.stroke && tint.includes('stroke')
       ? { ...ownStrokes, stroke: CURRENT_COLOR }

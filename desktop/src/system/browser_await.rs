@@ -56,6 +56,19 @@ return JSON.stringify(found.value);
     ))
 }
 
+/// Removes the slot whether or not the script settled, so a wait that ends early leaves nothing
+/// parked on the page.
+pub(crate) fn delete_script(slot: &str) -> Result<String, String> {
+    let slot = serde_json::to_string(slot).map_err(|error| error.to_string())?;
+    Ok(format!(
+        r#"(() => {{
+const slot = {slot};
+delete window[slot];
+return "";
+}})()"#
+    ))
+}
+
 #[derive(Deserialize)]
 #[serde(tag = "state", rename_all = "lowercase")]
 enum Slot {
@@ -103,12 +116,19 @@ pub(crate) async fn eval_awaited<R: Runtime>(
             tokio::time::sleep(POLL_PAUSE).await;
         }
     };
-    until_deadline(answer, wait, expired).await
+    let outcome = until_deadline(answer, wait, expired).await;
+    if outcome.is_err() {
+        // A timed-out or failed wait leaves its pending slot behind; remove it best-effort.
+        if let Ok(script) = delete_script(&slot) {
+            let _ = eval_text(window, &script).await;
+        }
+    }
+    outcome
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{read_outcome, read_script, slot_name, start_script};
+    use super::{delete_script, read_outcome, read_script, slot_name, start_script};
 
     #[test]
     fn a_slot_name_is_crypto_random_and_unique_per_call() {
@@ -191,5 +211,16 @@ mod tests {
             "e".repeat(4096)
         );
         assert!(read_outcome(&huge_error, 1024).is_err());
+    }
+
+    #[test]
+    fn a_timeout_leaves_a_delete_script_for_the_pending_slot() {
+        let script = delete_script("slot-1").expect("script");
+        assert!(script.contains("const slot = \"slot-1\";"));
+        assert!(script.contains("delete window[slot]"));
+        // The name is quoted the same way the other scripts quote it.
+        assert!(delete_script("a\"b")
+            .expect("quoted")
+            .contains("const slot = \"a\\\"b\";"));
     }
 }

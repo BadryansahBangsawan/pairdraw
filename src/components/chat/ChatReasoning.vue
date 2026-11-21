@@ -95,7 +95,7 @@ function updateOpen(value: boolean): void {
     </CollapsibleTrigger>
     <CollapsibleContent data-slot="chat-reasoning-content" :class="collapsibleContentMotion">
       <div :class="ui.body()">
-        <ChatMarkdown :content="text" :mode="markdownMode" surface="reasoning" />
+        <ChatMarkdown :content="text" :mode="markdownMode" />
       </div>
     </CollapsibleContent>
   </CollapsibleRoot>

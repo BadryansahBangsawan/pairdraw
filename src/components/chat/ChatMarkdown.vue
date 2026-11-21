@@ -5,7 +5,6 @@ import { IS_TAURI } from '@pairdraw/core/constants'
 
 import { fileLinkComponents } from '@/app/ai/chat/references/files'
 import { referenceComponents } from '@/app/ai/chat/references/link'
-import { markdownRenderKey, type MarkdownSurface } from '@/app/shell/markdown/state'
 import ChatFileLink from '@/components/chat/reference/ChatFileLink.vue'
 import ChatReferenceLink from '@/components/chat/reference/ChatReferenceLink.vue'
 import { loadMarkdownContent } from '@/components/markdown/lazy'
@@ -15,17 +14,14 @@ const MarkdownContent = defineAsyncComponent(loadMarkdownContent)
 const {
   content,
   mode = 'static',
-  surface = 'message',
   localFiles = IS_TAURI
 } = defineProps<{
   content: string
   mode?: 'static' | 'streaming'
-  surface?: MarkdownSurface
   /** Links to files on this computer show them in their folder; the desktop app only. */
   localFiles?: boolean
 }>()
 
-const renderKey = computed(() => markdownRenderKey({ mode, surface }))
 // References to layers, pages, and skills render as chips, and on the desktop links to local
 // files as links that show them; other links stay links.
 const rendered = computed(() => {
@@ -36,8 +32,9 @@ const components = { 'chat-reference': ChatReferenceLink, 'chat-file': ChatFileL
 </script>
 
 <template>
+  <!-- One renderer for the text's whole life: a new one when the reply settles would replay its
+       fade-in over text already read. -->
   <MarkdownContent
-    :key="renderKey"
     data-slot="chat-markdown"
     :content="rendered"
     :components="components"

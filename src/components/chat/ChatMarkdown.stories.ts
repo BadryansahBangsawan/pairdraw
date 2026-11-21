@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
+import { ref } from 'vue'
 
 import ChatMarkdown from './ChatMarkdown.vue'
 
@@ -137,5 +139,33 @@ export const LocalFileLinksInBrowser: Story = {
   args: {
     localFiles: false,
     content: 'I saved the tokens to [tokens.css](file:///Users/me/Designs/tokens.css).'
+  }
+}
+
+/** A reply that finishes, which the Finish button stands in for, keeps the text as it was drawn. */
+export const Finishing: Story = {
+  args: {
+    content:
+      'The card now **hugs** its content, with `16px` between [its rows](https://pairdraw.app).'
+  },
+  render: (args) => ({
+    components: { ChatMarkdown },
+    setup: () => ({ args, mode: ref<'static' | 'streaming'>('streaming') }),
+    template: `<div class="w-80 space-y-2">
+      <div class="bg-panel px-3.5 py-3 text-xs leading-relaxed text-surface"><ChatMarkdown :content="args.content" :mode="mode" /></div>
+      <button type="button" class="text-xs text-surface" @click="mode = 'static'">Finish</button>
+    </div>`
+  }),
+  play: async ({ canvasElement }) => {
+    // The Markdown renderer loads on demand, so it can arrive after the story mounts.
+    const markdown = await waitFor(async () => {
+      const element = canvasElement.querySelector('[data-markdown-mode]')
+      await expect(element).toHaveAttribute('data-markdown-mode', 'streaming')
+      return element
+    })
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Finish' }))
+    await waitFor(() => expect(markdown).toHaveAttribute('data-markdown-mode', 'static'))
+    // Still the element that streamed: a new one would fade the read text in again.
+    await expect(canvasElement.querySelector('[data-markdown-mode]')).toBe(markdown)
   }
 }

@@ -1,1 +1,2 @@
 - Separate messages from a coding agent show as separate paragraphs in the chat instead of running together.
+- A finished chat reply keeps its Markdown in place instead of fading the whole text in again.

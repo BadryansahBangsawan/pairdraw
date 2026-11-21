@@ -31,6 +31,7 @@ import {
   type FlowKind,
   type ParentFlow
 } from './flow'
+import { resolveFontFamilyStack } from './fonts'
 import {
   blockRichText,
   characterStyleFromCSS,
@@ -57,6 +58,39 @@ function cssShadows(value: string | undefined) {
 
 export interface DesignDocumentToSceneGraphOptions {
   pageName?: string
+  /**
+   * The family a CSS `font-family` stack should draw, given the stack's families; null keeps it.
+   * Hosts with a font service pass one that skips faces the document cannot draw; without it the
+   * first concrete family wins and a generic keyword maps to a concrete face of its class.
+   */
+  resolveFontFamily?: (value: string) => string | null
+}
+
+/**
+ * The document with every element's font stack resolved to the family its text layer draws, so
+ * the per-character CSS parse sees a concrete name instead of a generic keyword.
+ */
+function withResolvedFontFamilies(
+  node: DesignNode,
+  resolve: (value: string) => string | null
+): DesignNode {
+  if (node.type !== 'element') return node
+  const resolved = (
+    style: DesignStyleDeclaration | undefined
+  ): DesignStyleDeclaration | undefined => {
+    const stack = style?.['font-family']
+    const family = stack === undefined ? null : resolve(stack)
+    return family && family !== stack ? { ...style, 'font-family': family } : style
+  }
+  const computedStyle = resolved(node.computedStyle)
+  const inlineStyle = resolved(node.inlineStyle)
+  const next: DesignElement = {
+    ...node,
+    children: node.children.map((child) => withResolvedFontFamilies(child, resolve))
+  }
+  if (computedStyle) next.computedStyle = computedStyle
+  if (inlineStyle) next.inlineStyle = inlineStyle
+  return next
 }
 
 function textContent(node: DesignNode): string {
@@ -727,12 +761,17 @@ export function designDocumentToSceneGraph(
   document: DesignDocument,
   options: DesignDocumentToSceneGraphOptions = {}
 ): SceneGraph {
+  const resolve = options.resolveFontFamily ?? resolveFontFamilyStack
+  const resolved: DesignDocument = {
+    ...document,
+    children: document.children.map((child) => withResolvedFontFamilies(child, resolve))
+  }
   const graph = new SceneGraph()
   const page = graph.getPages().find((node) => node.type === 'CANVAS') ?? graph.addPage('DesignDOM')
 
   page.name = options.pageName ?? 'DesignDOM'
 
-  for (const child of document.children) {
+  for (const child of resolved.children) {
     createDesignNode(graph, page.id, child, 'none')
   }
 

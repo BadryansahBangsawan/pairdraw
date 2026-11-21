@@ -2,6 +2,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { mergeCSSText } from './import/css-text'
 import { jsxToDesignDocumentCore, type JSXChild } from './import/jsx/core'
+export { resolveFontFamilyStack, type FontStackOptions } from './import/fonts'
 import { designDocumentToSceneGraph, type ToSceneGraphOptions } from './import/scene-graph'
 import type { CompileTailwindCSSOptions } from './import/tailwind'
 import { createBrowserCSSRuntime, type BrowserCSSRuntimeOptions } from './runtime/browser/runtime'

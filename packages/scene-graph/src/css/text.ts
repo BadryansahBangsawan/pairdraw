@@ -45,6 +45,30 @@ export function parseCSSFontFamily(value: string | undefined): string | null {
   return words.trim().replace(/\s+/gu, ' ') || null
 }
 
+/**
+ * Every family of a CSS `font-family` list, in order, without quotes and escapes. A quoted family
+ * is one name; an unquoted one joins its words with single spaces.
+ */
+export function parseCSSFontFamilies(value: string | undefined): string[] {
+  const text = value?.trim()
+  if (!text) return []
+  const families: string[] = []
+  let current: valueParser.Node[] = []
+  for (const node of valueParser(text).nodes) {
+    if (node.type === 'div' && node.value === ',') {
+      families.push(valueParser.stringify(current))
+      current = []
+    } else {
+      current.push(node)
+    }
+  }
+  families.push(valueParser.stringify(current))
+  return families.flatMap((family) => {
+    const parsed = parseCSSFontFamily(family)
+    return parsed ? [parsed] : []
+  })
+}
+
 /** A CSS dimension's number and lowercase unit, or null. */
 function dimension(value: string): { number: number; unit: string } | null {
   const parsed = valueParser.unit(value)

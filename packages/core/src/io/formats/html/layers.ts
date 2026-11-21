@@ -11,6 +11,12 @@ export interface StyleHTMLOptions {
   tailwind?: boolean
 }
 
+export interface SceneGraphFromStyledHTMLOptions {
+  pageName?: string
+  /** The family a CSS stack should draw; null keeps its first family. See the dom-css option. */
+  resolveFontFamily?: (value: string) => string | null
+}
+
 /**
  * Styles HTML with the CSS runtime a host has: the browser's in the app, the headless runtime
  * in the CLI. Hosts hand it to tools, which build the layers with `sceneGraphFromStyledHTML`.
@@ -44,9 +50,12 @@ export function htmlClassNames(html: string): string[] {
  */
 export function sceneGraphFromStyledHTML(
   styled: DesignDocument,
-  options: { pageName?: string } = {}
+  options: SceneGraphFromStyledHTMLOptions = {}
 ): SceneGraph {
-  const graph = designDocumentToSceneGraph(styled, { pageName: options.pageName })
+  const graph = designDocumentToSceneGraph(styled, {
+    pageName: options.pageName,
+    resolveFontFamily: options.resolveFontFamily
+  })
   layoutAuthoredNodes(
     graph,
     graph.getPages().map((page) => page.id)

@@ -1,6 +1,8 @@
 import type { Editor, EditorState } from '@pairdraw/core'
 import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
-import { browserHTMLToDesignDocument } from '@pairdraw/dom-css/browser'
+import { fontManager } from '@pairdraw/core/text'
+import { browserHTMLToDesignDocument, resolveFontFamilyStack } from '@pairdraw/dom-css/browser'
+import { DEFAULT_FONT_FAMILY } from '@pairdraw/scene-graph/constants'
 
 import { describeDiagnosticError, recordDocumentFailure } from '@/app/diagnostics'
 import { yieldToUI } from '@/app/document/io/browser'
@@ -43,6 +45,16 @@ function errorDetail(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
+/** The family an imported CSS stack draws: its first face the font service knows, else its class default. */
+function resolveImportedFontFamily(value: string): string | null {
+  return resolveFontFamilyStack(value, {
+    // A family the catalog has not looked up is left to the editor, which can load it; one it
+    // knows is empty cannot be drawn.
+    isAvailable: (family) =>
+      family === DEFAULT_FONT_FAMILY || fontManager.familyFacesSync(family)?.length !== 0
+  })
+}
+
 function documentNameFor(file: File): string {
   return file.name.replace(/\.(html?|xhtml)$/i, '')
 }
@@ -67,7 +79,10 @@ export function createDOMOpenActions({
       signal: load.signal
     })
     load.signal.throwIfAborted()
-    const graph = sceneGraphFromStyledHTML(styled, { pageName })
+    const graph = sceneGraphFromStyledHTML(styled, {
+      pageName,
+      resolveFontFamily: resolveImportedFontFamily
+    })
     await yieldToUI()
     await applyImportedDocument(editor, graph, load)
     state.documentName = pageName

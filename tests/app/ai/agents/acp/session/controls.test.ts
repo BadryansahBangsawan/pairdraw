@@ -7,6 +7,7 @@ import {
   choiceName,
   LEGACY_MODE_CONTROL,
   LEGACY_MODEL_CONTROL,
+  sessionControlPurpose,
   sessionControls,
   sessionModel,
   skipsPermissionRequests,
@@ -192,4 +193,68 @@ test('the value a session started with stays known after the agent changes it', 
   const controls = sessionControls({ configOptions: [effort] })
   const changed = withConfigOptions(controls, [{ ...effort, currentValue: 'high' }])
   expect(changed.map((control) => [control.value, control.initial])).toEqual([['high', 'medium']])
+})
+
+describe('what a session control sets', () => {
+  const onOff = [
+    { value: 'on', name: 'On' },
+    { value: 'off', name: 'Off' }
+  ]
+
+  test("names Claude Code's agent persona, Fast mode, and Ultracode by their option ids", () => {
+    const controls = sessionControls({
+      configOptions: [
+        {
+          type: 'select',
+          id: 'agent',
+          name: 'Agent',
+          currentValue: 'default',
+          options: [
+            { value: 'default', name: 'Default' },
+            { value: 'reviewer', name: 'reviewer' }
+          ]
+        },
+        {
+          type: 'select',
+          id: 'fast',
+          name: 'Fast mode',
+          category: 'model_config',
+          currentValue: 'off',
+          options: onOff
+        },
+        {
+          type: 'select',
+          id: 'ultracode',
+          name: 'Ultracode',
+          category: 'model_config',
+          currentValue: 'off',
+          options: onOff
+        }
+      ]
+    })
+    expect(controls.map((control) => [control.id, sessionControlPurpose(control)])).toEqual([
+      ['agent', 'agent'],
+      ['fast', 'speed'],
+      ['ultracode', 'workflows']
+    ])
+  })
+
+  test('follows the category the agent gave, and leaves any other option generic', () => {
+    const controls = sessionControls({
+      configOptions: [
+        model,
+        effort,
+        {
+          type: 'select',
+          id: 'verbosity',
+          name: 'Verbosity',
+          category: 'model_config',
+          currentValue: 'on',
+          options: onOff
+        }
+      ],
+      modes
+    })
+    expect(controls.map(sessionControlPurpose)).toEqual(['model', 'thought_level', 'mode', 'other'])
+  })
 })

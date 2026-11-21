@@ -242,6 +242,32 @@ export function choiceName(control: AgentSessionControl, value: string): string 
   return value
 }
 
+/**
+ * What a control sets, for its icon: its category, or for an `other` option one the composer
+ * knows by its id, as Claude Code's adapter advertises them. Anything else stays `other`.
+ */
+export type AgentSessionControlPurpose =
+  | Exclude<AgentSessionControlCategory, 'other'>
+  | 'agent'
+  | 'speed'
+  | 'workflows'
+  | 'other'
+
+/**
+ * Claude Code's options by id: `agent` picks the main thread's agent persona, `fast` turns on
+ * Fast mode's quicker responses, and `ultracode` runs dynamic workflows on every task.
+ */
+const OPTION_PURPOSES: Readonly<Partial<Record<string, AgentSessionControlPurpose>>> = {
+  agent: 'agent',
+  fast: 'speed',
+  ultracode: 'workflows'
+}
+
+export function sessionControlPurpose(control: AgentSessionControl): AgentSessionControlPurpose {
+  if (control.category !== 'other') return control.category
+  return (control.kind === 'config' && OPTION_PURPOSES[control.id]) || 'other'
+}
+
 /** The model the session uses, as the agent names it, for usage counts. */
 export function sessionModel(controls: readonly AgentSessionControl[]): string | null {
   return controls.find((control) => control.category === 'model')?.value ?? null

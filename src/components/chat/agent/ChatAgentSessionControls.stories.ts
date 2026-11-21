@@ -76,6 +76,66 @@ async function advertise(agentId: string, extra = 0): Promise<void> {
   )
 }
 
+const ON_OFF = [
+  { value: 'on', name: 'On' },
+  { value: 'off', name: 'Off' }
+]
+
+/**
+ * What Claude Code's adapter advertises beyond the model, effort, and mode: the main thread's
+ * agent persona, Fast mode, and Ultracode, each with an icon for what it sets.
+ */
+async function advertiseClaude(agentId: string): Promise<void> {
+  await startAgentSessionControls(
+    agentId,
+    {
+      configOptions: [
+        {
+          type: 'select',
+          id: 'model',
+          name: 'Model',
+          category: 'model',
+          currentValue: 'opus',
+          options: [
+            { value: 'opus', name: 'Opus' },
+            { value: 'sonnet', name: 'Sonnet' }
+          ]
+        },
+        {
+          type: 'select',
+          id: 'fast',
+          name: 'Fast mode',
+          description: 'Faster responses on supported models',
+          category: 'model_config',
+          currentValue: 'off',
+          options: ON_OFF
+        },
+        {
+          type: 'select',
+          id: 'ultracode',
+          name: 'Ultracode',
+          description: 'Dynamic workflows on every task, at any effort level',
+          category: 'model_config',
+          currentValue: 'off',
+          options: ON_OFF
+        },
+        {
+          type: 'select',
+          id: 'agent',
+          name: 'Agent',
+          description: 'Main-thread agent persona',
+          currentValue: 'default',
+          options: [
+            { value: 'default', name: 'Default' },
+            { value: 'reviewer', name: 'reviewer' }
+          ]
+        }
+      ]
+    },
+    async () => null
+  )
+}
+
 const meta = {
   title: 'App/Chat/Agent Session Controls',
   args: { agentId: 'story-codex', agent: 'Codex', onError: fn() },
@@ -209,4 +269,23 @@ export const InNarrowComposer: Story = {
       }
     }
   }
+}
+
+/** Claude Code's agent persona, Fast mode, and Ultracode, each named by its own icon and label. */
+export const ClaudeCode: Story = {
+  args: { agentId: 'story-claude-code', agent: 'Claude Code' },
+  loaders: [({ args }) => advertiseClaude(args.agentId)],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    for (const name of ['Agent: Default', 'Fast mode: Off', 'Ultracode: Off']) {
+      await expect(canvas.getByRole('combobox', { name })).toBeVisible()
+    }
+  }
+}
+
+/** The same controls in a narrow composer, where only their icons tell them apart. */
+export const ClaudeCodeNarrow: Story = {
+  args: { agentId: 'story-claude-code-narrow', agent: 'Claude Code' },
+  loaders: [({ args }) => advertiseClaude(args.agentId)],
+  render: Narrow.render
 }

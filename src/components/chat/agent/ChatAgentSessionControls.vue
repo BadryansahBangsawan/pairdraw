@@ -6,6 +6,7 @@ import { useAgentMessages } from '@pairdraw/vue/i18n'
 
 import {
   choiceName,
+  sessionControlPurpose,
   type AgentSessionControl,
   type AgentSessionControlCategory
 } from '@/app/ai/agents/acp/session/controls'
@@ -87,17 +88,32 @@ async function choose(control: AgentSessionControl, value: string) {
           <Tip :label="summary(control)">
             <span :class="styles.triggerContent()">
               <icon-lucide-box
-                v-if="control.category === 'model'"
+                v-if="sessionControlPurpose(control) === 'model'"
                 :class="styles.triggerIcon()"
                 aria-hidden="true"
               />
               <icon-lucide-brain
-                v-else-if="control.category === 'thought_level'"
+                v-else-if="sessionControlPurpose(control) === 'thought_level'"
                 :class="styles.triggerIcon()"
                 aria-hidden="true"
               />
               <icon-lucide-shield-check
-                v-else-if="control.category === 'mode'"
+                v-else-if="sessionControlPurpose(control) === 'mode'"
+                :class="styles.triggerIcon()"
+                aria-hidden="true"
+              />
+              <icon-lucide-bot
+                v-else-if="sessionControlPurpose(control) === 'agent'"
+                :class="styles.triggerIcon()"
+                aria-hidden="true"
+              />
+              <icon-lucide-zap
+                v-else-if="sessionControlPurpose(control) === 'speed'"
+                :class="styles.triggerIcon()"
+                aria-hidden="true"
+              />
+              <icon-lucide-workflow
+                v-else-if="sessionControlPurpose(control) === 'workflows'"
                 :class="styles.triggerIcon()"
                 aria-hidden="true"
               />

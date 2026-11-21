@@ -64,14 +64,18 @@ function screen() {
 function colorAt(
   graph: SceneGraph,
   frameId: string,
-  playScenes: ReturnType<typeof createPlayScenes>['views'] | undefined,
+  scenes: ReturnType<typeof createPlayScenes> | undefined,
   x: number,
   y: number
 ): number[] {
   const surface = expectDefined(ck.MakeSurface(100, 100))
   try {
     renderer.worldViewport = { x: -1e6, y: -1e6, w: 2e6, h: 2e6 }
-    renderer.renderNode(surface.getCanvas(), graph, frameId, { playing: true, playScenes })
+    renderer.renderNode(surface.getCanvas(), graph, frameId, {
+      playing: true,
+      playScenes: scenes?.views,
+      playScroll: scenes?.scroll
+    })
     surface.flush()
     const image = surface.makeImageSnapshot()
     const pixels = expectDefined(
@@ -95,16 +99,50 @@ describe('a frame play changed', () => {
     const { graph, frame, instance, reaction } = screen()
     const scenes = createPlayScenes(() => graph)
     // The document's red instance is drawn, and its picture kept, first.
-    expect(colorAt(graph, frame.id, scenes.views, 40, 40)).toEqual([255, 0, 0])
+    expect(colorAt(graph, frame.id, scenes, 40, 40)).toEqual([255, 0, 0])
 
     scenes.run(startSession(frame.id), {
       sourceId: instance.id,
       action: reaction,
       transition: null
     })
-    expect(colorAt(graph, frame.id, scenes.views, 40, 40)).toEqual([0, 255, 0])
+    expect(colorAt(graph, frame.id, scenes, 40, 40)).toEqual([0, 255, 0])
 
     scenes.clear()
-    expect(colorAt(graph, frame.id, scenes.views, 40, 40)).toEqual([255, 0, 0])
+    expect(colorAt(graph, frame.id, scenes, 40, 40)).toEqual([255, 0, 0])
+  })
+})
+
+describe('a frame play scrolled', () => {
+  test('draws its content moved by the offset, inside its clip', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const frame = graph.createNode('FRAME', pageId, {
+      width: 100,
+      height: 100,
+      fills: [solid(1, 1, 1)]
+    })
+    const list = graph.createNode('FRAME', frame.id, {
+      y: 20,
+      width: 100,
+      height: 40,
+      clipsContent: true,
+      overflowDirection: 'VERTICAL',
+      fills: []
+    })
+    graph.createNode('RECTANGLE', list.id, { width: 100, height: 40, fills: [solid(1, 0, 0)] })
+    graph.createNode('RECTANGLE', list.id, {
+      y: 40,
+      width: 100,
+      height: 40,
+      fills: [solid(0, 0, 1)]
+    })
+    const scenes = createPlayScenes(() => graph)
+    expect(colorAt(graph, frame.id, scenes, 50, 30)).toEqual([255, 0, 0])
+
+    scenes.scrollBy(frame.id, [frame.id, list.id], 0, 40)
+    expect(colorAt(graph, frame.id, scenes, 50, 30)).toEqual([0, 0, 255])
+    // The red row moved above the list, where the list clips it away.
+    expect(colorAt(graph, frame.id, scenes, 50, 10)).toEqual([255, 255, 255])
   })
 })

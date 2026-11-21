@@ -277,6 +277,8 @@ export class SkiaRenderer {
   sceneScopeId: string | null = null
   /** Frames a playing prototype changed, which this canvas draws from their play scenes. */
   playScenes: ReadonlyMap<string, RenderedPlayScene> | null = null
+  /** How far a playing prototype scrolled each frame's content, by frame id. */
+  playScroll: ReadonlyMap<string, Vector> | null = null
   /** Status labels drawn in the last label pass; clicks on them open the status menu. */
   statusLabels: PlacedStatusLabel[] = []
 

@@ -45,11 +45,13 @@ function applyRenderOptions(renderer: SkiaRenderer, options: UseCanvasOptions | 
 
 /**
  * Shows only the scope layer the canvas asks for, or the whole page when it asks for none, with
- * the frames a playing prototype changed drawn from their play scenes.
+ * the frames a playing prototype changed drawn from their play scenes, scrolled as play scrolled
+ * them.
  */
 function applySceneScope(renderer: SkiaRenderer, options: UseCanvasOptions | undefined) {
   renderer.sceneScopeId = options?.getSceneScope?.() ?? null
   renderer.playScenes = options?.getPlayScenes?.() ?? null
+  renderer.playScroll = options?.getPlayScroll?.() ?? null
 }
 
 export function createCanvasSurfaceManager({

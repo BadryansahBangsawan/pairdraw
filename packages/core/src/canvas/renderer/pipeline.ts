@@ -49,18 +49,19 @@ export type RenderLayer = 'full' | 'scene' | 'overlays'
 
 /**
  * What a canvas that runs play leaves to its live islands, and the frames a playing prototype
- * draws from its play scenes; an editing canvas has neither.
+ * draws from its play scenes or scrolled; an editing canvas has none of them.
  */
 function playOverlays(
   r: SkiaRenderer,
   graph: SceneGraph,
   pageId: string,
   live: boolean
-): Pick<RenderOverlays, 'playIslands' | 'playScenes'> {
+): Pick<RenderOverlays, 'playIslands' | 'playScenes' | 'playScroll'> {
   if (!live) return {}
   return {
     playIslands: new Set(playIslandRoots(graph, pageId)),
-    playScenes: r.playScenes ?? undefined
+    playScenes: r.playScenes ?? undefined,
+    playScroll: r.playScroll ?? undefined
   }
 }
 

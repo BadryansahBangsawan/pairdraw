@@ -54,6 +54,8 @@ export interface RenderOverlays {
   playing?: boolean
   /** Top-level frames a playing prototype draws from its own copies instead of the document. */
   playScenes?: ReadonlyMap<string, RenderedPlayScene>
+  /** How far a playing prototype scrolled each frame's content, by frame id. */
+  playScroll?: ReadonlyMap<string, Vector>
   /** Layers a previewing canvas leaves to its live islands. */
   playIslands?: ReadonlySet<string>
   hoveredNodeId?: string | null

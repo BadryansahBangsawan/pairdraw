@@ -273,7 +273,12 @@ function renderChildren(
   if (isClippableContainer && node.clipsContent && childIds.length > 0) {
     canvas.save()
     r.clipNodeShape(canvas, node)
-    renderChildIds(r, canvas, graph, childIds, overlays, absX, absY, hasTransformedAncestor)
+    // A frame a playing prototype scrolled draws its content moved by the offset, inside the clip.
+    const scrolled = overlays.playScroll?.get(node.id)
+    if (scrolled) canvas.translate(-scrolled.x, -scrolled.y)
+    const contentX = absX - (scrolled?.x ?? 0)
+    const contentY = absY - (scrolled?.y ?? 0)
+    renderChildIds(r, canvas, graph, childIds, overlays, contentX, contentY, hasTransformedAncestor)
     canvas.restore()
   } else {
     renderChildIds(r, canvas, graph, childIds, overlays, absX, absY, hasTransformedAncestor)

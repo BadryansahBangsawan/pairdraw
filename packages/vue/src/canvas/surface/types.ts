@@ -1,5 +1,6 @@
 import type { EditorState } from '@pairdraw/core'
 import type { RenderedPlayScene } from '@pairdraw/core/canvas'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
 
 import type { PresentationColorSpace } from '#vue/canvas/surface/color-space'
@@ -74,6 +75,8 @@ export interface UseCanvasOptions {
    * scenes instead of the document, by frame id. Null or absent draws the document.
    */
   getPlayScenes?: () => ReadonlyMap<string, RenderedPlayScene> | null
+  /** How far a playing prototype scrolled each frame's content, by frame id. */
+  getPlayScroll?: () => ReadonlyMap<string, Vector> | null
   /**
    * Called after each frame this canvas draws, with the pan and zoom it was drawn at. DOM laid
    * over the canvas, such as preview islands, follows these to stay in step with the drawing

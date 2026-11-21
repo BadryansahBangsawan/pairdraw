@@ -7,6 +7,8 @@ description: Complete reference for all pairdraw commands, options, and flags.
 
 Document commands accept a `.fig` file as a positional argument. When omitted, the CLI connects to the running desktop app via RPC. `documents`, `undo`, `redo`, and `settings` always act on the running app.
 
+A user error — a bad flag, a missing file, a refused combination — prints its message and exits 1 without a stack trace. Set `PAIRDRAW_DEBUG=1` to print the stack as well, which a crash needs to be read.
+
 ## info
 
 Show document info — pages, node counts, fonts, file size.
@@ -30,7 +32,7 @@ pairdraw tree [file] [options]
 | Option | Description |
 |--------|-------------|
 | `--page` | Page name (default: first page) |
-| `--depth` | Max depth (default: unlimited) |
+| `--depth` | Max depth (default: unlimited); a non-negative integer, other values are refused |
 | `--json` | Output as JSON |
 
 ## find
@@ -46,7 +48,7 @@ pairdraw find [file] [options]
 | `--name` | Node name (partial match, case-insensitive) |
 | `--type` | Node type: `FRAME`, `TEXT`, `RECTANGLE`, `INSTANCE`, etc. |
 | `--page` | Page name (default: all pages) |
-| `--limit` | Max results (default: 100) |
+| `--limit` | Max results (default: 100); a positive integer, other values are refused |
 | `--json` | Output as JSON |
 
 ## node
@@ -61,6 +63,8 @@ pairdraw node [file] --id <id> [--json]
 |--------|-------------|
 | `--id` | **Required.** Node ID (e.g. `1:23`) |
 | `--json` | Output as JSON |
+
+`--json` reports the shape details a layer carries: per-corner radii (`topLeftRadius`, `topRightRadius`, `bottomRightRadius`, `bottomLeftRadius`) when the corners are independent and disagree, otherwise one `cornerRadius` when it is above zero; `isMask` and `maskType` while the layer masks; and a boolean layer's `booleanOperation`. A plain layer carries none of them.
 
 ## pages
 
@@ -130,6 +134,8 @@ pairdraw tokens app.fig --project ./app --write
 | `--write` | Write the import back to the input file |
 | `--output` | Write to a different file instead |
 
+`--out` is refused with `--import` or `--project`: it writes dtcg token files, while an import writes the document itself with `--write` or `--output`.
+
 ## export
 
 Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories. The app does not offer PowerPoint or draw.io export; the CLI does.
@@ -155,7 +161,7 @@ pairdraw export [file] [options]
 | `--design-images` | | Storybook: render a PNG per variant for the Design panel (default: on; `--no-design-images` to skip) |
 | `--watch` | | Storybook: re-export whenever the document is saved |
 | `--beside` | | Storybook: write each document's stories into the document's own folder; the file argument can then be several files or a quoted glob |
-| `--thumbnail` | | Export a page thumbnail fitted to `--width` and `--height`; PNG, JPG, or WEBP |
+| `--thumbnail` | | Export a page thumbnail fitted to `--width` and `--height`; PNG, JPG, or WEBP. Cannot combine with `--node` (a thumbnail is a whole page) |
 | `--width` | | Thumbnail width (default: 1920) |
 | `--height` | | Thumbnail height (default: 1080) |
 
@@ -537,7 +543,7 @@ pairdraw query [file] [selector] [options]
 |--------|-------------|
 | `selector` | XPath selector (e.g. `//FRAME[@width < 300]`, `//TEXT[contains(@name, "Label")]`) |
 | `--page` | Page name (default: all pages) |
-| `--limit` | Max results (default: 1000) |
+| `--limit` | Max results (default: 1000); a positive integer, other values are refused |
 | `--document-id` | Target Pairdraw document/tab ID when connected to the running app |
 | `--page-id` | Target page ID when connected to the running app |
 | `--json` | Output as JSON |

@@ -117,7 +117,9 @@ export function createChatSessionManager({
   } = {}
 }: ChatSessionOptions) {
   const failure = ref<AIChatFailure | null>(null)
-  let transportDirty = false
+  // Bumped by anything that changes the transport; a chat keeps the revision it was built from.
+  let transportRevision = 0
+  let chatTransportRevision = 0
   let currentChatStore: EditorStore | null = null
   /** The conversation the live chat answers, which its document shows again to resume it. */
   let currentChatSessionId: string | null = null
@@ -161,7 +163,7 @@ export function createChatSessionManager({
   }
 
   function markTransportDirty() {
-    transportDirty = true
+    transportRevision++
   }
 
   async function destroyAgentTransports(): Promise<void> {
@@ -284,14 +286,16 @@ export function createChatSessionManager({
 
     // A project folder chosen or cleared since starts the agent again in the new folder.
     if (chat && isACPProvider.value && chatProjectFolder(sessionId) !== acpProjectFolder) {
-      transportDirty = true
+      markTransportDirty()
     }
     if (
       !chat ||
-      transportDirty ||
+      chatTransportRevision !== transportRevision ||
       currentChatStore !== store ||
       currentChatSessionId !== sessionId
     ) {
+      // Read before building: a change while the transport loads leaves this chat out of date.
+      const revision = transportRevision
       const messages = initialMessages ?? currentChatMessages.get(store)
       const diagnosticContext: AIDiagnosticContext = { sessionId, runId: crypto.randomUUID() }
       // Failures belong to the provider this chat was created for, even if the profile changes.
@@ -359,7 +363,7 @@ export function createChatSessionManager({
       chat = created
       currentChatStore = store
       currentChatSessionId = sessionId
-      transportDirty = false
+      chatTransportRevision = revision
     }
     return chat
   }
@@ -382,7 +386,7 @@ export function createChatSessionManager({
     chat = null
     currentChatStore = null
     currentChatSessionId = null
-    transportDirty = false
+    chatTransportRevision = transportRevision
   }
 
   function setOverrideTransport(factory: (() => ChatTransport<UIMessage>) | null) {

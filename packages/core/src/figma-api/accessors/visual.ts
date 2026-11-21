@@ -5,6 +5,7 @@ import type {
   ShaderEffect,
   Stroke
 } from '@pairdraw/scene-graph'
+import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
 import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
 import { independentCornerChanges } from '@pairdraw/scene-graph/variables'
 
@@ -22,8 +23,6 @@ import { parseFigmaPaints, toFigmaPaint, type FigmaPaint } from '#core/figma-api
 import { getTextStyle } from '#core/figma-api/text/style'
 import { paintBindings, setPaintBindings } from '#core/figma-api/variables/bindings'
 import { textStyleChanges } from '#core/text/character-style'
-
-const OVERFLOW_DIRECTIONS: readonly OverflowDirection[] = ['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']
 
 /** `value` as a frame's overflow scrolling, refused in the words Figma's plugin API uses. */
 function checkedOverflowDirection(value: unknown): OverflowDirection {

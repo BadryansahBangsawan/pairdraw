@@ -13,6 +13,7 @@ import type {
   PrototypeTriggerType,
   SceneNode
 } from '@pairdraw/scene-graph'
+import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
 import type { GUID } from '@pairdraw/scene-graph/primitives'
 
 import type { KiwiNodeChange, SceneNodeToKiwiContext } from './export/context'
@@ -154,8 +155,6 @@ function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | n
   })
   return { id, trigger, actions }
 }
-
-const OVERFLOW_DIRECTIONS: readonly OverflowDirection[] = ['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']
 
 /** A record's `scrollDirection` as the frame's overflow; a missing or unknown one does not scroll. */
 export function overflowFromFigma(scrollDirection: unknown): OverflowDirection {

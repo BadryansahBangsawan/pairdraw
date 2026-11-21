@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
 import { styleDetachmentChanges } from '@pairdraw/scene-graph/shared-styles'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
@@ -41,13 +42,15 @@ export function scrollRefusal(node: FigmaNodeProxy): string | null {
 }
 
 /** Overflow scrolling in play, as Figma's `overflowDirection`. */
-export const overflowDirectionSchema = v.pipe(
-  v.picklist(['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']),
-  v.description(
-    'Overflow scrolling in prototype play (FRAME, COMPONENT, INSTANCE). A nested frame scrolls ' +
-      'only while it clips its content.'
+export function overflowDirectionInput() {
+  return v.pipe(
+    v.picklist(OVERFLOW_DIRECTIONS),
+    v.description(
+      'Overflow scrolling in prototype play (FRAME, COMPONENT, INSTANCE). A nested frame scrolls ' +
+        'only while it clips its content.'
+    )
   )
-)
+}
 
 export const updateNode = defineTool({
   name: 'update_node',
@@ -87,7 +90,7 @@ export const updateNode = defineTool({
       )
     ),
     name: v.optional(v.pipe(v.string(), v.description('Layer name'))),
-    overflow_direction: v.optional(overflowDirectionSchema)
+    overflow_direction: v.optional(overflowDirectionInput())
   }),
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)

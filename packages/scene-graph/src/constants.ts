@@ -1,5 +1,5 @@
 import type { Color } from './primitives'
-import type { NoiseEffectParams, TextureEffectParams } from './types'
+import type { NoiseEffectParams, OverflowDirection, TextureEffectParams } from './types'
 
 export const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 }
 export const WHITE: Color = { r: 1, g: 1, b: 1, a: 1 }
@@ -41,3 +41,11 @@ export const UNSET_TEXTURE: Readonly<TextureEffectParams> = {
   noiseSize: { x: 1, y: 1 },
   clipToShape: true
 }
+
+/** The ways a frame's content may scroll in play, as Figma's `overflowDirection` names them. */
+export const OVERFLOW_DIRECTIONS = [
+  'NONE',
+  'HORIZONTAL',
+  'VERTICAL',
+  'BOTH'
+] as const satisfies readonly OverflowDirection[]

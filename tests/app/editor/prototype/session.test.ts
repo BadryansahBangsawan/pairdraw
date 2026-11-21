@@ -112,6 +112,17 @@ describe('a click in play', () => {
     withReaction(graph, second.id, navigatesTo(first.id))
     expect(reactionAt(graph, startSession(first.id), 500, 100)).toBeNull()
   })
+
+  // Live-verified in Figma: a frame's background click runs the frame's own reaction.
+  test("runs the played frame's own reaction when its background is clicked", () => {
+    const { graph, first, second } = fixture()
+    withReaction(graph, first.id, navigatesTo(second.id))
+    expect(reactionAt(graph, startSession(first.id), 250, 150)?.action).toMatchObject({
+      nodeId: second.id
+    })
+    // Outside the frame, its reaction does not run.
+    expect(reactionAt(graph, startSession(first.id), 500, 150)).toBeNull()
+  })
 })
 
 describe('a step', () => {

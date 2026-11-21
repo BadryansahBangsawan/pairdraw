@@ -4,6 +4,7 @@ import type {
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
+import { isPointInNode } from '@pairdraw/scene-graph/hit-test'
 
 import { framesOnPage } from './frames'
 import { primaryAction } from './reactions'
@@ -84,7 +85,11 @@ export function reactionAt(
   x: number,
   y: number
 ): PlayClick | null {
-  let node = graph.hitTestDeep(x, y, shownFrame(session))
+  const shown = shownFrame(session)
+  // A click on the frame's own background is the frame's, not a layer's; one outside it hits
+  // nothing.
+  let node = graph.hitTestDeep(x, y, shown)
+  if (!node && isPointInNode(graph, shown, x, y)) node = graph.getNode(shown) ?? null
   while (node) {
     const reaction = node.prototypeReactions.find(
       (candidate) => candidate.trigger.type === 'ON_CLICK'

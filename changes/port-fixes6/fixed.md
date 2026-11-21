@@ -1,1 +1,2 @@
 - An inline SVG icon keeps its nearly closed circles when it is scaled, instead of drawing them as a dot.
+- Home shows previews of recent and stored files again instead of a placeholder icon.

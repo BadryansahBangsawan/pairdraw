@@ -104,14 +104,18 @@ function click(event: MouseEvent) {
 </script>
 
 <template>
-  <ContextMenuRoot :disabled="!menu">
-    <ContextMenuTrigger as-child>
-      <div
-        ref="root"
-        data-slot="document-entry"
-        :data-selected="selected || undefined"
-        :class="styles.root({ class: normalizeClass(className) })"
-      >
+  <!--
+    The entry's own element is its root, so a parent's directives and attributes reach it, as the
+    preview directives of Home do; under the context menu they would land on a fragment.
+  -->
+  <div
+    ref="root"
+    data-slot="document-entry"
+    :data-selected="selected || undefined"
+    :class="styles.root({ class: normalizeClass(className) })"
+  >
+    <ContextMenuRoot :disabled="!menu">
+      <ContextMenuTrigger as="div" data-slot="surface" :class="styles.surface()">
         <button
           type="button"
           :disabled="disabled"
@@ -179,23 +183,23 @@ function click(event: MouseEvent) {
             </DropdownMenuContent>
           </DropdownMenuPortal>
         </DropdownMenuRoot>
-      </div>
-    </ContextMenuTrigger>
-    <ContextMenuPortal v-if="menu">
-      <ContextMenuContent :class="menuUI.content">
-        <MenuScrollArea>
-          <ContextMenuItem
-            v-for="item in menu.items"
-            :key="item.action"
-            :class="[menuUI.item, styles.menuItem()]"
-            :data-tone="item.action === 'delete' ? 'danger' : undefined"
-            @select="emit('action', item.action)"
-          >
-            <DocumentEntryMenuIcon :action="item.action" :class="styles.menuIcon()" />
-            {{ item.label }}
-          </ContextMenuItem>
-        </MenuScrollArea>
-      </ContextMenuContent>
-    </ContextMenuPortal>
-  </ContextMenuRoot>
+      </ContextMenuTrigger>
+      <ContextMenuPortal v-if="menu">
+        <ContextMenuContent :class="menuUI.content">
+          <MenuScrollArea>
+            <ContextMenuItem
+              v-for="item in menu.items"
+              :key="item.action"
+              :class="[menuUI.item, styles.menuItem()]"
+              :data-tone="item.action === 'delete' ? 'danger' : undefined"
+              @select="emit('action', item.action)"
+            >
+              <DocumentEntryMenuIcon :action="item.action" :class="styles.menuIcon()" />
+              {{ item.label }}
+            </ContextMenuItem>
+          </MenuScrollArea>
+        </ContextMenuContent>
+      </ContextMenuPortal>
+    </ContextMenuRoot>
+  </div>
 </template>

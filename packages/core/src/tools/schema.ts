@@ -53,8 +53,10 @@ interface ToolMetadata {
    *   whose colors and type are its own, so the memory warns about them rather than refusing;
    * - `copied`: the layers the call names, which it copies or converts with their values, such
    *   as a clone, a group or a boolean, so values those layers already had are not new.
+   * - `merged`: layers the call joins into one, which may take a paint from any of them, such as
+   *   flatten and boolean operations; a value is only theirs when every named layer had it.
    */
-  content?: 'imported' | 'copied'
+  content?: 'imported' | 'copied' | 'merged'
 }
 
 export interface ToolDef extends ToolMetadata {

@@ -74,6 +74,11 @@ export interface DesignCheckOptions {
    * Any other call is judged only against what the memory allows, wherever else a value is used.
    */
   copiedFrom?: readonly string[]
+  /**
+   * The call joins the named layers into one and may take a paint from any of them, as flatten
+   * and boolean operations do: only a value every named layer had in the same field is theirs.
+   */
+  merged?: boolean
 }
 
 /** The neutral colors and the font Pairdraw gives a new layer of every kind. */
@@ -220,40 +225,70 @@ function broughtValues(graph: SceneGraph, edit: DesignEdit): BroughtValues[] {
 }
 
 /**
+ * A copied value's key with the field it sits in, so a fill never vouches for a stroke.
+ */
+function provenanceKey(value: DesignValue): string {
+  return `${String(value.field)}|${copiedValueKey(value)}`
+}
+
+/**
  * The values on the layers a copying call names, as they were before it: their subtrees, read
  * as they were where the call changed them, and the layers it deleted, such as a boolean's
- * operands. Only the named layers are read, never the rest of the document.
+ * operands. Only the named layers are read, never the rest of the document. A merging call may
+ * take one operand's paint, so it vouches only for a value every named layer had in that field.
  */
 function copiedValues(
   graph: SceneGraph,
   edit: DesignEdit,
-  sourceIds: readonly string[]
+  sourceIds: readonly string[],
+  merged: boolean
 ): Set<string> {
-  const keys = new Set<string>()
-  const add = (node: SceneNode) => {
-    for (const value of designValues(node)) keys.add(copiedValueKey(value))
-  }
-  for (const node of edit.deleted ?? []) add(node)
   const created = new Set(edit.created.map((node) => node.id))
   const before = new Map(edit.updated.map((change) => [change.id, change.before]))
-  const pending = [...sourceIds]
-  for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
-    const node = created.has(id) ? undefined : graph.getNode(id)
-    if (!node) continue
+  const deleted = new Map((edit.deleted ?? []).map((node) => [node.id, node]))
+  const snapshot = (id: string): SceneNode | undefined => {
+    if (created.has(id)) return undefined
+    const removed = deleted.get(id)
+    if (removed) return removed
+    const node = graph.getNode(id)
+    if (!node) return undefined
     const previous = before.get(id)
-    const layer = previous ? { ...node, ...previous } : node
-    add(layer)
-    pending.push(...layer.childIds)
+    return previous ? { ...node, ...previous } : node
   }
+  const subtreeKeys = (id: string): Set<string> => {
+    const keys = new Set<string>()
+    const pending = [id]
+    for (let current = pending.pop(); current !== undefined; current = pending.pop()) {
+      const node = snapshot(current)
+      if (!node) continue
+      for (const value of designValues(node)) keys.add(provenanceKey(value))
+      pending.push(...node.childIds)
+    }
+    return keys
+  }
+  const sources = sourceIds.map(subtreeKeys)
+  if (!merged) {
+    const keys = new Set<string>()
+    for (const node of edit.deleted ?? []) {
+      for (const value of designValues(node)) keys.add(provenanceKey(value))
+    }
+    for (const keysOfSource of sources) for (const key of keysOfSource) keys.add(key)
+    return keys
+  }
+  if (sources.length === 0) return new Set()
+  const [first, ...rest] = sources
+  let keys = first
+  for (const other of rest) keys = new Set([...keys].filter((key) => other.has(key)))
   return keys
 }
 
 /**
- * A value written on a layer, as it is judged: none when a copied layer already had it, and
- * only a warning for Pairdraw's own default for a new layer, which the agent did not choose.
+ * A value written on a layer, as it is judged: none when a copied layer already had it in the
+ * same field, and only a warning for Pairdraw's own default for a new layer, which the agent did
+ * not choose.
  */
 function layerValue(value: DesignValue, copied: Set<string> | null): DesignValue | null {
-  if (copied?.has(copiedValueKey(value))) return null
+  if (copied?.has(provenanceKey(value))) return null
   return PAIRDRAW_DEFAULT_KEYS.has(keyOf(value)) ? { ...value, soft: true } : value
 }
 
@@ -287,7 +322,9 @@ export function checkDesignEdit(
   if (pending.length === 0) return findings
   const rules = options.rules ?? currentDesignRules(graph, memory)
   findings.rules = rules
-  const copied = options.copiedFrom?.length ? copiedValues(graph, edit, options.copiedFrom) : null
+  const copied = options.copiedFrom?.length
+    ? copiedValues(graph, edit, options.copiedFrom, options.merged === true)
+    : null
   for (const { owner, values, layer } of pending) {
     for (const value of values) {
       const judged = layer ? layerValue(value, copied) : systemValueIn(rules, value)

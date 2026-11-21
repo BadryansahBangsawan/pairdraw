@@ -61,7 +61,7 @@ export const flattenNodes = defineTool({
 
   description: 'Flatten nodes into a single vector.',
   execution: { kind: 'sync', mutation: 'document' },
-  content: 'copied',
+  content: 'merged',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Node IDs to flatten'))
   }),

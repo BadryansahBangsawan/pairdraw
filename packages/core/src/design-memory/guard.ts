@@ -92,7 +92,11 @@ export function createDesignGuard(
   const checkOptions = {
     warnOnly: options.content === 'imported' || person,
     rules: rules ?? undefined,
-    copiedFrom: options.content === 'copied' ? copiedSources(options.args) : undefined
+    copiedFrom:
+      options.content === 'copied' || options.content === 'merged'
+        ? copiedSources(options.args)
+        : undefined,
+    merged: options.content === 'merged'
   }
   const warnings: DesignViolation[] = []
   let refused: DesignViolation[] = []

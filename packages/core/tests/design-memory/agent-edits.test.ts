@@ -365,6 +365,29 @@ describe('agents are judged only on values they brought in', () => {
     expect(refused(result)).toBe(false)
   })
 
+  test('flattening an agent layer with the person’s does not pass their colour off', async () => {
+    const { graph, figma, pageId, pink } = setup()
+    const card = graph.createNode('RECTANGLE', pageId, {
+      name: 'Card',
+      fills: solid(BRAND),
+      x: 100
+    })
+    editor.undo.clear()
+    const before = [...graph.getAllNodes()].length
+    const result = await agentCall(figma, 'flatten_nodes', { ids: [pink.id, card.id] })
+    expect(refused(result)).toBe(true)
+    expect(graph.getNode(card.id)).toBeDefined()
+    expect(graph.getNode(pink.id)).toBeDefined()
+    expect([...graph.getAllNodes()].length).toBe(before)
+  })
+
+  test('flattening layers that already share a colour keeps it', async () => {
+    const { figma, pink, other } = setup()
+    expect(refused(await agentCall(figma, 'flatten_nodes', { ids: [pink.id, other.id] }))).toBe(
+      false
+    )
+  })
+
   test('instances, variants and rendered JSX without colors succeed', async () => {
     const { figma, pink, other } = setup()
     const second = await agentCall(figma, 'create_component', { id: other.id })

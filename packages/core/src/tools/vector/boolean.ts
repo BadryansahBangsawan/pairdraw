@@ -23,7 +23,7 @@ export const booleanUnion = defineTool({
 
   description: 'Union (combine) multiple nodes.',
   execution: { kind: 'sync', mutation: 'document' },
-  content: 'copied',
+  content: 'merged',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(2), v.description('Node IDs to union'))
   }),
@@ -37,7 +37,7 @@ export const booleanSubtract = defineTool({
 
   description: 'Subtract the second node from the first.',
   execution: { kind: 'sync', mutation: 'document' },
-  content: 'copied',
+  content: 'merged',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(2), v.description('Node IDs (first minus rest)'))
   }),
@@ -51,7 +51,7 @@ export const booleanIntersect = defineTool({
 
   description: 'Intersect multiple nodes.',
   execution: { kind: 'sync', mutation: 'document' },
-  content: 'copied',
+  content: 'merged',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(2), v.description('Node IDs to intersect'))
   }),
@@ -65,7 +65,7 @@ export const booleanExclude = defineTool({
 
   description: 'Exclude (XOR) multiple nodes.',
   execution: { kind: 'sync', mutation: 'document' },
-  content: 'copied',
+  content: 'merged',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(2), v.description('Node IDs to exclude'))
   }),

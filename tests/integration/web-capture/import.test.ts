@@ -237,6 +237,23 @@ describe('importing a web capture', () => {
     }
   })
 
+  test('shows the text a captured field held, also when imported as HTML', async () => {
+    const field: WebCapture = {
+      ...CAPTURE,
+      root: {
+        ...element('input', { display: 'inline-block', width: '200px', height: '24px' }, [
+          { type: 'text', text: 'Rename' }
+        ]),
+        box: { x: 0, y: 0, width: 200, height: 24 }
+      }
+    }
+
+    for (const graph of await importedBothWays(field)) {
+      const texts = [...graph.getAllNodes()].filter((node) => node.type === 'TEXT')
+      expect(texts.map((node) => node.text)).toEqual(['Rename'])
+    }
+  })
+
   test('paints a captured gradient background as a gradient fill behind the text', () => {
     const panel: WebCapture = {
       ...CAPTURE,

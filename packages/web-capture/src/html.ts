@@ -70,6 +70,11 @@ function styleAttribute(style: Record<string, string>): string {
 function attributes(element: WebCaptureDesignElement, options: WebCaptureHTMLOptions): string {
   const attrs: Record<string, string> = { ...element.attrs }
   if (options.images === false && ownValue(attrs, 'src')?.startsWith('data:')) delete attrs.src
+  // A captured field holds the text it showed; an `<input>` holds it as its value.
+  if (element.tagName === 'input') {
+    const text = element.children.map((child) => (child.type === 'text' ? child.text : '')).join('')
+    if (text) attrs.value = text
+  }
   const style = styleAttribute(element.computedStyle)
   if (style) attrs.style = style
   return Object.entries(attrs)

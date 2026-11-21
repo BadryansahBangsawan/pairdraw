@@ -1,3 +1,4 @@
+export { easingAt, easingCSS } from './easing'
 export { framesOnPage } from './frames'
 export { playHitTest } from './hit'
 export {
@@ -20,6 +21,12 @@ export {
 } from './scene'
 export { scrollRange, scrollsInPlay, type ScrollChange } from './scroll'
 export { snapshotPlayFrame } from './snapshot'
+export {
+  createSmartAnimation,
+  type PlayFrame,
+  type SmartAnimation
+} from './smart-animate/animation'
+export { matchLayers, type LayerMatch } from './smart-animate/match'
 export {
   PLAY_SCENE_LIMIT,
   createPlayScenes,

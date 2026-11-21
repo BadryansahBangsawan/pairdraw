@@ -6,6 +6,7 @@ import type {
   SceneNode
 } from '@pairdraw/scene-graph'
 
+import { easingAt } from './easing'
 import {
   primaryAction,
   shownFrame,
@@ -106,20 +107,7 @@ export const DISSOLVE_EASING_CSS = `cubic-bezier(${DISSOLVE_EASING.x1}, ${DISSOL
 
 /** The share of the new screen a dissolve shows at `progress` of the way, along `DISSOLVE_EASING`. */
 export function dissolveEasing(progress: number): number {
-  if (progress <= 0) return 0
-  if (progress >= 1) return 1
-  const { x1, y1, x2, y2 } = DISSOLVE_EASING
-  const bezier = (t: number, p1: number, p2: number) =>
-    3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t
-  // x(t) rises monotonically, so bisection finds the t whose x is `progress`.
-  let low = 0
-  let high = 1
-  for (let index = 0; index < 32; index++) {
-    const middle = (low + high) / 2
-    if (bezier(middle, x1, x2) < progress) low = middle
-    else high = middle
-  }
-  return bezier((low + high) / 2, y1, y2)
+  return easingAt('EASE_OUT', progress)
 }
 
 /**

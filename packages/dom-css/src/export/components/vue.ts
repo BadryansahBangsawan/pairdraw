@@ -19,13 +19,14 @@ import {
   type IconImport,
   type IconPackage
 } from './icons'
-import type {
-  ComponentBinding,
-  ComponentElement,
-  ComponentGenerator,
-  ComponentModel,
-  ComponentNode,
-  GeneratedKind
+import {
+  drawsInput,
+  type ComponentBinding,
+  type ComponentElement,
+  type ComponentGenerator,
+  type ComponentModel,
+  type ComponentNode,
+  type GeneratedKind
 } from './model'
 import type { ComponentReference, IconReference } from './references'
 import {
@@ -93,8 +94,25 @@ const REKA: Record<
   plain: { parts: {} }
 }
 
-/** Kinds whose two-way value is their input's, which binds it rather than the root. */
+/**
+ * Kinds whose two-way value is their input's, which binds it rather than the root. Their input
+ * takes the caller's attributes too, such as `name` or `required`, and the root only `class`,
+ * as the React components spread the caller's props on the input.
+ */
 const INPUT_MODEL: ReadonlySet<GeneratedKind> = new Set(['textField', 'textarea'])
+
+/** Whether the caller's attributes go to the field's input: it is a field, and draws one. */
+const attrsToInput = (component: ComponentModel) =>
+  INPUT_MODEL.has(component.kind) && drawsInput(component.tree)
+
+/** The caller's attributes but `class`, which the root takes, for a field's input. */
+const INPUT_ATTRS = es.parseExpression('{ ...$attrs, class: undefined }')
+
+/** The caller's `class`, which a field's root takes since its attributes go to the input. */
+const ROOT_CLASS = es.parseExpression('$attrs.class')
+
+/** The caller's attributes reach the input rather than falling through to the root. */
+const NO_ATTRS_FALLTHROUGH = es.parseModule('defineOptions({ inheritAttrs: false })')
 
 /** What a group's root fixes: one item chosen at a time, and an accordion that can all close. */
 const ROOT_ATTRIBUTES: Partial<Record<GeneratedKind, vue.VueAttribute[]>> = {
@@ -171,6 +189,8 @@ function inputNode(className: string, uses: TemplateUses): vue.VueElement {
     vue.attribute('class', uses.classOf(className)),
     ...(component.model ? [vue.model(identifier(component.model))] : []),
     ...(placeholder ? [vue.attribute('placeholder', placeholder)] : []),
+    // The caller's attributes, such as `name` or a placeholder of its own, after the design's.
+    vue.spread(INPUT_ATTRS),
     ...(component.disabled ? [vue.bound('disabled', identifier('disabled'))] : [])
   ])
 }
@@ -257,6 +277,7 @@ function elementAttributes(
       vue.attribute(name, value)
     ),
     vue.attribute('class', compact([node.attrs.class, uses.classOf(node.className)]).join(' ')),
+    ...(root && attrsToInput(uses.component) ? [vue.bound('class', ROOT_CLASS)] : []),
     ...(node.value === undefined ? [] : [vue.attribute('value', node.value)]),
     ...node.bindings.flatMap((binding) => bindingAttributes(binding, uses, native))
   ]
@@ -447,10 +468,17 @@ function script(component: ComponentModel, uses: TemplateUses): es.SyntaxNode {
   const refs = uses.models.flatMap(
     (item) => es.fill(MODEL_REF, { $name: identifier(item.name) }).body
   )
+  const options = attrsToInput(component) ? NO_ATTRS_FALLTHROUGH.body : []
   return {
     type: 'Program',
     sourceType: 'module',
-    body: [...scriptImports(uses), ...props, ...modelDeclaration(component, uses), ...refs]
+    body: [
+      ...scriptImports(uses),
+      ...options,
+      ...props,
+      ...modelDeclaration(component, uses),
+      ...refs
+    ]
   }
 }
 

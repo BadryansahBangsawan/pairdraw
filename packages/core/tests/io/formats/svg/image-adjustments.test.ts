@@ -12,6 +12,8 @@ import { exportPDFDocument } from '#core/io/formats/pdf'
 import { renderNodesToLaidOutSVG } from '#core/io/formats/svg/text/layout'
 
 const ck = await getCanvasKit()
+// Exports bake through this renderer, as the app's do: the headless fallback would keep a
+// renderer, and the font provider it shares, alive for the rest of the test process.
 const renderer = new SkiaRenderer(ck, expectDefined(ck.MakeSurface(1, 1)))
 afterAll(() => renderer.destroy())
 
@@ -118,7 +120,10 @@ describe('an adjusted image exported to SVG', () => {
   test('embeds the adjusted pixels, the same the PNG export draws', async () => {
     const { graph, pageId, layerId } = scene(ALL_SEVEN)
     const expected = pngPixels(graph, pageId, layerId)
-    const svg = expectDefined(await renderNodesToLaidOutSVG(graph, pageId, [layerId]), 'SVG')
+    const svg = expectDefined(
+      await renderNodesToLaidOutSVG(graph, pageId, [layerId], {}, ck, renderer),
+      'SVG'
+    )
     const embedded = embeddedPixels(svg)
     const worst = Math.max(
       ...embedded.flatMap((pixel, index) =>
@@ -139,9 +144,13 @@ describe('an adjusted image exported to SVG', () => {
 describe('an adjusted image exported to PDF', () => {
   test('embeds the adjusted pixels svg2pdf draws, not the untouched bytes', async () => {
     const { graph, pageId, layerId, png } = scene(ALL_SEVEN)
-    const result = await exportPDFDocument(graph, [{ pageId, nodeIds: [layerId] }], {
-      embedFonts: false
-    })
+    const result = await exportPDFDocument(
+      graph,
+      [{ pageId, nodeIds: [layerId] }],
+      { embedFonts: false },
+      ck,
+      renderer
+    )
     const pdf = new TextDecoder('latin1').decode(expectDefined(result, 'PDF').data)
     expect(pdf).toContain('/Subtype /Image')
     // The adjusted PNG differs from the source; the PDF must carry the adjusted one.

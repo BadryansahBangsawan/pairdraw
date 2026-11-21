@@ -7,6 +7,7 @@ import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { createEditorStore } from '@/app/editor/session'
+
 import type { ArmedTimer } from '#tests/helpers/prototype-timers'
 
 const START = '1:1'

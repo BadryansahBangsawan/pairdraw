@@ -1,5 +1,6 @@
 import { pick } from 'es-toolkit'
 
+import type { SceneNode } from '@pairdraw/scene-graph'
 import {
   applyVariation,
   discardVariations,
@@ -7,7 +8,6 @@ import {
   variationSetsOnPage,
   type VariationSetView
 } from '@pairdraw/scene-graph/variations'
-import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { createVariations, type VariationRequest } from '#core/editor/variations/create'
 import { assertVariationPickable } from '#core/editor/variations/pick'

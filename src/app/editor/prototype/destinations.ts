@@ -2,6 +2,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import { variantSetsAround } from '@pairdraw/scene-graph/components'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import { parseVariantName } from '@pairdraw/scene-graph/variant-name'
+
 import type { AppSelectOption } from '@/components/ui/select/select'
 
 /** A destination the panel lists: the layer's id and the name it shows. */

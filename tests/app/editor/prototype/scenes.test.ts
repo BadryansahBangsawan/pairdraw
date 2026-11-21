@@ -8,6 +8,7 @@ import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { usePlayScenes } from '@/app/editor/prototype/scenes'
 import { createEditorStore } from '@/app/editor/session'
+
 import type { ArmedTimer } from '#tests/helpers/prototype-timers'
 
 const DELAY_MS = 1500

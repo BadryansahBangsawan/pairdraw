@@ -2,10 +2,10 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import { variantInstanceFor } from '@pairdraw/scene-graph/components'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
+import type { RenderedPlayScene } from '#core/canvas/renderer/types'
 import { reflow } from '#core/editor/play/states'
 import { extractPageContext, findPageId } from '#core/io/subgraph'
 import { computeAllLayouts, computeLayout } from '#core/layout'
-import type { RenderedPlayScene } from '#core/canvas/renderer/types'
 
 import { withoutInheritedCopies } from './reactions'
 

@@ -10,7 +10,7 @@ import { runToolData } from '#cli/tool-data'
 import { writeAndLog } from './write'
 
 /** Formats `export` records a prototype to, upper-cased as `export` compares formats. */
-export const VIDEO_EXPORT_FORMATS: ReadonlySet<string> = new Set(['GIF'])
+export const VIDEO_EXPORT_FORMATS: ReadonlySet<string> = new Set(['MP4', 'GIF', 'WEBM'])
 
 export interface VideoExportArgs extends PageCLIArgs {
   file?: string

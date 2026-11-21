@@ -59,7 +59,7 @@ async function writeFlowFig(): Promise<string> {
   return path
 }
 
-describe('export -f gif', () => {
+describe('export a prototype video', () => {
   test('records the prototype from the start frame to a GIF beside the document', async () => {
     const file = await writeFlowFig()
     const output = join(file, '..', 'flow.gif')
@@ -86,6 +86,22 @@ describe('export -f gif', () => {
 
     expect(await proc.exited).toBe(1)
     expect(stderr).toContain("'Outro' has no After delay interaction to follow")
+    expect(await Bun.file(output).exists()).toBe(false)
+  })
+
+  test('says which formats work when this engine cannot encode MP4', async () => {
+    const file = await writeFlowFig()
+    const output = join(file, '..', 'flow.mp4')
+    // No ffmpeg on the path, and Bun has no WebCodecs, so only a GIF can be recorded here.
+    const proc = Bun.spawn([process.execPath, CLI_ENTRY, 'export', file, '-f', 'mp4', '-o', output], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+      env: { ...process.env, PATH: '' }
+    })
+    const stderr = await new Response(proc.stderr).text()
+
+    expect(await proc.exited).toBe(1)
+    expect(stderr).toContain('MP4 can’t be encoded here at 60×40. Formats that work here: GIF.')
     expect(await Bun.file(output).exists()).toBe(false)
   })
 })

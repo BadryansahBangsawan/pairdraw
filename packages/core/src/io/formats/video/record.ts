@@ -155,26 +155,33 @@ export async function recordPrototype(
   const screen = createScreens(graph, timeline, render, options.width, options.height)
   const frameMs = 1000 / options.fps
   const frameCount = Math.max(1, Math.round(timeline.durationMs / frameMs))
-  for (let index = 0; index < frameCount; index++) {
+  try {
+    for (let index = 0; index < frameCount; index++) {
+      options.signal?.throwIfAborted()
+      // A clip that does not loop ends on its last screen, even one the flow leaves no time.
+      const last = index === frameCount - 1 && !timeline.loops
+      const shown = frameAt(timeline, last ? timeline.durationMs : index * frameMs)
+      const image =
+        'session' in shown
+          ? await screen(shown.session)
+          : crossfade(await screen(shown.from), await screen(shown.to), shown.mix)
+      await sink.add(image, index * frameMs, frameMs)
+      if (options.maxBytes !== undefined && sink.byteLength > options.maxBytes) {
+        throw new Error(
+          `The video passed ${Math.round(options.maxBytes / 1024 / 1024)} MB; lower the size or frame rate`
+        )
+      }
+      options.onProgress?.(index + 1, frameCount)
+      if ((index + 1) % FRAMES_PER_YIELD === 0) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 0)
+        })
+      }
+    }
     options.signal?.throwIfAborted()
-    const shown = frameAt(timeline, index * frameMs)
-    const image =
-      'session' in shown
-        ? await screen(shown.session)
-        : crossfade(await screen(shown.from), await screen(shown.to), shown.mix)
-    await sink.add(image, index * frameMs, frameMs)
-    if (options.maxBytes !== undefined && sink.byteLength > options.maxBytes) {
-      throw new Error(
-        `The video passed ${Math.round(options.maxBytes / 1024 / 1024)} MB; lower the size or frame rate`
-      )
-    }
-    options.onProgress?.(index + 1, frameCount)
-    if ((index + 1) % FRAMES_PER_YIELD === 0) {
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 0)
-      })
-    }
+    return { bytes: await sink.finish(), frameCount }
+  } catch (error) {
+    await sink.cancel()
+    throw error
   }
-  options.signal?.throwIfAborted()
-  return { bytes: await sink.finish(), frameCount }
 }

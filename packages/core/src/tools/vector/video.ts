@@ -9,7 +9,11 @@ import { framesOnPage, startFrame } from '#core/prototype'
 import { defineTool, toolNumber } from '#core/tools/schema'
 
 /** Frame rates and long edges a format records at unless the call names its own. */
-const DEFAULTS = { gif: { fps: 15, maxEdge: 960 } } as const
+const DEFAULTS = {
+  mp4: { fps: 30, maxEdge: 1920 },
+  gif: { fps: 15, maxEdge: 960 },
+  webm: { fps: 30, maxEdge: 1920 }
+} as const
 
 /** A top-level frame of the page by ID or name. */
 function pageFrame(graph: SceneGraph, pageId: string, ref: string): SceneNode | null {
@@ -61,15 +65,23 @@ export const exportVideo = defineTool({
         )
       )
     ),
-    format: v.optional(v.pipe(v.picklist(['gif']), v.description('File format: gif')), 'gif'),
+    format: v.optional(
+      v.pipe(
+        v.picklist(['mp4', 'gif', 'webm']),
+        v.description(
+          'File format: mp4 (H.264, default), gif, or webm (VP9). MP4 and WebM need WebCodecs, which the app has; headless, record a GIF'
+        )
+      ),
+      'mp4'
+    ),
     fps: v.optional(
       toolNumber(
         v.pipe(
           v.number(),
           v.integer(),
           v.minValue(1),
-          v.maxValue(50),
-          v.description('Frames per second (default: 15 for GIF)')
+          v.maxValue(60),
+          v.description('Frames per second (default: 30, or 15 for GIF, which plays at most 50)')
         )
       )
     ),
@@ -90,7 +102,7 @@ export const exportVideo = defineTool({
           v.number(),
           v.minValue(64),
           v.maxValue(3840),
-          v.description('Longest width or height in pixels (default: 960 for GIF)')
+          v.description('Longest width or height in pixels (default: 1920, or 960 for GIF)')
         )
       )
     ),
@@ -186,9 +198,15 @@ export const exportVideo = defineTool({
     const { width, height } = video.videoSize(start.width, start.height, {
       scale: args.scale,
       maxEdge: args.maxEdge ?? defaults.maxEdge,
-      even: false
+      even: args.format !== 'gif'
     })
-    const sink = video.createGIFSink({ width, height, fps, loops: timeline.loops })
+    let sink
+    try {
+      sink = await video.openVideoSink(args.format, { width, height, fps, loops: timeline.loops })
+    } catch (error) {
+      if (error instanceof video.VideoFormatError) return { error: error.message }
+      throw error
+    }
     const { bytes, frameCount } = await video.recordPrototype(graph, timeline, render, sink, {
       width,
       height,

@@ -5,7 +5,7 @@ import type { RGBAImage } from '#core/io/formats/raster'
 import type { VideoSink, VideoSinkOptions } from './sink'
 
 /** Browsers stretch delays under two hundredths of a second, so faster GIFs play slower. */
-const MAX_GIF_FPS = 50
+export const MAX_GIF_FPS = 50
 
 interface PendingFrame {
   image: RGBAImage
@@ -51,6 +51,10 @@ export function createGIFSink(options: VideoSinkOptions): VideoSink {
       pending = null
       encoder.finish()
       return Promise.resolve(encoder.bytes())
+    },
+    cancel() {
+      pending = null
+      return Promise.resolve()
     },
     get byteLength() {
       return encoder.bytesView().length

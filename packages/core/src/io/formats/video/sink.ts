@@ -25,6 +25,8 @@ export interface VideoSinkOptions {
 export interface VideoSink {
   add(image: RGBAImage, timestampMs: number, durationMs: number): Promise<void>
   finish(): Promise<Uint8Array>
+  /** Stops encoding without a file, releasing the encoder; recording calls it when it stops early. */
+  cancel(): Promise<void>
   /** Bytes encoded so far, which the recorder caps. */
   readonly byteLength: number
 }

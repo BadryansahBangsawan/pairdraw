@@ -242,6 +242,7 @@
     "jsep": "^1.4.0",
     "jsondiffpatch": "^0.7.6",
     "jspdf": "^4.2.1",
+    "mediabunny": "^1.66.2",
     "nanoevents": "^9.1.0",
     "ofetch": "^1.5.1",
     "opencc-js": "1.4.2",

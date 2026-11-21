@@ -399,10 +399,10 @@ export default defineCommand({
       description:
         'Video: top-level frame name or ID to play from (default: the selected or first frame)'
     },
-    fps: { type: 'string', description: 'Video: frames per second (default: 15 for GIF)' },
+    fps: { type: 'string', description: 'Video: frames per second (default: 30, or 15 for GIF)' },
     'max-edge': {
       type: 'string',
-      description: 'Video: longest width or height in pixels (default: 960 for GIF)'
+      description: 'Video: longest width or height in pixels (default: 1920, or 960 for GIF)'
     },
     'max-duration': {
       type: 'string',

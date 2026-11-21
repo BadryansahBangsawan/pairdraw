@@ -19,10 +19,16 @@ interface Added {
   durationMs: number
 }
 
-function recordingSink(): VideoSink & { frames: Added[] } {
+function recordingSink(): VideoSink & { frames: Added[]; cancelled: () => boolean } {
   const frames: Added[] = []
+  let cancelled = false
   return {
     frames,
+    cancelled: () => cancelled,
+    cancel: () => {
+      cancelled = true
+      return Promise.resolve()
+    },
     add: (image, timestampMs, durationMs) => {
       frames.push({ image, timestampMs, durationMs })
       return Promise.resolve()
@@ -52,7 +58,11 @@ function flatRenderer(graph: SceneGraph, colors: Record<string, number>) {
 }
 
 function after(seconds: number, action: PrototypeReaction['actions'][number]): PrototypeReaction {
-  return { id: `t-${seconds}`, trigger: { type: 'AFTER_TIMEOUT', delay: seconds }, actions: [action] }
+  return {
+    id: `t-${seconds}`,
+    trigger: { type: 'AFTER_TIMEOUT', delay: seconds },
+    actions: [action]
+  }
 }
 
 function setup() {
@@ -109,9 +119,12 @@ describe('recording a prototype', () => {
     expect(grayAt(midway, 1, 0)).toBe(Math.round(200 + (100 - 200) * 0.6847))
     // B is square, so it is letterboxed into the wide start frame's box with the page behind.
     const last = sink.frames[6].image
-    expect([grayAt(last, 0, 0), grayAt(last, 1, 0), grayAt(last, 2, 1), grayAt(last, 3, 1)]).toEqual(
-      [0, 100, 100, 0]
-    )
+    expect([
+      grayAt(last, 0, 0),
+      grayAt(last, 1, 0),
+      grayAt(last, 2, 1),
+      grayAt(last, 3, 1)
+    ]).toEqual([0, 100, 100, 0])
   })
 
   test('dims the screen under an overlay and centres the overlay on it', async () => {
@@ -139,6 +152,28 @@ describe('recording a prototype', () => {
     expect(grayAt(overlaid, 0, 0)).toBe(120)
     expect(grayAt(overlaid, 1, 0)).toBe(120)
     expect(grayAt(overlaid, 2, 1)).toBe(100)
+  })
+
+  test('ends on the last screen even when the flow leaves it no time', async () => {
+    const { graph, a, b } = setup()
+    graph.updateNode(a, {
+      prototypeReactions: [
+        after(0.3, {
+          type: 'NODE',
+          nodeId: b,
+          navigation: 'NAVIGATE',
+          transition: { type: 'INSTANT', duration: 0 },
+          overlayPosition: 'CENTER'
+        })
+      ]
+    })
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: 10_000, tailMs: 0 })
+    const { render } = flatRenderer(graph, { [a]: 200, [b]: 100 })
+    const sink = recordingSink()
+
+    await recordPrototype(graph, timeline, render, sink, { width: 4, height: 2, fps: 10 })
+
+    expect(sink.frames.map((frame) => grayAt(frame.image, 1, 0))).toEqual([200, 200, 100])
   })
 
   test('stops when cancelled', async () => {
@@ -171,5 +206,7 @@ describe('recording a prototype', () => {
 
     await expect(recording).rejects.toThrow()
     expect(sink.frames.length).toBeLessThan(5)
+    // The encoder is released rather than left holding frames it will never finish.
+    expect(sink.cancelled()).toBe(true)
   })
 })

@@ -1,5 +1,5 @@
 export { crossfade, dim, drawOver, filledImage } from './composite'
-export { createGIFSink } from './gif'
+export { createGIFSink, MAX_GIF_FPS } from './gif'
 export {
   VIDEO_FORMATS,
   VIDEO_MIME_TYPES,
@@ -9,3 +9,11 @@ export {
 } from './sink'
 export { recordPrototype, type RecordOptions, type RecordResult, type RenderFrame } from './record'
 export { MAX_VIDEO_BYTES, MAX_VIDEO_EDGE, videoSize } from './size'
+export { canRecordVideo, createWebCodecsSink, type EncodedVideoFormat } from './webcodecs'
+export {
+  canRecordFormat,
+  openVideoSink,
+  recordableFormats,
+  VIDEO_FORMAT_LABELS,
+  VideoFormatError
+} from './formats'

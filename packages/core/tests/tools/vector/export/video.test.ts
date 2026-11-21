@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { toUint8Array } from 'js-base64'
-
 import { runTool, setupToolTest } from '#core-tests/helpers/tools'
+import { PlaceholderAVCEncoder } from '#core-tests/helpers/video'
+import { toUint8Array } from 'js-base64'
+import { registerEncoder } from 'mediabunny'
 
 import {
   createCanvasKitRasterCodec,
@@ -15,7 +16,13 @@ const ck = await initCanvasKit()
 
 function solid(r: number, g: number, b: number) {
   return [
-    { type: 'SOLID' as const, color: { r, g, b, a: 1 }, opacity: 1, visible: true, blendMode: 'NORMAL' as const }
+    {
+      type: 'SOLID' as const,
+      color: { r, g, b, a: 1 },
+      opacity: 1,
+      visible: true,
+      blendMode: 'NORMAL' as const
+    }
   ]
 }
 
@@ -73,7 +80,13 @@ describe('export_video', () => {
       loops: false,
       truncated: false,
       steps: [
-        { at: 0.2, frame: 'Green', frameId: green, trigger: 'AFTER_TIMEOUT', transition: 'DISSOLVE' },
+        {
+          at: 0.2,
+          frame: 'Green',
+          frameId: green,
+          trigger: 'AFTER_TIMEOUT',
+          transition: 'DISSOLVE'
+        },
         { at: 0.5, frame: 'Blue', frameId: blue, trigger: 'AFTER_TIMEOUT', transition: 'INSTANT' }
       ]
     })
@@ -110,6 +123,46 @@ describe('export_video', () => {
 
     expect(await runTool(figma, 'export_video', { start: 'Purple', format: 'gif' })).toEqual({
       error: "No top-level frame named or with ID 'Purple' on this page"
+    })
+  })
+
+  test('names the formats that work where MP4 cannot be encoded', async () => {
+    const { figma } = setup()
+
+    // Another test file may have registered an H.264 encoder in this process, so MP4 may be listed.
+    const result = await runTool(figma, 'export_video', { start: 'Red', format: 'webm' })
+    expect(result).toEqual({
+      error: expect.stringMatching(
+        /^WebM can’t be encoded here at 40×20\. Formats that work here: .*GIF\.$/
+      )
+    })
+  })
+
+  test('records an MP4 at even dimensions, as H.264 needs', async () => {
+    registerEncoder(PlaceholderAVCEncoder)
+    const { figma } = setup()
+
+    const result = await runTool(figma, 'export_video', {
+      start: 'Red',
+      format: 'mp4',
+      fps: 10,
+      scale: 0.55
+    })
+
+    expect(result).toMatchObject({
+      mimeType: 'video/mp4',
+      width: 22,
+      height: 12,
+      fps: 10,
+      frameCount: 15
+    })
+  })
+
+  test('refuses a GIF faster than browsers play', async () => {
+    const { figma } = setup()
+
+    expect(await runTool(figma, 'export_video', { start: 'Red', format: 'gif', fps: 60 })).toEqual({
+      error: 'GIF plays at most 50 frames per second'
     })
   })
 })

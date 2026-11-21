@@ -5,6 +5,7 @@ import {
   effectiveReactions,
   hasPointerTriggers,
   pathChanges,
+  pointerLeftTrigger,
   pointerPath,
   pointerReactions,
   reactionAt,
@@ -27,6 +28,7 @@ export interface PointerPlay {
   scroll: () => ReadonlyMap<string, Vector>
   run: (click: PlayClick) => PlayStep | null
   revert: (undo: PlayRevert) => void
+  closeOverlay: (frameId: string) => void
   readonly revision: Readonly<Ref<number>>
 }
 
@@ -96,6 +98,16 @@ export function createPlayPointer(
     for (const entry of due.reverse()) play.revert(entry)
   }
 
+  /** Closes each While hovering overlay once the pointer is no longer over its trigger. */
+  function closeLeftOverlays(basePath: readonly string[]): void {
+    for (let index = hovering.length - 1; index >= 0; index -= 1) {
+      const entry = hovering[index]
+      if (entry.kind !== 'overlay' || !pointerLeftTrigger(basePath, entry.watchId)) continue
+      hovering.splice(index, 1)
+      play.closeOverlay(entry.frameId)
+    }
+  }
+
   function enter(graph: SceneGraph, id: string): void {
     cancelDelayed(`leave:${id}`)
     for (const reaction of pointerReactions(graph, id, 'ON_HOVER')) runNow(reaction, hovering)
@@ -126,7 +138,13 @@ export function createPlayPointer(
   function move(x: number, y: number): void {
     const current = session.value
     if (!current) return
-    const rootId = shownFrame(current)
+    // What the pointer is over in the base frame, even while an overlay covers it: a hovered
+    // overlay closes when the pointer leaves the trigger there, not in the overlay's own scene.
+    const baseId = current.frameId
+    closeLeftOverlays(pointerPath(play.graphFor(baseId), baseId, x, y, play.scroll()))
+    const shown = session.value
+    if (!shown) return
+    const rootId = shownFrame(shown)
     const graph = play.graphFor(rootId)
     if (pathRoot !== rootId) reset()
     pathRoot = rootId
@@ -160,6 +178,7 @@ export function createPlayPointer(
    */
   function leaveAll(): void {
     cancelQueuedMove()
+    closeLeftOverlays([])
     follow([])
     release()
   }
@@ -178,16 +197,21 @@ export function createPlayPointer(
 
   /**
    * Forgets the pointer, as when another frame shows or play starts over: a variant it switched
-   * goes back, while an overlay or a frame it opened stays, since the pointer can no longer leave
-   * the layer that opened it.
+   * goes back, while an overlay it opened stays until the pointer leaves its trigger or lifts.
    */
   function reset(): void {
     cancelQueuedMove()
     for (const timers of delayed.values()) for (const timer of timers) window.clearTimeout(timer)
     delayed.clear()
+    const openOverlays = new Set(session.value?.overlays)
     for (const undoes of [hovering, pressing]) {
       const changes = undoes.filter((entry) => entry.kind === 'change')
+      const overlays = undoes.filter(
+        (entry): entry is Extract<PlayRevert, { kind: 'overlay' }> =>
+          entry.kind === 'overlay' && openOverlays.has(entry.frameId)
+      )
       undoes.length = 0
+      undoes.push(...overlays)
       for (const entry of changes.reverse()) play.revert(entry)
     }
     path = []

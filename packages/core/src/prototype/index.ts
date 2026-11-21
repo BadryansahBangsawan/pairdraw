@@ -4,6 +4,7 @@ export {
   hasPointerTriggers,
   pathChanges,
   pointerPath,
+  pointerLeftTrigger,
   pointerReactions,
   revertFor,
   type PlayPointerReaction,

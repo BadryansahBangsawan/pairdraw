@@ -1,0 +1,1 @@
+- A While hovering interaction that opens an overlay closes when the pointer leaves its trigger, and a While pressing one closes on release.

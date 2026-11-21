@@ -62,7 +62,7 @@ A click goes to the topmost layer under the pointer, inside the frame being show
 - An **After delay** interaction on the frame being shown runs when its delay passes, counted from when the transition into that frame ends, as in Figma. Changing the frame starts its delays again, and leaving play cancels them.
 - **Dissolve** crossfades from the frame you leave for the interaction's own **Duration**, easing out, whether a click or a delay started it. With reduced motion on, it cuts instead.
 
-**While hovering** runs as the pointer enters a layer and is undone as it leaves: a variant switches back. **While pressing** runs on press and is undone on release, or when the pointer leaves the canvas first. A Dissolve crossfades for a hover, a press, and a delay as it does for a click. **Mouse enter** and **Mouse leave** run as the pointer enters or leaves, after their delay unless the pointer moves back first, and are not undone. A hovered variant goes back when another frame shows.
+**While hovering** runs as the pointer enters a layer and is undone as it leaves: a variant switches back, and an overlay closes when the pointer leaves the trigger in the frame behind it. **While pressing** runs on press and is undone on release, or when the pointer leaves the canvas first, closing an overlay it opened. A Dissolve crossfades for a hover, a press, and a delay as it does for a click. **Mouse enter** and **Mouse leave** run as the pointer enters or leaves, after their delay unless the pointer moves back first, and are not undone. A hovered variant goes back when another frame shows.
 
 A click that hits no interaction, or lands outside the frame, does nothing. A layer that holds controls takes its own click: play is the canvas's preview view, so a live control runs there as it does in Preview.
 
@@ -71,7 +71,7 @@ A click that hits no interaction, or lands outside the frame, does nothing. A la
 - An interaction runs its first action only, and the panel edits that one action. A file that carries more actions keeps them, but play runs only the first.
 - There is no drag or key trigger, and no Swap overlay, Open link, or variable action.
 - An overlay always opens fitted to the window, like a frame. The panel offers no corner position, and play ignores the position a file stores.
-- A While hovering or While pressing that opens an overlay or navigates is not undone: the overlay stays open until it is closed, and the frame stays until Back, as the new frame covers the layer the pointer would leave.
+- A While hovering that navigates is not undone: the frame stays until Back, as the new frame covers the layer the pointer would leave.
 - Dissolve is the only animation besides Instant. Smart animate from a Figma file plays as a dissolve and is kept when the file is saved, as is Figma's animated scroll on a Scroll to. A Scroll to set to Dissolve in Pairdraw eases in play but is saved to `.fig` as instant, since which animation Figma reads for one is not confirmed.
 - Fixed and sticky layers in a scrolling frame scroll with it, and Scroll to ignores the offset a Figma file stores.
 - A frame that holds live controls is drawn by Preview, so a Change to or scrolling inside it does not show.

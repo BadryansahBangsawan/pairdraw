@@ -5,6 +5,7 @@ import {
   hasPointerTriggers,
   pathChanges,
   pointerPath,
+  pointerLeftTrigger,
   pointerReactions,
   revertFor,
   startSession
@@ -184,5 +185,11 @@ describe('undoing a While hovering or While pressing reaction', () => {
       transition: null
     }
     expect(revertFor(session, scenes.run(session, same), same, graph)).toBeNull()
+  })
+
+  test('a trigger is left when the base frame path no longer holds it', () => {
+    expect(pointerLeftTrigger(['screen', 'card', 'button'], 'button')).toBe(false)
+    expect(pointerLeftTrigger(['screen', 'card'], 'button')).toBe(true)
+    expect(pointerLeftTrigger([], 'button')).toBe(true)
   })
 })

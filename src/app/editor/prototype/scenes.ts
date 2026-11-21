@@ -128,6 +128,17 @@ export function usePlayScenes(
     return rest
   }
 
+  /** Takes one overlay away by frame, even when a later overlay is on top of it. */
+  function closeOverlay(frameId: string): void {
+    const current = session.value
+    if (!current?.overlays.includes(frameId)) return
+    session.value = {
+      ...current,
+      overlays: current.overlays.filter((id) => id !== frameId)
+    }
+    changed()
+  }
+
   function clear(): void {
     stopTween()
     if (scenes.views.size === 0 && scenes.scroll.size === 0) return
@@ -221,6 +232,7 @@ export function usePlayScenes(
     /** Grows whenever what play shows of a frame changes. */
     revision,
     run,
-    revert
+    revert,
+    closeOverlay
   }
 }

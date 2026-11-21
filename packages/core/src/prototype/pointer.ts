@@ -71,6 +71,14 @@ export function pathChanges(
 }
 
 /**
+ * Whether the pointer has left the layer a While hovering reaction ran from: its path in the
+ * frame the action opened a variant on, so an overlay covering the pointer does not count.
+ */
+export function pointerLeftTrigger(basePath: readonly string[], triggerId: string): boolean {
+  return !basePath.includes(triggerId)
+}
+
+/**
  * Whether any layer of `rootId` reacts to the pointer moving over or pressing on it, an instance
  * by its variant; a frame without one is not hit-tested as the pointer moves.
  */

@@ -28,6 +28,23 @@ function changeTo(variantId: string, trigger: Trigger, delay = 0): PrototypeReac
   }
 }
 
+/** A reaction that opens `nodeId` as an overlay on `trigger`. */
+function openOverlay(nodeId: string, trigger: Trigger): PrototypeReaction {
+  return {
+    id: `${trigger}-overlay`,
+    trigger: { type: trigger, delay: 0 },
+    actions: [
+      {
+        type: 'NODE',
+        nodeId,
+        navigation: 'OVERLAY',
+        transition: { type: 'INSTANT', duration: 0 },
+        overlayPosition: 'CENTER'
+      }
+    ]
+  }
+}
+
 /** A button set (Default, Hover, Pressed, Lit) and a 200×200 screen with a button at 10,10. */
 function buttonDocument(
   reactions: (ids: { hover: string; pressed: string; lit: string }) => PrototypeReaction[]
@@ -137,6 +154,134 @@ describe('the pointer in play', () => {
     if (!current) throw new Error('play ended')
     expect(shownFrame(current)).toBe(target.id)
     expect(durations).toEqual([500])
+    stop()
+  })
+
+  test('a While hovering overlay closes when the pointer leaves its trigger', () => {
+    const document = buttonDocument(() => [])
+    const pageId = document.graph.getPages()[0].id
+    const tooltip = document.graph.createNode('FRAME', pageId, {
+      x: 400,
+      width: 50,
+      height: 20
+    })
+    document.graph.updateNode(document.base.id, {
+      prototypeReactions: [openOverlay(tooltip.id, 'ON_HOVER')]
+    })
+    const { pointer, session, stop } = setUp(document)
+    pointer.move(OVER.x, OVER.y)
+    expect(session.value?.overlays).toEqual([tooltip.id])
+    pointer.move(OVER.x + 2, OVER.y)
+    expect(session.value?.overlays).toEqual([tooltip.id])
+    pointer.move(AWAY.x, AWAY.y)
+    expect(session.value?.overlays).toEqual([])
+    stop()
+  })
+
+  test('a closed hover overlay does not close a later click-opened overlay', () => {
+    const document = buttonDocument(() => [])
+    const pageId = document.graph.getPages()[0].id
+    const tooltip = document.graph.createNode('FRAME', pageId, {
+      x: 400,
+      width: 50,
+      height: 20
+    })
+    document.graph.updateNode(document.base.id, {
+      prototypeReactions: [openOverlay(tooltip.id, 'ON_HOVER')]
+    })
+    const { pointer, session, stop } = setUp(document)
+    pointer.move(OVER.x, OVER.y)
+    expect(session.value?.overlays).toEqual([tooltip.id])
+
+    // Close the hover overlay, then open the same frame by a click.
+    const hovered = session.value
+    if (!hovered) throw new Error('no session')
+    session.value = { ...hovered, overlays: [] }
+    pointer.reset()
+    const closed = session.value
+    if (!closed) throw new Error('no session')
+    session.value = { ...closed, overlays: [tooltip.id] }
+    pointer.move(AWAY.x, AWAY.y)
+
+    expect(session.value?.overlays).toEqual([tooltip.id])
+    stop()
+  })
+
+  test('a hover overlay under a click overlay closes when its trigger is left', () => {
+    const document = buttonDocument(() => [])
+    const pageId = document.graph.getPages()[0].id
+    const tooltip = document.graph.createNode('FRAME', pageId, {
+      x: 400,
+      width: 50,
+      height: 20
+    })
+    const clickOverlay = document.graph.createNode('FRAME', pageId, {
+      x: 500,
+      width: 50,
+      height: 20
+    })
+    document.graph.updateNode(document.base.id, {
+      prototypeReactions: [openOverlay(tooltip.id, 'ON_HOVER')]
+    })
+    const { pointer, session, stop } = setUp(document)
+    pointer.move(OVER.x, OVER.y)
+    const hovered = session.value
+    if (!hovered) throw new Error('no session')
+    session.value = { ...hovered, overlays: [tooltip.id, clickOverlay.id] }
+
+    pointer.move(AWAY.x, AWAY.y)
+
+    expect(session.value?.overlays).toEqual([clickOverlay.id])
+    stop()
+  })
+
+  test('a nested instance trigger opens and closes its overlay', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { y: 500 })
+    const inner = graph.createNode('COMPONENT', set.id, { width: 40, height: 20 })
+    const outer = graph.createNode('COMPONENT', pageId, { width: 100, height: 100 })
+    graph.createInstance(inner.id, outer.id, { x: 10, y: 10 })
+    const screen = graph.createNode('FRAME', pageId, { width: 200, height: 200 })
+    graph.createInstance(outer.id, screen.id)
+    const tooltip = graph.createNode('FRAME', pageId, { x: 400, width: 50, height: 20 })
+    graph.updateNode(inner.id, {
+      prototypeReactions: [openOverlay(tooltip.id, 'ON_HOVER')]
+    })
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const scope = effectScope()
+    const live = computed(() => ({ revision: 0 }))
+    const parts = scope.run(() => {
+      const play = usePlayScenes(store, session, live)
+      return { play, pointer: createPlayPointer(session, play) }
+    })
+    if (!parts) throw new Error('no play')
+
+    parts.pointer.move(20, 20)
+    expect(session.value?.overlays).toEqual([tooltip.id])
+    parts.pointer.move(100, 100)
+    expect(session.value?.overlays).toEqual([])
+    scope.stop()
+    store.dispose()
+  })
+
+  test('a While pressing overlay closes when the pointer lifts', () => {
+    const document = buttonDocument(() => [])
+    const pageId = document.graph.getPages()[0].id
+    const tooltip = document.graph.createNode('FRAME', pageId, {
+      x: 400,
+      width: 50,
+      height: 20
+    })
+    document.graph.updateNode(document.base.id, {
+      prototypeReactions: [openOverlay(tooltip.id, 'ON_PRESS')]
+    })
+    const { pointer, session, stop } = setUp(document)
+    pointer.press(OVER.x, OVER.y)
+    expect(session.value?.overlays).toEqual([tooltip.id])
+    pointer.release()
+    expect(session.value?.overlays).toEqual([])
     stop()
   })
 

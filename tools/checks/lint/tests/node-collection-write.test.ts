@@ -29,7 +29,9 @@ describe('no-node-collection-write', () => {
     'node.variableBindingScales.width += 1',
     "delete node.componentPropertyValues['Label']",
     'node.dashPattern[0] = 4',
-    'node.fills.length = 0'
+    'node.fills.length = 0',
+    "node.source.fig.rawNodeFields.strokeJoin = 'BEVEL'",
+    "node.source.editedFields.push('fills')"
   ])('rejects writing into a node value: %s', async (source) => {
     expect(ruleDiagnostics(await lint(source, rules), rule)).toHaveLength(1)
   })
@@ -51,12 +53,16 @@ describe('no-node-collection-write', () => {
     expect(ruleDiagnostics(await lint(source, rules), rule)).toHaveLength(0)
   })
 
-  test('covers every value a new layer shares with other layers', () => {
+  test('names exactly the values a new layer shares with other layers', () => {
     const node = createDefaultNode(() => '1:1', 'RECTANGLE')
-    const shared = Object.entries(node)
+    const shared = [
+      ...Object.entries(node),
+      ...Object.entries(node.source),
+      ...Object.entries(node.source.fig)
+    ]
       .filter(([, value]) => value !== null && typeof value === 'object' && Object.isFrozen(value))
       .map(([field]) => field)
-    expect(shared.length).toBeGreaterThan(0)
     expect(shared.filter((field) => !NODE_COLLECTION_FIELDS.has(field))).toEqual([])
+    expect([...NODE_COLLECTION_FIELDS].filter((field) => !shared.includes(field))).toEqual([])
   })
 })

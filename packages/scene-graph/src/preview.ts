@@ -1,5 +1,5 @@
 import { normalizeEffects } from './effects'
-import { shareEmptyNodeValues } from './node-defaults'
+import { shareEmptyNodeValues } from './empty-values'
 import { textCacheInvalidationChanges } from './text/picture'
 import type { SceneNode } from './types'
 import { normalizeVectorNetwork } from './vector-network'

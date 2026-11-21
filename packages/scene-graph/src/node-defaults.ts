@@ -1,5 +1,3 @@
-import { isEmptyObject } from 'es-toolkit'
-
 import {
   BLACK,
   DEFAULT_FONT_FAMILY,
@@ -7,6 +5,7 @@ import {
   DEFAULT_STROKE_WEIGHT
 } from './constants'
 import { normalizeEffects } from './effects'
+import { EMPTY_LIST, EMPTY_RECORD, shareEmptyNodeValues } from './empty-values'
 import { createInstanceOverrideState } from './instances/overrides'
 import { NO_LETTER_SPACING } from './text/lengths'
 import type { NodeType, SceneNode, SourceMetadata } from './types'
@@ -16,59 +15,18 @@ export function createDefaultSourceMetadata(): SourceMetadata {
     format: null,
     id: null,
     orderKey: null,
-    editedFields: [],
+    editedFields: EMPTY_LIST,
     fig: {
       rawSize: null,
       rawTransform: null,
-      rawNodeFields: {},
+      rawNodeFields: EMPTY_RECORD,
       layout: null,
-      symbolOverrides: [],
-      componentPropAssignments: [],
-      derivedSymbolData: [],
+      symbolOverrides: EMPTY_LIST,
+      componentPropAssignments: EMPTY_LIST,
+      derivedSymbolData: EMPTY_LIST,
       derivedSymbolDataLayoutVersion: null,
       uniformScaleFactor: null
     }
-  }
-}
-
-/**
- * The empty list and record every layer holds until a field gets a value of its own. All layers
- * share them, so they are frozen: a field is replaced, never written into, and a write into one
- * throws instead of reaching every layer of every document.
- */
-const EMPTY_LIST: never[] = Object.freeze<never[]>([]) as never[]
-const EMPTY_RECORD: Record<string, never> = Object.freeze({})
-
-/** The child list is the graph's to grow in place, so every layer keeps its own. */
-const OWN_LIST_FIELDS: ReadonlySet<string> = new Set<keyof SceneNode>(['childIds'])
-
-/** Fields keyed by name, such as bindings and property values, that start empty. */
-const RECORD_FIELDS: ReadonlySet<string> = new Set<keyof SceneNode>([
-  'componentPropertyAssignments',
-  'componentPropertyValues',
-  'boundVariables',
-  'variableBindingScales',
-  'variableAssignmentScales',
-  'variableModes'
-])
-
-function sharedEmptyValue(field: string, value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.length === 0 && !OWN_LIST_FIELDS.has(field) ? EMPTY_LIST : value
-  }
-  if (!RECORD_FIELDS.has(field) || value === null || typeof value !== 'object') return value
-  return isEmptyObject(value) ? EMPTY_RECORD : value
-}
-
-/**
- * Swap the `fields` of `node` that hold an empty list or record for the shared ones. Writing
- * known keys keeps the shape every layer shares.
- */
-export function shareEmptyNodeValues(node: SceneNode, fields: Iterable<string>): void {
-  for (const field of fields) {
-    const value: unknown = Reflect.get(node, field)
-    const shared = sharedEmptyValue(field, value)
-    if (shared !== value) Reflect.set(node, field, shared)
   }
 }
 

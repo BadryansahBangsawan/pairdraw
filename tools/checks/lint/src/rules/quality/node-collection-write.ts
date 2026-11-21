@@ -26,7 +26,10 @@ const NODE_LIST_FIELDS: ReadonlySet<string> = new Set([
   'pluginData',
   'pluginRelaunchData',
   'prototypeReactions',
-  'derivedTextGlyphs'
+  'editedFields',
+  'symbolOverrides',
+  'componentPropAssignments',
+  'derivedSymbolData'
 ])
 
 const NODE_RECORD_FIELDS: ReadonlySet<string> = new Set([
@@ -35,12 +38,13 @@ const NODE_RECORD_FIELDS: ReadonlySet<string> = new Set([
   'boundVariables',
   'variableBindingScales',
   'variableAssignmentScales',
-  'variableModes'
+  'variableModes',
+  'rawNodeFields'
 ])
 
 /**
- * `SceneNode` lists and records that layers share while they are empty
- * (`packages/scene-graph/src/node-defaults.ts`). A layer's `childIds` is not one: the graph grows
+ * `SceneNode` lists and records, its source metadata's included, that layers share while they
+ * are empty (`packages/scene-graph/src/node-defaults.ts`). A layer's `childIds` is not one: the graph grows
  * it in place.
  */
 export const NODE_COLLECTION_FIELDS: ReadonlySet<string> = new Set([

@@ -1,0 +1,1 @@
+- In `@pairdraw/scene-graph`, a layer's empty lists and records, such as `fills`, `effects`, `boundVariables`, `pluginData`, and the lists in `source`, are one frozen value every layer shares. Give the field a new value, for example through `updateNode`, instead of writing into it; writing into it now throws a `TypeError`.

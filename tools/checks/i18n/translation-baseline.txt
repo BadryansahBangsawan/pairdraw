@@ -30,6 +30,7 @@ de:files.createBoard
 de:files.createDesign
 de:menu.text
 de:panels.alpha
+de:panels.behaviourValueField
 de:panels.blendModeNormal
 de:panels.chroma
 de:panels.code
@@ -99,6 +100,7 @@ es:diagnostics.categoryMCP
 es:diagnostics.durationMs
 es:diagnostics.runtimeError
 es:panels.auto
+es:panels.behaviourValueField
 es:panels.blendModeColor
 es:panels.blendModeNormal
 es:panels.colorFormatHsb
@@ -154,6 +156,7 @@ fr:pages.pageName
 fr:pages.pages
 fr:panels.alpha
 fr:panels.auto
+fr:panels.behaviourValueField
 fr:panels.blendModeExclusion
 fr:panels.blendModeNormal
 fr:panels.blendModeSaturation
@@ -235,6 +238,7 @@ it:files.createDesign
 it:menu.file
 it:panels.ai
 it:panels.auto
+it:panels.behaviourValueField
 it:panels.colorFormatHsb
 it:panels.colorFormatHsl
 it:panels.colorFormatRgb
@@ -302,6 +306,7 @@ pl:diagnostics.categoryRenderer
 pl:diagnostics.durationMs
 pl:panels.ai
 pl:panels.auto
+pl:panels.behaviourValueField
 pl:panels.chroma
 pl:panels.colorFormatHsb
 pl:panels.colorFormatHsl
@@ -332,6 +337,7 @@ ru:code.stylingCSS
 ru:code.stylingTailwind
 ru:diagnostics.categoryMCP
 ru:panels.ai
+ru:panels.behaviourValueField
 ru:panels.colorFormatHsb
 ru:panels.colorFormatHsl
 ru:panels.colorFormatRgb

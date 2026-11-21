@@ -176,12 +176,13 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Feature                                   | Status | Notes                                                                                                                                         |
 | ----------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | Prototype connections                     | ✅     | The Prototype section adds interactions; the canvas draws a selected layer's connections as dashed arrows; saved as Figma prototype reactions |
-| Triggers (click, hover, drag, etc.)       | 🟡     | On click and After delay; no hover, drag, press, or key triggers                                                                              |
-| Actions (navigate, overlay, scroll, etc.) | 🟡     | Navigate to, Open overlay, Close overlay, and Back; no Change to, Scroll to, or Swap overlay                                                  |
+| Triggers (click, hover, drag, etc.)       | 🟡     | On click, While hovering, While pressing, Mouse enter, Mouse leave, and After delay; no drag or key triggers                                  |
+| Actions (navigate, overlay, scroll, etc.) | 🟡     | Navigate to, Open overlay, Close overlay, Back, Change to, and Scroll to; no Swap overlay, link, or variable actions                          |
 | Animations & transitions                  | 🟡     | Instant and Dissolve                                                                                                                          |
-| Smart animate                             | 🔲     | Auto-animate matching layers                                                                                                                  |
+| Smart animate                             | 🟡     | Plays as a dissolve; kept in `.fig` files                                                                                                     |
 | Overlays                                  | 🟡     | Open and close an overlay over the frame; always fitted to the window, with no position                                                       |
-| Scroll & overflow behavior                | 🔲     | Scrollable frames in prototypes                                                                                                               |
+| Scroll & overflow behavior                | 🟡     | Overflow scrolling plays with the wheel and drag; fixed and sticky layers scroll with their frame                                             |
+| Interactive components                    | ✅     | Change to between variants, set once on the main component; While hovering and While pressing switch back                                     |
 | Prototype flows                           | 🔲     | Named starting points                                                                                                                         |
 | Variables in prototypes                   | 🔲     | Conditional logic with variables                                                                                                              |
 | Easing & spring animations                | 🔲     | Custom animation curves                                                                                                                       |

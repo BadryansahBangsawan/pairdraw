@@ -361,6 +361,7 @@ Discover available tools and their arguments from the connected server or browse
 - **`diff_visual`** — pixel diff between two rendered nodes; use it to confirm an edit changed only the intended region.
 - **`describe`** — semantic analysis of role, visual style, layout, and design issues.
 - **`batch_update`** — apply multiple node updates efficiently.
+- **`set_reactions` / `get_reactions`** — prototype interactions in Figma's plugin shape. For interactive components, set `{ trigger: { type: "ON_HOVER" }, actions: [{ type: "NODE", navigation: "CHANGE_TO", destinationId: "<Hover variant id>" }] }` once on the Default variant and every instance plays it; `SCROLL_TO` points at a layer in the same screen, and `update_node { overflow_direction: "VERTICAL" }` makes a clipping frame scroll in play.
 - **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables; `export_image` takes `quality` (1–100) for JPG and WEBP.
 - **`export_video`** — records the prototype from a start frame, following After delays and Dissolves (and scripted `clicks`) on a virtual clock, as MP4 (default), GIF, or WebM; check the returned `steps`, and pass `path` for the file. MP4 and WebM need the app's WebCodecs or, headless, `ffmpeg` on the path; otherwise ask for a GIF.
 - **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.

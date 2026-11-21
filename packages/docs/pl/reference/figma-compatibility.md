@@ -28,7 +28,7 @@ Porównanie funkcji Figma Design, jedna po drugiej, z obecnym stanem implementac
 | Własne miniatury plików                | 🔲   | Zapisane pliki pokazują jako podgląd pierwszą stronę, jak w Figmie bez strony okładki; brak wyboru miniatury                                                                                                                                                                                                     |
 | Ustawienia kroku przesunięcia          | ✅   | Mały i duży krok przesunięcia w **Ustawienia → Edytor**, domyślnie 1 px i 10 px                                                                                                                                                                                                                                  |
 | Menu aplikacji (w przeglądarce)        | ✅   | Menu Plik, Edycja, Widok, Obiekt, Tekst, Rozmieszczenie; Tauri używa menu systemowych                                                                                                                                                                                                                            |
-| Narzędzia AI                           | 🟡   | 142 narzędzia w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe, wektoryzacja obrazów oraz generowanie obrazów, usuwanie i zastępowanie tła i generowanie SVG z własnymi kluczami użytkownika do usług graficznych; brak wyszukiwania AI                                                      |
+| Narzędzia AI                           | 🟡   | 142 narzędzia w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe, wektoryzacja obrazów oraz generowanie obrazów, usuwanie i zastępowanie tła i generowanie SVG z własnymi kluczami użytkownika do usług graficznych; brak wyszukiwania AI                                                     |
 
 ## Warstwy i kształty
 
@@ -172,19 +172,20 @@ Porównanie funkcji Figma Design, jedna po drugiej, z obecnym stanem implementac
 
 ## Prototypowanie
 
-| Funkcja                                                | Stan | Uwagi                                                                                                                                                    |
-| ------------------------------------------------------ | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Połączenia prototypu                                   | ✅   | Sekcja **Prototyp** dodaje interakcje; obszar roboczy rysuje połączenia zaznaczonej warstwy jako przerywane strzałki; zapis jako reakcje prototypu Figmy |
-| Wyzwalacze (kliknięcie, najechanie, przeciąganie itp.) | 🟡   | **Po kliknięciu** i **Po opóźnieniu**; brak wyzwalaczy najechania, przeciągania, przytrzymania i klawiszy                                                |
-| Działania (nawigacja, nakładka, przewijanie itp.)      | 🟡   | **Przejdź do**, **Otwórz nakładkę**, **Zamknij nakładkę** i **Wstecz**; brak Change to, Scroll to i Swap overlay                                         |
-| Animacje i przejścia                                   | 🟡   | **Natychmiast** i **Przenikanie**                                                                                                                        |
-| Smart animate                                          | 🔲   | Automatyczna animacja pasujących warstw                                                                                                                  |
-| Nakładki                                               | 🟡   | Otwieranie i zamykanie nakładki nad ramką; zawsze dopasowana do okna, bez wyboru położenia                                                               |
-| Przewijanie i przepełnienie                            | 🔲   | Przewijane ramki w prototypach                                                                                                                           |
-| Przepływy prototypu                                    | 🔲   | Nazwane punkty początkowe                                                                                                                                |
-| Zmienne w prototypach                                  | 🔲   | Logika warunkowa ze zmiennymi                                                                                                                            |
-| Krzywe przejść i animacje sprężynowe                   | 🔲   | Własne krzywe animacji                                                                                                                                   |
-| Prezentowanie i odtwarzanie prototypów                 | 🟡   | **Odtwarzaj** uruchamia prototyp na obszarze roboczym; **Prezentuj** pokazuje ramki strony jako slajdy na pełnym ekranie                                 |
+| Funkcja                                                | Stan | Uwagi                                                                                                                                                                    |
+| ------------------------------------------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Połączenia prototypu                                   | ✅   | Sekcja **Prototyp** dodaje interakcje; obszar roboczy rysuje połączenia zaznaczonej warstwy jako przerywane strzałki; zapis jako reakcje prototypu Figmy                 |
+| Wyzwalacze (kliknięcie, najechanie, przeciąganie itp.) | 🟡   | **Po kliknięciu**, **Podczas najechania**, **Podczas naciskania**, **Wejście kursora**, **Wyjście kursora** i **Po opóźnieniu**; brak wyzwalaczy przeciągania i klawiszy |
+| Działania (nawigacja, nakładka, przewijanie itp.)      | 🟡   | **Przejdź do**, **Otwórz nakładkę**, **Zamknij nakładkę**, **Wstecz**, **Zmień na** i **Przewiń do**; brak zamiany nakładki, linków i akcji zmiennych                    |
+| Animacje i przejścia                                   | 🟡   | **Natychmiast** i **Przenikanie**                                                                                                                                        |
+| Smart animate                                          | 🟡   | Odtwarzane jako przenikanie; zachowywane w plikach `.fig`                                                                                                                |
+| Nakładki                                               | 🟡   | Otwieranie i zamykanie nakładki nad ramką; zawsze dopasowana do okna, bez wyboru położenia                                                                               |
+| Przewijanie i przepełnienie                            | 🟡   | **Przewijanie nadmiaru** działa kółkiem i przeciąganiem; warstwy przypięte i lepkie przewijają się z ramką                                                               |
+| Komponenty interaktywne                                | ✅   | **Zmień na** między wariantami, ustawiane raz na komponencie głównym; **Podczas najechania** i **Podczas naciskania** wracają                                            |
+| Przepływy prototypu                                    | 🔲   | Nazwane punkty początkowe                                                                                                                                                |
+| Zmienne w prototypach                                  | 🔲   | Logika warunkowa ze zmiennymi                                                                                                                                            |
+| Krzywe przejść i animacje sprężynowe                   | 🔲   | Własne krzywe animacji                                                                                                                                                   |
+| Prezentowanie i odtwarzanie prototypów                 | 🟡   | **Odtwarzaj** uruchamia prototyp na obszarze roboczym; **Prezentuj** pokazuje ramki strony jako slajdy na pełnym ekranie                                                 |
 
 ## Import i eksport
 
@@ -219,7 +220,7 @@ Porównanie funkcji Figma Design, jedna po drugiej, z obecnym stanem implementac
 | Fragmenty kodu                                 | 🟡   | Design JSX, HTML, Vue i React z CSS albo Tailwind oraz wartościami uwzględniającymi tokeny; brak Swift, Kotlin i Compose                                                                                              |
 | Eksport Tailwind CSS v4                        | ✅   | Eksport do HTML z klasami narzędziowymi Tailwind z panelu Kod, CLI lub programowo                                                                                                                                     |
 | Figma for VS Code                              | 🔲   | Integracja z wtyczką edytora                                                                                                                                                                                          |
-| Serwer MCP                                     | ✅   | `@pairdraw/mcp` z transportem stdio i HTTP; 142 podstawowe narzędzia oraz narzędzia dokumentu, historii i ustawień                                                                                                   |
+| Serwer MCP                                     | ✅   | `@pairdraw/mcp` z transportem stdio i HTTP; 142 podstawowe narzędzia oraz narzędzia dokumentu, historii i ustawień                                                                                                    |
 | Narzędzia CLI                                  | ✅   | 27 polecenia, m.in. `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` i `tool`                                       |
 
 ## Figma Draw

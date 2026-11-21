@@ -17,7 +17,7 @@ Pairdraw otwiera i zapisuje natywne pliki `.fig` bez wcześniejszej konwersji. I
 - **Komponenty:** tworzenie (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd>), zestawy komponentów, instancje z nadpisaniami, sloty oraz synchronizacja na żywo.
 - **Zachowania i podgląd:** komponenty mogą działać jak kontrolki Reka UI (przełącznik, suwak, karty, pole tekstowe, akordeon…), a <kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> pozwala wypróbować je na żywo nad obszarem roboczym ([Komponenty](/pl/user-guide/components#behaviours-and-preview)).
 - **Warstwy skryptów:** zawartość warstwy rysuje program JavaScript zapisany w dokumencie. Kontrolki `@input` można wiązać ze zmiennymi; zmiana kodu, danych wejściowych lub rozmiaru uruchamia ponownie skrypt, a wynik jednym krokiem zamienia się w zwykłe warstwy ([Warstwy skryptów](/user-guide/script-layers)).
-- **Prototypy:** interakcje po kliknięciu lub po opóźnieniu prowadzą do ramki, otwierają lub zamykają nakładkę albo wracają; można je odtwarzać na obszarze roboczym z natychmiastowym przejściem lub przenikaniem ([Odtwarzanie prototypu](/user-guide/playing-a-prototype)).
+- **Prototypy:** interakcje po kliknięciu, najechaniu, naciśnięciu, wejściu lub wyjściu kursora albo po opóźnieniu prowadzą do ramki, otwierają lub zamykają nakładkę, wracają, zmieniają wariant komponentu albo przewijają do warstwy, a ramki mogą się przewijać; można je odtwarzać na obszarze roboczym z natychmiastowym przejściem lub przenikaniem ([Odtwarzanie prototypu](/user-guide/playing-a-prototype)).
 - **Zmienne:** tokeny projektu z kolekcjami, trybami (Light/Dark), typami Color, Float, String i Boolean oraz powiązaniami.
 - **Sekcje:** kontenery porządkujące, które automatycznie przejmują obiekty i mają etykiety z tytułem.
 

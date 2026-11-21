@@ -191,6 +191,10 @@ function bindingAttributes(
   return node.bindings.flatMap((binding) => {
     if (binding.type === 'prop')
       return [jsx.attribute(binding.attribute, jsx.container(es.identifier(binding.prop.name)))]
+    if (binding.type === 'modelProp')
+      return [
+        jsx.attribute(binding.attribute, jsx.container(es.parseExpression(`props.${binding.name}`)))
+      ]
     // Radix sets `data-disabled` on its own roots; a native root needs it for the styles.
     if (binding.type === 'disabled' && native)
       return [jsx.attribute('data-disabled', jsx.container(disabledFlag(kind)))]

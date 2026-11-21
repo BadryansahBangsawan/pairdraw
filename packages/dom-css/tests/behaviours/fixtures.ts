@@ -705,3 +705,74 @@ export function plainBadgeSet() {
   }
   return { graph, set: graph.getNode(set.id) ?? set }
 }
+
+/**
+ * Tabs whose choice is the Tab variant property: each variant draws the same triggers and
+ * panels, with the active one's look. `set` is the component set and `AI` its first variant.
+ */
+export function variantTabsComponent() {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0].id
+  const slot = (propertyId: string) => [{ propertyId, field: 'SLOT_CONTENT' as const }]
+  const tabs = graph.createNode('COMPONENT_SET', page, {
+    name: 'FeatureTabs',
+    width: 200,
+    height: 120,
+    componentPropertyDefinitions: [
+      {
+        id: 'tab',
+        name: 'Tab',
+        type: 'VARIANT',
+        defaultValue: 'AI',
+        variantOptions: ['AI', 'Browser']
+      }
+    ]
+  })
+  const variants = ['AI', 'Browser'].map((tab) => {
+    const variant = graph.createNode('COMPONENT', tabs.id, {
+      name: `Tab=${tab}`,
+      width: 200,
+      height: 120,
+      componentPropertyValues: { Tab: tab }
+    })
+    const list = graph.createNode('FRAME', variant.id, {
+      name: 'List',
+      componentPropertyReferences: slot('list-slot'),
+      width: 200,
+      height: 24
+    })
+    const panels = graph.createNode('FRAME', variant.id, {
+      name: 'Panels',
+      componentPropertyReferences: slot('panels-slot'),
+      y: 30,
+      width: 200,
+      height: 80
+    })
+    for (const [index, label] of ['AI', 'Browser'].entries()) {
+      const trigger = graph.createNode('FRAME', list.id, {
+        name: 'Trigger',
+        x: index * 90,
+        width: 80,
+        height: 24,
+        fills: index === (tab === 'AI' ? 0 : 1) ? COLORS.on : COLORS.off
+      })
+      graph.createNode('TEXT', trigger.id, { name: 'Label', text: label })
+      const panel = graph.createNode('FRAME', panels.id, {
+        name: 'Panel',
+        width: 200,
+        height: 80,
+        visible: index === 0
+      })
+      graph.createNode('TEXT', panel.id, { name: 'Body', text: `${label} settings` })
+    }
+    return variant
+  })
+  graph.updateNode(tabs.id, {
+    pluginData: withBehaviour(tabs, {
+      ...emptyBehaviour('tabs'),
+      booleans: { value: { propertyId: 'tab' } },
+      parts: { list: 'list-slot', panels: 'panels-slot' }
+    })
+  })
+  return { graph, set: graph.getNode(tabs.id) ?? tabs, AI: variants[0] }
+}

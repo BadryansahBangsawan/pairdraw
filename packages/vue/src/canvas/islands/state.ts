@@ -20,6 +20,7 @@ export interface ControlState {
 const TEXT_INPUTS = new Set(['textField', 'textarea', 'numberField'])
 
 function initialChoice(control: ControlModel): string {
+  if (control.choice) return String(control.choice.designed)
   if (control.kind === 'tabs') return '0'
   const index = control.items.findIndex((item) => {
     const value = booleanOf(item, 'value') ?? booleanOf(item, 'open')
@@ -95,6 +96,10 @@ function instanceState(control: ControlModel, state: ControlState): InstanceStat
       const value = on ? model.on : model.off
       if (value) variants[model.definition.name] = value
     }
+  }
+  if (control.choice && state.choice !== '') {
+    const option = control.choice.options[Number(state.choice)]
+    if (option) variants[control.choice.definition.name] = option
   }
   const prefer: Record<string, string> = {}
   if (control.states) {

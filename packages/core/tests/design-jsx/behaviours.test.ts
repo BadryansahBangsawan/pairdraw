@@ -56,6 +56,30 @@ describe('Reka UI elements in design JSX', () => {
     expect(missing).toEqual([])
   })
 
+  test('a Tabs.Root whose variants draw the triggers binds its choice to the Tab property', async () => {
+    const { root, behaviour, missing } = await render(`
+      <Tabs.Root name="Feature tabs" modelValue="Tab">
+        <Component name="Tab=AI" w={240} h={40} flex="row">
+          <Tabs.List flex="row" gap={8}>
+            <Tabs.Trigger><Text>AI</Text></Tabs.Trigger>
+            <Tabs.Trigger><Text>Browser</Text></Tabs.Trigger>
+          </Tabs.List>
+        </Component>
+        <Component name="Tab=Browser" w={240} h={40} flex="row">
+          <Tabs.List flex="row" gap={8}>
+            <Tabs.Trigger><Text>AI</Text></Tabs.Trigger>
+            <Tabs.Trigger><Text>Browser</Text></Tabs.Trigger>
+          </Tabs.List>
+        </Component>
+      </Tabs.Root>
+    `)
+    const definition = root.componentPropertyDefinitions.find((item) => item.name === 'Tab')
+    expect(root.type).toBe('COMPONENT_SET')
+    expect(definition?.type).toBe('VARIANT')
+    expect(behaviour.booleans.value?.propertyId).toBe(definition?.id ?? '')
+    expect(missing).toEqual([])
+  })
+
   test('tab triggers and panels go in their List and Panels slots, the first panel showing', async () => {
     const { graph, root, behaviour, missing } = await render(`
       <Tabs.Root name="Tabs" w={240} flex="col">

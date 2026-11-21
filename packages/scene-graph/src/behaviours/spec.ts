@@ -1,9 +1,16 @@
 import { omitBy } from 'es-toolkit/object'
 
 import type { SceneGraph } from '../graph'
+import { slotPropertyId } from '../slots/frames'
 import type { ComponentPropertyDefinition, SceneNode } from '../types'
 import { behaviourContract } from './kinds'
-import { behaviourProperties, emptyBehaviour, guessInteractionStates, textBinding } from './model'
+import {
+  behaviourProperties,
+  booleanBinding,
+  emptyBehaviour,
+  guessInteractionStates,
+  textBinding
+} from './model'
 import { isNumberRange, type Behaviour, type BehaviourSpec } from './schema'
 
 /** Variant values that usually mean on, compared case-insensitively. */
@@ -58,13 +65,18 @@ function resolveValue(
   binding: ValueBinding
 ): void {
   const contract = behaviourContract(behaviour.kind)
-  const bindable = contract.values.filter((item) => item.type === 'boolean' || item.type === 'text')
-  const value = bindable.find((item) => item.id === valueId)
+  const value = contract.values.find((item) => item.id === valueId)
   if (!value)
     throw new Error(
-      `A ${behaviour.kind} has no boolean or text value "${valueId}"; it has ${listed(bindable)}`
+      `A ${behaviour.kind} has no value "${valueId}"; it has ${listed(contract.values)}`
     )
   const name = typeof binding === 'string' ? binding : binding.property
+  if (value.type === 'choice') {
+    // A choice is which child of its slot is active, held by the variant property that draws it.
+    const definition = findProperty(properties, name, ['VARIANT'], valueId)
+    behaviour.booleans[valueId] = { propertyId: definition.id }
+    return
+  }
   if (value.type === 'text') {
     behaviour.texts[valueId] = { propertyId: findProperty(properties, name, ['TEXT'], valueId).id }
     return
@@ -132,7 +144,85 @@ export function behaviourFromSpec(
     behaviour.parts[partId] = id
   }
   if (spec.states !== undefined) resolveStates(behaviour, properties, spec.states)
+  validateChoiceValues(graph, owner, behaviour)
   return behaviour
+}
+
+/** The words a layer reads, joined across its text. */
+function textOf(graph: SceneGraph, node: SceneNode): string {
+  if (node.type === 'TEXT') return node.text
+  return graph
+    .getChildren(node.id)
+    .map((child) => textOf(graph, child))
+    .join(' ')
+}
+
+/** The frames in one variant bound to the tabs' list slot, without entering nested instances. */
+function listFrames(graph: SceneGraph, variant: SceneNode, listPropertyId: string): SceneNode[] {
+  const frames: SceneNode[] = []
+  const visit = (node: SceneNode): void => {
+    for (const child of graph.getChildren(node.id)) {
+      if (slotPropertyId(child) === listPropertyId) frames.push(child)
+      else if (child.type !== 'INSTANCE') visit(child)
+    }
+  }
+  visit(variant)
+  return frames
+}
+
+/**
+ * The trigger labels under the tabs' list slot, in layer order. Each variant must draw one,
+ * with the same triggers, so choosing a variant changes no more than the tab drawn.
+ */
+function triggerLabels(graph: SceneGraph, owner: SceneNode, listPropertyId: string): string[] {
+  const variants =
+    owner.type === 'COMPONENT_SET'
+      ? graph.getChildren(owner.id).filter((child) => child.type === 'COMPONENT')
+      : [owner]
+  const frames: SceneNode[] = []
+  for (const variant of variants) {
+    const found = listFrames(graph, variant, listPropertyId)
+    if (!found.length)
+      throw new Error(`The variant "${variant.name}" has no frame bound to the tabs' list slot`)
+    frames.push(...found)
+  }
+  const labels = frames[0]
+    ? graph.getChildren(frames[0].id).map((child) => textOf(graph, child))
+    : []
+  for (const frame of frames.slice(1)) {
+    const others = graph.getChildren(frame.id).map((child) => textOf(graph, child))
+    if (others.length !== labels.length || others.some((label, index) => label !== labels[index]))
+      throw new Error(
+        `The tabs' triggers differ between variants; ${frames[0] ? `the first has ${labels.join(', ')}` : 'they have none'}`
+      )
+  }
+  return labels
+}
+
+/**
+ * Check the variant options a tabs' choice binds against the words its list draws. A choice
+ * picks the trigger of the same value, so the property must offer exactly those values.
+ */
+export function validateChoiceValues(
+  graph: SceneGraph,
+  owner: SceneNode,
+  behaviour: Behaviour
+): void {
+  if (behaviour.kind !== 'tabs') return
+  const binding = booleanBinding(behaviour, 'value')
+  const listPropertyId = behaviour.parts.list
+  if (!binding || !listPropertyId) return
+  const definition = behaviourProperties(graph, owner).find(
+    (item) => item.id === binding.propertyId && item.type === 'VARIANT'
+  )
+  if (!definition) return
+  const labels = triggerLabels(graph, owner, listPropertyId)
+  const options = definition.variantOptions ?? []
+  if (labels.length === 0) return
+  if (labels.length !== options.length || labels.some((label, index) => label !== options[index]))
+    throw new Error(
+      `"${definition.name}" offers ${options.join(', ')}; the tabs' triggers are ${labels.join(', ')}`
+    )
 }
 
 function stripUndefined<T extends Record<string, unknown>>(record: T): Partial<T> {

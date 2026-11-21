@@ -44,13 +44,18 @@ export function slugValues(labels: readonly string[]): string[] {
  * Tabs' triggers, the layers in its list, and its panels, the layers in its panels slot, each
  * with the value of the tab it belongs to, matched by position. The tabs start on the first.
  */
-export function tabParts(parts: ReadonlyMap<StateElement, string>): {
+export function tabParts(
+  parts: ReadonlyMap<StateElement, string>,
+  variantOptions: readonly string[] = []
+): {
   repeated: Map<StateElement, RepeatedPart>
   choice: ChoiceModel | null
 } {
   const partElement = (id: string) => [...parts].find(([, part]) => part === id)?.[0]
   const triggers = elementsOf(partElement('list'))
-  const values = slugValues(triggers.map(textOf))
+  const drawn = slugValues(triggers.map(textOf))
+  // A choice bound to a variant property names each trigger by that property's option.
+  const values = variantOptions.length === triggers.length ? [...variantOptions] : drawn
   const repeated = new Map<StateElement, RepeatedPart>()
   for (const [index, trigger] of triggers.entries())
     repeated.set(trigger, { part: 'trigger', value: values[index] ?? String(index) })

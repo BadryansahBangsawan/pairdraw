@@ -1,6 +1,7 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   behaviourFromSpec,
+  validateChoiceValues,
   withBehaviour,
   type BehaviourKind,
   type BehaviourSpec
@@ -249,5 +250,7 @@ export function finishRoot(
     ...behaviour.texts,
     ...Object.fromEntries([...scope.texts].map(([valueId, id]) => [valueId, { propertyId: id }]))
   }
+  // The parts are made while the root's children render, so their triggers are checked now.
+  validateChoiceValues(graph, owner, behaviour)
   graph.updateNode(owner.id, { pluginData: withBehaviour(owner, behaviour) })
 }

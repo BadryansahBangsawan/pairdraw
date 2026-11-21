@@ -7,10 +7,11 @@ import type { StateElement, StateStyles } from '#dom-css/behaviours/states/types
 import { uniq } from 'es-toolkit/array'
 import { camelCase } from 'es-toolkit/string'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { ComponentPropertyDefinition, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   behaviourContract,
   behaviourProperties,
+  booleanBinding,
   layerPath,
   readBehaviour,
   textBinding,
@@ -105,6 +106,8 @@ export type ComponentBinding =
   /** A group's item: the value it stands for, which the group chooses among. */
   | { type: 'value' }
   | { type: 'prop'; prop: VariantProp; attribute: string }
+  /** The model's choice on the variant property it draws, as the attribute that picks it. */
+  | { type: 'modelProp'; name: string; attribute: string }
 
 /** A layer of the generated markup, before a framework picks its element or component. */
 export interface ComponentElement {
@@ -295,6 +298,18 @@ export interface ComponentModelOptions extends Pick<SceneGraphToDesignOptions, '
   itemOf?: GroupKind
 }
 
+/** The variant props a component takes, without the property its choice draws. */
+function choiceProps(
+  graph: SceneGraph,
+  set: SceneNode,
+  args: BehaviourArgs,
+  taken: Set<string>,
+  choice: ComponentPropertyDefinition | undefined
+): VariantProp[] {
+  taken.add(choice?.name ?? '')
+  return variantProps(graph, set, args, taken).filter((prop) => prop.property !== choice?.name)
+}
+
 /** Each layer's behaviour part: the root, and the slot frames that draw the others. */
 function behaviourParts(
   graph: SceneGraph,
@@ -352,10 +367,14 @@ function rootBindings(
   model: string | null,
   item: boolean,
   disabled: boolean,
-  props: readonly VariantProp[]
+  props: readonly VariantProp[],
+  choice?: { name: string; attribute: string }
 ): ComponentBinding[] {
   return [
     ...(model ? [{ type: 'model' as const, name: model }] : []),
+    ...(model && choice
+      ? [{ type: 'modelProp' as const, name: model, attribute: choice.attribute }]
+      : []),
     ...(item ? [{ type: 'value' as const }] : []),
     ...(disabled ? [{ type: 'disabled' as const }] : []),
     ...props.map((prop) => ({
@@ -444,14 +463,21 @@ function drawnParts(
   const parts = behaviour
     ? behaviourParts(graph, set, behaviour, root)
     : new Map<StateElement, string>([[root, 'root']])
-  const tabs = behaviour?.kind === 'tabs' ? tabParts(parts) : null
+  const choiceBinding = behaviour?.kind === 'tabs' ? booleanBinding(behaviour, 'value') : undefined
+  const choiceProperty = choiceBinding
+    ? behaviourProperties(graph, set).find(
+        (item) => item.id === choiceBinding.propertyId && item.type === 'VARIANT'
+      )
+    : undefined
+  const tabs =
+    behaviour?.kind === 'tabs' ? tabParts(parts, choiceProperty?.variantOptions ?? []) : null
   const repeated = tabs?.repeated ?? new Map<StateElement, RepeatedPart>()
   activeTriggers(repeated)
   resetButtons(kind, parts, repeated)
   freePlacedParts(kind, parts)
   blockRoot(kind, root)
   borderBoxes(root)
-  return { parts, tabs, repeated }
+  return { parts, tabs, repeated, choiceProperty }
 }
 
 /** The number or text the component holds, and the text property a field's input shows. */
@@ -486,7 +512,13 @@ export function componentModel(
   if (!kind || !styles) return null
   const name = options.name ?? identifierName(set.name, 'Component')
 
-  const { parts, tabs, repeated } = drawnParts(graph, set, behaviour, kind, styles.root)
+  const { parts, tabs, repeated, choiceProperty } = drawnParts(
+    graph,
+    set,
+    behaviour,
+    kind,
+    styles.root
+  )
 
   // A group's items first, so its item component is used for them rather than a standalone one.
   const variantIds = [styles.restId, ...ownerVariants(graph, set).map((variant) => variant.id)]
@@ -511,7 +543,7 @@ export function componentModel(
   const { range, text, inputProperty } = valueModels(graph, set, kind, behaviour, args)
   const model = modelName(args, !!options.itemOf, !!(choice ?? range ?? text))
   const taken = new Set([...(model ? [model] : []), 'disabled', 'value'])
-  const props = variantProps(graph, set, args, taken)
+  const props = choiceProps(graph, set, args, taken, choiceProperty)
   const disabled = drawsDisabled(args)
   const used = usedLayers(graph, styles.root, variantIds, items?.used, options.references)
   const elements = allElements(styles.root)
@@ -538,7 +570,16 @@ export function componentModel(
         shaders: shaderLayers(graph, styles.restId, elements),
         layerOf: (element) => restLayerOf(graph, styles, element)
       },
-      rootBindings(model, !!options.itemOf, disabled, props)
+      rootBindings(
+        model,
+        !!options.itemOf,
+        disabled,
+        props,
+        choiceProperty && {
+          name: choiceProperty.name,
+          attribute: propAttribute(choiceProperty.name)
+        }
+      )
     ),
     model,
     choice,

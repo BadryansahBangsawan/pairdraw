@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { progressComponent, sliderComponent } from '#dom-css-tests/behaviours/fixtures'
+import {
+  progressComponent,
+  sliderComponent,
+  variantTabsComponent
+} from '#dom-css-tests/behaviours/fixtures'
 import { behaviourControls, booleanOf } from '#dom-css/behaviours/controls'
 import { controlRoles } from '#dom-css/behaviours/roles'
 
@@ -76,5 +80,20 @@ describe('behaviour controls', () => {
     const roles = controlRoles(behaviourControls(graph, card.id))
     expect(roles.get('Wifi')?.type).toBe('root')
     expect(roles.size).toBe(1)
+  })
+})
+
+describe('a tabs choice bound to a variant property', () => {
+  test('reads the property options and the tab the instance draws', () => {
+    const { graph, AI } = variantTabsComponent()
+    const card = graph.createNode('FRAME', graph.getPages()[0].id, { name: 'Card' })
+    const instance = graph.createInstance(AI?.id ?? '', card.id)
+    if (!instance) throw new Error('No instance')
+    const control = behaviourControls(graph, card.id).get(instance.name)
+    expect(control?.choice).toMatchObject({
+      options: ['AI', 'Browser'],
+      designed: 0
+    })
+    expect(control?.choice?.definition.name).toBe('Tab')
   })
 })

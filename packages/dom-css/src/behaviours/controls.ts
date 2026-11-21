@@ -24,6 +24,14 @@ export interface BooleanModel {
   designed: boolean
 }
 
+/** The variant property a tabs' choice binds, its options, and the one the instance shows. */
+export interface ChoiceControlModel {
+  definition: ComponentPropertyDefinition
+  options: string[]
+  /** The option's index as the document's instance draws it, 0 when none does. */
+  designed: number
+}
+
 /** The variant property that draws a control's interaction states. */
 export interface StatesModel {
   name: string
@@ -41,6 +49,8 @@ export interface ControlModel {
   kind: Behaviour['kind']
   behaviour: Behaviour
   booleans: Record<string, BooleanModel>
+  /** For tabs bound to a variant property, the tabs the triggers choose among. */
+  choice: ChoiceControlModel | null
   states: StatesModel | null
   /** Each bound part's slot frame, by part id, as a layer path below the root. */
   parts: Record<string, string>
@@ -134,6 +144,8 @@ function controlModel(graph: SceneGraph, rootId: string, instance: SceneNode): C
       designed: designedBoolean(graph, instance, definition, binding.on)
     }
   }
+  const choice = choiceModel(behaviour, properties, component)
+
   const frames = partFrames(graph, instance)
   const parts = Object.fromEntries(
     Object.entries(behaviour.parts).flatMap(([partId, propertyId]) => {
@@ -178,6 +190,7 @@ function controlModel(graph: SceneGraph, rootId: string, instance: SceneNode): C
     kind: behaviour.kind,
     behaviour,
     booleans,
+    choice,
     states: statesModel(graph, instance, owner, behaviour),
     parts,
     texts,
@@ -186,6 +199,22 @@ function controlModel(graph: SceneGraph, rootId: string, instance: SceneNode): C
     panels,
     triggers: behaviour.kind === 'tabs' ? childPaths(frameOf('list')) : []
   }
+}
+
+/** The variant property a tabs' choice binds, its options, and the drawn option's index. */
+function choiceModel(
+  behaviour: Behaviour,
+  properties: readonly ComponentPropertyDefinition[],
+  component: SceneNode | undefined
+): ChoiceControlModel | null {
+  const binding = behaviour.kind === 'tabs' ? booleanBinding(behaviour, 'value') : undefined
+  const definition = properties.find(
+    (item) => item.id === binding?.propertyId && item.type === 'VARIANT'
+  )
+  const options = definition?.variantOptions ?? []
+  if (!definition || options.length === 0) return null
+  const designed = component?.componentPropertyValues[definition.name]
+  return { definition, options, designed: Math.max(0, options.indexOf(designed ?? '')) }
 }
 
 /**

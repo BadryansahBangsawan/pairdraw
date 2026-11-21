@@ -19,7 +19,8 @@ import {
   settingsSectionSet,
   switchSet,
   tabsComponent,
-  toggleGroupComponent
+  toggleGroupComponent,
+  variantTabsComponent
 } from '#dom-css-tests/behaviours/fixtures'
 import { shaderBackdropSet, shaderHeroSet } from '#dom-css-tests/export/components/shader-fixtures'
 import { cssRules, fileText } from '#dom-css-tests/helpers'
@@ -311,6 +312,18 @@ describe('generated React components', () => {
     const second = render(component, { defaultValue: 'password' })
     expect(second).toContain('Password settings')
     expect(second).not.toContain('Account settings')
+  })
+
+  test('a variant-driven tabs chooses among the Tab options and draws its variant', async () => {
+    const { component } = await generate(variantTabsComponent())
+    const first = render(component)
+    expect(first).toContain('AI settings')
+    expect(first).not.toContain('Browser settings')
+    const second = render(component, { defaultValue: 'Browser' })
+    expect(second).toContain('Browser settings')
+    expect(second).not.toContain('AI settings')
+    // The choice drives the Tab variant's attribute, so a controlled trigger changes the variant.
+    expect(render(component, { value: 'Browser' })).toContain('data-tab="Browser"')
   })
 
   test('every tab trigger rests unchosen and takes the chosen look while active, in its place', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@pairdraw/scene-graph'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import { behaviourFromSpec, behaviourToSpec, guessOnOff } from '@pairdraw/scene-graph/behaviours'
 
 /** A switch set with State and Interaction variant properties and a Thumb slot. */
@@ -80,4 +80,56 @@ describe('behaviour specs', () => {
       behaviourFromSpec(graph, set, { kind: 'slider', parts: { track: 'Thumb', thumb: 'Thumb' } })
     ).toThrow('"Thumb" is already the track; a slot draws one part')
   })
+
+  test('the list slot matches by exact id, not by suffix', () => {
+    const { graph, set } = tabsSet(['A', 'B'], 'list', (graph, variant) => {
+      graph.createNode('FRAME', variant.id, {
+        name: 'Other',
+        componentPropertyReferences: [{ propertyId: 'not-list', field: 'SLOT_CONTENT' }]
+      })
+    })
+    expect(() =>
+      behaviourFromSpec(graph, set, {
+        kind: 'tabs',
+        values: { value: 'Tab' },
+        parts: { list: 'List' }
+      })
+    ).not.toThrow()
+  })
 })
+
+/** A Feature tabs set whose variants draw each option as a trigger in a list-slot frame. */
+function tabsSet(
+  options: string[] = ['A', 'B'],
+  listId = 'list',
+  add?: (graph: SceneGraph, variant: SceneNode) => void
+) {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const set = graph.createNode('COMPONENT_SET', page.id, {
+    name: 'Feature tabs',
+    componentPropertyDefinitions: [
+      {
+        id: 'tab',
+        name: 'Tab',
+        type: 'VARIANT',
+        defaultValue: options[0] ?? '',
+        variantOptions: options
+      },
+      { id: listId, name: 'List', type: 'SLOT', defaultValue: '' }
+    ]
+  })
+  for (const option of options) {
+    const variant = graph.createNode('COMPONENT', set.id, { name: `Tab=${option}` })
+    const list = graph.createNode('FRAME', variant.id, {
+      name: 'List',
+      componentPropertyReferences: [{ propertyId: listId, field: 'SLOT_CONTENT' }]
+    })
+    for (const label of options) {
+      const trigger = graph.createNode('FRAME', list.id, { name: `Trigger ${label}` })
+      graph.createNode('TEXT', trigger.id, { text: label })
+    }
+    add?.(graph, variant)
+  }
+  return { graph, set }
+}

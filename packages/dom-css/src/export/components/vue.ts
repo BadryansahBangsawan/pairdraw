@@ -142,6 +142,7 @@ function bindingAttributes(
     return [vue.model(identifier(bound), REKA[kind].model === 'open' ? 'open' : undefined)]
   }
   if (binding.type === 'prop') return [vue.bound(binding.attribute, identifier(binding.prop.name))]
+  if (binding.type === 'modelProp') return [vue.bound(binding.attribute, identifier(binding.name))]
   if (binding.type === 'value') return [vue.bound('value', identifier('value'))]
   // Reka sets `data-disabled` on its own roots; a native root needs it for the state styles.
   return [

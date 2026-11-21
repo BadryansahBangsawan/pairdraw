@@ -1,1 +1,2 @@
 - A Vue text field or textarea exported as code puts the attributes it is given, such as `name`, `required`, or `aria-invalid`, on its input rather than its wrapper, as the React components do.
+- In preview, a slider's range and a progress bar's indicator follow the value when they sit inside the track, as in the shadcn/ui kit's Slider.

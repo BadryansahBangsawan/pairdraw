@@ -36,7 +36,15 @@ export async function readHTMLDocument(
   const styled = options.tailwind
     ? await tailwindHTMLToDesignDocument(html, options.tailwind, { css: options.cssText, runtime })
     : await htmlToDesignDocument(html, { cssText: options.cssText, runtime })
-  return { styled, graph: sceneGraphFromStyledHTML(styled, { pageName: options.pageName }) }
+  const graph = sceneGraphFromStyledHTML(styled, { pageName: options.pageName })
+  // An empty page or markup a parser could not read would otherwise open as an empty document
+  // with nothing to tell the user; every caller reports a thrown error.
+  if (graph.getPages().every((page) => page.childIds.length === 0)) {
+    throw new Error(
+      'No layers found in this HTML document; check that it is HTML with visible content.'
+    )
+  }
+  return { styled, graph }
 }
 
 /** Styles HTML for `import_html` with the headless CSS runtime, where Node runs the tools. */

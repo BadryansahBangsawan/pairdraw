@@ -7,6 +7,7 @@ import {
 } from './copy'
 import { enforcedAspectRatio } from './layout/aspect-ratio'
 import type { Rect } from './primitives'
+import { followsPath } from './text/path'
 import type { ConstraintType, DerivedTextGlyph, SceneNode, Stroke, VectorNetwork } from './types'
 import { cloneVectorNetwork } from './vector-network'
 
@@ -332,7 +333,7 @@ export function scaledGeometryChanges(
   Object.assign(changes, scaledPathTextChanges(orig, sx, sy))
   // Glyphs scaled as a picture take their strokes along; any other stroke keeps its weight, as
   // Figma reports it, even where only a scaled outline can draw it.
-  if (orig.strokes.length > 0 && isScaledPathText(orig)) {
+  if (orig.strokes.length > 0 && followsPath(orig)) {
     changes.strokes = scaleStrokes(orig.strokes, sx, sy)
   }
   return changes
@@ -369,25 +370,13 @@ export function shapeGeometryChanges(
 
 type PathTextFields = Pick<SceneNode, 'derivedTextGlyphs' | 'textPathData' | 'textPathBox'>
 
-// Path text scales with its path, including baked path text that kept only rotated glyphs;
-// other text reflows in the new box, so its glyphs are dropped.
-function isScaledPathText(orig: PathTextFields): boolean {
-  const glyphs = orig.derivedTextGlyphs ?? []
-  return (
-    glyphs.length > 0 &&
-    (!!orig.textPathData ||
-      !!orig.textPathBox ||
-      glyphs.some((glyph) => (glyph.rotation ?? 0) !== 0))
-  )
-}
-
 /** The baked glyphs and layout box of path text, scaled with the layer; nothing for other text. */
 export function scaledPathTextChanges(
   orig: PathTextFields,
   sx: number,
   sy: number
 ): Pick<Partial<SceneNode>, 'derivedTextGlyphs' | 'textPathBox'> {
-  if (!isScaledPathText(orig)) return {}
+  if (!followsPath(orig)) return {}
   const changes: Pick<Partial<SceneNode>, 'derivedTextGlyphs' | 'textPathBox'> = {
     derivedTextGlyphs: scaleDerivedGlyphs(orig.derivedTextGlyphs, sx, sy)
   }

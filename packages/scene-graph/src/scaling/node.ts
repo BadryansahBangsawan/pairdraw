@@ -1,7 +1,7 @@
-import { scaleGeometryPaths } from '../copy'
-import { scaledPathTextChanges } from '../resize'
+import { copyDerivedGlyphs, scaleGeometryPaths } from '../copy'
 import { scaledTextLength } from '../text/lengths'
 import { TEXT_PARAGRAPH_SPACING_FIELDS } from '../text/paragraphs'
+import { followsPath } from '../text/path'
 import {
   type Effect,
   type Fill,
@@ -13,6 +13,29 @@ import {
   type TextParagraphStyle
 } from '../types'
 import { cloneVectorNetwork } from '../vector-network'
+
+function scaledPathText(node: SceneNode, scale: number): Partial<SceneNode> {
+  if (!node.textPathData && !followsPath(node)) {
+    return {}
+  }
+  const box = node.textPathBox
+  return {
+    derivedTextGlyphs:
+      copyDerivedGlyphs(node.derivedTextGlyphs)?.map((glyph) => ({
+        ...glyph,
+        x: glyph.x * scale,
+        y: glyph.y * scale,
+        fontSize: glyph.fontSize * scale,
+        ...(glyph.advance === undefined ? {} : { advance: glyph.advance * scale })
+      })) ?? null,
+    textPathBox: box && {
+      x: box.x * scale,
+      y: box.y * scale,
+      width: box.width * scale,
+      height: box.height * scale
+    }
+  }
+}
 
 function scaledOptional(value: number | null, scale: number): number | null {
   return value == null ? null : value * scale
@@ -165,6 +188,6 @@ export function scaleNodeChanges(
     vectorNetwork: scaledVectorNetwork(node, scale),
     fillGeometry: scaleGeometryPaths(node.fillGeometry, scale, scale),
     strokeGeometry: scaleGeometryPaths(node.strokeGeometry, scale, scale),
-    ...scaledPathTextChanges(node, scale, scale)
+    ...scaledPathText(node, scale)
   }
 }

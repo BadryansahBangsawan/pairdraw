@@ -146,7 +146,11 @@ function buildServerContext(options: ServerOptions) {
     options.authToken === undefined ? randomBytes(16).toString('hex') : options.authToken
   const corsOrigin = options.corsOrigin ?? null
   const withTcp = options.withTcp ?? false
-  const origins = admittedOrigins(corsOrigin, { withAgents: options.agents !== undefined })
+  // A `*` origin lets any website reach the server; it may only do so while a token still guards
+  // the routes, so an unauthenticated server ignores it exactly as the agent bridge does.
+  const origins = admittedOrigins(corsOrigin, { withAgents: options.agents !== undefined }).filter(
+    (origin) => authToken !== null || origin !== '*'
+  )
   // The bridge learns the TCP port once the listener is up; agents may reach only that `/mcp`.
   const listening = { port: 0 }
   const bridgeOptions = {

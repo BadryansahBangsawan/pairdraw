@@ -132,6 +132,35 @@ describe('MCP CORS origin configuration', () => {
     expect(resolveCORSOrigins('https://one.example')).toEqual(['https://one.example'])
   })
 
+  test('refuses a foreign origin when `*` meets disabled auth', async () => {
+    const handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: testSocketPath(),
+      authToken: NO_AUTH_TOKEN,
+      corsOrigin: '*',
+      enableEval: false,
+      mcpRoot: null
+    })
+    const httpPort = handle.httpPort
+    if (!httpPort) {
+      await handle.close()
+      throw new Error('withTcp: true did not produce an HTTP port')
+    }
+    try {
+      for (const path of ['/health', '/rpc']) {
+        const response = await fetch(`http://127.0.0.1:${httpPort}${path}`, {
+          method: path === '/rpc' ? 'POST' : 'GET',
+          headers: { origin: 'https://evil.example', 'content-type': 'text/plain' },
+          body: path === '/rpc' ? '{}' : undefined
+        })
+        expect(response.status).toBe(403)
+      }
+    } finally {
+      await handle.close()
+    }
+  })
+
   test('ignores `*` only when the agent bridge is on', () => {
     expect(admittedOrigins('*')).toContain('*')
     expect(admittedOrigins('*', { withAgents: false })).toContain('*')

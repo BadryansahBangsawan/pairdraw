@@ -1,0 +1,1 @@
+- A `*` CORS origin is ignored while authentication is off, so a website cannot call an unauthenticated server even if the operator wrote `PAIRDRAW_MCP_CORS_ORIGIN=*`.

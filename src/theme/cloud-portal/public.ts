@@ -10,8 +10,8 @@ export default {
     header: 'flex flex-col items-center gap-4 text-center',
     icon: 'size-12 rounded-xl',
     headingGroup: 'flex flex-col gap-1.5',
-    title: 'text-xl font-semibold text-balance',
-    description: 'text-sm text-pretty text-muted',
+    title: 'text-xl font-semibold',
+    description: 'text-sm text-muted',
     body: 'flex flex-col gap-4',
     aside: 'flex flex-wrap items-center justify-center gap-1 text-sm text-muted',
     footer:

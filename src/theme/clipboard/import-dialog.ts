@@ -23,7 +23,7 @@ export default {
 /** With nothing to choose between, the question reads as one card, as Save before closing does. */
 export const clipboardImportQuestionUI = {
   header: 'border-b-0 px-5 pt-5 pb-4',
-  title: 'mb-1 text-pretty break-words',
+  title: 'mb-1 break-words',
   description: 'leading-relaxed',
   body: 'px-5 pt-0 pb-4',
   footer: 'border-t-0 px-5 pt-0 pb-5'

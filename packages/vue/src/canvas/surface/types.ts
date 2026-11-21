@@ -1,7 +1,7 @@
 import type { EditorState } from '@pairdraw/core'
 import type { RenderedPlayScene } from '@pairdraw/core/canvas'
-import type { Vector } from '@pairdraw/scene-graph/primitives'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { PresentationColorSpace } from '#vue/canvas/surface/color-space'
 

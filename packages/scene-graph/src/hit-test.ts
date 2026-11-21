@@ -23,8 +23,35 @@ const OPAQUE_CONTAINER_TYPES = new Set<NodeType>(['COMPONENT', 'INSTANCE'])
  */
 const DEGENERATE_AXIS_SLOP = 4
 
-function hasVisibleFillOrStroke(node: SceneNode): boolean {
-  return node.fills.some((f) => f.visible) || node.strokes.some((s) => s.visible)
+/**
+ * Whether a paint shows, so its container's empty area counts when a click reaches past
+ * containers: a paint at 0% opacity, or a gradient whose stops are all transparent, does not,
+ * while 1% does, and the layer's own opacity does not matter.
+ */
+function isHitPaint(paint: SceneNode['fills'][number]): boolean {
+  if (!paint.visible || !(paint.opacity > 0)) return false
+  if (paint.type === 'SOLID') return paint.color.a > 0
+  if (
+    paint.type === 'GRADIENT_LINEAR' ||
+    paint.type === 'GRADIENT_RADIAL' ||
+    paint.type === 'GRADIENT_ANGULAR' ||
+    paint.type === 'GRADIENT_DIAMOND'
+  )
+    return (paint.gradientStops ?? []).some((stop) => stop.color.a > 0)
+  return true
+}
+
+function showsPaint(node: SceneNode): boolean {
+  return node.fills.some(isHitPaint) || node.strokes.some(isHitPaint)
+}
+
+/**
+ * Whether a container's empty area takes the click. Figma counts it only where a paint shows,
+ * except a main component's, which always counts, and an instance's when the click is a plain one.
+ */
+function takesEmptyArea(graph: SceneGraph, node: SceneNode, instanceBodies: boolean): boolean {
+  if (node.type === 'COMPONENT' || showsPaint(node) || ownsItsEmptyArea(graph, node)) return true
+  return instanceBodies && node.type === 'INSTANCE'
 }
 
 function isTopLevel(graph: SceneGraph, node: SceneNode): boolean {
@@ -188,7 +215,11 @@ function clippingMasks(graph: SceneGraph, childIds: readonly string[]): SceneNod
   return result
 }
 
-function hitTestOpaqueContainer(
+/**
+ * What a click inside a container reports. `opaque` is an instance or component whose body takes
+ * the click without looking through it; every other container looks through to its children first.
+ */
+function hitTestContainer(
   graph: SceneGraph,
   px: number,
   py: number,
@@ -197,12 +228,63 @@ function hitTestOpaqueContainer(
   deep: boolean,
   transformCache: Map<string, boolean>,
   pad: number,
-  locked = false
+  locked = false,
+  instanceBodies = false,
+  opaque = false
 ): SceneNode | null {
-  if (!containsPoint(px, py, child, graph, transformCache)) return null
-  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
-  if (childHit) return child
-  if (hasVisibleFillOrStroke(child)) return child
+  if (opaque) {
+    if (!containsPoint(px, py, child, graph, transformCache)) return null
+    const childHit = hitTestChildren(
+      graph,
+      px,
+      py,
+      childId,
+      deep,
+      transformCache,
+      pad,
+      locked,
+      instanceBodies
+    )
+    if (childHit) return child
+    if (takesEmptyArea(graph, child, instanceBodies)) return child
+    return null
+  }
+  if (child.type === 'GROUP') {
+    // A group fits its layers, so a padded click on one at its edge falls just outside it.
+    if (!containsPoint(px, py, child, graph, transformCache, pad)) return null
+    const childHit = hitTestChildren(
+      graph,
+      px,
+      py,
+      childId,
+      deep,
+      transformCache,
+      pad,
+      locked,
+      instanceBodies
+    )
+    if (childHit) return standIn(child, childHit, deep)
+    return containsPoint(px, py, child, graph, transformCache) ? child : null
+  }
+
+  const childHit = hitTestChildren(
+    graph,
+    px,
+    py,
+    childId,
+    deep,
+    transformCache,
+    pad,
+    locked,
+    instanceBodies
+  )
+  if (childHit) return standIn(child, childHit, true)
+
+  if (
+    containsPoint(px, py, child, graph, transformCache) &&
+    takesEmptyArea(graph, child, instanceBodies)
+  )
+    return child
   return null
 }
 /**
@@ -211,36 +293,6 @@ function hitTestOpaqueContainer(
  */
 function standIn(container: SceneNode, hit: SceneNode, deep: boolean): SceneNode {
   return container.locked || !deep ? container : hit
-}
-
-function hitTestTransparentContainer(
-  graph: SceneGraph,
-  px: number,
-  py: number,
-  child: SceneNode,
-  childId: string,
-  deep: boolean,
-  transformCache: Map<string, boolean>,
-  pad: number,
-  locked = false
-): SceneNode | null {
-  if (child.type === 'GROUP') {
-    // A group fits its layers, so a padded click on one at its edge falls just outside it.
-    if (!containsPoint(px, py, child, graph, transformCache, pad)) return null
-    const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
-    if (childHit) return standIn(child, childHit, deep)
-    return containsPoint(px, py, child, graph, transformCache) ? child : null
-  }
-
-  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
-  if (childHit) return standIn(child, childHit, true)
-
-  if (
-    containsPoint(px, py, child, graph, transformCache) &&
-    (hasVisibleFillOrStroke(child) || ownsItsEmptyArea(graph, child))
-  )
-    return child
-  return null
 }
 
 /** Whether the masks that clip a layer leave the point outside every one of their outlines. */
@@ -288,7 +340,8 @@ function hitTestChildren(
   deep = false,
   transformCache = new Map<string, boolean>(),
   pad = 0,
-  locked = false
+  locked = false,
+  instanceBodies = false
 ): SceneNode | null {
   const parent = graph.nodes.get(parentId)
   if (!parent) return null
@@ -306,7 +359,7 @@ function hitTestChildren(
     if (!takesClick(graph, px, py, child, masks[i], locked, transformCache)) continue
     if (CONTAINER_TYPES.has(child.type)) {
       if (OPAQUE_CONTAINER_TYPES.has(child.type) && !deep) {
-        const hit = hitTestOpaqueContainer(
+        const hit = hitTestContainer(
           graph,
           px,
           py,
@@ -315,13 +368,15 @@ function hitTestChildren(
           deep,
           transformCache,
           pad,
-          locked
+          locked,
+          instanceBodies,
+          true
         )
         if (hit) return hit
         continue
       }
 
-      const hit = hitTestTransparentContainer(
+      const hit = hitTestContainer(
         graph,
         px,
         py,
@@ -330,7 +385,8 @@ function hitTestChildren(
         deep,
         transformCache,
         pad,
-        locked
+        locked,
+        instanceBodies
       )
       if (hit) return hit
       continue
@@ -353,7 +409,7 @@ export function hitTest(
   scopeId?: string
 ): SceneNode | null {
   const scope = scopeId ?? graph.rootId
-  return hitTestChildren(graph, px, py, scope, false)
+  return hitTestChildren(graph, px, py, scope, false, new Map(), 0, false, true)
 }
 
 export function hitTestDeep(
@@ -449,7 +505,7 @@ export function hitTestSelectable(
   /** Whether locked layers are hit, as a right-click hits them; see `hitTestAtPoint`. */
   locked = false
 ): SceneNode | null {
-  const deepest = hitTestChildren(graph, px, py, scopeId, true, new Map(), pad, locked)
+  const deepest = hitTestChildren(graph, px, py, scopeId, true, new Map(), pad, locked, true)
   if (!deepest) {
     const scope = graph.nodes.get(scopeId)
     return scope ? frameChildAt(graph, scope, px, py, locked) : null
@@ -492,7 +548,7 @@ export function hitTestOpenContainer(
   py: number,
   scopeId: string
 ): SceneNode | null {
-  const deepest = hitTestChildren(graph, px, py, scopeId, true)
+  const deepest = hitTestChildren(graph, px, py, scopeId, true, new Map(), 0, false, false)
   for (let node: SceneNode | undefined = deepest ?? undefined; node && node.id !== scopeId;) {
     if (!opensByItself(graph, node) || ownsItsEmptyArea(graph, node)) return null
     node = node.parentId ? graph.nodes.get(node.parentId) : undefined
@@ -523,7 +579,7 @@ function rectOverlap(a: Rect, b: Rect): Rect | null {
  */
 function selectsByOwnArea(graph: SceneGraph, node: SceneNode): boolean {
   if (node.type === 'GROUP' || ownsItsEmptyArea(graph, node)) return true
-  return hasVisibleFillOrStroke(node) && !opensByItself(graph, node)
+  return showsPaint(node) && !opensByItself(graph, node)
 }
 
 /**

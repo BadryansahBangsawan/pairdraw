@@ -105,10 +105,8 @@ export function createKeyboardActions({
       else store.penCancel()
       return
     }
-    if (store.state.enteredContainerId) {
-      store.exitContainer()
-      return
-    }
+    // Figma clears the selection at any depth; Shift+Enter is the way up a level.
+    if (store.state.enteredContainerId) store.exitContainers()
     if (useComments().closeCard()) return
     store.clearSelection()
     store.setTool('SELECT')

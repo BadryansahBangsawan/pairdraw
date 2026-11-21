@@ -24,5 +24,10 @@ export function createSelectionContainerActions(ctx: EditorContext) {
     ctx.setSelectedIds(new Set(entered ? [entered] : []))
   }
 
-  return { validateEnteredContainer, enterContainer, exitContainer }
+  /** Leaves every entered container; Escape then lands on the page and clears the selection. */
+  function exitContainers() {
+    ctx.state.enteredContainerId = null
+  }
+
+  return { validateEnteredContainer, enterContainer, exitContainer, exitContainers }
 }

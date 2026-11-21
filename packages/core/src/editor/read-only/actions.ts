@@ -70,6 +70,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set([
   'clearSelection',
   'enterContainer',
   'exitContainer',
+  'exitContainers',
   'select',
   'selectAll',
   'selectAtPoint',

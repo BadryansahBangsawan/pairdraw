@@ -98,7 +98,7 @@ describe('hitTest', () => {
     expect(graph.hitTest(150, 150, pageId(graph))).toBeNull()
   })
 
-  test('instance without fills is click-through in empty area', () => {
+  test('instance and component bodies take clicks whatever their fill', () => {
     const graph = new SceneGraph()
     const compId = graph.createNode('COMPONENT', pageId(graph), {
       name: 'Comp',
@@ -121,8 +121,12 @@ describe('hitTest', () => {
     ).id
     // Hit on instance's child area — returns instance (opaque container)
     expect(graph.hitTest(320, 20, pageId(graph))?.id).toBe(instId)
-    // Miss on instance's empty area (no fills)
-    expect(graph.hitTest(450, 150, pageId(graph))).toBeNull()
+    // A plain click takes its empty area too, with no fill, as in Figma.
+    expect(graph.hitTest(450, 150, pageId(graph))?.id).toBe(instId)
+    // Reaching past containers, its empty area shows no paint and is passed through.
+    expect(graph.hitTestDeep(450, 150, pageId(graph))).toBeNull()
+    // A main component's empty area always counts.
+    expect(graph.hitTestDeep(150, 150, pageId(graph))?.id).toBe(compId)
   })
 
   test('hidden node is not hittable', () => {

@@ -49,6 +49,24 @@ describe('hitTestDeepInRect', () => {
     expect(select({ x: 50, y: 50, width: 10, height: 10 })).toEqual(['Group'])
   })
 
+  for (const [label, paint] of [
+    ['hidden', { ...FILL[0], visible: false }],
+    ['0% opacity', { ...FILL[0], opacity: 0 }],
+    ['zero alpha', { ...FILL[0], color: { ...FILL[0].color, a: 0 } }]
+  ] as const) {
+    test(`selects nothing over a container's empty area with a ${label} fill`, () => {
+      const { graph, card, select } = scene()
+      graph.updateNode(card.id, { fills: [paint] })
+      expect(select({ x: 160, y: 200, width: 40, height: 10 })).toEqual([])
+    })
+  }
+
+  test('selects a barely opaque container over its empty area', () => {
+    const { graph, card, select } = scene()
+    graph.updateNode(card.id, { fills: [{ ...FILL[0], opacity: 0.01 }] })
+    expect(select({ x: 160, y: 200, width: 40, height: 10 })).toEqual(['Card'])
+  })
+
   test('selects a top-level auto layout frame by the empty area it owns', () => {
     const { graph, board, select } = scene()
     graph.updateNode(board.id, { layoutMode: 'VERTICAL' })

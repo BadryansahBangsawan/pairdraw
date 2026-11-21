@@ -802,6 +802,12 @@
   "prototypeActionClose": "Закрыть оверлей",
   "prototypeDestination": "Назначение",
   "prototypeDestinationPlaceholder": "Выберите фрейм",
+  "prototypeVariantPlaceholder": "Выберите вариант",
+  "prototypeInheritedInteractions": {
+    "one": "{count} взаимодействие из главного компонента",
+    "few": "{count} взаимодействия из главного компонента",
+    "many": "{count} взаимодействий из главного компонента"
+  },
   "prototypeAnimation": "Анимация",
   "prototypeAnimationInstant": "Мгновенно",
   "prototypeAnimationDissolve": "Растворение",

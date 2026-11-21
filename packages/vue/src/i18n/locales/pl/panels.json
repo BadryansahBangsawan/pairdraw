@@ -802,6 +802,12 @@
   "prototypeActionClose": "Zamknij nakładkę",
   "prototypeDestination": "Cel",
   "prototypeDestinationPlaceholder": "Wybierz ramkę",
+  "prototypeVariantPlaceholder": "Wybierz wariant",
+  "prototypeInheritedInteractions": {
+    "one": "{count} interakcja z komponentu głównego",
+    "few": "{count} interakcje z komponentu głównego",
+    "many": "{count} interakcji z komponentu głównego"
+  },
   "prototypeAnimation": "Animacja",
   "prototypeAnimationInstant": "Natychmiast",
   "prototypeAnimationDissolve": "Przenikanie",

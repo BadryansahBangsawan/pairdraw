@@ -782,6 +782,10 @@
   "prototypeActionClose": "关闭叠加层",
   "prototypeDestination": "目标",
   "prototypeDestinationPlaceholder": "选择画框",
+  "prototypeVariantPlaceholder": "选择变体",
+  "prototypeInheritedInteractions": {
+    "many": "来自主组件的 {count} 个交互"
+  },
   "prototypeAnimation": "动画",
   "prototypeAnimationInstant": "即时",
   "prototypeAnimationDissolve": "溶解",

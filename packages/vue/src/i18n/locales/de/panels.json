@@ -792,6 +792,11 @@
   "prototypeActionClose": "Overlay schließen",
   "prototypeDestination": "Ziel",
   "prototypeDestinationPlaceholder": "Frame auswählen",
+  "prototypeVariantPlaceholder": "Variante auswählen",
+  "prototypeInheritedInteractions": {
+    "one": "{count} Interaktion aus der Hauptkomponente",
+    "many": "{count} Interaktionen aus der Hauptkomponente"
+  },
   "prototypeAnimation": "Animation",
   "prototypeAnimationInstant": "Sofort",
   "prototypeAnimationDissolve": "Überblenden",

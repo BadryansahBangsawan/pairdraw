@@ -2,3 +2,4 @@
 - Play runs Change to on instances of variants, from a click or an After delay set once on the main component's variant, and shows the switched variant without changing the document; an imported Figma interactive component plays the same.
 - A click in play counts over a frame's or an instance's whole box, so a button's background runs its interaction as its label does.
 - Play runs While hovering, While pressing, Mouse enter, and Mouse leave: a hovered or pressed instance shows its variant until the pointer leaves or lifts, and a Mouse enter or Mouse leave waits its delay unless the pointer moves back first.
+- The Prototype section offers Change to on a variant, an instance of one, or a layer inside one, listing the variants of its set, sets a delay for Mouse enter and Mouse leave, and shows how many interactions an instance takes from its main component, which a click selects.

@@ -12,7 +12,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { openVideoExport } from '@/app/document/export/video/open'
 import { useEditorStore } from '@/app/editor/active-store'
-import { actionChoice, type ActionChoice } from '@/app/editor/prototype/reactions'
+import { actionChoice, triggerHasDelay, type ActionChoice } from '@/app/editor/prototype/reactions'
 import { usePrototype } from '@/app/editor/prototype/use'
 import NumberField from '@/components/inputs/NumberField.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -24,6 +24,9 @@ const store = useEditorStore()
 const {
   reactions,
   targets,
+  variantTargets,
+  inheritedCount,
+  selectMain,
   play,
   add,
   remove,
@@ -54,12 +57,27 @@ const actionLabels = computed<Record<ActionChoice, string>>(() => ({
   CLOSE: panels.value.prototypeActionClose
 }))
 
-/** The actions offered for an interaction; one read from a file is listed so it shows. */
+/**
+ * The actions offered for an interaction: Change to on a layer in a variant, and one read from a
+ * file so it shows.
+ */
 function actionOptions(reaction: PrototypeReaction): { value: ActionChoice; label: string }[] {
   const current = actionChoice(reaction)
   const choices: ActionChoice[] = ['NAVIGATE', 'OVERLAY', 'BACK', 'CLOSE']
+  if (variantTargets.value.length > 0) choices.splice(2, 0, 'CHANGE_TO')
   if (!choices.includes(current)) choices.splice(2, 0, current)
   return choices.map((value) => ({ value, label: actionLabels.value[value] }))
+}
+
+/** What a node action can point at: frames for a navigation or overlay, variants for Change to. */
+function destinationOptions(reaction: PrototypeReaction) {
+  return node(reaction)?.navigation === 'CHANGE_TO' ? variantTargets.value : frameOptions.value
+}
+
+function destinationPlaceholder(reaction: PrototypeReaction): string {
+  return node(reaction)?.navigation === 'CHANGE_TO'
+    ? panels.value.prototypeVariantPlaceholder
+    : panels.value.prototypeDestinationPlaceholder
 }
 
 const transitionOptions = computed<{ value: PrototypeTransitionType; label: string }[]>(() => [
@@ -105,6 +123,17 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
       </IconButton>
     </template>
 
+    <button
+      v-if="inheritedCount > 0"
+      type="button"
+      class="flex min-w-0 items-center gap-1.5 rounded px-2 py-1 text-left text-[11px] text-muted hover:bg-hover hover:text-surface"
+      data-property="prototype-inherited"
+      @click="selectMain"
+    >
+      <icon-lucide-component class="size-3.5 shrink-0" />
+      <span class="truncate">{{ panels.prototypeInheritedInteractions(inheritedCount) }}</span>
+    </button>
+
     <div
       v-for="(reaction, index) in reactions"
       :key="reaction.id"
@@ -122,7 +151,7 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
           @update:model-value="(type: PrototypeTriggerType) => setTriggerType(reaction.id, type)"
         />
         <NumberField
-          v-if="reaction.trigger.type === 'AFTER_TIMEOUT'"
+          v-if="triggerHasDelay(reaction.trigger.type)"
           :model-value="reaction.trigger.delay"
           :min="0"
           :step="0.1"
@@ -152,8 +181,8 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
       <template v-if="node(reaction)">
         <AppSelect
           :model-value="node(reaction)?.nodeId ?? ''"
-          :options="frameOptions"
-          :placeholder="panels.prototypeDestinationPlaceholder"
+          :options="destinationOptions(reaction)"
+          :placeholder="destinationPlaceholder(reaction)"
           :label="panels.prototypeDestination"
           data-property="prototype-destination"
           @update:model-value="(id: string) => setTarget(reaction.id, id)"

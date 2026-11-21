@@ -6,11 +6,13 @@ import type {
   PrototypeTransitionType,
   PrototypeTriggerType
 } from '@pairdraw/scene-graph'
+import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
 import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 
+import { inheritedReactionCount, variantDestinations } from './destinations'
 import type { ActionChoice } from './reactions'
 import {
   createReaction,
@@ -42,6 +44,25 @@ export function usePrototype() {
   /** Frames on the current page, which a navigation or overlay may point at. */
   const targets = useSceneComputed(() => framesOnPage(store.graph, store.state.currentPageId))
 
+  /** The variants a Change to on the selected layer can show. */
+  const variantTargets = useSceneComputed(() => {
+    const node = selectedNode.value
+    return node ? variantDestinations(store.graph, node.id) : []
+  })
+
+  /** How many interactions the selected instance runs from its main component. */
+  const inheritedCount = useSceneComputed(() => {
+    const node = selectedNode.value
+    return node ? inheritedReactionCount(store.graph, node.id) : 0
+  })
+
+  /** Selects the main component of the selected instance, where its inherited interactions live. */
+  function selectMain() {
+    const node = selectedNode.value
+    const main = node?.type === 'INSTANCE' ? instanceMainComponent(store.graph, node) : undefined
+    if (main) store.select([main.id])
+  }
+
   function commit(next: readonly PrototypeReaction[], label: string) {
     const node = selectedNode.value
     if (!node) return
@@ -55,6 +76,9 @@ export function usePrototype() {
   return {
     reactions,
     targets,
+    variantTargets,
+    inheritedCount,
+    selectMain,
     play: () => store.startPlay(),
     add: () => commit(withReaction(reactions.value, createReaction()), 'Add interaction'),
     remove: (id: string) => commit(withoutReaction(reactions.value, id), 'Remove interaction'),

@@ -782,6 +782,10 @@
   "prototypeActionClose": "オーバーレイを閉じる",
   "prototypeDestination": "リンク先",
   "prototypeDestinationPlaceholder": "フレームを選択",
+  "prototypeVariantPlaceholder": "バリアントを選択",
+  "prototypeInheritedInteractions": {
+    "many": "メインコンポーネントのインタラクション {count} 件"
+  },
   "prototypeAnimation": "アニメーション",
   "prototypeAnimationInstant": "即時",
   "prototypeAnimationDissolve": "ディゾルブ",

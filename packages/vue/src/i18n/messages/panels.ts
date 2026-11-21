@@ -812,6 +812,11 @@ export const panelMessageDefaults = {
   prototypeActionClose: 'Close overlay',
   prototypeDestination: 'Destination',
   prototypeDestinationPlaceholder: 'Select a frame',
+  prototypeVariantPlaceholder: 'Select a variant',
+  prototypeInheritedInteractions: count({
+    one: '{count} interaction from the main component',
+    many: '{count} interactions from the main component'
+  }),
   prototypeAnimation: 'Animation',
   prototypeAnimationInstant: 'Instant',
   prototypeAnimationDissolve: 'Dissolve',

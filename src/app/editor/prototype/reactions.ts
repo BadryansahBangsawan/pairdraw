@@ -68,13 +68,23 @@ export function withReactionChange(
   return reactions.map((reaction) => (reaction.id === id ? next(reaction) : reaction))
 }
 
-/** Keeps the delay when it stays a delay, and gives a new timeout Figma's default one. */
+/** Whether a trigger waits a delay first: After delay, Mouse enter, and Mouse leave. */
+export function triggerHasDelay(type: PrototypeTriggerType): boolean {
+  return type === 'AFTER_TIMEOUT' || type === 'MOUSE_ENTER' || type === 'MOUSE_LEAVE'
+}
+
+/**
+ * Keeps the delay while it stays a delayed trigger; a new After delay gets Figma's default one, a
+ * new Mouse enter or leave none, and any other trigger drops it.
+ */
 export function setTriggerType(
   reaction: PrototypeReaction,
   type: PrototypeTriggerType
 ): PrototypeReaction {
   if (reaction.trigger.type === type) return reaction
-  const delay = type === 'AFTER_TIMEOUT' ? reaction.trigger.delay || DEFAULT_TIMEOUT_DELAY : 0
+  const kept = triggerHasDelay(reaction.trigger.type) ? reaction.trigger.delay : 0
+  if (!triggerHasDelay(type)) return { ...reaction, trigger: { type, delay: 0 } }
+  const delay = type === 'AFTER_TIMEOUT' ? kept || DEFAULT_TIMEOUT_DELAY : kept
   return { ...reaction, trigger: { type, delay } }
 }
 
@@ -97,8 +107,20 @@ export function setNavigation(
   navigation: PrototypeNodeAction['navigation']
 ): PrototypeReaction {
   const current = primaryAction(reaction)
-  if (current?.type !== 'NODE') return reaction
-  return replaceAction(reaction, { ...current, navigation })
+  if (current?.type !== 'NODE' || current.navigation === navigation) return reaction
+  // A frame, a variant, and a layer to scroll to are different picks; one does not carry over.
+  const sameKind = targetKind(current.navigation) === targetKind(navigation)
+  return replaceAction(reaction, {
+    ...current,
+    navigation,
+    nodeId: sameKind ? current.nodeId : null
+  })
+}
+
+/** What a node action points at: a frame for a navigation or overlay, else a variant or a layer. */
+function targetKind(navigation: PrototypeNavigationType): 'frame' | 'variant' | 'layer' {
+  if (navigation === 'CHANGE_TO') return 'variant'
+  return navigation === 'SCROLL_TO' ? 'layer' : 'frame'
 }
 
 export function setTarget(reaction: PrototypeReaction, nodeId: string | null): PrototypeReaction {

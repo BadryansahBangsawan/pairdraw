@@ -792,6 +792,11 @@
   "prototypeActionClose": "Chiudi sovrapposizione",
   "prototypeDestination": "Destinazione",
   "prototypeDestinationPlaceholder": "Seleziona un frame",
+  "prototypeVariantPlaceholder": "Seleziona una variante",
+  "prototypeInheritedInteractions": {
+    "one": "{count} interazione dal componente principale",
+    "many": "{count} interazioni dal componente principale"
+  },
   "prototypeAnimation": "Animazione",
   "prototypeAnimationInstant": "Immediata",
   "prototypeAnimationDissolve": "Dissolvenza",

@@ -792,6 +792,11 @@
   "prototypeActionClose": "Cerrar superposición",
   "prototypeDestination": "Destino",
   "prototypeDestinationPlaceholder": "Selecciona un marco",
+  "prototypeVariantPlaceholder": "Selecciona una variante",
+  "prototypeInheritedInteractions": {
+    "one": "{count} interacción del componente principal",
+    "many": "{count} interacciones del componente principal"
+  },
   "prototypeAnimation": "Animación",
   "prototypeAnimationInstant": "Instantánea",
   "prototypeAnimationDissolve": "Disolver",

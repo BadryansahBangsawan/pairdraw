@@ -21,6 +21,7 @@ import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 import type { EditorStore } from '@/app/editor/active-store'
 import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
+import { usePlayPointer } from './pointer'
 import { usePlayScenes } from './scenes'
 
 /** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
@@ -83,6 +84,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
 
   /** The frames play changed, which the canvas draws from their copies. */
   const play = usePlayScenes(store, session, live)
+  usePlayPointer(store, area, session, play, live)
 
   /** Whether an overlay is open, which dims everything but the overlay frame. */
   const scrim = computed(() => (session.value?.overlays.length ?? 0) > 0)

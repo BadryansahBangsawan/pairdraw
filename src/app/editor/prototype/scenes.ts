@@ -3,6 +3,7 @@ import { onScopeDispose, shallowRef, watch, type Ref } from 'vue'
 import {
   createPlayScenes,
   type PlayClick,
+  type PlayRevert,
   type PlaySession,
   type PlayStep,
   type PlayTimeout
@@ -44,6 +45,15 @@ export function usePlayScenes(
     session.value = result.session
     if (result.changed) changed()
     return result
+  }
+
+  /** Undoes a While hovering or While pressing reaction as the pointer leaves or lifts. */
+  function revert(undo: PlayRevert): void {
+    const current = session.value
+    if (!current) return
+    const result = scenes.revert(current, undo)
+    session.value = result.session
+    if (result.changed) changed()
   }
 
   function clear(): void {
@@ -127,6 +137,9 @@ export function usePlayScenes(
     /** The changed frames the canvas draws from their copies. */
     views: () => scenes.views,
     graphFor: (rootId: string) => scenes.graphFor(rootId),
-    run
+    /** Grows whenever what play shows of a frame changes. */
+    revision,
+    run,
+    revert
   }
 }

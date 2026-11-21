@@ -3,6 +3,7 @@ import * as v from 'valibot'
 
 import { PairdrawAPI } from '#core/pairdraw-api'
 import { defineTool } from '#core/tools/schema'
+import { listDocumentFonts } from '#core/text/replace-fonts'
 
 export const getFontStatus = defineTool({
   name: 'get_font_status',
@@ -18,13 +19,34 @@ export const getFontStatus = defineTool({
 
 export const listFonts = defineTool({
   name: 'list_fonts',
-  description: 'List fonts used in the current page.',
+  description:
+    'List fonts used in the current page as families with their weights. Pass scope ' +
+    '"document" for every face used anywhere in the document, with whether the host has it ' +
+    'and how many text layers use it, missing faces first; use replace_fonts to swap one for ' +
+    'an available face.',
   execution: { kind: 'sync', mutation: 'none' },
   exposure: { webmcp: false },
   input: v.strictObject({
-    family: v.optional(v.pipe(v.string(), v.description('Filter by family name (substring)')))
+    family: v.optional(v.pipe(v.string(), v.description('Filter by family name (substring)'))),
+    scope: v.optional(
+      v.pipe(
+        v.picklist(['page', 'document']),
+        v.description(
+          'page (default): families and weights of the current page. document: every face ' +
+            'across the document with missing and layerCount'
+        )
+      )
+    )
   }),
   execute: (figma, args) => {
+    if (args.scope === 'document') {
+      let fonts = listDocumentFonts(figma.graph)
+      if (args.family) {
+        const query = args.family.toLocaleLowerCase()
+        fonts = fonts.filter((font) => font.family.toLocaleLowerCase().includes(query))
+      }
+      return { count: fonts.length, fonts }
+    }
     const fonts = new Map<string, Set<number>>()
     const page = figma.currentPage
     page.findAll((node) => {

@@ -1,4 +1,5 @@
 export { setEffects } from './modify/effects'
+export { replaceFonts } from './modify/fonts'
 export { rescale, setMinMax, setOpacity, setRadius, setRotation } from './modify/geometry'
 export { setConstraints, setLayout, setLayoutChild } from './modify/layout'
 export { replaceMatchingProperties } from './modify/matching'

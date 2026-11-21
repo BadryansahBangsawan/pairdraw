@@ -51,6 +51,7 @@ import {
   replaceBackground
 } from '#core/tools/image-ai'
 import {
+  replaceFonts,
   setBlend,
   setConstraints,
   setEffects,
@@ -209,6 +210,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   setMinMax,
   setFontRange,
   setTextResize,
+  replaceFonts,
   setBlend,
   setLocked,
   setStrokeAlign,

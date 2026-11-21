@@ -280,7 +280,7 @@ The resources and the prompt stay available when `read_skill` is turned off in *
 
 ## Tools
 
-Pairdraw currently registers 142 shared design tools, plus MCP-only document and prompt operations when applicable.
+Pairdraw currently registers 143 shared design tools, plus MCP-only document and prompt operations when applicable.
 
 ### Document
 
@@ -325,7 +325,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `list_pages`           | List all pages                                                                                                                                                                                                      |
 | `list_variables`       | List design variables                                                                                                                                                                                               |
 | `list_collections`     | List variable collections                                                                                                                                                                                           |
-| `list_fonts`           | List fonts used in the current page                                                                                                                                                                                 |
+| `list_fonts`           | List fonts used in the current page as families with their weights; `scope: "document"` lists every face used anywhere in the document, with whether the host has it and how many text layers use it, missing faces first |
 | `list_available_fonts` | List font families the current host can render                                                                                                                                                                      |
 | `get_font_status`      | Report requested faces, loaded sources, active substitutions, why an installed face could not be loaded, and affected nodes                                                                                         |
 | `page_bounds`          | Get bounding box of all objects on the current page                                                                                                                                                                 |
@@ -386,6 +386,7 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `set_fill`                    | Set fill color (hex)                                                                                                                                                                                                                                                                  |
 | `set_image_fill`              | Fill a layer with an image from base64 `image_data` or a `url` (http, https, or data); `scale_mode` is `FILL` (default), `FIT`, `CROP`, `TILE`, or `STRETCH`, which stretches the whole image to the layer as the image fill panel's Stretch does                                     |
 | `replace_matching_properties` | Swap fill, text, or stroke colors, stroke weights, corner radii, font families, styles, or sizes for others everywhere on the page, the selection, or given layers; keeps instance overrides, and returns the layers of read-only library components it left unchanged in `read_only` |
+| `replace_fonts`               | Replace font faces everywhere in the document — text layers, character runs, and text styles — as one undoable step, and report how many layers, runs, and styles changed                                                                                                             |
 | `set_stroke`                  | Set stroke color, weight, alignment                                                                                                                                                                                                                                                   |
 | `set_effects`                 | Add shadow or blur effects                                                                                                                                                                                                                                                            |
 | `update_node`                 | Update position, size, opacity, corner radius, text, font                                                                                                                                                                                                                             |

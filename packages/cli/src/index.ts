@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
-import { defineCommand, runMain, type CommandDef } from 'citty'
+import { defineCommand, renderUsage, runCommand, runMain, type CommandDef } from 'citty'
 
 import { COMMANDS } from './commands'
+import { printError } from './format'
 
 const { version } = await import('../package.json')
 
@@ -149,4 +150,42 @@ function refuseExtraPositionals(command: CommandDef): void {
 refuseExtraPositionals(main)
 refuseUnknownOptions(main)
 
-void runMain(main, { rawArgs: withStdinValues(process.argv.slice(2)) })
+/** The command whose usage a run reached, and the group that holds it, as citty descends. */
+async function usageTarget(rawArgs: string[]): Promise<{ command: CommandDef; parent?: CommandDef }> {
+  let command: CommandDef = main
+  let parent: CommandDef | undefined
+  let args = rawArgs
+  for (;;) {
+    const subCommands = command.subCommands
+    if (!subCommands) return { command, parent }
+    const resolved = typeof subCommands === 'function' ? await subCommands() : await subCommands
+    const index = args.findIndex((arg) => !arg.startsWith('-'))
+    const entry = index === -1 ? undefined : resolved[args[index]]
+    if (!entry) return { command, parent }
+    const next = typeof entry === 'function' ? await entry() : await entry
+    parent = command
+    command = next
+    args = args.slice(index + 1)
+  }
+}
+
+const rawArgs = withStdinValues(process.argv.slice(2))
+if (rawArgs.includes('--help') || rawArgs.includes('-h') || (rawArgs.length === 1 && rawArgs[0] === '--version')) {
+  // citty shows usage and version itself, and has no error to report.
+  await runMain(main, { rawArgs })
+} else {
+  try {
+    await runCommand(main, { rawArgs })
+  } catch (error) {
+    // citty reports a missing command as a CLIError and printed the usage before it; keep that.
+    if ((error as { code?: unknown }).code === 'E_NO_COMMAND') {
+      const { command, parent } = await usageTarget(rawArgs)
+      // Printed here rather than through citty's consola, which hides info lines under NODE_ENV=test.
+      console.log(await renderUsage(command, parent))
+    }
+    // A user error is its message; PAIRDRAW_DEBUG adds the stack a crash needs to be read.
+    printError(error)
+    if (process.env.PAIRDRAW_DEBUG) console.error(error instanceof Error ? error.stack : error)
+    process.exit(1)
+  }
+}

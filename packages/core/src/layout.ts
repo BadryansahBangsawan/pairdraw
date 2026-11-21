@@ -25,6 +25,7 @@ import { insertFlowBox, setFlexFlow, setFlowEdges } from './layout/flow-edges'
 import { buildGridTree, createGridChildNode, gridTracksForAxis } from './layout/grid'
 import { sizeAutoResizingText } from './layout/text-auto-resize'
 export { sizeAutoResizingText } from './layout/text-auto-resize'
+export * from './layout/auto-layout-handles'
 export {
   estimateTextSize,
   getTextMeasurer,

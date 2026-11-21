@@ -26,7 +26,9 @@ const toolDescriptorSchema = v.object({
   effect: v.picklist(TOOL_EFFECTS),
   availability: v.picklist(TOOL_AVAILABILITIES),
   capabilities: v.array(v.picklist(TOOL_CAPABILITIES)),
-  enabled: v.boolean()
+  enabled: v.boolean(),
+  /** The call may run long even when it only reads, so the bridge waits as long as for an edit. */
+  long: v.optional(v.boolean())
 })
 
 export type ToolDescriptor = v.InferOutput<typeof toolDescriptorSchema>

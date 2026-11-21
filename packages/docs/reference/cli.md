@@ -138,7 +138,7 @@ pairdraw tokens app.fig --project ./app --write
 
 ## export
 
-Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories. The app does not offer PowerPoint or draw.io export; the CLI does.
+Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories, or record the page's prototype as a GIF. The app does not offer PowerPoint or draw.io export; the CLI does.
 
 ```sh
 pairdraw export [file] [options]
@@ -146,7 +146,7 @@ pairdraw export [file] [options]
 
 | Option | Alias | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook` |
+| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook`; `gif` records the prototype |
 | `--output` | `-o` | Output file path (default: `<name>.<format>`); a directory for `storybook` (default: `<name>-stories`) |
 | `--scale` | `-s` | Export scale (default: 1) |
 | `--quality` | `-q` | Quality 0–100, JPG/WEBP only (default: 90) |
@@ -164,6 +164,19 @@ pairdraw export [file] [options]
 | `--thumbnail` | | Export a page thumbnail fitted to `--width` and `--height`; PNG, JPG, or WEBP. Cannot combine with `--node` (a thumbnail is a whole page) |
 | `--width` | | Thumbnail width (default: 1920) |
 | `--height` | | Thumbnail height (default: 1080) |
+| `--start` | | Video: top-level frame name or ID to play from (default: the selected or the page's first frame) |
+| `--fps` | | Video: frames per second (default: 15 for GIF, at most 50) |
+| `--max-edge` | | Video: longest width or height in pixels (default: 960 for GIF); `--scale` sets the start frame's size below it |
+| `--max-duration` | | Video: seconds the clip may last at most (default: 30, at most 120) |
+| `--tail` | | Video: seconds the last frame stays when the flow ends (default: 1) |
+| `--click` | | Video: a click to run, `<seconds>:<layer name or ID>`; repeat it for more clicks |
+
+A video plays the prototype from its start frame as Play does, following each After delay and its Dissolve on a virtual clock rather than in real time, so the clip is the same on every run. It ends when play returns to the start frame (the GIF then loops), when nothing else happens, or at `--max-duration`. The command prints each step it recorded:
+
+```sh
+pairdraw export hero.fig -f gif --start "Hero 1" -o hero.gif
+pairdraw export app.fig -f gif --click 1.5:"Buy button" --click 3:Close
+```
 
 ## libraries
 

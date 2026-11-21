@@ -4,6 +4,7 @@ import {
   DISSOLVE_EASING_CSS,
   frameAt,
   planTimeline,
+  sessionDrawKey,
   TimelineError,
   type Timeline
 } from '@pairdraw/core/prototype'
@@ -122,6 +123,14 @@ describe('the screen a timeline shows at a moment', () => {
     expect(mid.mix).toBeCloseTo(0.177555, 5)
     expect(frameAt(timeline, 1300)).toEqual({ session: expect.objectContaining({ frameId: b }) })
     expect(frameAt(timeline, 99_000)).toEqual({ session: expect.objectContaining({ frameId: b }) })
+  })
+})
+
+describe('the key of what play draws', () => {
+  test('follows the frame and its overlays, not the history Back uses', () => {
+    const shown = { frameId: '1:1', startFrameId: '1:1', history: [], overlays: ['1:3'] }
+    expect(sessionDrawKey({ ...shown, history: ['1:2'] })).toBe(sessionDrawKey(shown))
+    expect(sessionDrawKey({ ...shown, overlays: [] })).not.toBe(sessionDrawKey(shown))
   })
 })
 
@@ -287,6 +296,7 @@ describe('steps a timeline takes', () => {
       frameId: a,
       overlays: [menu]
     })
+    expect(timeline.overlayPositions).toEqual({ [menu]: 'CENTER' })
     expect(timeline.loops).toBe(true)
     expect(timeline.durationMs).toBe(2000)
   })

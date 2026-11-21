@@ -18,6 +18,7 @@ export {
   dissolveEasing,
   frameAt,
   planTimeline,
+  sessionDrawKey,
   TimelineError,
   transitionMs,
   type Timeline,

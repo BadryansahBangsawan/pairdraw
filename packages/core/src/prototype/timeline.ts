@@ -1,5 +1,6 @@
 import type {
   PrototypeAction,
+  PrototypeOverlayPositionType,
   PrototypeTransitionType,
   SceneGraph,
   SceneNode
@@ -61,6 +62,8 @@ export interface Timeline {
   /** The flow went on past `maxMs`, where the timeline stops. */
   truncated: boolean
   steps: TimelineStep[]
+  /** Where each overlay frame play opened sits over the screen, from the action that opened it. */
+  overlayPositions: Record<string, PrototypeOverlayPositionType>
 }
 
 /** What a timeline shows at a moment: one screen, or two mid-crossfade with `mix` of the second. */
@@ -110,8 +113,12 @@ export function dissolveEasing(progress: number): number {
   return bezier((low + high) / 2, y1, y2)
 }
 
-/** What play draws: the base frame and its overlays. History only matters to Back. */
-function drawKey(session: PlaySession): string {
+/**
+ * What play draws, as a key two sessions share when they look alike: the base frame and its
+ * overlays. History only matters to Back. State that changes what a frame shows extends it here,
+ * and the recorder's screen cache follows.
+ */
+export function sessionDrawKey(session: PlaySession): string {
   return [session.frameId, ...session.overlays].join(' ')
 }
 
@@ -191,7 +198,8 @@ function startWalk(graph: SceneGraph, options: TimelineOptions): { walk: Walk; s
     clicks: (options.clicks ?? []).toSorted((a, b) => a.atMs - b.atMs),
     clickIndex: 0,
     segments: [],
-    steps: []
+    steps: [],
+    overlayPositions: {}
   }
   if (walk.timers.length === 0 && walk.clicks.length === 0) {
     throw new TimelineError(`'${start.name}' has no After delay interaction to follow`)
@@ -210,6 +218,7 @@ interface Walk {
   clickIndex: number
   segments: TimelineSegment[]
   steps: TimelineStep[]
+  overlayPositions: Record<string, PrototypeOverlayPositionType>
 }
 
 interface WalkEvent {
@@ -270,6 +279,9 @@ function advance(walk: Walk, event: WalkEvent & { action: PrototypeAction }, nex
     trigger: event.trigger,
     transition: durationMs > 0 ? 'DISSOLVE' : 'INSTANT'
   })
+  if (action.type === 'NODE' && action.navigation === 'OVERLAY' && action.nodeId) {
+    walk.overlayPositions[action.nodeId] = action.overlayPosition
+  }
   walk.session = next
   walk.readyMs = atMs + durationMs
   walk.timers = armTimers(walk.graph, next, walk.readyMs)
@@ -281,7 +293,8 @@ function finish(walk: Walk, durationMs: number, end: 'ends' | 'loops' | 'truncat
     durationMs,
     loops: end === 'loops',
     truncated: end === 'truncated',
-    steps: walk.steps
+    steps: walk.steps,
+    overlayPositions: walk.overlayPositions
   }
 }
 
@@ -294,7 +307,7 @@ function finish(walk: Walk, durationMs: number, end: 'ends' | 'loops' | 'truncat
  */
 export function planTimeline(graph: SceneGraph, options: TimelineOptions): Timeline {
   const { walk, start } = startWalk(graph, options)
-  const startKey = drawKey(walk.session)
+  const startKey = sessionDrawKey(walk.session)
 
   for (let taken = 0; taken <= MAX_TIMELINE_STEPS; taken++) {
     const dueAt = nextEventAt(walk)
@@ -321,7 +334,7 @@ export function planTimeline(graph: SceneGraph, options: TimelineOptions): Timel
     if (next === walk.session) continue
     advance(walk, { ...event, action }, next)
 
-    if (drawKey(next) === startKey && walk.clickIndex >= walk.clicks.length) {
+    if (sessionDrawKey(next) === startKey && walk.clickIndex >= walk.clicks.length) {
       if (walk.readyMs === 0) {
         throw new TimelineError(`The flow loops back to '${start.name}' at once`)
       }

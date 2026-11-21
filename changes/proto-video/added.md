@@ -1,0 +1,1 @@
+- The CLI (`pairdraw export -f gif`) and the MCP `export_video` tool record a prototype as a GIF: from a start frame, following its After delay interactions, their Dissolve transitions, and optional scripted clicks on a virtual clock, so the clip is the same on every run.

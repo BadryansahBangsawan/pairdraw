@@ -26,7 +26,15 @@ export type ToolCapability =
 
 export type ToolExecution =
   | { kind: 'sync'; mutation: 'none' | 'view' | 'properties' | 'document' }
-  | { kind: 'async'; mutation: 'none' | 'view' | 'document' }
+  | {
+      kind: 'async'
+      mutation: 'none' | 'view' | 'document'
+      /**
+       * The call can run for a long time even when it only reads, such as recording a video, so
+       * bridges give it the deadline they give an edit.
+       */
+      long?: boolean
+    }
 
 export type ToolInterface = 'mcp' | 'ai' | 'webmcp'
 export type ToolExposure = Partial<Record<ToolInterface, boolean>>

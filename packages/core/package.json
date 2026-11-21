@@ -144,6 +144,11 @@
       "import": "./dist/io/formats/html/layers.js",
       "default": "./dist/io/formats/html/layers.js"
     },
+    "./io/formats/video": {
+      "types": "./dist/io/formats/video/index.d.ts",
+      "import": "./dist/io/formats/video/index.js",
+      "default": "./dist/io/formats/video/index.js"
+    },
     "./io/formats/raster": {
       "types": "./dist/io/formats/raster/index.d.ts",
       "import": "./dist/io/formats/raster/index.js",
@@ -230,6 +235,7 @@
     "es-toolkit": "^1.52.0",
     "fflate": "^0.8.3",
     "fontoxpath": "^3.34.0",
+    "gifenc": "^1.0.3",
     "happy-dom": "^20.14.6",
     "harfbuzzjs": "1.6.4",
     "js-base64": "^3.9.3",

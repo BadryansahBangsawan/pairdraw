@@ -116,6 +116,7 @@ import {
   exportImage,
   exportPDF,
   exportSVG,
+  exportVideo,
   pathFlip,
   pathGet,
   pathMove,
@@ -241,6 +242,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   exportSVG,
   exportPDF,
   exportImage,
+  exportVideo,
   exportHTML,
   // Analyze & diff
   analyzeColors,

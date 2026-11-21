@@ -121,6 +121,7 @@ pairdraw export design.fig -f jsx --style tailwind -o component.tsx
 pairdraw export design.pen -f storybook -o src/stories --watch  # stories + design images per component, re-exported on save
 pairdraw export 'src/**/*.pen' -f storybook --beside  # stories next to each design file
 pairdraw export design.fig --thumbnail --width 1920 --height 1080
+pairdraw export flow.fig -f gif --start "Hero 1" -o hero.gif  # record the prototype's After delay chain
 pairdraw export --page "Components" -o components.png
 
 pairdraw convert design.fig -o design.pen
@@ -319,7 +320,7 @@ The CLI defaults the filesystem root to the home directory on Windows and the cu
 2. **Query** — `get_page_tree`, `find_nodes`, `query_nodes`, `get_node`, `list_pages`, `get_current_page`.
 3. **Inspect** — `get_jsx`, `diff_jsx`, `diff_create`, `diff_visual`, `describe`, `export_image`, `export_svg`, `export_pdf`.
 4. **Modify** — `render`, `batch_update`, `update_node`, `set_fill`, `set_layout`, `create_shape`, `import_svg`, etc. For a flowchart, write it as Mermaid and call `import_mermaid { mermaid }`: it lays out FigJam shapes, sections, and connectors without overlaps and returns each node's layer id, instead of placing shapes and connectors by hand. When layers you created overlap, call `arrange { ids }`: it spreads them apart and keeps each near where it was. `arrange` also packs screens (`mode: "pack"`) and lays shapes out along the connectors joining them (`mode: "flow"` for flows, `"tree"` for hierarchies, `"radial"` for mind maps, `"network"` for relationship maps).
-5. **Save/export** — `save_file`, `export_image`, `export_svg`, `export_pdf`, or CLI `export`.
+5. **Save/export** — `save_file`, `export_image`, `export_svg`, `export_pdf`, `export_video`, or CLI `export`.
 6. **Close** — `close_file { document_id, unsaved }` closes a document tab after the workflow. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; automation never prompts in the app.
 
 Each session keeps the document it edits, including after the person switches tabs. Home and a New file tab are not documents: an edit with none chosen yet opens a document tab and leaves the current tab in front. `open_file` owns a document only when that call opened it. `close_file` without `document_id` closes only a document this session opened. `save_file` without `document_id` saves the document this session is targeting, or the document in front. When that document has been closed, call `list_documents` and pass `document_id`, or call `new_document` or `open_file`. A new HTTP session starts with no document. An idle timeout of 15 minutes ends the previous session, and the next edit opens its own tab. Set `PAIRDRAW_SESSION` to run two CLI agents at once; otherwise CLI commands share one `cli` session.
@@ -349,6 +350,7 @@ Discover available tools and their arguments from the connected server or browse
 - **`describe`** — semantic analysis of role, visual style, layout, and design issues.
 - **`batch_update`** — apply multiple node updates efficiently.
 - **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables; `export_image` takes `quality` (1–100) for JPG and WEBP.
+- **`export_video`** — records the prototype from a start frame, following After delays and Dissolves (and scripted `clicks`) on a virtual clock; check the returned `steps`, and pass `path` for the file.
 - **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.
 - **`diff_changes`** — outside AI chat, call it with `mark: true`, then later without it to see what you or the designer changed since.
 - **`find_empty_space`** — a free spot of a given size beside existing content, before placing new frames.

@@ -3,6 +3,7 @@ import type { IncomingMessage } from 'node:http'
 
 import { isPlainObject } from 'es-toolkit'
 
+import { ALL_TOOLS } from '@pairdraw/core/tools'
 import { readDiscoveryFile } from '@pairdraw/mcp/discovery'
 import type { DiscoveryInfo } from '@pairdraw/mcp/discovery'
 import { platformHasUnixSockets } from '@pairdraw/mcp/transport'
@@ -11,6 +12,20 @@ import type { AppTarget } from '#cli/app/target'
 
 /** Maximum time to wait for a single RPC request before giving up. */
 const RPC_TIMEOUT_MS = 30_000
+/**
+ * How long a tool that declares `execution.long`, such as a video recording, may take: past the
+ * MCP bridge's own 120 s deadline for it, so the CLI reads the app's answer rather than giving up.
+ */
+const LONG_RPC_TIMEOUT_MS = 135_000
+
+/** How long to wait for `command`: longer for a Core tool that runs long. */
+export function rpcTimeoutMs(command: string, args: unknown): number {
+  if (command !== 'tool' || !isPlainObject(args)) return RPC_TIMEOUT_MS
+  const tool = ALL_TOOLS.find((candidate) => candidate.name === args.name)
+  return tool?.execution.kind === 'async' && tool.execution.long
+    ? LONG_RPC_TIMEOUT_MS
+    : RPC_TIMEOUT_MS
+}
 
 /**
  * Commands are separate processes, so a random id per process would open a new document each
@@ -52,7 +67,8 @@ function doRequest(
   path: string,
   method: string,
   body?: Record<string, unknown>,
-  forceTcp = false
+  forceTcp = false,
+  timeoutMs = RPC_TIMEOUT_MS
 ): Promise<{ status: number; data: unknown }> {
   return new Promise((resolve, reject) => {
     const bodyJSON = body ? JSON.stringify(body) : undefined
@@ -88,8 +104,8 @@ function doRequest(
     })
 
     const timer = setTimeout(() => {
-      req.destroy(new Error(`RPC request timed out after ${RPC_TIMEOUT_MS / 1000}s`))
-    }, RPC_TIMEOUT_MS)
+      req.destroy(new Error(`RPC request timed out after ${timeoutMs / 1000}s`))
+    }, timeoutMs)
 
     req.on('error', (err) => {
       clearTimeout(timer)
@@ -112,7 +128,14 @@ async function doRPC<T>(
   args: unknown,
   forceTcp = false
 ): Promise<RPCResponse<T>> {
-  const { status, data } = await doRequest(info, '/rpc', 'POST', { command, args }, forceTcp)
+  const { status, data } = await doRequest(
+    info,
+    '/rpc',
+    'POST',
+    { command, args },
+    forceTcp,
+    rpcTimeoutMs(command, args)
+  )
 
   if (status === 401) {
     throw new UnauthorizedError(

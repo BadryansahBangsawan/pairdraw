@@ -89,6 +89,14 @@ function printReadWarnings(filePath: string, warnings: readonly ReadDocumentWarn
       )
       continue
     }
+    if (warning.kind === 'missing-image') {
+      console.error(
+        warn(
+          `${filePath}: names image files it cannot read (${warning.urls.join(', ')}); their fills are left out.`
+        )
+      )
+      continue
+    }
     console.error(
       warn(
         `${filePath}: could not open the libraries it imports (${warning.paths.join(', ')}); their components read as placeholders.`

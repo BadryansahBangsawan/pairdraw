@@ -26,10 +26,12 @@ const PEN_ICON_SIZE = 24
 const WARNING_NAMES = 10
 
 /** One warning for the names found, capped, or none when nothing was found. */
-function warningList(names: ReadonlySet<string>): ReadDocumentWarning[] {
-  return names.size > 0
-    ? [{ kind: 'unknown-variable', names: [...names].slice(0, WARNING_NAMES) }]
-    : []
+function warningList<K extends 'unknown-variable' | 'missing-image' | 'unknown-node'>(
+  kind: K,
+  field: K extends 'unknown-variable' ? 'names' : K extends 'missing-image' ? 'urls' : 'types',
+  names: ReadonlySet<string>
+): ReadDocumentWarning[] {
+  return names.size > 0 ? [{ kind, [field]: [...names].slice(0, WARNING_NAMES) } as ReadDocumentWarning] : []
 }
 
 /**
@@ -91,19 +93,22 @@ async function loadPenShaders(
   return shaders
 }
 
+/** The images the host has, and the URLs it does not, whose paints are dropped. */
 async function loadPenImages(
   urls: readonly string[],
   input: ReadDocumentInput,
   opened: ReadonlyMap<string, OpenedImport>
-): Promise<Map<string, Uint8Array>> {
+): Promise<{ images: Map<string, Uint8Array>; missing: Set<string> }> {
   const images = new Map<string, Uint8Array>()
+  const missing = new Set<string>()
   await Promise.all(
     urls.map(async (url) => {
       const bytes = await loadPenFile(url, input, opened)
       if (bytes) images.set(url, bytes)
+      else missing.add(url)
     })
   )
-  return images
+  return { images, missing }
 }
 
 /** A request's options as a key, so requests drawn the same way share a fetch. */
@@ -163,7 +168,7 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     const { imports, opened } = await loadPenImports(doc, input, unresolved)
     const importsIncomplete = unresolved.warnings().length > 0
     const assets = penAssets(withUsedImports(doc, imports))
-    const [images, shaders, icons, fonts] = await Promise.all([
+    const [{ images, missing }, shaders, icons, fonts] = await Promise.all([
       loadPenImages(assets.images, input, opened),
       loadPenShaders(assets.shaders, input, opened),
       loadPenIcons(assets.icons, context?.icons ?? defaultIcons),
@@ -190,7 +195,8 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     })
     const warnings: ReadDocumentWarning[] = [
       ...unresolved.warnings(),
-      ...warningList(unknownVariables)
+      ...warningList('unknown-variable', 'names', unknownVariables),
+      ...warningList('missing-image', 'urls', missing)
     ]
     return warnings.length > 0
       ? { graph, sourceFormat: 'pen', warnings }

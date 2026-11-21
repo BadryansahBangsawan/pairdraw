@@ -105,6 +105,10 @@ export function reportReadWarnings(
       toast.warning(messages.unknownVariables({ names: warning.names.join(', ') }))
       continue
     }
+    if (warning.kind === 'missing-image') {
+      toast.warning(messages.missingImages({ names: warning.urls.join(', ') }))
+      continue
+    }
     const params = { name: documentName, paths: warning.paths.join(', ') }
     if (warning.reason === 'unreadable') toast.warning(messages.importedLibrariesUnreadable(params))
     // On the desktop only a file dropped in comes without a path to read its libraries beside.

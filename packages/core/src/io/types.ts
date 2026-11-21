@@ -61,6 +61,12 @@ export type ReadDocumentWarning =
       /** The variable names as the document writes them, without the `$`. */
       names: string[]
     }
+  | {
+      /** Image files a paint names that the host opened the document without. */
+      kind: 'missing-image'
+      /** The URLs as the document writes them. */
+      urls: string[]
+    }
 
 export interface ReadDocumentResult {
   graph: SceneGraph

@@ -38,6 +38,9 @@ const notificationMessageDefaults = {
   unknownVariables: params(
     'Layers reference variables the document does not define ({names}); they use their fallback values.'
   ),
+  missingImages: params(
+    'Image files the document names are missing ({names}); their fills are left out.'
+  ),
   viewDiagnostics: 'View diagnostics',
   importedDOMCSS: 'Imported DOM/CSS document.',
   importDOMCSSFailed: params('Could not import DOM/CSS: {error}'),

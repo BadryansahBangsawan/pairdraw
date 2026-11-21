@@ -11,6 +11,7 @@
   "importedLibrariesNeedOpenDialog": "Un file trascinato non può aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto. Aprilo con File > Apri… per vederli.",
   "importedLibrariesUnreadable": "Impossibile aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto.",
   "unknownVariables": "I livelli fanno riferimento a variabili che il documento non definisce ({names}); usano i valori di riserva.",
+  "missingImages": "Mancano file immagine indicati dal documento ({names}); i relativi riempimenti vengono omessi.",
   "viewDiagnostics": "Mostra diagnostica",
   "importedDOMCSS": "Documento DOM/CSS importato.",
   "importDOMCSSFailed": "Impossibile importare DOM/CSS: {error}",

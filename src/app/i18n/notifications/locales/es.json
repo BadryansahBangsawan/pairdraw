@@ -11,6 +11,7 @@
   "importedLibrariesNeedOpenDialog": "Un archivo arrastrado no puede abrir las bibliotecas que importa «{name}» ({paths}), así que sus componentes se muestran como marcadores de posición. Ábrelo con Archivo > Abrir… para verlos.",
   "importedLibrariesUnreadable": "No se pudieron abrir las bibliotecas que importa «{name}» ({paths}), así que sus componentes se muestran como marcadores de posición.",
   "unknownVariables": "Las capas hacen referencia a variables que el documento no define ({names}); usan sus valores de reserva.",
+  "missingImages": "Faltan archivos de imagen que el documento menciona ({names}); sus rellenos se omiten.",
   "viewDiagnostics": "Ver diagnóstico",
   "importedDOMCSS": "Documento DOM/CSS importado.",
   "importDOMCSSFailed": "No se pudo importar DOM/CSS: {error}",

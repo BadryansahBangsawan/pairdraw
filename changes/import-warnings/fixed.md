@@ -1,1 +1,1 @@
-- A .pen import now tells the host about variables it does not define instead of losing content silently.
+- A .pen import now tells the host about variables it does not define and missing image files instead of losing content silently.

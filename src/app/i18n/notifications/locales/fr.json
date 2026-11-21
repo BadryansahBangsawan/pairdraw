@@ -11,6 +11,7 @@
   "importedLibrariesNeedOpenDialog": "Un fichier déposé ne peut pas ouvrir les bibliothèques importées par « {name} » ({paths}) : leurs composants s’affichent comme des espaces réservés. Ouvrez-le avec Fichier > Ouvrir… pour les voir.",
   "importedLibrariesUnreadable": "Impossible d’ouvrir les bibliothèques importées par « {name} » ({paths}) : leurs composants s’affichent comme des espaces réservés.",
   "unknownVariables": "Des calques référencent des variables que le document ne définit pas ({names}) ; ils utilisent leurs valeurs de repli.",
+  "missingImages": "Des fichiers d’image nommés par le document sont absents ({names}) ; leurs remplissages sont omis.",
   "viewDiagnostics": "Voir les diagnostics",
   "importedDOMCSS": "Document DOM/CSS importé.",
   "importDOMCSSFailed": "Impossible d’importer le DOM/CSS : {error}",

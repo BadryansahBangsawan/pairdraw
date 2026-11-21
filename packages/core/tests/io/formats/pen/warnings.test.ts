@@ -37,6 +37,23 @@ describe('penFormat warnings', () => {
     ])
   })
 
+  test('names an image file the host could not read', async () => {
+    const { graph, warnings } = await read({
+      children: [
+        {
+          id: 'photo',
+          type: 'rectangle',
+          fill: { type: 'image', url: './gone.png' },
+          width: 40,
+          height: 40
+        }
+      ]
+    })
+
+    // The paint is dropped as before.
+    expect(graph.getNode('photo')?.fills).toEqual([])
+    expect(warnings).toContainEqual({ kind: 'missing-image', urls: ['./gone.png'] })
+  })
 
 
 

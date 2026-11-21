@@ -5,7 +5,8 @@ import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import { resolveNodeLayoutDirection } from '@pairdraw/scene-graph/text/direction'
 
 import { ownAxisSizing } from './axis-sizing'
-import { applyContentInsets, applyStrokeMargins } from './strokes'
+import { keepsSavedFrameSize } from './derived'
+import { applyContentInsets, applyStrokeMargins, contentInsetsSize } from './strokes'
 import {
   applyMinMaxConstraints,
   configureAbsoluteChild,
@@ -24,15 +25,21 @@ export function gridTracksForAxis(node: SceneNode, axis: 'width' | 'height'): Gr
 }
 
 function configureAsGrid(
+  graph: SceneGraph,
   yogaNode: YogaNode,
   node: SceneNode,
   direction: Exclude<SceneNode['layoutDirection'], 'AUTO'>
 ): void {
   yogaNode.setDisplay(Display.Grid)
   yogaNode.setDirection(direction === 'RTL' ? Direction.RTL : Direction.LTR)
-  if (ownAxisSizing(node, 'width') !== 'HUG') yogaNode.setWidth(node.width)
+  const insets = keepsSavedFrameSize(graph, node) ? null : contentInsetsSize(node)
+  if (ownAxisSizing(node, 'width') !== 'HUG') {
+    yogaNode.setWidth(insets ? Math.max(node.width, insets.width) : node.width)
+  }
   if (ownAxisSizing(node, 'height') !== 'HUG') {
-    if (node.gridTemplateRows.length > 0 || node.height > 0) yogaNode.setHeight(node.height)
+    if (node.gridTemplateRows.length > 0 || node.height > 0) {
+      yogaNode.setHeight(insets ? Math.max(node.height, insets.height) : node.height)
+    }
   }
 
   if (node.gridTemplateColumns.length > 0) {
@@ -87,7 +94,7 @@ export function buildGridTree(
 ): YogaNode {
   const root = createYogaNode()
   const direction = resolveNodeLayoutDirection(frame, inheritedDirection)
-  configureAsGrid(root, frame, direction)
+  configureAsGrid(graph, root, frame, direction)
 
   const children = graph.getChildren(frame.id)
   for (const child of children) {

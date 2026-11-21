@@ -5,8 +5,9 @@ import { enforcedAspectRatio } from '@pairdraw/scene-graph/layout'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { layoutConstrainedChildRect, shapeGeometryChanges } from '@pairdraw/scene-graph/resize'
 
-import { keepsSavedLayout, usesDetachedDerivedLayout } from './derived'
+import { keepsSavedFrameSize, keepsSavedLayout, usesDetachedDerivedLayout } from './derived'
 import { laidOutFlowBox } from './flow-edges'
+import { contentInsetsSize } from './strokes'
 
 export type ComputeLayoutFn = (graph: SceneGraph, frameId: string) => void
 
@@ -153,6 +154,74 @@ function hugStart(frame: SceneNode): { width: number; height: number } | null {
   }
 }
 
+/**
+ * The smallest size a layout frame holds: what Yoga computed for it, or the room its padding and
+ * included inside strokes take, which Yoga's fixed size does not count. A saved frame nobody
+ * edited holds exactly what Yoga computed, so opening a file never grows it.
+ */
+function heldFrameSize(
+  frame: SceneNode,
+  yogaNode: YogaNode,
+  holdsSavedSize: boolean
+): { width: number; height: number } {
+  const insets = holdsSavedSize ? null : contentInsetsSize(frame)
+  return {
+    width: Math.max(yogaNode.getComputedWidth(), insets?.width ?? 0),
+    height: Math.max(yogaNode.getComputedHeight(), insets?.height ?? 0)
+  }
+}
+
+/** A grid's size: automatic rows take their height, and a hugged axis takes what Yoga computed. */
+function applyGridFrameSize(
+  graph: SceneGraph,
+  frame: SceneNode,
+  yogaNode: YogaNode,
+  computeLayout: ComputeLayoutFn
+): void {
+  const updates: LayoutGeometry = {}
+  const holds = keepsSavedFrameSize(graph, frame)
+  const held = heldFrameSize(frame, yogaNode, holds)
+  if (frame.primaryAxisSizing === 'HUG') updates.width = held.width
+  else if (!holds && held.width > frame.width) updates.width = held.width
+  const automaticRows = frame.gridTemplateRows.length === 0
+  if (automaticRows || frame.counterAxisSizing === 'HUG') updates.height = held.height
+  else if (!holds && held.height > frame.height) updates.height = held.height
+  writeLayoutGeometry(graph, frame.id, updates, computeLayout)
+}
+
+/** The sizes a flex frame takes: a fixed one grows to its padding, and a hugged one hugs. */
+function flexFrameSizeUpdates(
+  frame: SceneNode,
+  held: { width: number; height: number },
+  computed: (axis: 'width' | 'height') => number,
+  derived: Partial<Record<'width' | 'height', number>> | null,
+  keepsSavedSize: (axis: 'width' | 'height') => boolean,
+  holdsSavedSize: boolean
+): LayoutGeometry {
+  const primary = frame.layoutMode === 'HORIZONTAL' ? 'width' : 'height'
+  const counter = primary === 'width' ? 'height' : 'width'
+  const updates: LayoutGeometry = {}
+  // The padding floor is an edit: a saved frame nobody touched keeps the size it has.
+  if (frame.primaryAxisSizing === 'FIXED' && !holdsSavedSize && held[primary] > frame[primary]) {
+    updates[primary] = held[primary]
+  }
+  if (frame.counterAxisSizing === 'FIXED' && !holdsSavedSize && held[counter] > frame[counter]) {
+    updates[counter] = held[counter]
+  }
+  if (frame.primaryAxisSizing === 'HUG') {
+    const floor = holdsSavedSize ? 0 : held[primary]
+    updates[primary] = Math.max(derived?.[primary] ?? computed(primary), floor)
+  }
+  if (frame.counterAxisSizing === 'HUG') {
+    const floor = holdsSavedSize ? 0 : held[counter]
+    updates[counter] = Math.max(
+      keepsSavedSize(counter) ? frame[counter] : (derived?.[counter] ?? computed(counter)),
+      floor
+    )
+  }
+  return updates
+}
+
 function applyFrameSize(
   graph: SceneGraph,
   frame: SceneNode,
@@ -161,36 +230,25 @@ function applyFrameSize(
   computeLayout: ComputeLayoutFn
 ): void {
   if (frame.layoutMode === 'GRID') {
-    // A grid with automatic rows takes the height they need; one that hugs either axis takes
-    // the size Yoga computed for its tracks, as Figma hugs a grid.
-    const updates: LayoutGeometry = {}
-    if (frame.primaryAxisSizing === 'HUG') updates.width = yogaNode.getComputedWidth()
-    if (frame.gridTemplateRows.length === 0 || frame.counterAxisSizing === 'HUG') {
-      updates.height = yogaNode.getComputedHeight()
-    }
-    writeLayoutGeometry(graph, frame.id, updates, computeLayout)
+    applyGridFrameSize(graph, frame, yogaNode, computeLayout)
     return
   }
 
   const before = hugStart(frame)
-  if (!before) return
-
-  const updates: LayoutGeometry = {}
-  const derived = keepsSaved ? frame.derivedLayout : null
-  const primary = frame.layoutMode === 'HORIZONTAL' ? 'width' : 'height'
-  const counter = primary === 'width' ? 'height' : 'width'
   const computed = (axis: 'width' | 'height') =>
     axis === 'width' ? yogaNode.getComputedWidth() : yogaNode.getComputedHeight()
-  if (frame.primaryAxisSizing === 'HUG') updates[primary] = derived?.[primary] ?? computed(primary)
-  if (frame.counterAxisSizing === 'HUG') {
-    updates[counter] =
-      keepsSaved && preservesImportedHugCrossSize(graph, frame, counter)
-        ? frame[counter]
-        : (derived?.[counter] ?? computed(counter))
-  }
-
-  writeLayoutGeometry(graph, frame.id, updates, computeLayout, before)
-  huggedSizes.set(frame, { width: frame.width, height: frame.height })
+  const holds = keepsSavedFrameSize(graph, frame)
+  const updates = flexFrameSizeUpdates(
+    frame,
+    heldFrameSize(frame, yogaNode, holds),
+    computed,
+    keepsSaved ? frame.derivedLayout : null,
+    (axis) => keepsSaved && preservesImportedHugCrossSize(graph, frame, axis),
+    holds
+  )
+  if (Object.keys(updates).length === 0) return
+  writeLayoutGeometry(graph, frame.id, updates, computeLayout, before ?? undefined)
+  if (before) huggedSizes.set(frame, { width: frame.width, height: frame.height })
 }
 
 function computedChildPosition(

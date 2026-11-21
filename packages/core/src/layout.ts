@@ -19,7 +19,7 @@ import {
   setCrossAxisSizing,
   setMainAxisSizing
 } from './layout/axis-sizing'
-import { keepsSavedLayout, usesDetachedDerivedLayout } from './layout/derived'
+import { keepsSavedFrameSize, keepsSavedLayout, usesDetachedDerivedLayout } from './layout/derived'
 import { applyEffectiveGeneratedTextLayout } from './layout/effective-generated-text'
 import { insertFlowBox, setFlexFlow, setFlowEdges } from './layout/flow-edges'
 import { buildGridTree, createGridChildNode, gridTracksForAxis } from './layout/grid'
@@ -37,7 +37,12 @@ import { connectorSublayers, layoutConnector } from '@pairdraw/scene-graph/conne
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
-import { applyContentInsets, applyStrokeMargins, strokeRoom } from './layout/strokes'
+import {
+  applyContentInsets,
+  applyStrokeMargins,
+  contentInsetsSize,
+  strokeRoom
+} from './layout/strokes'
 import {
   autoWidthWrapWidth,
   estimateTextSize,
@@ -181,23 +186,26 @@ function buildYogaTree(
 ): YogaNode {
   const root = createYogaNode()
   const direction = resolveNodeLayoutDirection(frame, inheritedDirection)
+  const insets = keepsSavedFrameSize(graph, frame) ? null : contentInsetsSize(frame)
+  const width = insets ? Math.max(frame.width, insets.width) : frame.width
+  const height = insets ? Math.max(frame.height, insets.height) : frame.height
 
   if (frame.primaryAxisSizing === 'FIXED') {
-    if (frame.layoutMode === 'HORIZONTAL') root.setWidth(frame.width)
-    else root.setHeight(frame.height)
+    if (frame.layoutMode === 'HORIZONTAL') root.setWidth(width)
+    else root.setHeight(height)
   }
   if (frame.counterAxisSizing === 'FIXED') {
-    if (frame.layoutMode === 'HORIZONTAL') root.setHeight(frame.height)
-    else root.setWidth(frame.width)
+    if (frame.layoutMode === 'HORIZONTAL') root.setHeight(height)
+    else root.setWidth(width)
   }
   // Laid out on its own, a frame its parent stretches keeps the size the parent gave it on
   // that axis, so its content aligns within that size rather than within a hug.
   const stretchedAxis = parentStretchedAxis(graph, frame)
-  if (stretchedAxis === 'width') root.setWidth(frame.width)
-  if (stretchedAxis === 'height') root.setHeight(frame.height)
+  if (stretchedAxis === 'width') root.setWidth(width)
+  if (stretchedAxis === 'height') root.setHeight(height)
   const heldAxis = heldHugAxis(graph, frame)
-  if (heldAxis === 'width') root.setWidth(frame.width)
-  if (heldAxis === 'height') root.setHeight(frame.height)
+  if (heldAxis === 'width') root.setWidth(width)
+  if (heldAxis === 'height') root.setHeight(height)
 
   configureFlexContainer(root, frame, direction)
 

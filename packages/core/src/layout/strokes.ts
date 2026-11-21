@@ -74,6 +74,18 @@ export function applyContentInsets(yogaNode: YogaNode, node: SceneNode): void {
 }
 
 /**
+ * The room a horizontal and vertical layout frame's padding and included inside strokes take,
+ * which is the smallest size it holds even when set smaller, as Figma grows such a frame.
+ */
+export function contentInsetsSize(node: SceneNode): { width: number; height: number } {
+  const inside = node.strokesIncludedInLayout ? strokeExtent(node, 'inside') : null
+  return {
+    width: node.paddingLeft + node.paddingRight + (inside ? inside[1] + inside[3] : 0),
+    height: node.paddingTop + node.paddingBottom + (inside ? inside[0] + inside[2] : 0)
+  }
+}
+
+/**
  * With strokes included in its parent's layout, the part of a child's stroke that falls outside
  * its box takes room beside it, so neighbours and a hugging parent clear the stroke.
  */

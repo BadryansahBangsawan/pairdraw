@@ -1,5 +1,6 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { LAYOUT_AFFECTING_KEYS } from '@pairdraw/scene-graph/fields'
+import { takesOwnSize } from '@pairdraw/scene-graph/instances'
 
 /** Edits that make saved geometry stale: layout fields, visibility, and text laid out again. */
 const LAYOUT_EDIT_FIELDS: ReadonlySet<string> = new Set([
@@ -94,4 +95,17 @@ export function usesDetachedDerivedLayout(graph: SceneGraph, child: SceneNode): 
       (heightSizing === 'HUG' && derived.height !== undefined)) &&
     keepsSavedLayout(graph, child)
   )
+}
+
+/**
+ * Whether layout holds a frame's saved size exactly: a frame read from a file whose flow and
+ * layout are still untouched by the user or a tool. Growing it to its padding belongs to an
+ * edit, so opening or re-laying out a file leaves the saved size alone.
+ */
+export function keepsSavedFrameSize(graph: SceneGraph, frame: SceneNode): boolean {
+  // An instance shows the size its main or an override gives it, as do the layers inside it; their
+  // own padding is not an edit this layout may grow them from.
+  if (frame.type === 'INSTANCE' || !takesOwnSize(graph, frame)) return true
+  const readFromFile = frame.source.format === 'fig' || frame.derivedLayout != null
+  return readFromFile && keepsSavedLayout(graph, frame)
 }

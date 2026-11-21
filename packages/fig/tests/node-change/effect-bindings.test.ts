@@ -53,6 +53,18 @@ describe('effect bindings through the modeled effects', () => {
     })
   })
 
+  test('a binding past the record’s effects is left out', () => {
+    expect(
+      remapEffectBindings(
+        {
+          'effects/9/radius': 'missing-effect',
+          'fills/0/color': 'fill-color'
+        },
+        effects
+      )
+    ).toEqual({ 'fills/0/color': 'fill-color' })
+  })
+
   test('bindings pass through unchanged when the record lists no effects', () => {
     const bindings = { 'effects/1/radius': 'shadow-radius' }
     expect(remapEffectBindings(bindings, undefined)).toEqual(bindings)

@@ -55,6 +55,13 @@ async function acceptHealth(): Promise<void> {
   })
 }
 
+/** Lets the start that just accepted health finish on its microtasks. */
+async function settleStarted(): Promise<void> {
+  for (let turn = 0; turn < 5; turn++) {
+    await Promise.resolve()
+  }
+}
+
 function pluginOptions(spawnProcess: (env: NodeJS.ProcessEnv) => SpawnedChild) {
   return {
     browserURL: 'http://127.0.0.1:9',
@@ -213,27 +220,27 @@ describe('development MCP restart wiring', () => {
   })
 
   test('giving up names how many restarts were used', async () => {
-    // Real timers: the plugin's restart waits are the life of this test, and its start path also
-    // waits on real work (mkdir, a readiness line over a pipe). A fake clock cannot drive that
-    // work, so advancing it can strand a start the platform has not reached yet.
+    // The restart waits are this test's only wall-clock dependency. Starts still do real file
+    // and pipe work, so every spawn is awaited before the next clock advance.
+    vi.useFakeTimers()
     const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     const gate = trackChildren()
     try {
       const plugin = await startPlugin(gate.spawn)
 
-      for (const count of [2, 3, 4]) {
-        const next = gate.spawned(count)
+      for (const [index, delay] of [5, 10, 20].entries()) {
         crash(gate.children.at(-1))
-        await next
+        await vi.advanceTimersByTime(delay)
+        await gate.spawned(index + 2)
         await acceptHealth()
+        await settleStarted()
       }
       crash(gate.children.at(-1))
 
       expect(reportedAttempts(logged.mock.calls)).toEqual([3])
       expect(gate.children).toHaveLength(4)
-      // Past the wait a fourth attempt would take (the policy's third wait is 20 ms), so a
-      // restart that was wrongly still planned would have started by now.
-      await Bun.sleep(100)
+      // A wrongly planned next attempt would start within the third wait (20 ms).
+      await vi.advanceTimersByTime(30)
       expect(gate.children).toHaveLength(4)
       await stopPlugin(plugin)
     } finally {

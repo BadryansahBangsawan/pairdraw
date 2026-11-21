@@ -75,14 +75,21 @@ function standInMark(node: SceneNode | undefined): string | undefined {
 
 /** Removes stand-in marks from a layer moving into the original, and from its layers. */
 function clearStandInMarks(graph: SceneGraph, rootId: string): void {
+  for (const node of subtree(graph, rootId)) {
+    if (standInMark(node) !== undefined) {
+      graph.updateNode(node.id, { pluginData: withStandIn(node, null) })
+    }
+  }
+}
+
+/** The layer at `rootId` and every layer inside it. */
+function* subtree(graph: SceneGraph, rootId: string): Generator<SceneNode> {
   const pending = [rootId]
   for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
     const node = graph.getNode(id)
     if (!node) continue
     pending.push(...node.childIds)
-    if (standInMark(node) !== undefined) {
-      graph.updateNode(id, { pluginData: withStandIn(node, null) })
-    }
+    yield node
   }
 }
 
@@ -111,6 +118,21 @@ export function variationPickProblem(
   }
   if (original.locked) return 'original-locked'
   return replaces(version.type, original.type) ? null : 'version-type-differs'
+}
+
+/**
+ * The set and version `versionId` names, a version or a layer inside one, and why it cannot
+ * replace its original, or null when it can. Throws when `versionId` is in no set's versions.
+ */
+export function variationToPick(
+  graph: SceneGraph,
+  versionId: string
+): { view: VariationSetView; version: SceneNode; problem: VariationPickProblem | null } {
+  const view = variationSetOf(graph, versionId)
+  if (!view) throw new VariationError('not-in-set', versionId)
+  const version = versionOf(graph, view, versionId)
+  if (!version) throw new VariationError('not-a-version', versionId)
+  return { view, version, problem: variationPickProblem(graph, view, version.id) }
 }
 
 /**
@@ -160,11 +182,7 @@ function renamedReactions(
  */
 function renameReferences(graph: SceneGraph, rootId: string, pairs: ReadonlyMap<string, string>) {
   const rename = (id: string) => pairs.get(id) ?? id
-  const pending = [rootId]
-  for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
-    const node = graph.getNode(id)
-    if (!node) continue
-    pending.push(...node.childIds)
+  for (const node of subtree(graph, rootId)) {
     const changes: Partial<SceneNode> = {}
     for (const end of ['connectorStart', 'connectorEnd'] as const) {
       const endpoint = node[end]
@@ -174,7 +192,7 @@ function renameReferences(graph: SceneGraph, rootId: string, pairs: ReadonlyMap<
     }
     const reactions = renamedReactions(node.prototypeReactions, rename)
     if (reactions) changes.prototypeReactions = reactions
-    if (Object.keys(changes).length > 0) graph.updateNode(id, changes)
+    if (Object.keys(changes).length > 0) graph.updateNode(node.id, changes)
   }
 }
 
@@ -238,11 +256,7 @@ function applyChildren(
  * falls back to its stored point, as on any deleted layer. The caller records the edit as one step and lays out the original and its parent.
  */
 export function applyVariation(graph: SceneGraph, versionId: string): { originalId: string } {
-  const view = variationSetOf(graph, versionId)
-  if (!view) throw new VariationError('not-in-set', versionId)
-  const version = versionOf(graph, view, versionId)
-  if (!version) throw new VariationError('not-a-version', versionId)
-  const problem = variationPickProblem(graph, view, version.id)
+  const { view, version, problem } = variationToPick(graph, versionId)
   if (problem || !view.original) throw new VariationError(problem ?? 'original-missing', versionId)
   const original = view.original
 

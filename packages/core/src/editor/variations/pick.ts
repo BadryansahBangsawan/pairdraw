@@ -2,8 +2,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   VariationError,
   variationPickProblem,
-  variationSetOf,
-  versionOf,
+  variationToPick,
   type VariationPickProblem,
   type VariationSetView
 } from '@pairdraw/scene-graph/variations'
@@ -30,11 +29,7 @@ export function pickProblemOf(
  * of another type than the version, or owned by a library.
  */
 export function assertVariationPickable(graph: SceneGraph, versionId: string): void {
-  const view = variationSetOf(graph, versionId)
-  if (!view) throw new VariationError('not-in-set', versionId)
-  const version = versionOf(graph, view, versionId)
-  if (!version) throw new VariationError('not-a-version', versionId)
-  const problem = variationPickProblem(graph, view, version.id)
+  const { view, problem } = variationToPick(graph, versionId)
   if (problem) throw new VariationError(problem, versionId)
   if (view.original) assertNodeEditable(graph, view.original.id)
 }

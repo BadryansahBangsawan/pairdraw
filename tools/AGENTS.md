@@ -45,7 +45,7 @@ The `/demo` document is a tour of eight chapters on one page, each a section sta
 
 ## Landing posters
 
-`tools/generate/landing-posters/` captures WebP stills of every docs landing stage, per locale, theme, and layout, from a production docs build served locally in headless Chromium with software WebGL. `build:production` in `packages/docs` runs it after `vitepress build`; it reuses `.cache/landing-posters/<fingerprint>` when the inputs in `src/fingerprint.ts` are unchanged and copies the stills into `dist`, and `generate:landing-posters` forces a capture. CI can spread one capture over runners: `--shard i/4` captures only that part of the pages into the cache, and `--assemble`, run once the parts are gathered, checks that every still is there before copying them into the build. A stage that starts depending on a new source tree adds it to `LANDING_POSTER_INPUTS`.
+`tools/generate/landing-posters/` captures WebP stills of every docs stage, on each locale's download page, per theme and layout, from a production docs build served locally in headless Chromium with software WebGL. `build:production` in `packages/docs` runs it after `vitepress build`; it reuses `.cache/landing-posters/<fingerprint>` when the inputs in `src/fingerprint.ts` are unchanged and copies the stills into `dist`, and `generate:landing-posters` forces a capture. CI can spread one capture over runners: `--shard i/4` captures only that part of the pages into the cache, and `--assemble`, run once the parts are gathered, checks that every still is there before copying them into the build. A stage that starts depending on a new source tree adds it to `LANDING_POSTER_INPUTS`.
 
 ## Brand assets
 

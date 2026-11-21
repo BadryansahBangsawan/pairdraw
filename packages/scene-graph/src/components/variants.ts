@@ -1,4 +1,5 @@
 import type { SceneGraph } from '../graph'
+import { instanceMainComponent } from '../instances/main-component'
 import type { SceneNode } from '../types'
 
 /** Variants in reading order on the canvas: top to bottom, then left to right, then by name. */
@@ -49,5 +50,43 @@ export function restingVariant(graph: SceneGraph, set: SceneNode): SceneNode | u
           child.type === 'COMPONENT' &&
           values.every(([name, value]) => child.componentPropertyValues[name] === value)
       ) ?? defaultVariant(graph, set)
+  )
+}
+
+/** The component set a variant belongs to, or the set of the variant an instance shows. */
+function variantSetOf(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
+  const variant = node.type === 'INSTANCE' ? instanceMainComponent(graph, node) : node
+  if (variant?.type !== 'COMPONENT' || !variant.parentId) return undefined
+  const set = graph.getNode(variant.parentId)
+  return set?.type === 'COMPONENT_SET' ? set : undefined
+}
+
+/**
+ * The component sets whose variants a prototype's Change to on this layer may show, nearest
+ * first: the set of each variant, and of each instance of a variant, from the layer up.
+ */
+export function variantSetsAround(graph: SceneGraph, nodeId: string): SceneNode[] {
+  const sets: SceneNode[] = []
+  graph.closest(nodeId, (node) => {
+    const set = variantSetOf(graph, node)
+    if (set && !sets.includes(set)) sets.push(set)
+    return false
+  })
+  return sets
+}
+
+/**
+ * The instance a Change to from this layer switches to another variant of `setId`: the layer
+ * itself or its nearest instance ancestor that shows a variant of that set. A main component has
+ * none, since it is the definition rather than a copy that changes.
+ */
+export function variantInstanceFor(
+  graph: SceneGraph,
+  nodeId: string,
+  setId: string
+): SceneNode | undefined {
+  return graph.closest(
+    nodeId,
+    (node) => node.type === 'INSTANCE' && variantSetOf(graph, node)?.id === setId
   )
 }

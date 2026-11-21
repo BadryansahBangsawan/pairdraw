@@ -71,6 +71,7 @@ export const INSTANCE_SYNC_PROPS: (keyof SceneNode)[] = difference(
     'itemReverseZIndex',
     'gridPosition',
     'clipsContent',
+    'overflowDirection',
     'layoutGrids',
     'boundVariables',
     'variableModes',

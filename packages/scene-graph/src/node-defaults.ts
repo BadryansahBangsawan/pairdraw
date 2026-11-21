@@ -139,6 +139,7 @@ export function createDefaultNode(
     visible: true,
     locked: false,
     clipsContent: false,
+    overflowDirection: 'NONE',
     text: '',
     fontSize: 14,
     fontFamily: DEFAULT_FONT_FAMILY,

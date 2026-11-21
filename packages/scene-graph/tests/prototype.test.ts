@@ -75,3 +75,24 @@ describe('prototype reactions', () => {
     )
   })
 })
+
+describe('overflow scrolling', () => {
+  test('a new frame does not scroll', () => {
+    const graph = new SceneGraph()
+    const node = graph.createNode('FRAME', firstPageId(graph))
+    expect(node.overflowDirection).toBe('NONE')
+  })
+
+  test("an instance scrolls the way its main component does, and follows the main's changes", () => {
+    const graph = new SceneGraph()
+    const component = graph.createNode('COMPONENT', firstPageId(graph), {
+      overflowDirection: 'VERTICAL'
+    })
+    const instance = expectDefined(graph.createInstance(component.id, firstPageId(graph)))
+    expect(instance.overflowDirection).toBe('VERTICAL')
+
+    graph.updateNode(component.id, { overflowDirection: 'BOTH' })
+    graph.syncInstances(component.id)
+    expect(getNodeOrThrow(graph, instance.id).overflowDirection).toBe('BOTH')
+  })
+})

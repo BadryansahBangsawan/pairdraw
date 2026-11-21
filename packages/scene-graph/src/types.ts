@@ -711,14 +711,32 @@ export interface CommentThread {
   replies: CommentReply[]
 }
 
-/** How a prototype reaction starts, as `.fig` keeps `PrototypeEvent.interactionType`. */
-export type PrototypeTriggerType = 'ON_CLICK' | 'AFTER_TIMEOUT'
+/**
+ * How a prototype reaction starts, as `.fig` keeps `PrototypeEvent.interactionType`: a click, the
+ * pointer held over the layer (`ON_HOVER`, While hovering) or pressed on it (`ON_PRESS`, While
+ * pressing), which undo themselves when it leaves or lifts, the pointer entering or leaving it,
+ * or a delay.
+ */
+export type PrototypeTriggerType =
+  | 'ON_CLICK'
+  | 'ON_HOVER'
+  | 'ON_PRESS'
+  | 'MOUSE_ENTER'
+  | 'MOUSE_LEAVE'
+  | 'AFTER_TIMEOUT'
 
 /** What a reaction does, as `.fig` keeps `ConnectionType` on `PrototypeAction`. */
 export type PrototypeActionType = 'NODE' | 'BACK' | 'CLOSE'
 
-/** Whether an action moves to a frame or opens it over the screen, as `NavigationType`. */
-export type PrototypeNavigationType = 'NAVIGATE' | 'OVERLAY'
+/**
+ * What a node action does with its node, as `NavigationType`: move to a frame, open it over the
+ * screen, show another variant of the instance's set (Figma's Change to, `SWAP_STATE` in `.fig`),
+ * or scroll the layer into view.
+ */
+export type PrototypeNavigationType = 'NAVIGATE' | 'OVERLAY' | 'CHANGE_TO' | 'SCROLL_TO'
+
+/** Which way a frame's content scrolls in play, as Figma's `overflowDirection`. */
+export type OverflowDirection = 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'BOTH'
 
 /** How a reaction animates between frames, as `TransitionType` keeps them. */
 export type PrototypeTransitionType = 'INSTANT' | 'DISSOLVE'
@@ -739,10 +757,13 @@ export interface PrototypeTransition {
   duration: number
 }
 
-/** A reaction's move to another frame, or the overlay it opens. */
+/** A reaction's move to another frame, the overlay it opens, the variant or layer it shows. */
 export interface PrototypeNodeAction {
   type: 'NODE'
-  /** The frame the action shows; `null` keeps the connection when its target is gone. */
+  /**
+   * The frame the action shows, the variant a Change to shows, or the layer a Scroll to brings
+   * into view; `null` keeps the connection when its target is gone.
+   */
   nodeId: string | null
   navigation: PrototypeNavigationType
   transition: PrototypeTransition
@@ -762,10 +783,10 @@ export interface PrototypeCloseAction {
 
 export type PrototypeAction = PrototypeNodeAction | PrototypeBackAction | PrototypeCloseAction
 
-/** What starts a reaction, and after how long an AFTER_TIMEOUT does. */
+/** What starts a reaction, and after how long an AFTER_TIMEOUT or mouse enter or leave does. */
 export interface PrototypeTrigger {
   type: PrototypeTriggerType
-  /** AFTER_TIMEOUT only: the seconds before the reaction runs. */
+  /** AFTER_TIMEOUT, MOUSE_ENTER and MOUSE_LEAVE: the seconds before the reaction runs. */
   delay: number
 }
 
@@ -819,6 +840,8 @@ export interface SceneNode {
   visible: boolean
   locked: boolean
   clipsContent: boolean
+  /** Which way the frame's content scrolls in play; a nested frame scrolls only while it clips. */
+  overflowDirection: OverflowDirection
 
   blendMode: BlendMode
 

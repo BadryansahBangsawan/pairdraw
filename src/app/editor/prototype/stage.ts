@@ -11,6 +11,7 @@ import {
   startSession,
   step,
   timeoutReactions,
+  transitionMs,
   type PlaySession
 } from '@pairdraw/core/prototype'
 import type { PrototypeAction } from '@pairdraw/scene-graph'
@@ -19,8 +20,8 @@ import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 import type { EditorStore } from '@/app/editor/active-store'
 import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
-/** How long a dissolve takes, matching the transition's own duration in seconds. */
-const DISSOLVE_MS = 300
+/** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
+const DISSOLVE_SETTLE_MS = 100
 
 /**
  * Prototype play: the frame being played fitted to the canvas, everything around it blacked out,
@@ -31,7 +32,12 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   const session = ref<PlaySession | null>(null)
   const size = useElementSize(area)
   /** The frame before a dissolve started, as the PNG the crossfade fades out over the canvas. */
-  const dissolvingFrom = ref<{ src: string; rect: VisibleCanvas } | null>(null)
+  const dissolvingFrom = ref<{ src: string; rect: VisibleCanvas; durationMs: number } | null>(null)
+  /**
+   * How long the transition into the shown frame runs. Its After delays count from when that ends,
+   * as Figma's do, so the timers arming for it wait this much longer.
+   */
+  let enteringMs = 0
 
   /**
    * How the canvas is behaving while a prototype plays. A slide presentation is live too, and it
@@ -79,7 +85,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
    * The previous frame drawn to a PNG the canvas crossfades from during a dissolve. A frame that
    * cannot be drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
    */
-  function snapshotBefore(): VisibleCanvas | null {
+  function snapshotBefore(durationMs: number): VisibleCanvas | null {
     const shown = session.value
     if (!shown) return null
     const node = store.graph.getNode(shownFrame(shown))
@@ -103,17 +109,35 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       width: bounds.width * zoom,
       height: bounds.height * zoom
     }
-    dissolvingFrom.value = { src: URL.createObjectURL(blob), rect }
+    // A dissolve that starts while another runs replaces its snapshot; each timer clears only its own.
+    if (dissolvingFrom.value) URL.revokeObjectURL(dissolvingFrom.value.src)
+    const src = URL.createObjectURL(blob)
+    dissolvingFrom.value = { src, rect, durationMs }
     window.setTimeout(() => {
-      if (dissolvingFrom.value) URL.revokeObjectURL(dissolvingFrom.value.src)
+      if (dissolvingFrom.value?.src !== src) return
+      URL.revokeObjectURL(src)
       dissolvingFrom.value = null
-    }, DISSOLVE_MS + 100)
+    }, durationMs + DISSOLVE_SETTLE_MS)
     return rect
+  }
+
+  /**
+   * Runs an action from a click or a timeout with the transition it asks for: a dissolve crossfades
+   * for its own duration, and the next frame's timers wait until it ends.
+   */
+  function runAction(current: PlaySession, action: PrototypeAction) {
+    const next = step(store.graph, current, action)
+    if (next === current) return
+    const durationMs = transitionMs(action)
+    if (durationMs > 0) snapshotBefore(durationMs)
+    enteringMs = durationMs
+    session.value = next
   }
 
   watch(
     live,
     (playing) => {
+      enteringMs = 0
       if (!playing) {
         session.value = null
         return
@@ -128,7 +152,8 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     { immediate: true }
   )
 
-  // The shown frame's AFTER_TIMEOUT reactions run once their delay passes. Restart and a new
+  // The shown frame's AFTER_TIMEOUT reactions run once their delay passes, counted from the end of
+  // the transition that brought the frame in. Restart and a new
   // document drop timers even when the frame id stays, and leaving play or unmounting drops them
   // too. A callback that still runs after that does not step.
   const timers = new Set<number>()
@@ -142,6 +167,8 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     clearTimers()
     const shown = session.value
     const generation = timerGeneration
+    const readyInMs = enteringMs
+    enteringMs = 0
     if (!shown) return
     const frameId = shownFrame(shown)
     const schedule = (action: PrototypeAction, delayMs: number) => {
@@ -150,8 +177,8 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
         if (generation !== timerGeneration) return
         const current = session.value
         if (!current || shownFrame(current) !== frameId) return
-        session.value = step(store.graph, current, action)
-      }, delayMs)
+        runAction(current, action)
+      }, readyInMs + delayMs)
       timers.add(timer)
     }
     for (const { action, delayMs } of timeoutReactions(store.graph, shown)) {
@@ -186,10 +213,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       const bounds = event.target.getBoundingClientRect()
       const point = store.screenToCanvas(event.clientX - bounds.left, event.clientY - bounds.top)
       const click = reactionAt(store.graph, shown, point.x, point.y)
-      if (click) {
-        if (click.transition?.type === 'DISSOLVE') snapshotBefore()
-        session.value = step(store.graph, shown, click.action)
-      }
+      if (click) runAction(shown, click.action)
     },
     { capture: true }
   )

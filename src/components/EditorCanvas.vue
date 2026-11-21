@@ -36,6 +36,7 @@ import {
   SECTION_TITLE_HEIGHT
 } from '@pairdraw/core/constants'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
+import { DISSOLVE_EASING_CSS } from '@pairdraw/core/prototype'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
 import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
@@ -397,11 +398,14 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
         />
         <img
           v-if="dissolvingFrom"
+          :key="dissolvingFrom.src"
           data-test-id="prototype-dissolve"
           aria-hidden="true"
-          class="pointer-events-none absolute z-30 transition-opacity duration-300"
+          class="pointer-events-none absolute z-30 animate-out fade-out fill-mode-forwards motion-reduce:hidden"
           :src="dissolvingFrom.src"
           :style="{
+            '--tw-animation-duration': `${dissolvingFrom.durationMs}ms`,
+            '--tw-ease': DISSOLVE_EASING_CSS,
             left: `${dissolvingFrom.rect.left}px`,
             top: `${dissolvingFrom.rect.top}px`,
             width: `${dissolvingFrom.rect.width}px`,

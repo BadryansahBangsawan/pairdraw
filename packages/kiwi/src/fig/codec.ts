@@ -322,6 +322,7 @@ export interface NodeChange {
   // Frame
   clipsContent?: boolean
   frameMaskDisabled?: boolean
+  scrollDirection?: 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'BOTH'
   resizeToFit?: boolean
   // Vector
   booleanOperation?: 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'XOR'

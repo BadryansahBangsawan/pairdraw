@@ -3,9 +3,14 @@ import * as v from 'valibot'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type {
+  OverflowDirection,
   PrototypeAction,
+  PrototypeNavigationType,
   PrototypeOverlayPositionType,
   PrototypeReaction,
+  PrototypeTransitionType,
+  PrototypeTrigger,
+  PrototypeTriggerType,
   SceneNode
 } from '@pairdraw/scene-graph'
 import type { GUID } from '@pairdraw/scene-graph/primitives'
@@ -51,33 +56,83 @@ type FigmaAction = v.InferOutput<typeof actionSchema>
 type FigmaEvent = v.InferOutput<typeof eventSchema>
 type FigmaInteraction = v.InferOutput<typeof interactionSchema>
 
-/** True when the action is a move to a frame or over it, or a back or close — the ones edited here. */
+/**
+ * The node actions this model edits, by the `.fig` navigation each is written as: Figma's Change
+ * to is `SWAP_STATE` in the file, while `SWAP` (swap overlay) stays out of the model.
+ */
+const NAVIGATION_FROM_FIGMA: Readonly<Record<string, PrototypeNavigationType>> = {
+  NAVIGATE: 'NAVIGATE',
+  OVERLAY: 'OVERLAY',
+  SWAP_STATE: 'CHANGE_TO',
+  SCROLL_TO: 'SCROLL_TO'
+}
+
+const NAVIGATION_TO_FIGMA: Readonly<Record<PrototypeNavigationType, string>> = {
+  NAVIGATE: 'NAVIGATE',
+  OVERLAY: 'OVERLAY',
+  CHANGE_TO: 'SWAP_STATE',
+  SCROLL_TO: 'SCROLL_TO'
+}
+
+/** The triggers this model edits; `.fig` names them as the plugin API does. */
+const MODELED_TRIGGERS: ReadonlySet<string> = new Set<PrototypeTriggerType>([
+  'ON_CLICK',
+  'ON_HOVER',
+  'ON_PRESS',
+  'MOUSE_ENTER',
+  'MOUSE_LEAVE',
+  'AFTER_TIMEOUT'
+])
+
+/** Triggers whose delay the file keeps in the event's `transitionTimeout`. */
+const DELAYED_TRIGGERS: ReadonlySet<PrototypeTriggerType> = new Set<PrototypeTriggerType>([
+  'AFTER_TIMEOUT',
+  'MOUSE_ENTER',
+  'MOUSE_LEAVE'
+])
+
+function isModeledTrigger(type: string | undefined): type is PrototypeTriggerType {
+  return type !== undefined && MODELED_TRIGGERS.has(type)
+}
+
+/**
+ * The animation play runs for a file's transition: a dissolve for Dissolve and for Smart animate,
+ * the closest one play has, an eased scroll for Figma's animated scroll, and a cut for the rest.
+ * Export keeps the file's own transition while the model still reads it this way, so Figma's
+ * slides, Smart animate, and animated scrolls survive an edit.
+ */
+function transitionFromFigma(type: string | undefined): PrototypeTransitionType {
+  return type === 'DISSOLVE' || type === 'SMART_ANIMATE' || type === 'SCROLL_ANIMATE'
+    ? 'DISSOLVE'
+    : 'INSTANT'
+}
+
+/** True when the action is one the Prototype section edits: a node action, a back or a close. */
 function isModeledAction(action: FigmaAction): boolean {
   const connection = action.connectionType ?? 'INTERNAL_NODE'
   if (connection === 'BACK' || connection === 'CLOSE') return true
   if (connection !== 'INTERNAL_NODE') return false
-  const navigation = action.navigationType ?? 'NAVIGATE'
-  return navigation === 'NAVIGATE' || navigation === 'OVERLAY'
+  return Object.hasOwn(NAVIGATION_FROM_FIGMA, action.navigationType ?? 'NAVIGATE')
 }
 
 /** True when the interaction is one the Prototype section can show and edit. */
 function isModeledInteraction(interaction: FigmaInteraction): boolean {
   if (interaction.isDeleted === true) return false
-  const type = interaction.event?.interactionType
-  if (type !== 'ON_CLICK' && type !== 'AFTER_TIMEOUT') return false
+  if (!isModeledTrigger(interaction.event?.interactionType)) return false
   const actions = interaction.actions ?? []
   return actions.length > 0 && actions.every(isModeledAction)
+}
+
+function triggerFromFigma(event: FigmaEvent): PrototypeTrigger {
+  const type = isModeledTrigger(event.interactionType) ? event.interactionType : 'ON_CLICK'
+  return { type, delay: DELAYED_TRIGGERS.has(type) ? (event.transitionTimeout ?? 0) : 0 }
 }
 
 function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | null {
   if (!isModeledInteraction(interaction)) return null
   const id = interaction.id ? guidToString(interaction.id) : null
   if (!id) return null
-  const event = interaction.event ?? {}
-  const trigger =
-    event.interactionType === 'AFTER_TIMEOUT'
-      ? { type: 'AFTER_TIMEOUT' as const, delay: event.transitionTimeout ?? 0 }
-      : { type: 'ON_CLICK' as const, delay: 0 }
+  const trigger = triggerFromFigma(interaction.event ?? {})
   const actions = (interaction.actions ?? []).flatMap<PrototypeAction>((action) => {
     const connection = action.connectionType ?? 'INTERNAL_NODE'
     if (connection === 'BACK') return [{ type: 'BACK' }]
@@ -86,9 +141,9 @@ function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | n
       {
         type: 'NODE',
         nodeId: action.transitionNodeID ? guidToString(action.transitionNodeID) : null,
-        navigation: action.navigationType === 'OVERLAY' ? 'OVERLAY' : 'NAVIGATE',
+        navigation: NAVIGATION_FROM_FIGMA[action.navigationType ?? 'NAVIGATE'] ?? 'NAVIGATE',
         transition: {
-          type: action.transitionType === 'DISSOLVE' ? 'DISSOLVE' : 'INSTANT',
+          type: transitionFromFigma(action.transitionType),
           duration: action.transitionDuration ?? 0
         },
         // Figma records an overlay's placement on the destination frame, not on the action; the
@@ -98,6 +153,13 @@ function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | n
     ]
   })
   return { id, trigger, actions }
+}
+
+const OVERFLOW_DIRECTIONS: readonly OverflowDirection[] = ['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']
+
+/** A record's `scrollDirection` as the frame's overflow; a missing or unknown one does not scroll. */
+export function overflowFromFigma(scrollDirection: unknown): OverflowDirection {
+  return OVERFLOW_DIRECTIONS.find((direction) => direction === scrollDirection) ?? 'NONE'
 }
 
 /**
@@ -176,6 +238,22 @@ function parseGuid(id: string): GUID | null {
   return { sessionID: Number(match[1]), localID: Number(match[2]) }
 }
 
+/**
+ * The file's own transition while the model still plays it as `type`, else `type` itself. A
+ * Scroll to made here is written instant whatever it plays as: no Figma file shows which
+ * transition Figma reads for an animated scroll made outside it, so the instant one it is known
+ * to read is written.
+ */
+function transitionToFigma(
+  type: PrototypeTransitionType,
+  raw: string | undefined,
+  navigation: PrototypeNavigationType
+): string {
+  if (raw !== undefined && transitionFromFigma(raw) === type) return raw
+  if (navigation === 'SCROLL_TO') return 'INSTANT_TRANSITION'
+  return type === 'DISSOLVE' ? 'DISSOLVE' : 'INSTANT_TRANSITION'
+}
+
 /** A `.fig` interaction, merged onto the raw action it came from so unknown fields survive. */
 function interactionToFigma(
   reaction: PrototypeReaction,
@@ -185,11 +263,16 @@ function interactionToFigma(
 ): FigmaInteraction | null {
   const id = parseGuid(reaction.id)
   if (!id) return null
-  const event: FigmaEvent = {
-    ...raw?.event,
-    interactionType: reaction.trigger.type === 'AFTER_TIMEOUT' ? 'AFTER_TIMEOUT' : 'ON_CLICK'
+  const event: FigmaEvent = { ...raw?.event, interactionType: reaction.trigger.type }
+  // A timeout's delay is Figma's `transitionTimeout`. A mouse enter or leave delay is read from
+  // there too, but written back only where the file already stored one: where Figma saves a delay
+  // it gave such a trigger is not confirmed yet, so a delay set here plays without being written.
+  if (
+    reaction.trigger.type === 'AFTER_TIMEOUT' ||
+    (DELAYED_TRIGGERS.has(reaction.trigger.type) && raw?.event?.transitionTimeout !== undefined)
+  ) {
+    event.transitionTimeout = reaction.trigger.delay
   }
-  if (reaction.trigger.type === 'AFTER_TIMEOUT') event.transitionTimeout = reaction.trigger.delay
   const rawActions = raw?.actions ?? []
   const actions = reaction.actions.flatMap((action, index) => {
     const base = rawActions[index] ?? {}
@@ -204,8 +287,12 @@ function interactionToFigma(
         ...base,
         transitionNodeID: target,
         connectionType: 'INTERNAL_NODE',
-        navigationType: action.navigation,
-        transitionType: action.transition.type === 'DISSOLVE' ? 'DISSOLVE' : 'INSTANT_TRANSITION',
+        navigationType: NAVIGATION_TO_FIGMA[action.navigation],
+        transitionType: transitionToFigma(
+          action.transition.type,
+          base.transitionType,
+          action.navigation
+        ),
         transitionDuration: action.transition.duration
       }
     ]

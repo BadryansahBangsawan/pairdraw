@@ -884,6 +884,15 @@ function applyDashPattern(
   if (dashPattern.length > 0 || 'dashPattern' in rawNodeFields) nc.dashPattern = dashPattern
 }
 
+/**
+ * A frame's overflow scrolling as `scrollDirection`. Figma's default is no scrolling, and only a
+ * frame-like layer scrolls; an edited overflow already hides the stale raw field.
+ */
+function applyOverflow(node: SceneNode, nc: KiwiNodeChange): void {
+  const scrolls = node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE'
+  if (scrolls && node.overflowDirection !== 'NONE') nc.scrollDirection = node.overflowDirection
+}
+
 function applyNodeVisualProps(
   context: SceneNodeToKiwiContext,
   node: SceneNode,
@@ -913,6 +922,7 @@ function applyNodeVisualProps(
   if (node.type === 'TEXT') serializeText(context, node, nc)
 
   if (node.type !== 'VECTOR') nc.frameMaskDisabled = !node.clipsContent
+  applyOverflow(node, nc)
   applySharedStyleProps(context, node, nc)
   if (node.horizontalConstraint !== 'MIN') nc.horizontalConstraint = node.horizontalConstraint
   if (node.verticalConstraint !== 'MIN') nc.verticalConstraint = node.verticalConstraint

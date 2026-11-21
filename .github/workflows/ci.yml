@@ -348,6 +348,15 @@ jobs:
       - name: Build shared Core test dependency
         run: bun --filter @pairdraw/core build
 
+      # The PDF export test runs Core's dist under Node, which resolves workspace packages
+      # through dist rather than Bun's source condition.
+      - name: Build Node test dependencies
+        if: matrix.group == 'core'
+        run: |
+          bun --filter @pairdraw/kiwi build
+          bun --filter @pairdraw/scene-graph build
+          bun --filter @pairdraw/fig build
+
       - name: Build MCP test dependency
         if: matrix.group == 'app'
         run: bun --filter @pairdraw/mcp build

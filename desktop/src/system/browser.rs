@@ -374,14 +374,6 @@ pub async fn browser_capture_element<R: Runtime>(app: AppHandle<R>) -> Result<St
     capture_html(eval_capture(&window, &element_call(selector)?).await?)
 }
 
-#[derive(Deserialize)]
-struct JsonBox {
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-}
-
 /// The session's page zoom: CSS pixels times this are the webview's points.
 fn session_zoom<R: Runtime>(app: &AppHandle<R>) -> f64 {
     app.state::<BrowserWindowState>()
@@ -395,32 +387,40 @@ fn session_zoom<R: Runtime>(app: &AppHandle<R>) -> f64 {
 
 async fn element_rect<R: Runtime>(
     window: &WebviewWindow<R>,
+    zoom: f64,
 ) -> Result<crate::system::browser_shot::ShotRect, String> {
     let picked = eval_pick(window).await?;
     let selector = picked_selector(&picked)?.to_owned();
     let quoted = serde_json::to_string(&selector).map_err(|error| error.to_string())?;
+    // The view's width comes back with the rect, so the cap needs no second round trip.
     let script = format!(
-        "(() => {{ const el = document.querySelector({quoted}); if (!el) return \"\"; el.scrollIntoView({{block:\"nearest\",inline:\"nearest\"}}); const r = el.getBoundingClientRect(); return JSON.stringify({{x:r.x,y:r.y,width:r.width,height:r.height}}); }})()"
+        "(() => {{ const el = document.querySelector({quoted}); if (!el) return \"\"; el.scrollIntoView({{block:\"nearest\",inline:\"nearest\"}}); const r = el.getBoundingClientRect(); return JSON.stringify({{x:r.x,y:r.y,width:r.width,height:r.height,viewWidth:innerWidth}}); }})()"
     );
     let reported = eval_text(window, &script).await?;
     if reported.is_empty() {
         return Err("The element is not on the page".to_owned());
     }
-    let view: JsonBox =
-        serde_json::from_str(&reported).map_err(|_| "The element has no size".to_owned())?;
-    if !view.width.is_finite()
-        || !view.height.is_finite()
-        || view.width <= 0.0
-        || view.height <= 0.0
-    {
-        return Err("The element has no size".to_owned());
+    #[derive(Deserialize)]
+    #[serde(rename_all = "camelCase")]
+    struct ElementBox {
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+        view_width: f64,
     }
-    Ok(crate::system::browser_shot::ShotRect {
-        x: view.x.max(0.0),
-        y: view.y.max(0.0),
-        width: view.width,
-        height: view.height,
-    })
+    let view: ElementBox =
+        serde_json::from_str(&reported).map_err(|_| "The element has no size".to_owned())?;
+    let rect = crate::system::browser_shot::in_points(
+        crate::system::browser_shot::ShotRect {
+            x: view.x,
+            y: view.y,
+            width: view.width,
+            height: view.height,
+        },
+        zoom,
+    );
+    crate::system::browser_shot::capped_element(rect, view.view_width * zoom)
 }
 
 /// A PNG of the open page, as base64. `kind` is `visible`, `full`, or `element`.
@@ -429,14 +429,12 @@ pub async fn browser_screenshot<R: Runtime>(
     app: AppHandle<R>,
     kind: String,
 ) -> Result<String, String> {
-    use crate::system::browser_shot::{
-        capture_png, in_points, page_area, shot_kind, ShotArea, ShotKind,
-    };
+    use crate::system::browser_shot::{capture_png, page_area, shot_kind, ShotArea, ShotKind};
 
     let window = browser_window(&app)?;
     let zoom = session_zoom(&app);
     let area = match shot_kind(&kind)? {
-        ShotKind::Element => ShotArea::Rect(in_points(element_rect(&window).await?, zoom)),
+        ShotKind::Element => ShotArea::Rect(element_rect(&window, zoom).await?),
         kind => page_area(&window, kind, zoom).await?,
     };
     capture_png(&window, area).await

@@ -95,6 +95,39 @@ pub fn capped_document(width: f64, height: f64, viewport: f64) -> Result<PageSiz
     })
 }
 
+/// The element rect a snapshot may ask WebKit for, in points: no taller than a full page
+/// (4096), no wider than the view, and never off the view's top-left. A hostile page can report
+/// an element of any magnitude; without this cap the snapshot configuration carries it straight
+/// into the webview process.
+pub fn capped_element(rect: ShotRect, view_width: f64) -> Result<ShotRect, String> {
+    if !view_width.is_finite() || view_width <= 0.0 {
+        return Err("The element has no size".to_owned());
+    }
+    if !rect.width.is_finite()
+        || !rect.height.is_finite()
+        || rect.width <= 0.0
+        || rect.height <= 0.0
+    {
+        return Err("The element has no size".to_owned());
+    }
+    let x = if rect.x.is_finite() {
+        rect.x.max(0.0)
+    } else {
+        0.0
+    };
+    let y = if rect.y.is_finite() {
+        rect.y.max(0.0)
+    } else {
+        0.0
+    };
+    Ok(ShotRect {
+        x,
+        y,
+        width: rect.width.clamp(1.0, view_width),
+        height: rect.height.clamp(1.0, 4096.0),
+    })
+}
+
 /// The document and the viewport that shows it, as the page measures them: in CSS pixels.
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -161,6 +194,7 @@ mod macos {
     use std::ffi::c_void;
     use std::ptr::NonNull;
     use std::sync::Mutex;
+    use std::time::Duration;
 
     use base64::Engine;
     use block2::RcBlock;
@@ -178,6 +212,10 @@ mod macos {
     type ShotSender = oneshot::Sender<Result<Vec<u8>, String>>;
     type ShotSlot = Mutex<Option<ShotSender>>;
 
+    /// How long the editor waits for WebKit's snapshot callback. The completion handler restores
+    /// the grown frame whenever it fires; this deadline only unblocks the editor if it never does.
+    const SNAPSHOT_WAIT: Duration = Duration::from_secs(60);
+
     pub async fn capture<R: Runtime>(
         window: &WebviewWindow<R>,
         area: ShotArea,
@@ -187,9 +225,16 @@ mod macos {
         window
             .with_webview(move |webview| schedule(webview.inner(), area, slot))
             .map_err(|error| error.to_string())?;
-        let bytes = receiver
-            .await
-            .map_err(|_| "The page did not answer".to_owned())??;
+        let bytes = super::until_deadline(
+            async {
+                receiver
+                    .await
+                    .map_err(|_| "The page did not answer".to_owned())
+            },
+            SNAPSHOT_WAIT,
+            "The snapshot timed out",
+        )
+        .await??;
         Ok(base64::engine::general_purpose::STANDARD.encode(bytes))
     }
 
@@ -299,7 +344,10 @@ mod macos {
 
 #[cfg(test)]
 mod tests {
-    use super::{capped_document, grown_frame, in_points, shot_kind, PageSize, ShotKind, ShotRect};
+    use super::{
+        capped_document, capped_element, grown_frame, in_points, shot_kind, PageSize, ShotKind,
+        ShotRect,
+    };
 
     #[test]
     fn a_picture_is_the_view_the_page_or_an_element() {
@@ -323,6 +371,33 @@ mod tests {
         );
         assert!(capped_document(0.0, 10.0, 700.0).is_err());
         assert!(capped_document(10.0, 10.0, f64::NAN).is_err());
+    }
+
+    #[test]
+    fn an_element_rect_is_capped_to_the_full_page_box_and_the_view_width() {
+        let rect = |x, y, width, height| ShotRect {
+            x,
+            y,
+            width,
+            height,
+        };
+        // A hostile page can report an element of any magnitude; the snapshot asks WebKit for
+        // this rect, so it is bounded like the full page: 4096 points tall, the view wide.
+        let huge = capped_element(rect(10.0, 20.0, 1e9, 1e9), 1024.0).expect("capped");
+        assert_eq!((huge.width, huge.height), (1024.0, 4096.0));
+        assert_eq!((huge.x, huge.y), (10.0, 20.0));
+        // A small element keeps its size and place.
+        let small = capped_element(rect(5.0, 6.0, 300.0, 150.0), 1024.0).expect("capped");
+        assert_eq!(
+            (small.x, small.y, small.width, small.height),
+            (5.0, 6.0, 300.0, 150.0)
+        );
+        // Negative origins clamp to the view; a non-finite or empty rect is refused.
+        let negative = capped_element(rect(-50.0, -50.0, 100.0, 100.0), 1024.0).expect("capped");
+        assert_eq!((negative.x, negative.y), (0.0, 0.0));
+        assert!(capped_element(rect(0.0, 0.0, 0.0, 10.0), 1024.0).is_err());
+        assert!(capped_element(rect(0.0, 0.0, f64::NAN, 10.0), 1024.0).is_err());
+        assert!(capped_element(rect(0.0, 0.0, 10.0, 10.0), 0.0).is_err());
     }
 
     #[test]

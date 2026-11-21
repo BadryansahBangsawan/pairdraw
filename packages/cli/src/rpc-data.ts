@@ -2,7 +2,12 @@ import { executeRPCCommand } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appPageTargetRPCArgs, requestedPage, type PageCLIArgs } from '#cli/app/target'
-import { loadDocument, populateWholeDocument, prepareDocumentForRPC, requirePage } from '#cli/headless'
+import {
+  loadDocument,
+  populateWholeDocument,
+  prepareDocumentForRPC,
+  requirePage
+} from '#cli/headless'
 
 type RPCArgs = { [key: string]: unknown }
 

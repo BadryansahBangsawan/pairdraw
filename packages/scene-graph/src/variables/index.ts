@@ -289,10 +289,7 @@ export function modesDefaultFirst(collection: VariableCollection): VariableColle
  * The collection's own array keeps the file's saved order, which an export writes back as it was.
  */
 export function modesInListedOrder(collection: VariableCollection): VariableCollectionMode[] {
-  return sortBy(collection.modes, [
-    (mode) => !mode.sortPosition,
-    (mode) => mode.sortPosition ?? ''
-  ])
+  return sortBy(collection.modes, [(mode) => !mode.sortPosition, (mode) => mode.sortPosition ?? ''])
 }
 
 export function getVariablesForCollection(graph: SceneGraph, collectionId: string): Variable[] {

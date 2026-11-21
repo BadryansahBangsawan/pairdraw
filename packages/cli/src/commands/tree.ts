@@ -4,8 +4,8 @@ import { defineCommand } from 'citty'
 import type { TreeNodeResult, TreeResult } from '@pairdraw/core/rpc'
 
 import { pageOptions } from '#cli/app/target'
-import { integerOptionError } from '#cli/options'
 import { fmtTree, printError, printJSON, entity, formatType, writeStdout } from '#cli/format'
+import { integerOptionError } from '#cli/options'
 import { loadRPCData } from '#cli/rpc-data'
 
 function toAgentfmtTree(node: TreeNodeResult, maxDepth: number, depth = 0): TreeNode {

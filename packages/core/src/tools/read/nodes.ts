@@ -106,7 +106,6 @@ export const getPageTree = defineTool({
       // A page root exists before its layers load; only the async path can answer it.
       if (figma.graph.getNode(root.id)?.type === 'CANVAS') return undefined
       return { root: root.id, tree: nodeToTreeEntry(root, 1, depth, typeFilter) }
-
     }
     return currentPageTree(figma, depth, typeFilter)
   },

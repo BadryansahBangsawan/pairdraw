@@ -151,7 +151,9 @@ refuseExtraPositionals(main)
 refuseUnknownOptions(main)
 
 /** The command whose usage a run reached, and the group that holds it, as citty descends. */
-async function usageTarget(rawArgs: string[]): Promise<{ command: CommandDef; parent?: CommandDef }> {
+async function usageTarget(
+  rawArgs: string[]
+): Promise<{ command: CommandDef; parent?: CommandDef }> {
   let command: CommandDef = main
   let parent: CommandDef | undefined
   let args = rawArgs
@@ -170,7 +172,11 @@ async function usageTarget(rawArgs: string[]): Promise<{ command: CommandDef; pa
 }
 
 const rawArgs = withStdinValues(process.argv.slice(2))
-if (rawArgs.includes('--help') || rawArgs.includes('-h') || (rawArgs.length === 1 && rawArgs[0] === '--version')) {
+if (
+  rawArgs.includes('--help') ||
+  rawArgs.includes('-h') ||
+  (rawArgs.length === 1 && rawArgs[0] === '--version')
+) {
   // citty shows usage and version itself, and has no error to report.
   await runMain(main, { rawArgs })
 } else {

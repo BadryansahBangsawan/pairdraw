@@ -1,8 +1,8 @@
-import { validFontSizeClass } from './font-size-class'
 import { escapeAttribute, escapeText } from 'entities'
 import { twirl } from 'twirlwind'
 
 import type { DesignDocument, DesignElement, DesignNode, DesignText } from '../types'
+import { validFontSizeClass } from './font-size-class'
 
 export interface SerializeHTMLOptions {
   style?: 'inline' | 'tailwind'

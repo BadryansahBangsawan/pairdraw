@@ -7,7 +7,6 @@ import type { PrototypeAction } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
-
 import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
 import {

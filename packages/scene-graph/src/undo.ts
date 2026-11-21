@@ -221,8 +221,7 @@ export class UndoManager {
    */
   pushIntoParked(history: UndoHistory, entry: UndoEntry): UndoHistory {
     const undo = [...history.undo, entry]
-    const overflow =
-      Number.isFinite(this.limit) && this.limit > 0 ? undo.length - this.limit : 0
+    const overflow = Number.isFinite(this.limit) && this.limit > 0 ? undo.length - this.limit : 0
     return { undo: overflow > 0 ? undo.slice(overflow) : undo, redo: [] }
   }
 

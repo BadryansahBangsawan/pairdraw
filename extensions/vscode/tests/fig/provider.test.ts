@@ -1,10 +1,9 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
-import { fromUint8Array } from 'js-base64'
-
 import type { FigDocument } from '#vscode/fig/provider'
 import { FigEditorProvider } from '#vscode/fig/provider'
 import type { EditorProviderHost } from '#vscode/host'
+import { fromUint8Array } from 'js-base64'
 
 const files = new Map<string, Uint8Array>()
 
@@ -96,9 +95,13 @@ function createPanel() {
 /** Resolves an editor for the document, as VS Code does again after the webview is torn down. */
 function resolve(provider: FigEditorProvider, document: FigDocument) {
   const fake = createPanel()
-  provider.resolveCustomEditor(document, fake.panel as never, {
-    isCancellationRequested: false
-  } as never)
+  provider.resolveCustomEditor(
+    document,
+    fake.panel as never,
+    {
+      isCancellationRequested: false
+    } as never
+  )
   return fake
 }
 

@@ -262,8 +262,7 @@ export function buildVarContext(graph: SceneGraph, doc: PenDocument): VarContext
   )
   // A variable no axis decides goes with the first axes, where it holds one value in every mode. A
   // document with neither variables nor themes, such as a new one, gets no empty collection.
-  const fallback =
-    collections[0] ?? (definitions.length > 0 ? addThemeCollection(graph, []) : null)
+  const fallback = collections[0] ?? (definitions.length > 0 ? addThemeCollection(graph, []) : null)
   const collectionFor = (definition: PenVariable): ThemeCollection | null => {
     const first = axesOf(definition, axes).at(0)
     return (first && collectionOfAxis.get(first[0])) || fallback

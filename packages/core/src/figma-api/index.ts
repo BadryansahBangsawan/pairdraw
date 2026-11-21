@@ -744,7 +744,6 @@ export class FigmaAPI implements NodeProxyHost {
     void options
   }
 
-
   notify(message: string): { cancel: () => void } {
     if (typeof console !== 'undefined') console.warn(`[figma.notify] ${message}`)
     return { cancel: noop }

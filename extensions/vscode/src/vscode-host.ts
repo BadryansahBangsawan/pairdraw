@@ -17,8 +17,7 @@ export const vscodeEditorHost: EditorProviderHost = {
   ...vscodeHost,
   joinPath: (base, ...parts) => vscode.Uri.joinPath(base, ...parts),
   parseURI: (value) => vscode.Uri.parse(value),
-  configuredEditorURL: () =>
-    vscode.workspace.getConfiguration('pairdraw').get<string>('editorUrl'),
+  configuredEditorURL: () => vscode.workspace.getConfiguration('pairdraw').get<string>('editorUrl'),
   copyFile: (from, to) => vscode.workspace.fs.copy(from, to),
   deleteFile: (uri) => vscode.workspace.fs.delete(uri),
   createEventEmitter: <T>() => new vscode.EventEmitter<T>()

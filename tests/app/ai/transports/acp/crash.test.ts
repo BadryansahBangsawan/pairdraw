@@ -6,11 +6,8 @@
 import 'fake-indexeddb/auto'
 import { afterEach, expect, test } from 'bun:test'
 
-import {
-  AgentSideConnection,
-  ndJsonStream,
-  PROTOCOL_VERSION
-} from '@agentclientprotocol/sdk'
+import { AgentSideConnection, ndJsonStream, PROTOCOL_VERSION } from '@agentclientprotocol/sdk'
+
 import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import type { AgentHost } from '@/app/ai/agents/host/types'
@@ -35,10 +32,18 @@ afterEach(() => {
 function crashingHost(): { host: AgentHost; chat: () => string | null } {
   let chat: string | null = null
   const host: AgentHost = {
-    detect: async () => { throw new Error('unused') },
-    install: async () => { throw new Error('unused') },
-    signIn: async () => { throw new Error('unused') },
-    check: async () => { throw new Error('unused') },
+    detect: async () => {
+      throw new Error('unused')
+    },
+    install: async () => {
+      throw new Error('unused')
+    },
+    signIn: async () => {
+      throw new Error('unused')
+    },
+    check: async () => {
+      throw new Error('unused')
+    },
     workspace: async () => '.',
     spawn: async (_def, options) => {
       const toClient = new TransformStream<Uint8Array>()
@@ -54,7 +59,9 @@ function crashingHost(): { host: AgentHost; chat: () => string | null } {
           prompt: async () => {
             void toClient.writable.close().catch(() => undefined)
             options?.onExit?.()
-            return new Promise<never>(() => { /* never answers: the process exited */ })
+            return new Promise<never>(() => {
+              /* never answers: the process exited */
+            })
           },
           cancel: async () => undefined
         }),
@@ -65,7 +72,11 @@ function crashingHost(): { host: AgentHost; chat: () => string | null } {
         input: toAgent.writable,
         output: toClient.readable,
         close: async () => {
-          try { await toClient.writable.close() } catch { console.warn('crash host: stream already closed') }
+          try {
+            await toClient.writable.close()
+          } catch {
+            console.warn('crash host: stream already closed')
+          }
         }
       }
     }
@@ -88,7 +99,9 @@ async function drain(stream: ReadableStream<{ type: string }>) {
   // prompt never settles, so a real deadline is the only way to fail that case (no event to await).
   const outcome = await Promise.race([
     read,
-    new Promise<'TIMEOUT'>((resolve) => { setTimeout(() => resolve('TIMEOUT'), 2000) })
+    new Promise<'TIMEOUT'>((resolve) => {
+      setTimeout(() => resolve('TIMEOUT'), 2000)
+    })
   ])
   reader.releaseLock()
   return { outcome, types }
@@ -98,12 +111,17 @@ test('an agent that exits mid-reply ends it with an error and releases the chat'
   store = createEditorStore()
   const { host, chat } = crashingHost()
   const transport = new ACPChatTransport({
-    agentDef, host, store,
+    agentDef,
+    host,
+    store,
     automationAuthToken: async () => null,
     startupTimeoutMs: 2000
   })
   const stream = await transport.sendMessages({
-    trigger: 'submit-message', chatId: 'crash', messageId: undefined, abortSignal: undefined,
+    trigger: 'submit-message',
+    chatId: 'crash',
+    messageId: undefined,
+    abortSignal: undefined,
     messages: [{ id: 'user', role: 'user', parts: [{ type: 'text', text: 'Hello' }] }]
   })
   const { outcome, types } = await drain(stream as ReadableStream<{ type: string }>)

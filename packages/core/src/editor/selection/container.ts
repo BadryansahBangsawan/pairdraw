@@ -19,9 +19,7 @@ export function createSelectionContainerActions(ctx: EditorContext) {
   function enterContainerOf(nodeId: string) {
     const parentId = ctx.graph.getNode(nodeId)?.parentId ?? null
     const entered =
-      parentId &&
-      parentId !== ctx.state.currentPageId &&
-      !ctx.graph.isOpenContainer(parentId)
+      parentId && parentId !== ctx.state.currentPageId && !ctx.graph.isOpenContainer(parentId)
     ctx.state.enteredContainerId = entered ? parentId : null
   }
 
@@ -43,5 +41,11 @@ export function createSelectionContainerActions(ctx: EditorContext) {
     ctx.state.enteredContainerId = null
   }
 
-  return { validateEnteredContainer, enterContainer, enterContainerOf, exitContainer, exitContainers }
+  return {
+    validateEnteredContainer,
+    enterContainer,
+    enterContainerOf,
+    exitContainer,
+    exitContainers
+  }
 }

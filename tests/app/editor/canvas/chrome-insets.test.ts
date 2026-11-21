@@ -2,11 +2,8 @@ import { expect, test } from 'bun:test'
 
 import { Window, type Element as HappyElement } from 'happy-dom'
 
-import {
-  canvasChromeInsets,
-  insetsFromChrome
-} from '@/app/editor/canvas/chrome-insets'
 import type { ViewportInsets } from '@/app/document/io/types'
+import { canvasChromeInsets, insetsFromChrome } from '@/app/editor/canvas/chrome-insets'
 
 import { asDouble } from '#tests/helpers/doubles'
 

@@ -1,9 +1,6 @@
 import type { Editor } from '@pairdraw/core'
-import {
-  AUTO_LAYOUT_HOVER_GAP_REGION_TOLERANCE,
-  AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE,
-  AUTO_LAYOUT_HOVER_TICK_HIT_TOLERANCE
-} from '@pairdraw/core/constants'
+import { AUTO_LAYOUT_HOVER_TICK_HIT_TOLERANCE } from '@pairdraw/core/constants'
+import { hitAutoLayoutHandle, measureAutoLayoutHandles } from '@pairdraw/core/layout'
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
@@ -25,59 +22,22 @@ function isNear(value: number, target: number, tolerance = AUTO_LAYOUT_HOVER_TIC
 
 function resolvePaddingHover(
   node: SceneNode,
+  children: SceneNode[],
   localX: number,
   localY: number
 ): AutoLayoutHover | null {
-  const centerX = node.width / 2
-  const centerY = node.height / 2
-
-  if (node.paddingTop > 0) {
-    const tickY = node.paddingTop / 2
-    if (isNear(localX, centerX) && isNear(localY, tickY)) {
-      return { nodeId: node.id, kind: 'padding-value', side: 'top' }
-    }
-    if (localY <= Math.min(node.paddingTop, AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE)) {
-      return { nodeId: node.id, kind: 'padding', side: 'top' }
-    }
-  }
-
-  if (node.paddingBottom > 0) {
-    const tickY = node.height - node.paddingBottom / 2
-    if (isNear(localX, centerX) && isNear(localY, tickY)) {
-      return { nodeId: node.id, kind: 'padding-value', side: 'bottom' }
-    }
-    if (
-      localY >=
-      node.height - Math.min(node.paddingBottom, AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE)
-    ) {
-      return { nodeId: node.id, kind: 'padding', side: 'bottom' }
-    }
-  }
-
-  if (node.paddingLeft > 0) {
-    const tickX = node.paddingLeft / 2
-    if (isNear(localX, tickX) && isNear(localY, centerY)) {
-      return { nodeId: node.id, kind: 'padding-value', side: 'left' }
-    }
-    if (localX <= Math.min(node.paddingLeft, AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE)) {
-      return { nodeId: node.id, kind: 'padding', side: 'left' }
-    }
-  }
-
-  if (node.paddingRight > 0) {
-    const tickX = node.width - node.paddingRight / 2
-    if (isNear(localX, tickX) && isNear(localY, centerY)) {
-      return { nodeId: node.id, kind: 'padding-value', side: 'right' }
-    }
-    if (
-      localX >=
-      node.width - Math.min(node.paddingRight, AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE)
-    ) {
-      return { nodeId: node.id, kind: 'padding', side: 'right' }
-    }
-  }
-
-  return null
+  const layout = measureAutoLayoutHandles(node, children)
+  const hit = hitAutoLayoutHandle(layout, localX, localY)
+  if (hit?.kind !== 'padding' || !layout) return null
+  const handle = layout.padding.find((padding) => padding.side === hit.side)
+  if (!handle) return null
+  const isVertical = hit.side === 'left' || hit.side === 'right'
+  const tickX = handle.rect.x + handle.rect.width / 2
+  const tickY = handle.rect.y + handle.rect.height / 2
+  const atTick = isVertical
+    ? isNear(localY, node.height / 2) && isNear(localX, tickX)
+    : isNear(localX, node.width / 2) && isNear(localY, tickY)
+  return { nodeId: node.id, kind: atTick ? 'padding-value' : 'padding', side: hit.side }
 }
 
 function resolveSpacingHover(
@@ -86,34 +46,19 @@ function resolveSpacingHover(
   localX: number,
   localY: number
 ): AutoLayoutHover | null {
-  if (children.length < 2 || node.itemSpacing <= 0) return null
-  const isRow = node.layoutMode === 'HORIZONTAL'
-  const contentCrossStart = isRow ? node.paddingTop : node.paddingLeft
-  const contentCrossEnd = isRow ? node.height - node.paddingBottom : node.width - node.paddingRight
-  const cross = isRow ? localY : localX
-  if (cross < contentCrossStart || cross > contentCrossEnd) return null
-
-  for (let i = 0; i < children.length - 1; i++) {
-    const prev = children[i]
-    const next = children[i + 1]
-    const gapStart = isRow ? prev.x + prev.width : prev.y + prev.height
-    const gapEnd = isRow ? next.x : next.y
-    if (gapEnd < gapStart) continue
-
-    const cursor = isRow ? localX : localY
-    const tickMain = (gapStart + gapEnd) / 2
-    const tickCross = (contentCrossStart + contentCrossEnd) / 2
-    if (isNear(cursor, tickMain) && isNear(cross, tickCross)) {
-      return { nodeId: node.id, kind: 'spacing-value', index: i }
-    }
-    if (
-      cursor >= gapStart - AUTO_LAYOUT_HOVER_GAP_REGION_TOLERANCE &&
-      cursor <= gapEnd + AUTO_LAYOUT_HOVER_GAP_REGION_TOLERANCE
-    ) {
-      return { nodeId: node.id, kind: 'spacing', index: i }
-    }
+  const layout = measureAutoLayoutHandles(node, children)
+  const hit = hitAutoLayoutHandle(layout, localX, localY)
+  if (hit?.kind !== 'gap' || !layout) return null
+  const handle = layout.gaps.find((gap) => gap.axis === hit.axis && gap.index === hit.index)
+  if (!handle) return null
+  const { x, y, width, height } = handle.rect
+  const atTick = isNear(localX, x + width / 2) && isNear(localY, y + height / 2)
+  return {
+    nodeId: node.id,
+    kind: atTick ? 'spacing-value' : 'spacing',
+    axis: hit.axis,
+    index: hit.index
   }
-  return null
 }
 
 function resolveChildrenHover(
@@ -155,8 +100,8 @@ export function resolveAutoLayoutHover(
 
   const children = visibleLayoutChildren(node, editor)
   return (
+    resolvePaddingHover(node, children, localX, localY) ??
     resolveSpacingHover(node, children, localX, localY) ??
-    resolvePaddingHover(node, localX, localY) ??
     resolveChildrenHover(node, children, localX, localY) ?? { nodeId: node.id, kind: 'frame' }
   )
 }
@@ -168,6 +113,7 @@ export type AutoLayoutValueField =
   | 'paddingBottom'
   | 'paddingLeft'
   | 'itemSpacing'
+  | 'counterAxisSpacing'
 
 const PADDING_FIELDS = {
   top: 'paddingTop',
@@ -180,7 +126,8 @@ const PADDING_FIELDS = {
 export function autoLayoutValueField(hover: AutoLayoutHover): AutoLayoutValueField | null {
   if ((hover.kind === 'padding' || hover.kind === 'padding-value') && hover.side)
     return PADDING_FIELDS[hover.side]
-  if (hover.kind === 'spacing' || hover.kind === 'spacing-value') return 'itemSpacing'
+  if (hover.kind === 'spacing' || hover.kind === 'spacing-value')
+    return hover.axis === 'counter' ? 'counterAxisSpacing' : 'itemSpacing'
   return null
 }
 
@@ -205,6 +152,18 @@ export function autoLayoutValueAnchor(
   if (field === 'paddingRight')
     return { x: abs.x + node.width - node.paddingRight / 2, y: middle.y }
   const children = visibleLayoutChildren(node, editor)
+  if (field === 'counterAxisSpacing') {
+    const handle = measureAutoLayoutHandles(node, children)?.gaps.find(
+      (candidate) => candidate.axis === 'counter' && candidate.index === gap
+    )
+    if (handle) {
+      return {
+        x: abs.x + handle.rect.x + handle.rect.width / 2,
+        y: abs.y + handle.rect.y + handle.rect.height / 2
+      }
+    }
+    return middle
+  }
   const prev = children.at(gap)
   const next = children.at(gap + 1)
   if (!prev || !next) return middle

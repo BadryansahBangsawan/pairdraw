@@ -50,6 +50,11 @@ export function moveDrag(
     return
   }
 
+  if (d.type === 'auto-layout') {
+    d.update(sx, sy, e.altKey, e.shiftKey)
+    return
+  }
+
   if (d.type === 'gradient' || d.type === 'shape-handle') {
     d.update(sx, sy, e.shiftKey)
     return

@@ -33,6 +33,8 @@ export interface CanvasToolContext {
   setDrag: (d: DragState) => void
   tryStartRotation: (cx: number, cy: number) => boolean
   handleTextEditClick: (cx: number, cy: number, shiftKey: boolean) => boolean
+  /** Settings → Editor's large nudge, in pixels. */
+  bigNudge: () => number
   /** Shows what the pointer is over while selecting: the cursor, guides, and auto layout. */
   hoverLayers: (pointer: CanvasToolPointer) => void
 }
@@ -68,7 +70,8 @@ const select: CanvasTool = {
       context.hitFns,
       context.tryStartRotation,
       context.handleTextEditClick,
-      context.setDrag
+      context.setDrag,
+      context.bigNudge()
     ),
   hover: (pointer, { hoverLayers }) => hoverLayers(pointer)
 }

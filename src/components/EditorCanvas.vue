@@ -243,7 +243,8 @@ const {
   () => ({
     wheelZooms: appPreferences.value.navigation.wheelZoom,
     invert: appPreferences.value.navigation.invertZoom
-  })
+  }),
+  () => appPreferences.value.editing.nudge.large
 )
 
 watch(isActivePane, (active) => {
@@ -278,7 +279,8 @@ const valueFieldIcons = {
   paddingTop: IconLucidePanelTop,
   paddingRight: IconLucidePanelRight,
   paddingBottom: IconLucidePanelBottom,
-  paddingLeft: IconLucidePanelLeft
+  paddingLeft: IconLucidePanelLeft,
+  counterAxisSpacing: IconLucideAlignVerticalSpaceBetween
 } satisfies Record<Exclude<AutoLayoutValueField, 'itemSpacing'>, Component>
 
 const canvasLabelEditNode = computed(() => {

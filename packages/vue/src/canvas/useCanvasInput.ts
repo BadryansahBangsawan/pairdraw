@@ -21,7 +21,7 @@ import {
   updateNodeEditHover
 } from '#vue/canvas/vector-input/input'
 import { stopViewportTween } from '#vue/canvas/viewport/tween'
-import { resolveAutoLayoutHover } from '#vue/shared/input/auto-layout-hover'
+import { resolveAutoLayoutHover } from '#vue/shared/input/auto-layout/hover'
 import { createClickCounter } from '#vue/shared/input/click-count'
 import { refreshConnectorDrag } from '#vue/shared/input/connector/draw'
 import { cancelMove, handleMoveUp } from '#vue/shared/input/move/drag'
@@ -66,7 +66,9 @@ export function useCanvasInput(
   /** How far wheel and pinch zoom move per event; 1 is the default rate. */
   zoomSpeed: () => number = () => 1,
   /** Whether a plain wheel zooms and whether a wheel zoom is inverted. */
-  zoomOptions: () => WheelZoomOptions = () => DEFAULT_WHEEL_ZOOM_OPTIONS
+  zoomOptions: () => WheelZoomOptions = () => DEFAULT_WHEEL_ZOOM_OPTIONS,
+  /** Settings → Editor's large nudge, in pixels, for handle drags with Shift. */
+  bigNudge: () => number = () => 10
 ) {
   const drag = ref<DragState | null>(null)
   const profile = () => resolveEditorProfile(editor.state)
@@ -231,6 +233,7 @@ export function useCanvasInput(
     setDrag,
     tryStartRotation,
     handleTextEditClick,
+    bigNudge,
     hoverLayers
   }
 

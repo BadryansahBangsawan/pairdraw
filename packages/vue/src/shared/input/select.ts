@@ -4,6 +4,7 @@ export { updateHoverCursor } from '#vue/shared/input/select/hover'
 import { editedGradient, editedImage, resolveEditorProfile, type Editor } from '@pairdraw/core'
 import type { SceneNode } from '@pairdraw/scene-graph'
 
+import { tryStartAutoLayoutHandleDrag } from '#vue/shared/input/auto-layout/drag'
 import { tryStartConnectorEndDrag } from '#vue/shared/input/connector/end'
 import { tryStartConnectorLineDrag } from '#vue/shared/input/connector/line'
 import { tryStartGradientDrag } from '#vue/shared/input/gradient'
@@ -92,7 +93,8 @@ function tryStartHandleDrag(
   editor: Editor,
   fns: HitTestFns,
   tryStartRotation: (cx: number, cy: number) => boolean,
-  setDrag: (d: DragState) => void
+  setDrag: (d: DragState) => void,
+  bigNudge: number
 ): boolean {
   if (!resolveEditorProfile(editor.state).edits) return false
   if (tryStartGradientDrag(editor, sx, sy, setDrag)) return true
@@ -102,6 +104,7 @@ function tryStartHandleDrag(
   if (tryStartImageCropDrag(editor, sx, sy, setDrag)) return true
   if (editedImage(editor.graph, editor.state.imageEdit)) return false
   if (tryStartShapeHandleDrag(editor, sx, sy, altKey, setDrag)) return true
+  if (tryStartAutoLayoutHandleDrag(editor, cx, cy, sx, sy, setDrag, bigNudge)) return true
   if (tryStartConnectorEndDrag(editor, sx, sy, setDrag)) return true
   if (tryStartConnectorLineDrag(editor, cx, cy, sx, sy, setDrag)) return true
   if (tryStartLineEndDrag(editor, cx, cy, setDrag)) return true
@@ -178,7 +181,8 @@ export function handleSelectDown(
   fns: HitTestFns,
   tryStartRotation: (cx: number, cy: number) => boolean,
   handleTextEditClick: (cx: number, cy: number, shiftKey: boolean) => boolean,
-  setDrag: (d: DragState) => void
+  setDrag: (d: DragState) => void,
+  bigNudge = 10
 ) {
   // Node edit mode intercept
   if (getNodeEditState(editor)) {
@@ -190,7 +194,10 @@ export function handleSelectDown(
 
   if (editor.state.editingTextId) editor.commitTextEdit()
 
-  if (tryStartHandleDrag(cx, cy, sx, sy, e.altKey, editor, fns, tryStartRotation, setDrag)) return
+  if (
+    tryStartHandleDrag(cx, cy, sx, sy, e.altKey, editor, fns, tryStartRotation, setDrag, bigNudge)
+  )
+    return
 
   const deep = e.metaKey || e.ctrlKey
   const hit = tinySelectionAt(cx, cy, editor) ?? resolveHit(cx, cy, editor, fns, deep)

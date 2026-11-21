@@ -85,6 +85,8 @@ export interface RenderOverlays {
   autoLayoutHover?: {
     nodeId: string
     kind: 'frame' | 'children' | 'spacing' | 'spacing-value' | 'padding' | 'padding-value'
+    /** For a gap: whether it edits the flow's spacing or the wrapped lines' spacing. */
+    axis?: 'primary' | 'counter'
     index?: number
     side?: 'top' | 'right' | 'bottom' | 'left'
   } | null

@@ -97,6 +97,7 @@ export function createSelectionOverlayActions(ctx: EditorContext) {
     if (
       current?.nodeId === hover?.nodeId &&
       current?.kind === hover?.kind &&
+      current?.axis === hover?.axis &&
       current?.index === hover?.index &&
       current?.side === hover?.side
     ) {

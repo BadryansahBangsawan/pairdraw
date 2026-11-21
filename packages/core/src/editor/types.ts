@@ -189,6 +189,8 @@ export interface EditorViewState {
   autoLayoutHover: {
     nodeId: string
     kind: 'frame' | 'children' | 'spacing' | 'spacing-value' | 'padding' | 'padding-value'
+    /** For a gap: the flow axis whose spacing it edits. */
+    axis?: 'primary' | 'counter'
     index?: number
     side?: 'top' | 'right' | 'bottom' | 'left'
   } | null

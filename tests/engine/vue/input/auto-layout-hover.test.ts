@@ -4,7 +4,7 @@ import type { Editor } from '@pairdraw/core'
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
-import { autoLayoutValueAnchor, resolveAutoLayoutHover } from '#vue/shared/input/auto-layout-hover'
+import { autoLayoutValueAnchor, resolveAutoLayoutHover } from '#vue/shared/input/auto-layout/hover'
 
 function frame(overrides: Partial<SceneNode> = {}): SceneNode {
   return createDefaultNode(() => 'frame', 'FRAME', {

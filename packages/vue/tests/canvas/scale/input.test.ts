@@ -239,6 +239,7 @@ describe('Scale tool press on a handle that cannot scale', () => {
       setDrag: (d) => drags.push(d),
       tryStartRotation: () => false,
       handleTextEditClick: () => false,
+      bigNudge: () => 10,
       hoverLayers: () => undefined
     }
     const event = {

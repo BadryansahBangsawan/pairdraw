@@ -357,7 +357,17 @@ export interface DragShapeHandle {
   cancel: () => void
 }
 
+/** Dragging a padding edge or an item gap of the selected auto layout frame. */
+export interface DragAutoLayout {
+  type: 'auto-layout'
+  /** Sets the padding or gap so far; Alt edits the opposite side (with Shift, all sides), Shift the large nudge. */
+  update: (screenX: number, screenY: number, altKey: boolean, shiftKey: boolean) => void
+  commit: () => void
+  cancel: () => void
+}
+
 export type DragState =
+  | DragAutoLayout
   | DragShapeHandle
   | DragDraw
   | DragStickyDraw

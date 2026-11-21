@@ -1,13 +1,11 @@
 import type { Canvas } from 'canvaskit-wasm'
 
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import type { Color } from '@pairdraw/scene-graph/primitives'
+import type { Color, Rect } from '@pairdraw/scene-graph/primitives'
 
 import { strokeLayoutChildren } from '#core/canvas/overlays/layout-outlines'
 import type { RenderOverlays, SkiaRenderer } from '#core/canvas/renderer'
 import {
-  AUTO_LAYOUT_HOVER_BLUE,
-  AUTO_LAYOUT_HOVER_BLUE_FILL,
   AUTO_LAYOUT_HOVER_MAGENTA,
   AUTO_LAYOUT_HOVER_MAGENTA_FILL,
   AUTO_LAYOUT_HOVER_STRIPE_GAP,
@@ -16,11 +14,14 @@ import {
   AUTO_LAYOUT_HOVER_TICK_LENGTH,
   AUTO_LAYOUT_HOVER_VALUE_OFFSET,
   AUTO_LAYOUT_HOVER_GAP_PILL,
-  AUTO_LAYOUT_HOVER_PADDING_PILL,
   AUTO_LAYOUT_HOVER_VALUE_PILL_HEIGHT,
   AUTO_LAYOUT_HOVER_VALUE_PILL_PADDING_X,
   AUTO_LAYOUT_HOVER_VALUE_PILL_RADIUS
 } from '#core/constants'
+import {
+  measureAutoLayoutHandles,
+  type AutoLayoutHandleLayout
+} from '#core/layout/auto-layout-handles'
 
 type Hover = NonNullable<RenderOverlays['autoLayoutHover']>
 type RectTuple = [x: number, y: number, width: number, height: number]
@@ -141,55 +142,23 @@ function drawValuePill(
   canvas.drawText(text, x - advance / 2, y - (top + bottom) / 2, r.auxFill, font)
 }
 
-function gapRects(node: SceneNode, graph: SceneGraph): RectTuple[] {
-  const children = visibleLayoutChildren(node, graph)
-  if (children.length < 2 || node.itemSpacing <= 0) return []
+function absoluteRect(graph: SceneGraph, node: SceneNode, rect: Rect): RectTuple {
   const abs = graph.getAbsolutePosition(node.id)
-  const isRow = node.layoutMode === 'HORIZONTAL'
-  const rects: RectTuple[] = []
-
-  for (let i = 0; i < children.length - 1; i++) {
-    const prev = children[i]
-    const next = children[i + 1]
-    const gapStart = isRow ? prev.x + prev.width : prev.y + prev.height
-    const gapEnd = isRow ? next.x : next.y
-    if (gapEnd <= gapStart) continue
-    rects.push(
-      isRow
-        ? [
-            abs.x + gapStart,
-            abs.y + node.paddingTop,
-            gapEnd - gapStart,
-            node.height - node.paddingTop - node.paddingBottom
-          ]
-        : [
-            abs.x + node.paddingLeft,
-            abs.y + gapStart,
-            node.width - node.paddingLeft - node.paddingRight,
-            gapEnd - gapStart
-          ]
-    )
-  }
-  return rects
+  return [abs.x + rect.x, abs.y + rect.y, rect.width, rect.height]
 }
 
-function paddingRect(node: SceneNode, graph: SceneGraph, side: Hover['side']): RectTuple | null {
-  if (!side) return null
-  const abs = graph.getAbsolutePosition(node.id)
-  if (side === 'top') return [abs.x, abs.y, node.width, node.paddingTop]
-  if (side === 'bottom') {
-    return [abs.x, abs.y + node.height - node.paddingBottom, node.width, node.paddingBottom]
-  }
-  if (side === 'left') return [abs.x, abs.y, node.paddingLeft, node.height]
-  return [abs.x + node.width - node.paddingRight, abs.y, node.paddingRight, node.height]
-}
-
-function drawBaselineTicks(r: SkiaRenderer, canvas: Canvas, graph: SceneGraph, node: SceneNode) {
+function drawBaselineTicks(
+  r: SkiaRenderer,
+  canvas: Canvas,
+  graph: SceneGraph,
+  node: SceneNode,
+  layout: AutoLayoutHandleLayout
+) {
   const abs = graph.getAbsolutePosition(node.id)
   const xCenter = (abs.x + node.width / 2) * r.zoom + r.panX
   const yCenter = (abs.y + node.height / 2) * r.zoom + r.panY
 
-  setStroke(r, AUTO_LAYOUT_HOVER_BLUE)
+  setStroke(r, AUTO_LAYOUT_HOVER_MAGENTA)
   if (node.paddingTop > 0) {
     drawHorizontalTick(r, canvas, xCenter, (abs.y + node.paddingTop / 2) * r.zoom + r.panY)
   }
@@ -214,9 +183,9 @@ function drawBaselineTicks(r: SkiaRenderer, canvas: Canvas, graph: SceneGraph, n
   }
 
   setStroke(r, AUTO_LAYOUT_HOVER_MAGENTA)
-  for (const rect of gapRects(node, graph)) {
-    const [x, y, width, height] = rect
-    if (node.layoutMode === 'HORIZONTAL') {
+  for (const gap of layout.gaps) {
+    const [x, y, width, height] = absoluteRect(graph, node, gap.rect)
+    if (width <= height) {
       drawVerticalTick(r, canvas, (x + width / 2) * r.zoom + r.panX, yCenter)
     } else {
       drawHorizontalTick(r, canvas, xCenter, (y + height / 2) * r.zoom + r.panY)
@@ -229,18 +198,28 @@ function drawSpacingHover(
   canvas: Canvas,
   graph: SceneGraph,
   node: SceneNode,
+  layout: AutoLayoutHandleLayout,
+  hover: Hover,
   showValue: boolean
 ) {
-  const rects = gapRects(node, graph)
-  for (const rect of rects) {
-    drawStripedRect(r, canvas, rect, AUTO_LAYOUT_HOVER_MAGENTA, AUTO_LAYOUT_HOVER_MAGENTA_FILL)
-  }
-  if (!showValue || rects.length === 0) return
-  const [x, y, width, height] = rects[0]
+  const handles = layout.gaps
+  const shown =
+    handles.find((gap) => gap.axis === (hover.axis ?? 'primary') && gap.index === hover.index) ??
+    handles.at(0)
+  if (!shown) return
+  drawStripedRect(
+    r,
+    canvas,
+    absoluteRect(graph, node, shown.rect),
+    AUTO_LAYOUT_HOVER_MAGENTA,
+    AUTO_LAYOUT_HOVER_MAGENTA_FILL
+  )
+  if (!showValue) return
+  const [x, y, width, height] = absoluteRect(graph, node, shown.rect)
   drawValuePill(
     r,
     canvas,
-    String(Math.round(node.itemSpacing)),
+    String(Math.round(shown.value)),
     (x + width / 2) * r.zoom + r.panX + AUTO_LAYOUT_HOVER_VALUE_OFFSET,
     (y + height / 2) * r.zoom + r.panY - AUTO_LAYOUT_HOVER_VALUE_OFFSET,
     AUTO_LAYOUT_HOVER_GAP_PILL
@@ -252,22 +231,23 @@ function drawPaddingHover(
   canvas: Canvas,
   graph: SceneGraph,
   node: SceneNode,
+  layout: AutoLayoutHandleLayout,
   hover: Hover,
   showValue: boolean
 ) {
-  const rect = paddingRect(node, graph, hover.side)
-  if (!rect) return
-  drawStripedRect(r, canvas, rect, AUTO_LAYOUT_HOVER_BLUE, AUTO_LAYOUT_HOVER_BLUE_FILL)
+  const handle = layout.padding.find((padding) => padding.side === hover.side)
+  if (!handle) return
+  const rect = absoluteRect(graph, node, handle.rect)
+  drawStripedRect(r, canvas, rect, AUTO_LAYOUT_HOVER_MAGENTA, AUTO_LAYOUT_HOVER_MAGENTA_FILL)
   if (!showValue) return
   const [x, y, width, height] = rect
-  const value = hover.side === 'left' || hover.side === 'right' ? width : height
   drawValuePill(
     r,
     canvas,
-    String(Math.round(value)),
+    String(Math.round(handle.value)),
     (x + width / 2) * r.zoom + r.panX + AUTO_LAYOUT_HOVER_VALUE_OFFSET,
     (y + height / 2) * r.zoom + r.panY - AUTO_LAYOUT_HOVER_VALUE_OFFSET,
-    AUTO_LAYOUT_HOVER_PADDING_PILL
+    AUTO_LAYOUT_HOVER_GAP_PILL
   )
 }
 
@@ -280,13 +260,15 @@ export function drawAutoLayoutHover(
   if (!hover) return
   const node = graph.getNode(hover.nodeId)
   if (!node || (node.layoutMode !== 'HORIZONTAL' && node.layoutMode !== 'VERTICAL')) return
+  const layout = measureAutoLayoutHandles(node, visibleLayoutChildren(node, graph))
+  if (!layout) return
 
   if (hover.kind === 'children') strokeLayoutChildren(r, canvas, graph, node)
   if (hover.kind === 'spacing' || hover.kind === 'spacing-value') {
-    drawSpacingHover(r, canvas, graph, node, hover.kind === 'spacing-value')
+    drawSpacingHover(r, canvas, graph, node, layout, hover, hover.kind === 'spacing-value')
   }
   if (hover.kind === 'padding' || hover.kind === 'padding-value') {
-    drawPaddingHover(r, canvas, graph, node, hover, hover.kind === 'padding-value')
+    drawPaddingHover(r, canvas, graph, node, layout, hover, hover.kind === 'padding-value')
   }
-  drawBaselineTicks(r, canvas, graph, node)
+  drawBaselineTicks(r, canvas, graph, node, layout)
 }

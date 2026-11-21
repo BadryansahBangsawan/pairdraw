@@ -6,6 +6,7 @@ description: Flex and grid layout in Pairdraw — direction, gap, padding, align
 # Auto Layout
 
 Auto layout positions children automatically within a frame. It supports two modes: **flex** (horizontal/vertical flow) and **grid** (rows and columns with track sizing).
+
 ## Enabling Auto Layout
 
 - Select a frame and press <kbd>⇧</kbd><kbd>A</kbd> (<kbd>Shift</kbd> + <kbd>A</kbd>) to toggle auto layout on or off
@@ -76,10 +77,19 @@ Hold <kbd>⌃</kbd> (<kbd>Ctrl</kbd> on Windows and Linux) while dragging to ign
 
 When an auto-layout frame is selected, the Layout section in the properties panel shows all auto-layout controls: direction, gap, padding, justify, and align.
 
+## On-canvas Handles
+
+Select a single flex frame and the canvas shows its padding and gap handles, as Figma does. Hover a padding area or the space between two children to tint it pink; double-click a tinted value to edit it.
+
+- Drag a padding area to change that side. Hold <kbd>⇧</kbd> (<kbd>Shift</kbd>) to move the value by the large nudge in Settings → Editor. Hold <kbd>⌥</kbd> (<kbd>Alt</kbd>) to change the opposite side on the same axis, or <kbd>⌥</kbd><kbd>⇧</kbd> (<kbd>Alt</kbd> + <kbd>Shift</kbd>) to change all four.
+- Drag the gap between children to change **Item spacing**. With **Wrap** on, the space between wrapped lines edits **Counter axis spacing**.
+- Hold <kbd>⇧</kbd> while dragging a gap to move it by the same large nudge.
+- Handles hide when a value is zero, when the gap is **Space between**, and on generated frames. An instance can edit its own padding and spacing, recorded as an instance override. A drag previews on the canvas and commits as one undo step.
+
 ## Keyboard Shortcuts
 
-| Action | Mac | Windows / Linux |
-|--------|-----|-----------------|
+| Action             | Mac                      | Windows / Linux                 |
+| ------------------ | ------------------------ | ------------------------------- |
 | Toggle auto layout | <kbd>⇧</kbd><kbd>A</kbd> | <kbd>Shift</kbd> + <kbd>A</kbd> |
 
 ## CSS Grid

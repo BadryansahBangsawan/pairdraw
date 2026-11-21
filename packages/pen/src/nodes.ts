@@ -420,7 +420,10 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
   const iconInstance = fields.type === 'icon' && insideComponent(build.graph, parentId)
   const leaveTheme = fields.theme ? build.ctx.enterTheme(fields.theme) : undefined
   try {
-    const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields, build.ctx, build.onUnknownNodeType)
+    const type =
+      instanceOf || iconInstance
+        ? 'INSTANCE'
+        : sceneType(fields, build.ctx, build.onUnknownNodeType)
     // An ID a hand-edited file repeats gets a fresh one, so the layer does not replace the first
     // layer with it or become its own parent.
     const id = build.graph.getNode(pen.id) ? build.graph.entityIdMinter()() : pen.id

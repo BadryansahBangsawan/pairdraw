@@ -31,7 +31,9 @@ function warningList<K extends 'unknown-variable' | 'missing-image' | 'unknown-n
   field: K extends 'unknown-variable' ? 'names' : K extends 'missing-image' ? 'urls' : 'types',
   names: ReadonlySet<string>
 ): ReadDocumentWarning[] {
-  return names.size > 0 ? [{ kind, [field]: [...names].slice(0, WARNING_NAMES) } as ReadDocumentWarning] : []
+  return names.size > 0
+    ? [{ kind, [field]: [...names].slice(0, WARNING_NAMES) } as ReadDocumentWarning]
+    : []
 }
 
 /**

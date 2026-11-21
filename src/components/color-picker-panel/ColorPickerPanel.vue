@@ -3,8 +3,8 @@ import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { OkHCLControls } from '@pairdraw/vue/controls/color-model'
 
 import ColorAreaControl from '@/components/color-picker-panel/ColorAreaControl.vue'
-import DocumentColorsSection from '@/components/color-picker-panel/DocumentColorsSection.vue'
 import { provideColorPickerPanel } from '@/components/color-picker-panel/context'
+import DocumentColorsSection from '@/components/color-picker-panel/DocumentColorsSection.vue'
 import FormatControls from '@/components/color-picker-panel/FormatControls.vue'
 import HueAlphaSliders from '@/components/color-picker-panel/HueAlphaSliders.vue'
 

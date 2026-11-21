@@ -22,6 +22,7 @@ import {
 import { imageMimeType } from '@pairdraw/scene-graph/images'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
+import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
 import type { FontFaceRef } from '#core/text/font/faces'
 
 import { svg, type SVGNode } from './node'
@@ -55,6 +56,8 @@ export interface SVGExportContext {
   /** Measured line breaks. Without them, only explicit newlines start a new baseline. */
   textLayout?: SVGTextLayout
   fontAlias?: SVGFontAlias
+  /** The live result path of a boolean made in Pairdraw, which stores none. */
+  booleanPath?: BooleanPathResolver
 }
 
 export function nextDefId(ctx: SVGExportContext, prefix: string): string {

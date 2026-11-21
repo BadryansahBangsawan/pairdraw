@@ -331,7 +331,7 @@ function collectShapeNodeProps(node: SceneNode, props: JSXProp[]): void {
   if (node.type === 'POLYGON' && node.pointCount !== 3) {
     props.push(['points', node.pointCount])
   }
-  if (node.type === 'VECTOR' && node.vectorNetwork) {
+  if ((node.type === 'VECTOR' || node.type === 'BOOLEAN_OPERATION') && node.vectorNetwork) {
     // Figma's own form of a vector's geometry, which <Vector> reads back as written.
     const paths = vectorNetworkPaths(node.vectorNetwork)
     if (paths.length > 0) props.push(['paths', paths.map((path) => ({ ...path }))])

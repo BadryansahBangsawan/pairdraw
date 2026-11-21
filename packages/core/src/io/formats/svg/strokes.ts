@@ -50,9 +50,9 @@ export function alignedStrokeElement(
   node: SceneNode,
   stroke: Stroke,
   strokeAttrs: Attrs,
-  ctx: SVGExportContext
+  ctx: SVGExportContext,
+  outline = closedOutlinePath(node)
 ): SVGNode[] {
-  const outline = closedOutlinePath(node)
   if (outline === null) return []
   const clipId = nextDefId(ctx, 'clip')
   if (stroke.align === 'INSIDE') {

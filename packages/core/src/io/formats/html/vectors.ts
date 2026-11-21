@@ -3,6 +3,7 @@ import { colorToHex } from '@pairdraw/scene-graph/color'
 import { isIconModified, readIcon, readIconTint } from '@pairdraw/scene-graph/icons'
 
 import { iconColor } from '#core/icons/render'
+import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
 import { renderNodeSVGElement } from '#core/io/formats/svg/export'
 import type { SVGNode } from '#core/io/formats/svg/node'
 
@@ -33,13 +34,18 @@ function idPart(id: string): string {
  * were edited. Def ids start with the layer's id, so several SVGs on one page never pick up each
  * other's gradients or filters.
  */
-export const vectorElement: VectorElementRenderer = (graph, node) => {
+export const vectorElement = (
+  graph: Parameters<VectorElementRenderer>[0],
+  node: Parameters<VectorElementRenderer>[1],
+  booleanPath?: BooleanPathResolver
+): ReturnType<VectorElementRenderer> => {
   const idPrefix = `${idPart(node.id)}-`
   const icon = readIcon(node)
   const drawn = renderNodeSVGElement(graph, node, {
     idPrefix,
     colorSpace: graph.documentColorSpace,
-    tint: icon ? readIconTint : undefined
+    tint: icon ? readIconTint : undefined,
+    booleanPath
   })
   const element = drawn && designNode(drawn)
   if (element?.type !== 'element') return null

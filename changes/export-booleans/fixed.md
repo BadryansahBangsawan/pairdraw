@@ -1,0 +1,1 @@
+- A Union, Subtract, Intersect or Exclude made in Pairdraw exports as its result path in SVG, HTML and JSX instead of its bounding box and operands.

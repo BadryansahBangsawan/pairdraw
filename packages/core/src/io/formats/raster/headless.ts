@@ -40,7 +40,7 @@ async function createRenderer(ck: CanvasKit): Promise<SkiaRenderer> {
  * The offscreen renderer for `canvasKit`, made on first use. A browser host passes the build its
  * canvas already uses; without one the export renderer loads its own.
  */
-async function getRenderer(
+export async function headlessRenderer(
   canvasKit?: CanvasKit
 ): Promise<{ ck: CanvasKit; renderer: SkiaRenderer }> {
   const ck = canvasKit ?? (await initCanvasKit())
@@ -67,7 +67,7 @@ export async function headlessRenderNodes(
   } = {},
   canvasKit?: CanvasKit
 ): Promise<Uint8Array<ArrayBuffer> | null> {
-  const { ck, renderer } = await getRenderer(canvasKit)
+  const { ck, renderer } = await headlessRenderer(canvasKit)
   renderer.invalidateAllPictures()
   await renderer.prepareForExport(graph, pageId, nodeIds)
   return renderNodesToImage(ck, renderer, graph, pageId, nodeIds, {
@@ -87,7 +87,7 @@ export async function headlessRenderThumbnail(
   quality = 100,
   canvasKit?: CanvasKit
 ): Promise<Uint8Array<ArrayBuffer> | null> {
-  const { ck, renderer } = await getRenderer(canvasKit)
+  const { ck, renderer } = await headlessRenderer(canvasKit)
   renderer.invalidateAllPictures()
   await renderer.prepareForExport(graph, pageId, graph.getNode(pageId)?.childIds ?? [])
   return renderThumbnail(ck, renderer, graph, pageId, width, height, format, quality)

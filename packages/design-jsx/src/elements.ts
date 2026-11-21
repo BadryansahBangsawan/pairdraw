@@ -140,7 +140,7 @@ export const DESIGN_JSX_ELEMENTS: DesignJSXElementDefinition[] = [
     runtimeType: 'vector',
     description: 'A vector layer.',
     nodeType: 'VECTOR',
-    writes: ['VECTOR']
+    writes: ['VECTOR', 'BOOLEAN_OPERATION']
   },
   {
     name: 'Group',

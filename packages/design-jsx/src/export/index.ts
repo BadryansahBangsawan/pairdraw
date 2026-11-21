@@ -162,6 +162,8 @@ function nodeToJSX(
     for (let count = elementCount(content); count > 0; count--) layerIds?.push(null)
     return [jsx.element(tag, attributes, content, depth, inline)]
   }
+  // A boolean's result path draws it, so its operands are not written as children.
+  if (node.type === 'BOOLEAN_OPERATION') return [jsx.element(tag, attributes, [], depth)]
   return [jsx.element(tag, attributes, children(depth + 1), depth)]
 }
 

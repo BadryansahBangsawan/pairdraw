@@ -32,6 +32,8 @@ export { geometryBlobToSVGPath, nodeOutlinePath, type OutlineNode } from './path
 import type { SceneGraph, SceneNode, Fill, Stroke, VectorNetwork } from '@pairdraw/scene-graph'
 import { looseSegments, regionSVGPaths } from '@pairdraw/scene-graph/vector-network'
 
+import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
+
 import { arrowHeadElements, openPathElements, vectorArrowHeads } from './arrows'
 import type { SVGExportContext, SVGFontAlias } from './defs'
 import { svg, renderSVGNode } from './node'
@@ -603,6 +605,90 @@ function maskedChildNodes(childNodes: SceneNode[], ctx: SVGExportContext): SVGNo
   return content
 }
 
+/** A boolean's live result path in the paints its fills and strokes give it. */
+function booleanPathElements(
+  node: SceneNode,
+  d: string,
+  visibleFills: Fill[],
+  fillAttr: string | null,
+  fillOpacity: number | undefined,
+  strokeAttrs: Array<Record<string, string | number | undefined>>,
+  visibleStrokes: Stroke[],
+  ctx: SVGExportContext
+): SVGNode[] {
+  const common = { d, 'fill-rule': 'evenodd' as const }
+  // A centred first stroke joins the fill element, as a shape's does; every later stroke, and
+  // every inside or outside stroke, is drawn over the result outline on its own. An unset
+  // alignment strokes the centred way, as `alignedStroke` treats it.
+  const centered = (stroke: Stroke): boolean =>
+    stroke.align !== 'INSIDE' && stroke.align !== 'OUTSIDE'
+  const firstJoins = visibleStrokes.length > 0 && centered(visibleStrokes[0])
+  const joined = firstJoins ? strokeAttrs[0] : {}
+  const elements =
+    visibleFills.length <= 1
+      ? [
+          svg('path', {
+            ...common,
+            fill: fillAttr ?? 'none',
+            'fill-opacity': fillOpacity,
+            ...joined
+          })
+        ]
+      : visibleFills.map((fill, index) =>
+          svg('path', {
+            ...common,
+            fill: resolveFill(fill, node, ctx) ?? 'none',
+            'fill-opacity': solidFillOpacity(fill, ctx.colorSpace),
+            ...(index === visibleFills.length - 1 ? joined : {})
+          })
+        )
+
+  for (let index = firstJoins ? 1 : 0; index < visibleStrokes.length; index++) {
+    const stroke = visibleStrokes[index]
+    const attrs = strokeAttrs[index]
+    elements.push(
+      ...(centered(stroke)
+        ? [svg('path', { d, fill: 'none', ...attrs })]
+        : alignedStrokeElement(node, stroke, attrs, ctx, d))
+    )
+  }
+  return elements
+}
+
+/** A boolean made in Pairdraw draws its computed result path instead of its operands. */
+function renderBooleanNode(
+  node: SceneNode,
+  ctx: SVGExportContext,
+  paint: {
+    groupAttrs: Record<string, string | number | undefined>
+    visibleFills: Fill[]
+    fillAttr: string | null
+    fillOpacity: number | undefined
+    strokeAttrs: Array<Record<string, string | number | undefined>>
+    visibleStrokes: Stroke[]
+  }
+): SVGNode | null {
+  if (node.type !== 'BOOLEAN_OPERATION' || node.fillGeometry.length > 0 || !ctx.booleanPath) {
+    return null
+  }
+  const d = ctx.booleanPath(ctx.graph, node)
+  if (!d) return null
+  return svg(
+    'g',
+    paint.groupAttrs,
+    ...booleanPathElements(
+      node,
+      d,
+      paint.visibleFills,
+      paint.fillAttr,
+      paint.fillOpacity,
+      paint.strokeAttrs,
+      paint.visibleStrokes,
+      ctx
+    )
+  )
+}
+
 function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
   if (!node.visible) return null
 
@@ -631,6 +717,16 @@ function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
     const attrs = buildSVGStrokeAttrs(stroke, node, ctx)
     return tint.includes('stroke') ? { ...attrs, stroke: CURRENT_COLOR } : attrs
   })
+
+  const booleanDrawn = renderBooleanNode(node, ctx, {
+    groupAttrs,
+    visibleFills,
+    fillAttr,
+    fillOpacity,
+    strokeAttrs,
+    visibleStrokes
+  })
+  if (booleanDrawn) return booleanDrawn
 
   const children: (SVGNode | null)[] = buildShapeChildren(
     node,
@@ -684,6 +780,11 @@ export interface SVGExportOptions {
    * file under. Text in an aliased face is written in that family at normal weight and style.
    */
   fontAlias?: SVGFontAlias
+  /**
+   * The live result path of a boolean operation made in Pairdraw, which stores none. Left out,
+   * such a boolean draws its box and its operands, as an archive-less reader sees it.
+   */
+  booleanPath?: BooleanPathResolver
 }
 
 export function renderNodesToSVG(
@@ -705,7 +806,8 @@ export function renderNodesToSVG(
     graph,
     colorSpace: options.colorSpace ?? 'srgb',
     textLayout: options.textLayout,
-    fontAlias: options.fontAlias
+    fontAlias: options.fontAlias,
+    booleanPath: options.booleanPath
   }
 
   const contentNodes: SVGNode[] = []
@@ -761,10 +863,22 @@ export function renderNodeSVGElement(
   {
     idPrefix,
     colorSpace = 'srgb',
-    tint
-  }: Pick<SVGExportContext, 'tint'> & { idPrefix: string; colorSpace?: RenderColorSpace }
+    tint,
+    booleanPath
+  }: Pick<SVGExportContext, 'tint' | 'booleanPath'> & {
+    idPrefix: string
+    colorSpace?: RenderColorSpace
+  }
 ): SVGNode | null {
-  const ctx: SVGExportContext = { defs: [], defIdCounter: 0, graph, colorSpace, idPrefix, tint }
+  const ctx: SVGExportContext = {
+    defs: [],
+    defIdCounter: 0,
+    graph,
+    colorSpace,
+    idPrefix,
+    tint,
+    booleanPath
+  }
   const drawn = renderNode({ ...node, x: 0, y: 0, rotation: 0, opacity: 1 }, ctx)
   if (!drawn) return null
   // A straight line has no height or width, but its stroke still needs a viewport to draw in.

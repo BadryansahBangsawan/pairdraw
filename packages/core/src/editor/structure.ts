@@ -1,6 +1,6 @@
 import { pick } from 'es-toolkit'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { BooleanOperation, SceneNode } from '@pairdraw/scene-graph'
 import { TRANSFORM_FIELDS } from '@pairdraw/scene-graph/fields'
 import { createsComponentCycle } from '@pairdraw/scene-graph/instances'
 import { defaultNodeName } from '@pairdraw/scene-graph/node-defaults'
@@ -9,10 +9,7 @@ import { acceptingParent, acceptsChildren, prepareSlotEdits } from '#core/editor
 import { fitEnclosingGroupsWithUndo } from '#core/editor/structure/group/bounds'
 
 import { wrapInAutoLayout as wrapInAutoLayoutImpl } from './structure/auto-layout-wrap'
-import {
-  booleanOperationSelected as booleanOperationSelectedImpl,
-  type BooleanOperation
-} from './structure/boolean'
+import { booleanOperationSelected as booleanOperationSelectedImpl } from './structure/boolean'
 import { wrapSelectionInContainer as wrapSelectionInContainerImpl } from './structure/container-wrap'
 import { flattenSelected as flattenSelectedImpl } from './structure/flatten'
 import { ungroupSelected as ungroupImpl } from './structure/group/ungroup'

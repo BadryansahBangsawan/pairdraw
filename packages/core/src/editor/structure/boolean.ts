@@ -1,4 +1,4 @@
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { BooleanOperation, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { copyFills } from '@pairdraw/scene-graph/copy'
 import {
   fitEnclosingGroups,
@@ -14,8 +14,6 @@ import type { EditorContext } from '#core/editor/types'
 
 import { canvasWrapIndex, inStackOrder, wrapNodes } from './container-wrap'
 import { selectedNodesInSharedParent } from './selection'
-
-export type BooleanOperation = 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'EXCLUDE'
 
 /**
  * Wraps sibling layers in a boolean operation named after it, as Figma names one from the canvas

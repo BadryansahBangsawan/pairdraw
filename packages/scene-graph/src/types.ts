@@ -245,6 +245,7 @@ export type StrokeJoin = 'MITER' | 'BEVEL' | 'ROUND'
 export type SharedStyleType = 'FILL' | 'TEXT' | 'EFFECT' | 'GRID'
 export type SharedStyleKind = 'fill' | 'stroke' | 'text' | 'effect' | 'grid'
 export type MaskType = 'ALPHA' | 'VECTOR' | 'LUMINANCE'
+export type BooleanOperation = 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'EXCLUDE'
 
 export interface LayoutGrid {
   visible?: boolean
@@ -850,7 +851,7 @@ export interface SceneNode {
 
   vectorNetwork: VectorNetwork | null
   handleMirroring: HandleMirroring
-  booleanOperation: 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'EXCLUDE' | undefined
+  booleanOperation: BooleanOperation | undefined
   fillGeometry: GeometryPath[]
   strokeGeometry: GeometryPath[]
 

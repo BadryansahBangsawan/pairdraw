@@ -3,6 +3,7 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { pluginChildren } from './accessors/sticky'
 import { figmaFills, figmaStrokes } from './accessors/visual'
 import type { NodeProxyHost } from './proxy'
+import { shapeDetailFields } from './shape-details'
 
 function resolveBindings(graph: SceneGraph, node: SceneNode): Record<string, unknown> | undefined {
   const keys = Object.keys(node.boundVariables)
@@ -61,7 +62,7 @@ export function nodeProxyToJSON(
   // The angle `set_rotation` writes, as the Figma API reports it. The scene stores the turn in
   // the opposite direction and keeps floating-point noise, so read it through the proxy.
   if (n.rotation !== 0) obj.rotation = api.wrapNode(nodeId).rotation
-  if (n.cornerRadius > 0) obj.cornerRadius = n.cornerRadius
+  Object.assign(obj, shapeDetailFields(n))
   if (!n.visible) obj.visible = false
   if (n.text) obj.characters = n.text
   if (n.type === 'TEXT') {

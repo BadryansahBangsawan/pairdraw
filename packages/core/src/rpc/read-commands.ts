@@ -1,7 +1,8 @@
 import { sumBy } from 'es-toolkit'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { BooleanOperation, MaskType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
+import { shapeDetailFields } from '#core/figma-api/shape-details'
 import { ELLIPSIS } from '#core/text/ellipsis'
 import type { DocumentFontStatus } from '#core/text/font/status'
 import { prepareGraphFonts } from '#core/text/prepare'
@@ -299,7 +300,14 @@ export interface NodeResult {
   fills: unknown[]
   strokes: unknown[]
   effects: unknown[]
-  cornerRadius: number
+  cornerRadius?: number
+  topLeftRadius?: number
+  topRightRadius?: number
+  bottomRightRadius?: number
+  bottomLeftRadius?: number
+  isMask?: boolean
+  maskType?: MaskType
+  booleanOperation?: BooleanOperation
   blendMode: string
   layoutMode: string
   layoutDirection: string
@@ -325,7 +333,6 @@ export const nodeCommand: RPCCommand<NodeArgs, NodeResult | { error: string }> =
       const variable = graph.variables.get(varId)
       boundVars[field] = variable?.name ?? varId
     }
-
     return {
       id: node.id,
       name: node.name,
@@ -338,7 +345,7 @@ export const nodeCommand: RPCCommand<NodeArgs, NodeResult | { error: string }> =
       fills: node.fills,
       strokes: node.strokes,
       effects: node.effects,
-      cornerRadius: node.cornerRadius,
+      ...shapeDetailFields(node),
       blendMode: node.blendMode,
       layoutMode: node.layoutMode,
       layoutDirection: node.layoutDirection,

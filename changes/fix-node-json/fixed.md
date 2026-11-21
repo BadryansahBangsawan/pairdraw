@@ -1,0 +1,1 @@
+- `pairdraw node --json` and the `get_node` tool report per-corner radii when they differ, `isMask`/`maskType`, and a boolean layer’s `booleanOperation`, which the document already held, and still leave those fields out for a plain layer.

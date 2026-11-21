@@ -21,6 +21,7 @@ export type { ImagePreview, ImagePreviewDecoder } from './images/previews'
 export {
   SkiaRenderer,
   type PresenceCursor,
+  type RenderedPlayScene,
   type RenderOverlays,
   type RulerTheme,
   type SelectionTheme

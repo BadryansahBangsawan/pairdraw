@@ -47,6 +47,23 @@ export function renderSceneToCanvas(
 
 export type RenderLayer = 'full' | 'scene' | 'overlays'
 
+/**
+ * What a canvas that runs play leaves to its live islands, and the frames a playing prototype
+ * draws from its play scenes; an editing canvas has neither.
+ */
+function playOverlays(
+  r: SkiaRenderer,
+  graph: SceneGraph,
+  pageId: string,
+  live: boolean
+): Pick<RenderOverlays, 'playIslands' | 'playScenes'> {
+  if (!live) return {}
+  return {
+    playIslands: new Set(playIslandRoots(graph, pageId)),
+    playScenes: r.playScenes ?? undefined
+  }
+}
+
 export function renderFromEditorState(
   r: SkiaRenderer,
   state: EditorState,
@@ -95,7 +112,7 @@ export function renderFromEditorState(
     editChrome ? state.selectedIds : new Set<string>(),
     {
       playing: !editChrome,
-      playIslands: live ? new Set(playIslandRoots(graph, state.currentPageId)) : undefined,
+      ...playOverlays(r, graph, state.currentPageId, live !== null),
       hoveredNodeId: editChrome ? state.hoveredNodeId : null,
       showPixelGrid: editChrome && state.showPixelGrid !== false,
       gradientEdit: state.gradientEdit,

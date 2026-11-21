@@ -1,4 +1,4 @@
-import type { VectorRegion, VectorVertex } from '@pairdraw/scene-graph'
+import type { SceneGraph, VectorRegion, VectorVertex } from '@pairdraw/scene-graph'
 import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import type { SnapGuide } from '@pairdraw/scene-graph/snap'
 
@@ -38,10 +38,22 @@ export interface PresenceCursor {
   outline?: Rect[]
 }
 
+/**
+ * A top-level frame a playing prototype changed, which the canvas draws from the frame's private
+ * copy: the copy, a count that grows with each change, and the layers the changes touched, whose
+ * cached drawings are stale. `@pairdraw/core/prototype`'s play scenes are these.
+ */
+export interface RenderedPlayScene {
+  readonly graph: SceneGraph
+  readonly revision: number
+  readonly touched: ReadonlySet<string>
+}
+
 export interface RenderOverlays {
   /** Whether the canvas previews: it draws the design without labels or editing outlines. */
   playing?: boolean
-  /** Nodes a previewing canvas draws from its preview session instead of the document. */
+  /** Top-level frames a playing prototype draws from its own copies instead of the document. */
+  playScenes?: ReadonlyMap<string, RenderedPlayScene>
   /** Layers a previewing canvas leaves to its live islands. */
   playIslands?: ReadonlySet<string>
   hoveredNodeId?: string | null

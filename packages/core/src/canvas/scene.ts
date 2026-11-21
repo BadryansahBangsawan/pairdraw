@@ -44,6 +44,7 @@ import {
   effectRasterScale,
   effectRasterScaleMatches
 } from './renderer/effect-raster-cache'
+import { playSceneGraph } from './renderer/play-scenes'
 import { mapVisualBounds, subtreeVisualBounds } from './renderer/visual-bounds'
 import { drawShaderEffectChain } from './shaders/effect'
 import { isolatesInnerShadows, renderLayerShadows } from './shadows'
@@ -381,6 +382,12 @@ export function renderNode(
 ): void {
   const found = graph.getNode(nodeId)
   if (!found || !drawsNode(found, overlays)) return
+  // A frame a playing prototype changed is drawn from its play scene, not the document.
+  const played = playSceneGraph(r, nodeId, overlays)
+  if (played && played !== graph) {
+    renderNode(r, canvas, played, nodeId, overlays, parentAbsX, parentAbsY, hasTransformedAncestor)
+    return
+  }
   const node = stickyPlaceholderNode(graph, found, r.stickyPlaceholder) ?? found
 
   r._nodeCount++

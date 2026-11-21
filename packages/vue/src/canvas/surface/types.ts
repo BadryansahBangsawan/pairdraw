@@ -1,4 +1,5 @@
 import type { EditorState } from '@pairdraw/core'
+import type { RenderedPlayScene } from '@pairdraw/core/canvas'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
 
 import type { PresentationColorSpace } from '#vue/canvas/surface/color-space'
@@ -68,6 +69,11 @@ export interface UseCanvasOptions {
    * presentation shows only its slide. Null draws every layer of the page.
    */
   getSceneScope?: () => string | null
+  /**
+   * The top-level frames a playing prototype changed, which this canvas draws from their play
+   * scenes instead of the document, by frame id. Null or absent draws the document.
+   */
+  getPlayScenes?: () => ReadonlyMap<string, RenderedPlayScene> | null
   /**
    * Called after each frame this canvas draws, with the pan and zoom it was drawn at. DOM laid
    * over the canvas, such as preview islands, follows these to stay in step with the drawing

@@ -49,6 +49,7 @@ import { TextPreparationCache } from './text/preparation/cache'
 export type {
   MeasurementMode,
   PresenceCursor,
+  RenderedPlayScene,
   RenderOverlays,
   RulerTheme,
   SelectionTheme
@@ -87,7 +88,12 @@ import type { PlacedStatusLabel } from './labels/status'
 import { EffectRasterCache } from './renderer/effect-raster-cache'
 import { TiledSceneController } from './renderer/tiles'
 import type { TransientCanvasPreview } from './renderer/transient-previews'
-import type { RenderOverlays, RulerTheme, SelectionTheme } from './renderer/types'
+import type {
+  RenderedPlayScene,
+  RenderOverlays,
+  RulerTheme,
+  SelectionTheme
+} from './renderer/types'
 
 /**
  * A picture uploaded as a texture that knows its size: an `ImageBitmap`, or a canvas, which
@@ -269,6 +275,8 @@ export class SkiaRenderer {
    * presentation shows only its slide; null draws every layer of the page.
    */
   sceneScopeId: string | null = null
+  /** Frames a playing prototype changed, which this canvas draws from their play scenes. */
+  playScenes: ReadonlyMap<string, RenderedPlayScene> | null = null
   /** Status labels drawn in the last label pass; clicks on them open the status menu. */
   statusLabels: PlacedStatusLabel[] = []
 

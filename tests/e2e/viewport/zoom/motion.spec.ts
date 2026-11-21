@@ -26,13 +26,22 @@ test('zoom to 100% glides there instead of jumping', async () => {
 })
 
 test('with reduced motion the view jumps', async () => {
-  await editor.page.emulateMedia({ reducedMotion: 'reduce' })
-  // The media query's change event reaches the app with the next frame.
-  await editor.page.evaluate(() => {
-    const { promise, resolve } = Promise.withResolvers()
-    requestAnimationFrame(resolve)
-    return promise
+  // The app reads reduced motion from the media query's change event, which can come frames after
+  // the emulation. Change events reach media query lists oldest first, so once a list made now
+  // hears it, the app's own list, made at boot, has too.
+  const changed = await editor.page.evaluateHandle(() => {
+    const query = matchMedia('(prefers-reduced-motion: reduce)')
+    const heard = new Promise<boolean>((resolve) => {
+      query.addEventListener('change', () => resolve(true), { once: true })
+    })
+    return { heard }
   })
+  try {
+    await editor.page.emulateMedia({ reducedMotion: 'reduce' })
+    await changed.evaluate((wait) => wait.heard)
+  } finally {
+    await changed.dispose()
+  }
   await editor.page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')

@@ -269,6 +269,19 @@ export interface TextLineData {
   isFirstLineOfList?: boolean
 }
 
+export interface GridTrackInfo {
+  minSizing?: { type?: string; value?: number }
+  maxSizing?: { type?: string; value?: number }
+}
+
+export interface GUIDPositionMap {
+  entries?: Array<{ id?: GUID; position?: string; trackSize?: GridTrackInfo }>
+}
+
+export interface GridTrackSizeMap {
+  entries?: Array<{ id?: GUID; trackSize?: GridTrackInfo }>
+}
+
 export interface NodeChange {
   [key: string]: unknown
   guid?: GUID
@@ -298,8 +311,19 @@ export interface NodeChange {
   exportSettings?: unknown[]
   layoutGrids?: unknown[]
   // Layout
-  stackMode?: 'NONE' | 'HORIZONTAL' | 'VERTICAL'
+  stackMode?: 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'GRID'
   stackSpacing?: number
+  gridRows?: GUIDPositionMap
+  gridColumns?: GUIDPositionMap
+  gridRowsSizing?: GridTrackSizeMap
+  gridColumnsSizing?: GridTrackSizeMap
+  gridRowGap?: number
+  gridColumnGap?: number
+  gridAutoTracks?: string
+  gridRowAnchor?: GUID
+  gridColumnAnchor?: GUID
+  gridRowSpan?: number
+  gridColumnSpan?: number
   stackPadding?: number
   stackPaddingRight?: number
   stackPaddingBottom?: number

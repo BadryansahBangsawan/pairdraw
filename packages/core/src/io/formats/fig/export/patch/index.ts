@@ -181,6 +181,14 @@ function planRecords(
     return owner
   }
   for (const id of changes.touched) add(id)
+  // A frame that left grid layout leaves its children's anchors pointing at tracks it no longer
+  // has, so their records are rewritten too; the serializer clears the anchors it finds.
+  for (const id of changes.touched) {
+    const node = graph.getNode(id)
+    if (!node || node.layoutMode === 'GRID' || !node.source.editedFields.includes('layoutMode'))
+      continue
+    for (const child of graph.getChildren(id)) add(child.id)
+  }
   addComponentInstances(graph, records, add)
   const replaceVariables = changes.changedVariables.size > 0 || changes.collectionsChanged
   if (replaceVariables) addVariableUsers(graph, changes, add)

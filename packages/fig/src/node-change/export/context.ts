@@ -128,6 +128,7 @@ export interface SceneNodeToKiwiContext {
     glyphBlobMap: Map<string, number> | undefined
   ) => void
   serializeLayoutProps: (node: SceneNode, nc: KiwiNodeChange) => void
+  serializeGridLayout: (node: SceneNode, nc: KiwiNodeChange, guid: GUID, parentGuid: GUID) => void
   serializeGeometry: (node: SceneNode, nc: KiwiNodeChange, blobs: Uint8Array[]) => void
   serializeVariableBindings: (
     node: SceneNode,

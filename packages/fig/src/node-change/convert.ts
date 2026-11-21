@@ -10,6 +10,7 @@ import {
 import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { isMeshFill } from '@pairdraw/scene-graph/gradient'
 import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
+import { compareOrderKeys } from '@pairdraw/scene-graph/order-keys'
 import { PAIRDRAW_PLUGIN_DATA } from '@pairdraw/scene-graph/plugin-data'
 import { POINT_COUNT_RANGE } from '@pairdraw/scene-graph/polygon'
 import { isShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
@@ -82,6 +83,8 @@ import type {
   TextCase,
   ArcData,
   LayoutGrid,
+  GridPosition,
+  GridTrack,
   SharedStyleType,
   VectorNetwork,
   ComponentPropertyDefinition,
@@ -170,8 +173,102 @@ function mapStackMode(mode?: string): LayoutMode {
       return 'HORIZONTAL'
     case 'VERTICAL':
       return 'VERTICAL'
+    case 'GRID':
+      return 'GRID'
     default:
       return 'NONE'
+  }
+}
+
+interface GridTrackEntry {
+  id?: GUID
+  position?: string
+}
+
+interface GridPositionMap {
+  entries?: GridTrackEntry[]
+}
+
+/** The tracks of one grid axis in layout order. */
+function orderedGridTracks(map: GridPositionMap | undefined): Array<GridTrackEntry & { id: GUID }> {
+  const entries = map?.entries ?? []
+  return entries
+    .filter((entry): entry is GridTrackEntry & { id: GUID } => !!entry.id)
+    .sort((left, right) => compareOrderKeys(left.position ?? '', right.position ?? ''))
+}
+
+interface GridSizingEntry {
+  id?: GUID
+  trackSize?: {
+    minSizing?: { type?: string; value?: number }
+    maxSizing?: { type?: string; value?: number }
+  }
+}
+
+interface GridSizingMap {
+  entries?: GridSizingEntry[]
+}
+
+/** A Kiwi track size as Pairdraw's one sizing and value. */
+function convertGridTrack(id: GUID, sizing: GridSizingMap | undefined): GridTrack {
+  const entries = sizing?.entries ?? []
+  const found = entries.find((entry) => entry.id && guidToString(entry.id) === guidToString(id))
+  const size = found?.trackSize?.maxSizing ?? found?.trackSize?.minSizing
+  switch (size?.type) {
+    case 'FLEX':
+      return { sizing: 'FR', value: size.value ?? 1 }
+    case 'HUG':
+      return { sizing: 'AUTO', value: size.value ?? 0 }
+    default:
+      return { sizing: 'FIXED', value: size?.value ?? 0 }
+  }
+}
+
+function convertGridLayout(nc: NodeChange): Partial<SceneNode> {
+  const stackMode: string | undefined = nc.stackMode
+  if (stackMode !== 'GRID') return {}
+  const rows = orderedGridTracks(nc.gridRows)
+  const columns = orderedGridTracks(nc.gridColumns)
+  return {
+    gridTemplateRows: rows.map((track) => convertGridTrack(track.id, nc.gridRowsSizing)),
+    gridTemplateColumns: columns.map((track) => convertGridTrack(track.id, nc.gridColumnsSizing)),
+    gridRowGap: nc.gridRowGap ?? 0,
+    gridColumnGap: nc.gridColumnGap ?? 0
+  }
+}
+
+interface GridFrameRecord {
+  stackMode?: string
+  gridRows?: GridPositionMap
+  gridColumns?: GridPositionMap
+}
+
+interface GridChildRecord {
+  gridRowAnchor?: GUID
+  gridColumnAnchor?: GUID
+  gridRowSpan?: number
+  gridColumnSpan?: number
+}
+
+/** Where a grid child sits, from the track GUIDs its record anchors it to. */
+export function gridPositionFromAnchors(
+  child: GridChildRecord,
+  parent: GridFrameRecord
+): GridPosition | null {
+  if (parent.stackMode !== 'GRID') return null
+  const row = orderedGridTracks(parent.gridRows).findIndex(
+    (track) => child.gridRowAnchor && guidToString(track.id) === guidToString(child.gridRowAnchor)
+  )
+  const column = orderedGridTracks(parent.gridColumns).findIndex(
+    (track) =>
+      child.gridColumnAnchor && guidToString(track.id) === guidToString(child.gridColumnAnchor)
+  )
+  if (row === -1 || column === -1) return null
+  return {
+    row,
+    column,
+    rowSpan: Math.max(1, child.gridRowSpan ?? 1),
+    columnSpan: Math.max(1, child.gridColumnSpan ?? 1)
   }
 }
 
@@ -637,6 +734,7 @@ function convertLayoutProps(
     counterAxisSizing,
     primaryAxisAlign: convertPrimaryAxisAlign(nc),
     counterAxisAlign: mapStackCounterAlign(nc.stackCounterAlignItems ?? nc.stackCounterAlign),
+    ...convertGridLayout(nc),
     layoutWrap: nc.stackWrap === 'WRAP' ? 'WRAP' : 'NO_WRAP',
     counterAxisSpacing: nc.stackCounterSpacing ?? 0,
     layoutPositioning: nc.stackPositioning === 'ABSOLUTE' ? 'ABSOLUTE' : 'AUTO',

@@ -1078,6 +1078,7 @@ export function sceneNodeToKiwiWithContext(
   if (strokePaints.length > 0) nc.strokePaints = strokePaints
 
   context.serializeLayoutProps(node, nc)
+  context.serializeGridLayout(node, nc, guid, parentGuid)
   context.serializeGeometry(nodeForGeometryExport(node), nc, context.blobs)
   context.serializeVariableBindings(node, nc, context.graph, context.varIdToGuid)
   mergeParameterBindings(nc)

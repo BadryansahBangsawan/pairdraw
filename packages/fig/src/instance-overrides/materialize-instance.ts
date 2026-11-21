@@ -10,6 +10,7 @@ import {
 import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
 
 import { nodeChangeToProps } from '../node-change'
+import { gridPositionFromAnchors } from '../node-change/convert'
 import { numericVariableBindingScales } from '../node-change/variable/bindings'
 import {
   recordVariableBindingClaims,
@@ -38,6 +39,16 @@ function occurrenceMetadata(
  * metadata and its override maps.
  */
 const OWN_FIELDS = new Set(['childIds', 'source', 'instanceOverrides'])
+
+/** The cell an occurrence's own record anchors it to in its parent's grid, if the parent is one. */
+function gridCell(
+  occurrence: InstanceOccurrence,
+  parent: InstanceOccurrence['properties'] | undefined
+): Pick<SceneNode, 'gridPosition'> | Record<string, never> {
+  if (!parent) return {}
+  const gridPosition = gridPositionFromAnchors(occurrence.properties, parent)
+  return gridPosition ? { gridPosition } : {}
+}
 
 /** Maps and sets are written in place, so values holding them are never shared. */
 function holdsCollections(value: unknown): boolean {
@@ -187,7 +198,12 @@ export function materializeInstance(
       ? graph.createNodeWithId(id, nodeType, parent, props)
       : graph.createNode(nodeType, parent, props)
   }
-  const create = (current: InstanceOccurrence, parent: string, owner?: SceneNode): SceneNode => {
+  const create = (
+    current: InstanceOccurrence,
+    parent: string,
+    owner?: SceneNode,
+    parentRecord?: InstanceOccurrence['properties']
+  ): SceneNode => {
     const converted = prepared.get(current)
     if (!converted) throw new Error('Missing prepared occurrence')
     const { nodeType, ...props } = converted
@@ -195,6 +211,7 @@ export function materializeInstance(
     const metadata = occurrenceMetadata(current, converted)
     const propsWithIdentity = {
       ...props,
+      ...gridCell(current, parentRecord),
       variableAssignmentScales: occurrenceAssignmentScales(current),
       componentScale: occurrenceScale(current),
       variableBindingScales: numericVariableBindingScales(
@@ -240,7 +257,8 @@ export function materializeInstance(
       }
     }
     const children = current.children.map(
-      (child) => create(child, node.id, node.type === 'INSTANCE' ? node : owner).id
+      (child) =>
+        create(child, node.id, node.type === 'INSTANCE' ? node : owner, current.properties).id
     )
     node.childIds = children
     return node

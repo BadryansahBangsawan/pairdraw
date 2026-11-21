@@ -23,6 +23,7 @@ import {
   type MaterializedComponentOccurrence
 } from '../instance-overrides/source-children'
 import { nodeChangeToProps } from '../node-change'
+import { gridPositionFromAnchors } from '../node-change/convert'
 import { generatedFrameCodec } from '../node-change/generated/codecs'
 import { readNodeChangePluginData } from '../node-change/plugin-data'
 import { figArchiveRecordInfo, type FigArchiveRecordInfo } from '../record-patch'
@@ -526,16 +527,25 @@ function materializeReaderInto(
     graph.isEntityIdTaken(sourceId) ? undefined : sourceId
   /** Generated frames whose records name other layers, linked once the pass has made them. */
   const linked: Array<{ node: SceneNode; record: NodeChange }> = []
-  const createShells = (occurrence: InstanceOccurrence, parentId: string): void => {
+  const createShells = (
+    occurrence: InstanceOccurrence,
+    parentId: string,
+    parentRecord?: NodeChange
+  ): void => {
     if (occurrence.mainComponentId !== null) return
     const existingId = sources.get(occurrence.sourceId)
     if (existingId) {
-      for (const child of occurrence.children) createShells(child, existingId)
+      for (const child of occurrence.children)
+        createShells(child, existingId, occurrence.properties)
       return
     }
     const { nodeType, ...props } = nodeChangeToProps(occurrence.properties, blobs)
     if (nodeType === 'DOCUMENT' || nodeType === 'VARIABLE')
       throw new Error(`Unsupported scene type ${nodeType}`)
+    const gridPosition = parentRecord
+      ? gridPositionFromAnchors(occurrence.properties, parentRecord)
+      : null
+    if (gridPosition) props.gridPosition = gridPosition
     const id = recordId(occurrence)
     const node = id
       ? graph.createNodeWithId(id, nodeType, parentId, props)
@@ -545,7 +555,7 @@ function materializeReaderInto(
     const codec = generatedFrameCodec(node.type)
     codec?.read(graph, node, occurrence.properties, blobs)
     if (codec?.link) linked.push({ node, record: occurrence.properties })
-    for (const child of occurrence.children) createShells(child, node.id)
+    for (const child of occurrence.children) createShells(child, node.id, occurrence.properties)
   }
   for (const page of pages) createShells(page, graph.rootId)
   for (const item of plan) {

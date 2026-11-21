@@ -1,0 +1,1 @@
+- Open Figma frames with grid auto layout, keeping their rows, columns, gaps, and child placement when the file is saved again.

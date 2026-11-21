@@ -2,13 +2,14 @@ import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { guidToString, stringToGuid } from '@pairdraw/kiwi/fig/guid'
 import type {
   ComponentPropertyDefinition,
+  GridTrack,
   PluginDataEntry,
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
 import { DEFAULT_STROKE_WEIGHT } from '@pairdraw/scene-graph/constants'
 import { normalizeFontFamily } from '@pairdraw/scene-graph/font-style'
-import { fractionalPosition } from '@pairdraw/scene-graph/order-keys'
+import { compareOrderKeys, fractionalPosition } from '@pairdraw/scene-graph/order-keys'
 import {
   hasPluginData,
   PAIRDRAW_PLUGIN_DATA,
@@ -174,7 +175,174 @@ function serializeTextProps(
 }
 
 function normalizeStackMode(value: string | undefined): KiwiNodeChange['stackMode'] {
-  return value === 'HORIZONTAL' || value === 'VERTICAL' || value === 'NONE' ? value : undefined
+  return value === 'HORIZONTAL' || value === 'VERTICAL' || value === 'GRID' || value === 'NONE'
+    ? value
+    : undefined
+}
+
+const GRID_LAYOUT_FIELDS = new Set([
+  'gridTemplateColumns',
+  'gridTemplateRows',
+  'gridColumnGap',
+  'gridRowGap',
+  'gridPosition'
+])
+
+function gridFieldsEdited(node: SceneNode): boolean {
+  return !node.source.id || node.source.editedFields.some((field) => GRID_LAYOUT_FIELDS.has(field))
+}
+
+function gridTrackGuid(parentGuid: GUID, axis: 'rows' | 'columns', index: number): GUID {
+  return {
+    sessionID: parentGuid.sessionID,
+    localID: 0x7f000000 + (axis === 'rows' ? 0x10000 : 0) + index
+  }
+}
+
+/** No cell: written when a layer leaves a grid, so its record no longer points at a track. */
+const NO_GRID_TRACK: GUID = { sessionID: 0, localID: 0 }
+
+interface RawGridTrackMap {
+  entries?: Array<{ id?: GUID; position?: string }>
+}
+
+/**
+ * A track GUID the imported frame's own records name, in layout order. An unedited frame keeps
+ * those GUIDs, so a child moved on it must point at them, not at newly written tracks.
+ */
+function rawGridTrackGuid(
+  parent: SceneNode,
+  axis: 'rows' | 'columns',
+  index: number
+): GUID | undefined {
+  const map = parent.source.fig.rawNodeFields[axis === 'rows' ? 'gridRows' : 'gridColumns'] as
+    | RawGridTrackMap
+    | undefined
+  const tracks = (map?.entries ?? [])
+    .filter((entry): entry is { id: GUID; position?: string } => !!entry.id)
+    .sort((left, right) => compareOrderKeys(left.position ?? '', right.position ?? ''))
+  return tracks[index]?.id
+}
+
+function gridTrackSize(track: GridTrack): {
+  minSizing: { type: string; value: number }
+  maxSizing: { type: string; value: number }
+} {
+  const type = { FR: 'FLEX', AUTO: 'HUG', FIXED: 'FIXED' }[track.sizing]
+  return {
+    minSizing: { type, value: track.value },
+    maxSizing: { type, value: track.value }
+  }
+}
+
+function writeGridTracks(
+  tracks: GridTrack[],
+  parentGuid: GUID,
+  axis: 'rows' | 'columns',
+  position: (index: number) => string
+): {
+  positions: { entries: Array<{ id: GUID; position: string }> }
+  sizing: { entries: Array<{ id: GUID; trackSize: ReturnType<typeof gridTrackSize> }> }
+} {
+  const ids = tracks.map((_, index) => gridTrackGuid(parentGuid, axis, index))
+  return {
+    positions: {
+      entries: ids.map((id, index) => ({ id, position: position(index) }))
+    },
+    sizing: {
+      entries: ids.map((id, index) => ({ id, trackSize: gridTrackSize(tracks[index]) }))
+    }
+  }
+}
+
+function hasRawGridFields(node: SceneNode): boolean {
+  const raw = node.source.fig.rawNodeFields
+  return (
+    'gridRows' in raw ||
+    'gridColumns' in raw ||
+    'gridRowGap' in raw ||
+    'gridColumnGap' in raw ||
+    'gridRowAnchor' in raw ||
+    'gridColumnAnchor' in raw
+  )
+}
+
+/** Grid tracks on a frame and the cell a child sits in, in Kiwi's GUID-keyed records. */
+function serializeGridLayout(
+  node: SceneNode,
+  nc: KiwiNodeChange,
+  guid: GUID,
+  parentGuid: GUID,
+  graph: SceneGraph,
+  position: (index: number) => string
+): void {
+  const parent = node.parentId ? graph.getNode(node.parentId) : undefined
+  const parentInGrid = parent?.layoutMode === 'GRID'
+  const parentGridEdited = !!parent && gridFieldsEdited(parent)
+
+  if (parentInGrid) {
+    if (parentGridEdited) {
+      if (node.gridPosition) {
+        nc.gridColumnAnchor = gridTrackGuid(parentGuid, 'columns', node.gridPosition.column)
+        nc.gridRowAnchor = gridTrackGuid(parentGuid, 'rows', node.gridPosition.row)
+        nc.gridColumnSpan = node.gridPosition.columnSpan
+        nc.gridRowSpan = node.gridPosition.rowSpan
+      } else {
+        // The parent's tracks were rewritten, so anchors from the source point at old tracks.
+        nc.gridColumnAnchor = NO_GRID_TRACK
+        nc.gridRowAnchor = NO_GRID_TRACK
+        nc.gridColumnSpan = 1
+        nc.gridRowSpan = 1
+      }
+    } else if (node.gridPosition && node.source.editedFields.includes('gridPosition')) {
+      // The frame keeps Figma's tracks, so the moved child points at the track GUIDs it saved.
+      const row = rawGridTrackGuid(parent, 'rows', node.gridPosition.row)
+      const column = rawGridTrackGuid(parent, 'columns', node.gridPosition.column)
+      if (row) nc.gridRowAnchor = row
+      if (column) nc.gridColumnAnchor = column
+      nc.gridRowSpan = node.gridPosition.rowSpan
+      nc.gridColumnSpan = node.gridPosition.columnSpan
+    }
+  } else {
+    // A frame that left grid layout, or a child of one, no longer names tracks or a cell.
+    const parentLeftGrid =
+      !!parent && parent.layoutMode !== 'GRID' && parent.source.editedFields.includes('layoutMode')
+    if (parentLeftGrid || hasRawGridFields(node)) {
+      nc.gridColumnAnchor = NO_GRID_TRACK
+      nc.gridRowAnchor = NO_GRID_TRACK
+      nc.gridRowSpan = 1
+      nc.gridColumnSpan = 1
+    }
+  }
+
+  if (node.layoutMode !== 'GRID') {
+    if (hasRawGridFields(node)) {
+      nc.gridRows = undefined
+      nc.gridColumns = undefined
+      nc.gridRowsSizing = undefined
+      nc.gridColumnsSizing = undefined
+      // Written as zero rather than dropped: an archive's own gap survives an unset, and a
+      // non-grid frame reads its spacing from the stack fields.
+      nc.gridRowGap = 0
+      nc.gridColumnGap = 0
+      nc.gridAutoTracks = undefined
+    }
+    return
+  }
+
+  nc.stackMode = 'GRID'
+  nc.stackSpacing = node.itemSpacing
+  if (!gridFieldsEdited(node)) return
+
+  const rows = writeGridTracks(node.gridTemplateRows, guid, 'rows', position)
+  const columns = writeGridTracks(node.gridTemplateColumns, guid, 'columns', position)
+  nc.gridRows = rows.positions
+  nc.gridRowsSizing = rows.sizing
+  nc.gridColumns = columns.positions
+  nc.gridColumnsSizing = columns.sizing
+  nc.gridRowGap = node.gridRowGap
+  nc.gridColumnGap = node.gridColumnGap
+  nc.gridAutoTracks = 'NONE'
 }
 
 function normalizeStackSizing(value: string | undefined): KiwiNodeChange['stackPrimarySizing'] {
@@ -570,6 +738,8 @@ export function sceneNodeToKiwi(
     serializeTextProps: (textNode, nc, textGraph, digests, textBlobs, glyphs) =>
       serializeTextProps(textNode, nc, textGraph, digests, textBlobs, glyphs, runtime),
     serializeLayoutProps: (layoutNode, nc) => serializeLayoutProps(layoutNode, nc, graph),
+    serializeGridLayout: (layoutNode, nc, ownGuid, parent) =>
+      serializeGridLayout(layoutNode, nc, ownGuid, parent, graph, fractionalPosition),
     serializeGeometry,
     serializeVariableBindings,
     sceneNodeToKiwi: sceneNodeToKiwiWithContext

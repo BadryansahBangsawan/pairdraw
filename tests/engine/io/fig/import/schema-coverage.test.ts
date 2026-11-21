@@ -373,7 +373,7 @@ describe('Figma Kiwi schema coverage', () => {
     expect(
       Object.fromEntries([...buckets].map(([bucket, items]) => [bucket, items.length]))
     ).toEqual({
-      modeled: 128,
+      modeled: 129,
       schemaTag: 60,
       internalBookkeeping: 16,
       rawPreserved: 51,
@@ -382,7 +382,7 @@ describe('Figma Kiwi schema coverage', () => {
       textMetadata: 18,
       slideFigjamMetadata: 39,
       visualGeometryMetadata: 35,
-      layoutMetadata: 29,
+      layoutMetadata: 28,
       prototypeConnectorMetadata: 29,
       variableDevMetadata: 14,
       widgetMetadata: 11,

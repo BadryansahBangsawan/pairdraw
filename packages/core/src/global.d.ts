@@ -46,3 +46,8 @@ declare module 'gifenc' {
   export function quantize(rgba: Uint8Array, maxColors: number): Palette
   export function applyPalette(rgba: Uint8Array, palette: Palette): Uint8Array
 }
+
+/** gifenc's ES build is the same module as its root, which Node loads as CJS. */
+declare module 'gifenc/dist/gifenc.esm.js' {
+  export * from 'gifenc'
+}

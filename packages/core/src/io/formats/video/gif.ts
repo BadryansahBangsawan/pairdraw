@@ -1,4 +1,6 @@
-import { applyPalette, GIFEncoder, quantize } from 'gifenc'
+// gifenc's package root resolves to its CJS build under Node, whose named exports Node ESM cannot
+// see; the ES build it ships for bundlers has them, and every runtime loads that same file.
+import { applyPalette, GIFEncoder, quantize } from 'gifenc/dist/gifenc.esm.js'
 
 import type { RGBAImage } from '#core/io/formats/raster'
 

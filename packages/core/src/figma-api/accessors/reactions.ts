@@ -21,7 +21,12 @@ export function installReactionAccessors(prototype: object, internals: NodeProxy
         const pageId = sceneGraph.pageOf(node.id) ?? ''
         const previous: readonly PrototypeReaction[] = node.prototypeReactions
         updateNode(this, internals, {
-          prototypeReactions: parseFigmaReactions(value, { graph: sceneGraph, pageId, previous })
+          prototypeReactions: parseFigmaReactions(value, {
+            graph: sceneGraph,
+            nodeId: node.id,
+            pageId,
+            previous
+          })
         })
       }
     }

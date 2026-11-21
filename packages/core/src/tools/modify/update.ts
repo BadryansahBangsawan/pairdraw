@@ -32,11 +32,28 @@ function resized(node: FigmaNodeProxy, width = node.width, height = node.height)
   return changed
 }
 
+const SCROLLING_TYPES: ReadonlySet<string> = new Set(['FRAME', 'COMPONENT', 'INSTANCE'])
+
+/** Why a layer cannot take overflow scrolling, or null when it can, as Figma's frames take it. */
+export function scrollRefusal(node: FigmaNodeProxy): string | null {
+  if (SCROLLING_TYPES.has(node.type)) return null
+  return `Only a frame, component or instance scrolls; ${node.type} "${node.name}" cannot.`
+}
+
+/** Overflow scrolling in play, as Figma's `overflowDirection`. */
+export const overflowDirectionSchema = v.pipe(
+  v.picklist(['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']),
+  v.description(
+    'Overflow scrolling in prototype play (FRAME, COMPONENT, INSTANCE). A nested frame scrolls ' +
+      'only while it clips its content.'
+  )
+)
+
 export const updateNode = defineTool({
   name: 'update_node',
 
   description:
-    'Update properties of an existing node: position, size, opacity, corner radius, visibility, text, font.',
+    'Update properties of an existing node: position, size, opacity, corner radius, visibility, text, font, overflow scrolling.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
@@ -69,12 +86,16 @@ export const updateNode = defineTool({
         v.pipe(v.number(), v.minValue(100), v.maxValue(900), v.description('Font weight (100-900)'))
       )
     ),
-    name: v.optional(v.pipe(v.string(), v.description('Layer name')))
+    name: v.optional(v.pipe(v.string(), v.description('Layer name'))),
+    overflow_direction: v.optional(overflowDirectionSchema)
   }),
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
     assertNodeEditable(figma.graph, args.id)
+    // Refused before anything is written, so the call changes all or nothing.
+    const refusal = args.overflow_direction === undefined ? null : scrollRefusal(node)
+    if (refusal) return { error: refusal }
     // Written to the layer directly, since the plugin setters need a loaded font; an edit to a
     // text style's field leaves the style, as the editor's updates do.
     const editTypography = (changes: Partial<SceneNode>) => {
@@ -131,6 +152,10 @@ export const updateNode = defineTool({
     if (args.font_weight !== undefined) {
       editTypography({ fontWeight: args.font_weight })
       updated.push('fontWeight')
+    }
+    if (args.overflow_direction !== undefined) {
+      node.overflowDirection = args.overflow_direction
+      updated.push('overflowDirection')
     }
     return { id: args.id, updated }
   }

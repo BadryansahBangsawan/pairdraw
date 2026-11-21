@@ -8,21 +8,19 @@ import type {
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType,
-  SceneGraph
+  SceneGraph,
+  SceneNode
 } from '@pairdraw/scene-graph'
+import { variantSetsAround } from '@pairdraw/scene-graph/components'
 
 import { issuePath } from '#core/figma-api/effects'
 
 /**
  * Triggers Figma's plugin API offers that a prototype in Pairdraw cannot start from, and the
- * message it gets instead. Only a click and a timeout play.
+ * message it gets instead.
  */
 const UNSUPPORTED_TRIGGERS: Record<string, true> = {
   ON_DRAG: true,
-  ON_HOVER: true,
-  ON_PRESS: true,
-  MOUSE_ENTER: true,
-  MOUSE_LEAVE: true,
   MOUSE_UP: true,
   MOUSE_DOWN: true,
   ON_KEY_DOWN: true
@@ -57,8 +55,21 @@ const transitionSchema = v.strictObject({
 
 const nodeActionSchema = v.strictObject({
   type: v.literal('NODE'),
-  destinationId: v.pipe(v.string(), v.minLength(1), v.description('Top-level frame on the page.')),
-  navigation: v.picklist(['NAVIGATE', 'OVERLAY'] satisfies PrototypeNavigationType[]),
+  destinationId: v.pipe(
+    v.string(),
+    v.minLength(1),
+    v.description(
+      'NAVIGATE/OVERLAY: a top-level frame on the page; CHANGE_TO: a variant of the set the ' +
+        "layer is a variant of, an instance of, or inside; SCROLL_TO: a layer in the layer's " +
+        'top-level frame.'
+    )
+  ),
+  navigation: v.picklist([
+    'NAVIGATE',
+    'OVERLAY',
+    'CHANGE_TO',
+    'SCROLL_TO'
+  ] satisfies PrototypeNavigationType[]),
   transition: v.optional(transitionSchema, { type: 'INSTANT', duration: 0 }),
   overlayRelativePosition: v.optional(overlayPositionSchema, 'CENTER')
 })
@@ -70,8 +81,14 @@ const actionSchema = v.variant('type', [
 ])
 
 const triggerSchema = v.variant('type', [
-  v.strictObject({ type: v.literal('ON_CLICK') }),
-  v.strictObject({ type: v.literal('AFTER_TIMEOUT'), timeout: secondsSchema })
+  v.strictObject({ type: v.picklist(['ON_CLICK', 'ON_HOVER', 'ON_PRESS']) }),
+  v.strictObject({ type: v.literal('AFTER_TIMEOUT'), timeout: secondsSchema }),
+  v.strictObject({
+    type: v.picklist(['MOUSE_ENTER', 'MOUSE_LEAVE']),
+    delay: v.optional(secondsSchema, 0),
+    // Figma's plugin API reads it; play treats both versions alike.
+    deprecatedVersion: v.optional(v.boolean())
+  })
 ])
 
 const reactionSchema = v.strictObject({
@@ -91,11 +108,13 @@ export type FigmaReactionAction = FigmaReaction['actions'][number]
 
 /** `reaction` in the plugin shape: the trigger and every action, named as Figma names them. */
 export function toFigmaReaction(reaction: PrototypeReaction): FigmaReaction {
-  const trigger: FigmaReactionTrigger =
-    reaction.trigger.type === 'AFTER_TIMEOUT'
-      ? { type: 'AFTER_TIMEOUT', timeout: reaction.trigger.delay }
-      : { type: 'ON_CLICK' }
-  return { trigger, actions: reaction.actions.map(toFigmaAction) }
+  return { trigger: toFigmaTrigger(reaction.trigger), actions: reaction.actions.map(toFigmaAction) }
+}
+
+function toFigmaTrigger({ type, delay }: PrototypeReaction['trigger']): FigmaReactionTrigger {
+  if (type === 'AFTER_TIMEOUT') return { type, timeout: delay }
+  if (type === 'MOUSE_ENTER' || type === 'MOUSE_LEAVE') return { type, delay }
+  return { type }
 }
 
 function toFigmaAction(action: PrototypeAction): FigmaReactionAction {
@@ -112,7 +131,9 @@ function toFigmaAction(action: PrototypeAction): FigmaReactionAction {
 /** The validation context: where the reactions live, and what they may point at. */
 export interface ReactionContext {
   graph: SceneGraph
-  /** The page the layer is on; a destination must be a top-level frame on it. */
+  /** The layer the reactions are on, which a Change to or Scroll to destination must suit. */
+  nodeId: string
+  /** The page the layer is on; a navigation's destination must be a top-level frame on it. */
   pageId: string
   /** The reactions the layer has now, whose ids this keeps by position. */
   previous?: readonly PrototypeReaction[]
@@ -146,7 +167,8 @@ export function parseFigmaReactions(value: unknown, context: ReactionContext): P
 
 function toTrigger(trigger: FigmaReactionTrigger): PrototypeReaction['trigger'] {
   const type: PrototypeTriggerType = trigger.type
-  return { type, delay: trigger.type === 'AFTER_TIMEOUT' ? trigger.timeout : 0 }
+  if (trigger.type === 'AFTER_TIMEOUT') return { type, delay: trigger.timeout }
+  return { type, delay: 'delay' in trigger ? trigger.delay : 0 }
 }
 
 function toAction(
@@ -155,7 +177,7 @@ function toAction(
   reactionIndex: number
 ): PrototypeAction {
   if (action.type !== 'NODE') return { type: action.type }
-  assertDestination(action.destinationId, context, reactionIndex)
+  assertDestination(action, context, reactionIndex)
   return {
     type: 'NODE',
     nodeId: action.destinationId,
@@ -166,18 +188,60 @@ function toAction(
   }
 }
 
-/** A destination must be a frame at the top of the layer's page, as the play can only show one. */
-function assertDestination(destinationId: string, context: ReactionContext, index: number): void {
+function failure(message: string): Error {
+  return new Error(`Property "reactions" failed validation: ${message}`)
+}
+
+/**
+ * A destination play can show: a navigation's is a frame at the top of the layer's page, a Change
+ * to's a variant of a set the layer belongs to, and a Scroll to's a layer in the layer's
+ * top-level frame.
+ */
+function assertDestination(
+  action: v.InferOutput<typeof nodeActionSchema>,
+  context: ReactionContext,
+  index: number
+): void {
+  const { destinationId, navigation } = action
   const destination = context.graph.getNode(destinationId)
   const at = `reactions[${index}]`
-  if (!destination) {
-    throw new Error(
-      `Property "reactions" failed validation: no layer ${destinationId} at ${at}.actions[0].destinationId`
+  if (!destination) throw failure(`no layer ${destinationId} at ${at}.actions[0].destinationId`)
+  if (navigation === 'CHANGE_TO') return assertVariant(destination, context, at)
+  if (navigation === 'SCROLL_TO') return assertScrollTarget(destination, context, at)
+  if (destination.type !== 'FRAME' || destination.parentId !== context.pageId) {
+    throw failure(
+      `${at} must navigate to a top-level frame on the same page, not ${destination.type} "${destination.name}"`
     )
   }
-  if (destination.type !== 'FRAME' || destination.parentId !== context.pageId) {
-    throw new Error(
-      `Property "reactions" failed validation: ${at} must navigate to a top-level frame on the same page, not ${destination.type} "${destination.name}"`
+}
+
+function assertVariant(destination: SceneNode, context: ReactionContext, at: string): void {
+  const sets = variantSetsAround(context.graph, context.nodeId)
+  const [nearest] = sets
+  if (!nearest) {
+    throw failure(
+      `${at}: only a variant, an instance of one, or a layer inside one can Change to another variant`
+    )
+  }
+  const inSet = sets.some((set) => set.id === destination.parentId)
+  if (destination.type !== 'COMPONENT' || !inSet) {
+    throw failure(
+      `${at} must Change to a variant of ${nearest.name}, not ${destination.type} "${destination.name}"`
+    )
+  }
+}
+
+/** The page's direct child a layer sits in, which play shows as one screen. */
+function topLevelOf(graph: SceneGraph, nodeId: string, pageId: string): SceneNode | undefined {
+  return graph.closest(nodeId, (node) => node.parentId === pageId)
+}
+
+function assertScrollTarget(destination: SceneNode, context: ReactionContext, at: string): void {
+  const { graph, nodeId, pageId } = context
+  const top = topLevelOf(graph, nodeId, pageId)
+  if (!top || destination.id === top.id || !graph.isDescendant(destination.id, top.id)) {
+    throw failure(
+      `${at} must Scroll to a layer inside the same top-level frame, not ${destination.type} "${destination.name}"`
     )
   }
 }
@@ -194,7 +258,7 @@ function unsupportedKind(value: unknown): string | null {
     if (trigger && typeof trigger === 'object' && 'type' in trigger) {
       const type = trigger.type
       if (typeof type === 'string' && type in UNSUPPORTED_TRIGGERS) {
-        return `a prototype starts from ON_CLICK or AFTER_TIMEOUT, not ${type}`
+        return `a prototype starts from ON_CLICK, ON_HOVER, ON_PRESS, MOUSE_ENTER, MOUSE_LEAVE or AFTER_TIMEOUT, not ${type}`
       }
     }
     const actions = reaction.actions

@@ -1,4 +1,10 @@
-import type { Effect, SceneNode, ShaderEffect, Stroke } from '@pairdraw/scene-graph'
+import type {
+  Effect,
+  OverflowDirection,
+  SceneNode,
+  ShaderEffect,
+  Stroke
+} from '@pairdraw/scene-graph'
 import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
 import { independentCornerChanges } from '@pairdraw/scene-graph/variables'
 
@@ -16,6 +22,18 @@ import { parseFigmaPaints, toFigmaPaint, type FigmaPaint } from '#core/figma-api
 import { getTextStyle } from '#core/figma-api/text/style'
 import { paintBindings, setPaintBindings } from '#core/figma-api/variables/bindings'
 import { textStyleChanges } from '#core/text/character-style'
+
+const OVERFLOW_DIRECTIONS: readonly OverflowDirection[] = ['NONE', 'HORIZONTAL', 'VERTICAL', 'BOTH']
+
+/** `value` as a frame's overflow scrolling, refused in the words Figma's plugin API uses. */
+function checkedOverflowDirection(value: unknown): OverflowDirection {
+  const direction = OVERFLOW_DIRECTIONS.find((candidate) => candidate === value)
+  if (direction) return direction
+  const expected = OVERFLOW_DIRECTIONS.map((candidate) => `'${candidate}'`).join(' | ')
+  throw new Error(
+    `in set_overflowDirection: Property "overflowDirection" failed validation: Invalid enum value. Expected ${expected}, received '${String(value)}'`
+  )
+}
 
 function styleReference(
   internals: NodeProxyInternals,
@@ -171,6 +189,21 @@ export function installVisualNodeProxyAccessors(
       },
       set(this: ProxyThis, value: boolean) {
         updateNode(this, internals, { clipsContent: value })
+      }
+    },
+    overflowDirection: {
+      get(this: ProxyThis): OverflowDirection {
+        return raw(this, internals).overflowDirection
+      },
+      set(this: ProxyThis, value: unknown) {
+        const node = raw(this, internals)
+        // Only a frame-like layer scrolls in play, and only its record carries the field.
+        if (node.type !== 'FRAME' && node.type !== 'COMPONENT' && node.type !== 'INSTANCE') {
+          throw new Error(
+            `in set_overflowDirection: Only a frame, component or instance scrolls; ${node.type} "${node.name}" cannot`
+          )
+        }
+        updateNode(this, internals, { overflowDirection: checkedOverflowDirection(value) })
       }
     },
     cornerRadius: {

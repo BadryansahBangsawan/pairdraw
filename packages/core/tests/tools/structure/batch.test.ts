@@ -151,3 +151,20 @@ test('a SPACE_AROUND batch applies, as set_layout accepts it', () => {
   expect(result.updated).toBe(1)
   expect(node.primaryAxisAlignItems).toBe('SPACE_AROUND')
 })
+
+test('sets overflow scrolling on frames and refuses the batch for a layer that cannot scroll', () => {
+  const { figma, node } = frame()
+  const rect = figma.createRectangle()
+  const refused = batchUpdate.execute(figma, {
+    operations: batch(node.id, rect.id, { overflow_direction: 'VERTICAL' })
+  }) as BatchResult
+  expect(refused.error).toBe(
+    'Only a frame, component or instance scrolls; RECTANGLE "Rectangle" cannot.'
+  )
+  expect(node.name).not.toBe('Renamed')
+
+  batchUpdate.execute(figma, {
+    operations: [{ id: node.id, props: { overflow_direction: 'HORIZONTAL' } }]
+  })
+  expect(node.overflowDirection).toBe('HORIZONTAL')
+})

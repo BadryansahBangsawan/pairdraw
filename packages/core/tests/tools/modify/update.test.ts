@@ -56,4 +56,24 @@ describe('update_node', () => {
     expect(wider).toEqual({ id: text.id, updated: ['size', 'textAutoResize'] })
     expect(text.textAutoResize).toBe('HEIGHT')
   })
+
+  test('sets the overflow scrolling of a frame, and refuses it on a layer that cannot scroll', async () => {
+    const figma = new FigmaAPI(new SceneGraph())
+    const list = figma.createFrame()
+    const rect = figma.createRectangle()
+
+    const result = await updateNode.execute(figma, { id: list.id, overflow_direction: 'VERTICAL' })
+    expect(result).toEqual({ id: list.id, updated: ['overflowDirection'] })
+    expect(list.overflowDirection).toBe('VERTICAL')
+
+    const refused = await updateNode.execute(figma, {
+      id: rect.id,
+      name: 'Kept',
+      overflow_direction: 'BOTH'
+    })
+    expect(refused).toEqual({
+      error: 'Only a frame, component or instance scrolls; RECTANGLE "Rectangle" cannot.'
+    })
+    expect(rect.name).toBe('Rectangle')
+  })
 })

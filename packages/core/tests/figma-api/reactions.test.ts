@@ -83,7 +83,7 @@ describe('prototype reactions in the plugin shape', () => {
           actions: [{ type: 'NODE', destinationId: details.id, navigation: 'NAVIGATE' }]
         }
       ])
-    }).toThrow('ON_CLICK or AFTER_TIMEOUT')
+    }).toThrow('ON_CLICK, ON_HOVER, ON_PRESS, MOUSE_ENTER, MOUSE_LEAVE or AFTER_TIMEOUT')
   })
 
   test('refuses an action the play cannot run', () => {
@@ -102,6 +102,117 @@ describe('prototype reactions in the plugin shape', () => {
     expect(() => {
       Reflect.set(button, 'reactions', [clickTo(button.id)])
     }).toThrow('top-level frame on the same page')
+  })
+})
+
+/** A toggle set with Off and On variants, an instance of Off on a screen, and a lone frame. */
+function toggle() {
+  const graph = new SceneGraph()
+  const pageId = graph.getPages()[0].id
+  const set = graph.createNode('COMPONENT_SET', pageId, { name: 'Toggle' })
+  const off = graph.createNode('COMPONENT', set.id, { name: 'State=Off' })
+  const on = graph.createNode('COMPONENT', set.id, { name: 'State=On', x: 100 })
+  const other = graph.createNode('COMPONENT_SET', pageId, { name: 'Tabs' })
+  const tab = graph.createNode('COMPONENT', other.id, { name: 'Selected=No' })
+  const screen = graph.createNode('FRAME', pageId, { name: 'Screen' })
+  const list = graph.createNode('FRAME', screen.id, { name: 'List', overflowDirection: 'VERTICAL' })
+  const row = graph.createNode('FRAME', list.id, { name: 'Row' })
+  const elsewhere = graph.createNode('FRAME', pageId, { name: 'Elsewhere' })
+  const instance = graph.createInstance(off.id, screen.id)
+  if (!instance) throw new Error('no instance')
+  const figma = new FigmaAPI(graph)
+  const proxy = (id: string) => {
+    const node = figma.getNodeById(id)
+    if (!node) throw new Error(`no node ${id}`)
+    return node
+  }
+  return { graph, figma, proxy, set, off, on, tab, screen, list, row, elsewhere, instance }
+}
+
+function action(destinationId: string, navigation: 'CHANGE_TO' | 'SCROLL_TO') {
+  return { type: 'NODE' as const, destinationId, navigation }
+}
+
+describe('interactive components and scrolling in the plugin shape', () => {
+  test('an instance of a variant changes to another variant of its set', () => {
+    const { proxy, graph, on, instance } = toggle()
+    Reflect.set(proxy(instance.id), 'reactions', [
+      { trigger: { type: 'ON_CLICK' }, actions: [action(on.id, 'CHANGE_TO')] }
+    ])
+    expect(graph.getNode(instance.id)?.prototypeReactions[0]?.actions[0]).toMatchObject({
+      type: 'NODE',
+      nodeId: on.id,
+      navigation: 'CHANGE_TO'
+    })
+  })
+
+  test('refuses a Change to a variant of another set, or to a frame', () => {
+    const { proxy, off, tab, elsewhere } = toggle()
+    for (const destination of [tab.id, elsewhere.id]) {
+      expect(() => {
+        Reflect.set(proxy(off.id), 'reactions', [
+          { trigger: { type: 'ON_CLICK' }, actions: [action(destination, 'CHANGE_TO')] }
+        ])
+      }).toThrow('a variant of Toggle')
+    }
+  })
+
+  test('refuses a Change to on a layer that is no variant', () => {
+    const { proxy, on, elsewhere } = toggle()
+    expect(() => {
+      Reflect.set(proxy(elsewhere.id), 'reactions', [
+        { trigger: { type: 'ON_CLICK' }, actions: [action(on.id, 'CHANGE_TO')] }
+      ])
+    }).toThrow('only a variant, an instance of one, or a layer inside one can Change to')
+  })
+
+  test('scrolls to a layer in the same top-level frame, and refuses one outside it', () => {
+    const { proxy, graph, instance, row, elsewhere } = toggle()
+    Reflect.set(proxy(instance.id), 'reactions', [
+      { trigger: { type: 'ON_PRESS' }, actions: [action(row.id, 'SCROLL_TO')] }
+    ])
+    expect(graph.getNode(instance.id)?.prototypeReactions[0]?.actions[0]).toMatchObject({
+      navigation: 'SCROLL_TO',
+      nodeId: row.id
+    })
+    expect(() => {
+      Reflect.set(proxy(instance.id), 'reactions', [
+        { trigger: { type: 'ON_CLICK' }, actions: [action(elsewhere.id, 'SCROLL_TO')] }
+      ])
+    }).toThrow('a layer inside the same top-level frame')
+  })
+
+  test('reads and writes a mouse enter delay in seconds', () => {
+    const { proxy, row, instance } = toggle()
+    const reactions = [
+      { trigger: { type: 'MOUSE_ENTER', delay: 0.4 }, actions: [action(row.id, 'SCROLL_TO')] },
+      { trigger: { type: 'MOUSE_LEAVE', delay: 0 }, actions: [{ type: 'BACK' }] }
+    ]
+    const node = proxy(instance.id)
+    Reflect.set(node, 'reactions', reactions)
+    expect(node.reactions.map((reaction) => reaction.trigger)).toEqual([
+      { type: 'MOUSE_ENTER', delay: 0.4 },
+      { type: 'MOUSE_LEAVE', delay: 0 }
+    ])
+  })
+
+  test("a frame's overflowDirection reads and writes its overflow scrolling", () => {
+    const { proxy, graph, list, screen } = toggle()
+    expect(proxy(list.id).overflowDirection).toBe('VERTICAL')
+    proxy(screen.id).overflowDirection = 'HORIZONTAL'
+    expect(graph.getNode(screen.id)?.overflowDirection).toBe('HORIZONTAL')
+    expect(() => {
+      Reflect.set(proxy(screen.id), 'overflowDirection', 'SIDEWAYS')
+    }).toThrow('overflowDirection')
+  })
+
+  test('refuses overflow scrolling on a layer that cannot scroll', () => {
+    const { figma, graph } = toggle()
+    const rect = figma.createRectangle()
+    expect(() => {
+      Reflect.set(rect, 'overflowDirection', 'VERTICAL')
+    }).toThrow('Only a frame, component or instance scrolls')
+    expect(graph.getNode(rect.id)?.overflowDirection).toBe('NONE')
   })
 })
 
@@ -129,11 +240,35 @@ describe('prototype connection tools', () => {
         id: button.id,
         reactions: [
           {
-            trigger: { type: 'MOUSE_ENTER' },
+            trigger: { type: 'ON_DRAG' },
             actions: [{ type: 'NODE', destinationId: button.id, navigation: 'NAVIGATE' }]
           }
         ]
       })
     ).toThrow('ON_CLICK')
+  })
+
+  test('set_reactions writes a Change to on a variant, and get_reactions reads it back', async () => {
+    const { figma, off, on } = toggle()
+    const changeTo = {
+      trigger: { type: 'ON_HOVER' as const },
+      actions: [
+        {
+          type: 'NODE' as const,
+          destinationId: on.id,
+          navigation: 'CHANGE_TO' as const,
+          transition: { type: 'DISSOLVE' as const, duration: 0.2 },
+          overlayRelativePosition: 'CENTER' as const
+        }
+      ]
+    }
+    const args = parseToolArgs('set_reactions', setReactions.input, {
+      id: off.id,
+      reactions: [changeTo]
+    })
+    await setReactions.execute(figma, args)
+    expect(await getReactions.execute(figma, { id: off.id })).toMatchObject({
+      reactions: [changeTo]
+    })
   })
 })

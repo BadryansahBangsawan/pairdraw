@@ -36,7 +36,6 @@ import {
   SECTION_TITLE_HEIGHT
 } from '@pairdraw/core/constants'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
-import { DISSOLVE_EASING_CSS } from '@pairdraw/core/prototype'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
 import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
@@ -418,7 +417,7 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
           :src="dissolvingFrom.src"
           :style="{
             '--tw-animation-duration': `${dissolvingFrom.durationMs}ms`,
-            '--tw-ease': DISSOLVE_EASING_CSS,
+            '--tw-ease': dissolvingFrom.easing,
             left: `${dissolvingFrom.rect.left}px`,
             top: `${dissolvingFrom.rect.top}px`,
             width: `${dissolvingFrom.rect.width}px`,

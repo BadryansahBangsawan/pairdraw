@@ -1,6 +1,7 @@
 import { onScopeDispose, shallowRef, watch, type Ref } from 'vue'
 
 import {
+  animationFor,
   createPlayScenes,
   type PlayClick,
   type PlayRevert,
@@ -8,10 +9,11 @@ import {
   type PlayStep,
   type PlayTimeout,
   type ScrollChange,
+  type SmartAnimation,
   shownFrame,
   transitionMs
 } from '@pairdraw/core/prototype'
-import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { PrototypeEasingType, SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
@@ -27,12 +29,16 @@ type PlayLive = Readonly<Ref<{ revision: number } | null>>
 export interface PlayScenesOptions {
   onReveal?: (reveal: Vector) => void
   /** Called before a dissolving reaction runs, to draw the frame as it was for the crossfade. */
-  beforeDissolve?: (rootId: string, durationMs: number) => void
+  beforeDissolve?: (rootId: string, durationMs: number, easing?: PrototypeEasingType) => void
   /**
    * Called after a reaction changed the shown frame or overlay, with how long its transition takes.
    * The stage counts the next frame's After delays from the end of that transition.
    */
   onFrameTransition?: (durationMs: number) => void
+  /** Called with a Smart animate Change to's animation, to play over its duration. */
+  onAnimation?: (animation: SmartAnimation, durationMs: number) => void
+  /** Called when a change brings no animation, to stop one still running over that frame. */
+  onAnimationStopped?: (rootId?: string) => void
 }
 
 /**
@@ -62,10 +68,13 @@ export function usePlayScenes(
   function run(click: PlayClick, rootId?: string): PlayStep | null {
     const current = session.value
     if (!current) return null
-    // A Scroll to animates by easing its frames instead of crossfading.
+    // A Scroll to animates by easing its frames, and Smart animate by moving layers, instead of
+    // crossfading.
     const scrolls = click.action.type === 'NODE' && click.action.navigation === 'SCROLL_TO'
-    if (click.transition && click.transition.type !== 'INSTANT' && !scrolls) {
-      options.beforeDissolve?.(rootId ?? shownFrame(current), transitionMs(click.action))
+    const crossfades = animationFor(current, click.action) === 'dissolve'
+    if (click.transition && crossfades && !scrolls) {
+      const durationMs = transitionMs(click.action)
+      options.beforeDissolve?.(rootId ?? shownFrame(current), durationMs, click.transition.easing)
     }
     const result = scenes.run(current, click, rootId)
     session.value = result.session
@@ -73,6 +82,10 @@ export function usePlayScenes(
       options.onFrameTransition?.(transitionMs(click.action))
     }
     if (result.changed) changed()
+    if (result.animation) options.onAnimation?.(result.animation, transitionMs(click.action))
+    // A change with no animation of its own shows at once: a Smart animate still running over
+    // the frame would draw its stale copy over what play now shows.
+    else if (result.changed) options.onAnimationStopped?.(rootId ?? shownFrame(result.session))
     if (result.scrolled?.length) {
       if (click.transition && click.transition.type !== 'INSTANT') animate(result.scrolled)
       else store.requestRepaint()
@@ -112,6 +125,11 @@ export function usePlayScenes(
     const result = scenes.revert(current, undo)
     session.value = result.session
     if (result.changed) changed()
+    if (result.animation && undo.kind === 'change' && undo.transition) {
+      options.onAnimation?.(result.animation, undo.transition.duration * 1000)
+    }
+    // A revert with no animation shows the earlier variant at once, as a click's change does.
+    else if (result.changed && undo.kind === 'change') options.onAnimationStopped?.()
   }
 
   /**

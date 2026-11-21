@@ -1,4 +1,9 @@
-import type { PrototypeTriggerType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type {
+  PrototypeTransition,
+  PrototypeTriggerType,
+  SceneGraph,
+  SceneNode
+} from '@pairdraw/scene-graph'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { playHitTest } from './hit'
@@ -22,7 +27,8 @@ export interface PlayPointerReaction extends PlayClick {
 /**
  * How to undo a While hovering or While pressing reaction once the pointer leaves or lifts, and
  * the layer whose leaving undoes it: the layer the reaction ran from, or the instance it
- * switched when that layer went with the switch.
+ * switched when that layer went with the switch. A Change to switches back with the transition
+ * it switched with, as Figma's does.
  */
 export type PlayRevert =
   | {
@@ -32,6 +38,7 @@ export type PlayRevert =
       instanceId: string
       from: string
       to: string
+      transition: PrototypeTransition | null
     }
   | { kind: 'overlay'; watchId: string; frameId: string }
   | { kind: 'back'; watchId: string; frameId: string }
@@ -118,14 +125,14 @@ export function pointerReactions(
 export function revertFor(
   before: PlaySession,
   done: PlayStep,
-  { sourceId, action }: PlayClick,
+  { sourceId, action, transition }: PlayClick,
   shown: SceneGraph
 ): PlayRevert | null {
   if (done.changed) {
     const { rootId, instanceId, from, to } = done.changed
     // A layer inside the instance went with the switch; leaving the instance undoes it then.
     const watchId = shown.getNode(sourceId) ? sourceId : instanceId
-    return { kind: 'change', watchId, rootId, instanceId, from, to }
+    return { kind: 'change', watchId, rootId, instanceId, from, to, transition }
   }
   if (action.type !== 'NODE' || !action.nodeId) return null
   const after = done.session

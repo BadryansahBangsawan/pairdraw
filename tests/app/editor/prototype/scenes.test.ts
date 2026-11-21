@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import { computed, effectScope, nextTick, ref } from 'vue'
 
 import { startSession, type PlaySession } from '@pairdraw/core/prototype'
-import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
+import { SceneGraph, type PrototypeNodeAction, type PrototypeReaction } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { usePlayScenes } from '@/app/editor/prototype/scenes'
@@ -205,6 +205,37 @@ describe('play scenes on the stage', () => {
     store.dispose()
   })
 
+  test('a Smart animate Change to hands over its animation and its duration, with no crossfade', () => {
+    const { graph, screen, instance, loading } = loaderDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const dissolves: string[] = []
+    const animations: { rootId: string; durationMs: number }[] = []
+    const scope = effectScope()
+    const play = scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 })),
+        {
+          beforeDissolve: (rootId) => dissolves.push(rootId),
+          onAnimation: (animation, durationMs) =>
+            animations.push({ rootId: animation.rootId, durationMs })
+        }
+      )
+    )
+    if (!play) throw new Error('no play scenes')
+    const smart = { type: 'SMART_ANIMATE' as const, duration: 0.4 }
+    const action = { ...changeTo(loading.id, 'ON_CLICK').actions[0], transition: smart }
+
+    play.run({ sourceId: instance.id, action, transition: smart })
+
+    expect(animations).toEqual([{ rootId: screen.id, durationMs: 400 }])
+    expect(dissolves).toEqual([])
+    scope.stop()
+    store.dispose()
+  })
+
   test('a dissolving Change to asks for the frame as it was first; an instant one and a Scroll to do not', () => {
     const { graph, screen, instance, loading, done } = loaderDocument()
     const store = createEditorStore(graph)
@@ -222,8 +253,9 @@ describe('play scenes on the stage', () => {
       )
     )
     if (!play) throw new Error('no play scenes')
-    const action = changeTo(loading.id, 'ON_CLICK').actions[0]
-    play.run({ sourceId: instance.id, action, transition: { type: 'DISSOLVE', duration: 0.3 } })
+    const dissolve = { type: 'DISSOLVE' as const, duration: 0.3 }
+    const action = { ...changeTo(loading.id, 'ON_CLICK').actions[0], transition: dissolve }
+    play.run({ sourceId: instance.id, action, transition: dissolve })
     expect(before).toEqual([screen.id])
     play.run({
       sourceId: instance.id,
@@ -355,6 +387,45 @@ describe('play scenes on the stage', () => {
     if (!timer) throw new Error('no timer')
     timer.fn()
     expect(before).toEqual([screen.id])
+    scope.stop()
+    store.dispose()
+  })
+
+  test('a change with no animation of its own stops the one still running', () => {
+    const { graph, screen, instance, loading, done } = loaderDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const stopped: (string | undefined)[] = []
+    const scope = effectScope()
+    const play = scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 })),
+        {
+          onAnimationStopped: (rootId) => stopped.push(rootId)
+        }
+      )
+    )
+    if (!play) throw new Error('no play scenes')
+    const smart = { type: 'SMART_ANIMATE' as const, duration: 0.5 }
+    const action: PrototypeNodeAction = {
+      type: 'NODE',
+      nodeId: loading.id,
+      navigation: 'CHANGE_TO',
+      transition: smart,
+      overlayPosition: 'CENTER'
+    }
+    play.run({ sourceId: instance.id, action, transition: smart })
+    expect(stopped).toEqual([])
+
+    // An Instant Change to during the animation shows at once: the running copy must go.
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(done.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    expect(stopped).toEqual([screen.id])
     scope.stop()
     store.dispose()
   })

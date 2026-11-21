@@ -48,6 +48,7 @@ export {
   type PlaySession
 } from './session'
 export {
+  animationFor,
   DISSOLVE_EASING,
   DISSOLVE_EASING_CSS,
   dissolveEasing,
@@ -56,6 +57,7 @@ export {
   sessionDrawKey,
   TimelineError,
   transitionMs,
+  type PlayAnimation,
   type Timeline,
   type TimelineClick,
   type TimelineErrorReason,

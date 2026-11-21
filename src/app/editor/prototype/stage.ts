@@ -3,6 +3,9 @@ import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
 import { resolveEditorProfile, type VisibleCanvas } from '@pairdraw/core'
 import {
+  animationFor,
+  createSmartAnimation,
+  easingCSS,
   reactionAt,
   restartSession,
   shownFrame,
@@ -15,7 +18,7 @@ import {
   type PlayClick,
   type PlaySession
 } from '@pairdraw/core/prototype'
-import type { PrototypeAction } from '@pairdraw/scene-graph'
+import type { PrototypeAction, PrototypeEasingType } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
@@ -25,6 +28,7 @@ import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 import { usePlayPointer } from './pointer'
 import { usePlayScenes } from './scenes'
 import { usePlayScroll } from './scroll'
+import { usePlaySmartAnimate } from './smart-animate'
 import { playFitArea, revealPan } from './viewport'
 
 /** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
@@ -38,8 +42,16 @@ const DISSOLVE_SETTLE_MS = 100
 export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElement | null>) {
   const session = ref<PlaySession | null>(null)
   const size = useElementSize(area)
-  /** The frame before a dissolve started, as the PNG the crossfade fades out over the canvas. */
-  const dissolvingFrom = ref<{ src: string; rect: VisibleCanvas; durationMs: number } | null>(null)
+  /**
+   * The frame before a dissolve started, as the PNG the crossfade fades out over the canvas, with
+   * how long it fades and along which CSS curve.
+   */
+  const dissolvingFrom = ref<{
+    src: string
+    rect: VisibleCanvas
+    durationMs: number
+    easing: string
+  } | null>(null)
   /**
    * How long the transition into the shown frame runs. Its After delays count from when that ends,
    * as Figma's do, so the timers arming for it wait this much longer.
@@ -107,13 +119,17 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     if (dx !== 0 || dy !== 0) store.pan(dx, dy)
   }
 
+  /** Smart animations running over the frame they animate into. */
+  const smart = usePlaySmartAnimate(store)
   /** The frames play changed, which the canvas draws from their copies. */
   const play = usePlayScenes(store, session, live, {
     onReveal: reveal,
-    beforeDissolve: (rootId, durationMs) => snapshotBefore(durationMs, rootId),
+    beforeDissolve: (rootId, durationMs, easing) => snapshotBefore(durationMs, rootId, easing),
     onFrameTransition: (durationMs) => {
       enteringMs = durationMs
-    }
+    },
+    onAnimation: (animation, durationMs) => smart.start(animation, durationMs),
+    onAnimationStopped: (rootId) => smart.stop(rootId)
   })
   usePlayPointer(store, area, session, play, live)
   usePlayScroll(store, area, session, play)
@@ -126,7 +142,11 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
    * it: from its copy of a frame it changed, scrolled as play scrolled it. A frame that cannot be
    * drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
    */
-  function snapshotBefore(durationMs: number, rootId: string): VisibleCanvas | null {
+  function snapshotBefore(
+    durationMs: number,
+    rootId: string,
+    easing?: PrototypeEasingType
+  ): VisibleCanvas | null {
     const graph = play.graphFor(rootId)
     const node = graph.getNode(rootId)
     if (!session.value || !node || !store.renderer) return null
@@ -149,7 +169,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     // A dissolve that starts while another runs replaces its snapshot; each timer clears only its own.
     if (dissolvingFrom.value) URL.revokeObjectURL(dissolvingFrom.value.src)
     const src = URL.createObjectURL(blob)
-    dissolvingFrom.value = { src, rect, durationMs }
+    dissolvingFrom.value = { src, rect, durationMs, easing: easingCSS(easing) }
     window.setTimeout(() => {
       if (dissolvingFrom.value?.src !== src) return
       URL.revokeObjectURL(src)
@@ -176,7 +196,16 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     const next = step(store.graph, current, action)
     if (next === current) return
     const durationMs = transitionMs(action)
-    if (durationMs > 0) snapshotBefore(durationMs, shownFrame(current))
+    const animation = animationFor(current, action)
+    const easing = action.type === 'NODE' ? action.transition.easing : undefined
+    if (animation === 'smart') {
+      const from = { graph: play.graphFor(current.frameId), rootId: current.frameId }
+      const to = { graph: play.graphFor(next.frameId), rootId: next.frameId }
+      smart.start(createSmartAnimation(from, to, easing), durationMs)
+    } else {
+      smart.stop()
+      if (animation === 'dissolve') snapshotBefore(durationMs, shownFrame(current), easing)
+    }
     enteringMs = durationMs
     session.value = next
   }
@@ -185,6 +214,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     live,
     (playing) => {
       enteringMs = 0
+      smart.stop()
       if (!playing) {
         session.value = null
         return
@@ -273,7 +303,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     frameId,
     scrim,
     dissolvingFrom,
-    playScenes: play.views,
+    playScenes: () => smart.views(play.views()),
     playScroll: play.scroll
   }
 }

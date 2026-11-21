@@ -125,12 +125,29 @@ describe('undoing a While hovering or While pressing reaction', () => {
       rootId: screen.id,
       instanceId: button.id,
       from: base.id,
-      to: hover.id
+      to: hover.id,
+      transition: { type: 'INSTANT', duration: 0 }
     })
     if (!revert) throw new Error('no revert')
     scenes.revert(done.session, revert)
     const played = scenes.graphFor(screen.id)
     expect(shows(played, played.getNode(button.id))).toBe(base.id)
+  })
+
+  test('a Smart animate Change to animates back as it animated in', () => {
+    const { graph, screen, button } = buttonScreen()
+    const scenes = createPlayScenes(() => graph)
+    const session = startSession(screen.id)
+    const [hovered] = pointerReactions(graph, button.id, 'ON_HOVER')
+    if (hovered?.action.type !== 'NODE') throw new Error('no hover reaction')
+    const transition = { type: 'SMART_ANIMATE' as const, duration: 0.2 }
+    const enter = { ...hovered, action: { ...hovered.action, transition }, transition }
+    const done = scenes.run(session, enter)
+    const revert = revertFor(session, done, enter, scenes.graphFor(screen.id))
+    if (!revert) throw new Error('no revert')
+
+    expect(done.animation?.rootId).toBe(screen.id)
+    expect(scenes.revert(done.session, revert).animation?.rootId).toBe(screen.id)
   })
 
   test('a Change to leaves the variant alone once something else changed it', () => {

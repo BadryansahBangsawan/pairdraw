@@ -1,6 +1,8 @@
-import type { PrototypeAction, SceneGraph } from '@pairdraw/scene-graph'
+import type { PrototypeAction, PrototypeTransition, SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
+
+import { extractPageContext, findPageId } from '#core/io/subgraph'
 
 import type { PlayRevert } from './pointer'
 import { effectiveReactions } from './reactions'
@@ -13,6 +15,11 @@ import {
 } from './scene'
 import { clampScroll, scrollAlong, scrollIntoView, type ScrollChange } from './scroll'
 import { primaryAction, shownFrame, step, type PlayClick, type PlaySession } from './session'
+import {
+  createSmartAnimation,
+  type PlayFrame,
+  type SmartAnimation
+} from './smart-animate/animation'
 
 /** How many changed frames play keeps; a frame dropped beyond them starts again as designed. */
 export const PLAY_SCENE_LIMIT = 4
@@ -39,6 +46,11 @@ export interface PlayStep {
   changed: PlayChange | null
   scrolled?: ScrollChange[]
   reveal?: Vector | null
+  /**
+   * A Smart animate Change to's animation from the frame as it was to its copy as it is now, for
+   * the player to run over the transition's duration; the copy shows the change at once.
+   */
+  animation?: SmartAnimation
 }
 
 /**
@@ -89,6 +101,39 @@ export function createPlayScenes(
     return scenes.get(rootId)?.graph ?? getDocument()
   }
 
+  /**
+   * The frame as play shows it before a change: the document while play has not changed it, else
+   * a copy of play's copy, which the change is about to edit in place.
+   */
+  function frameBefore(rootId: string): PlayFrame {
+    const scene = scenes.get(rootId)
+    if (!scene) return { graph: getDocument(), rootId }
+    const pageId = findPageId(scene.graph, rootId) ?? scene.graph.rootId
+    return {
+      graph: extractPageContext(scene.graph, pageId, [rootId], { shareTables: true }),
+      rootId
+    }
+  }
+
+  /**
+   * Runs a Change to on `rootId`'s copy, and with a Smart animate transition the animation from the
+   * frame as it was.
+   */
+  function changeWith(
+    rootId: string,
+    sourceId: string,
+    variantId: string,
+    transition: PrototypeTransition | null
+  ): Pick<PlayStep, 'changed' | 'animation'> {
+    const smart = transition?.type === 'SMART_ANIMATE' && transition.duration > 0
+    const before = smart && changeTarget(graphFor(rootId), rootId, sourceId, variantId)
+    const from = before ? frameBefore(rootId) : null
+    const changed = changeIn(rootId, sourceId, variantId)
+    if (!changed || !from) return { changed }
+    const to = { graph: graphFor(rootId), rootId }
+    return { changed, animation: createSmartAnimation(from, to, transition?.easing) }
+  }
+
   function changeIn(rootId: string, sourceId: string, variantId: string): PlayChange | null {
     // Checked on what play shows now, so a Change to that cannot run copies nothing.
     if (!changeTarget(graphFor(rootId), rootId, sourceId, variantId)) return null
@@ -117,8 +162,8 @@ export function createPlayScenes(
     },
     run(session, { sourceId, action }, rootId = shownFrame(session)) {
       if (action.type === 'NODE' && action.navigation === 'CHANGE_TO') {
-        const changed = action.nodeId ? changeIn(rootId, sourceId, action.nodeId) : null
-        return { session, changed }
+        if (!action.nodeId) return { session, changed: null }
+        return { session, ...changeWith(rootId, sourceId, action.nodeId, action.transition) }
       }
       if (action.type === 'NODE' && action.navigation === 'SCROLL_TO') {
         if (!action.nodeId) return { session, changed: null, scrolled: [], reveal: null }
@@ -134,7 +179,8 @@ export function createPlayScenes(
         if (!instance || instanceMainComponent(graph, instance)?.id !== revert.to) {
           return { session, changed: null }
         }
-        return { session, changed: changeIn(revert.rootId, revert.instanceId, revert.from) }
+        const { rootId, instanceId, from, transition } = revert
+        return { session, ...changeWith(rootId, instanceId, from, transition) }
       }
       const shown =
         revert.kind === 'overlay'

@@ -236,3 +236,108 @@ describe('prototype play transitions on a timeout', () => {
     store.dispose()
   })
 })
+
+describe('prototype play with Smart animate', () => {
+  let restore: (() => void) | null = null
+
+  afterEach(() => {
+    restore?.()
+    restore = null
+  })
+
+  /** Animation frames the test steps by hand, each given a time in milliseconds. */
+  function installFrameProbe() {
+    const frames = new Map<number, (now: number) => void>()
+    let next = 1
+    const real = {
+      request: globalThis.requestAnimationFrame,
+      cancel: globalThis.cancelAnimationFrame,
+      now: performance.now.bind(performance)
+    }
+    let clock = 0
+    globalThis.requestAnimationFrame = (callback) => {
+      frames.set(next, callback)
+      return next++
+    }
+    globalThis.cancelAnimationFrame = (id) => {
+      frames.delete(id)
+    }
+    performance.now = () => clock
+    return {
+      /** Runs the frames waiting now, at `ms`. */
+      step(ms: number) {
+        clock = ms
+        const due = [...frames.values()]
+        frames.clear()
+        for (const frame of due) frame(ms)
+      },
+      restore() {
+        globalThis.requestAnimationFrame = real.request
+        globalThis.cancelAnimationFrame = real.cancel
+        performance.now = real.now
+      }
+    }
+  }
+
+  test('moves the layers both screens share, then shows the destination as designed', async () => {
+    const timers = installTimerProbe()
+    const frames = installFrameProbe()
+    restore = () => {
+      timers.restore()
+      frames.restore()
+    }
+    const graph = documentWith(false)
+    graph.createNode('RECTANGLE', START, { name: 'Card', x: 10, y: 10, width: 50, height: 50 })
+    const card = graph.createNode('RECTANGLE', TARGET, {
+      name: 'Card',
+      x: 110,
+      y: 10,
+      width: 50,
+      height: 50
+    })
+    graph.updateNode(START, {
+      prototypeReactions: [
+        {
+          ...timeoutToTarget,
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: TARGET,
+              navigation: 'NAVIGATE',
+              transition: { type: 'SMART_ANIMATE', duration: 0.5, easing: 'LINEAR' },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    graph.updateNode(TARGET, {
+      prototypeReactions: [{ ...timeoutToTarget, id: '9:2', actions: [{ type: 'BACK' }] }]
+    })
+    const store = createEditorStore(graph)
+    store.startPlay()
+    const scope = effectScope()
+    const stage = scope.run(() => usePrototypeStage(store, ref<HTMLCanvasElement | null>(null)))
+    if (!stage) throw new Error('Play stage did not start')
+    await nextTick()
+
+    const [first] = timers.prototypeTimers()
+    if (!first) throw new Error('The start frame armed no timeout')
+    first.fn()
+    await nextTick()
+
+    expect(shown(stage.session.value)).toBe(TARGET)
+    const drawn = () => stage.playScenes().get(TARGET)?.graph.getNode(card.id)?.x
+    expect(drawn()).toBe(10)
+    frames.step(250)
+    expect(drawn()).toBe(60)
+    frames.step(500)
+    // Done: the destination is drawn from the document again.
+    expect(stage.playScenes().has(TARGET)).toBe(false)
+    expect(graph.getNode(card.id)?.x).toBe(110)
+    expect(timers.armedFor(DELAY_MS + 500)).toHaveLength(1)
+
+    scope.stop()
+    store.dispose()
+  })
+})

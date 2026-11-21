@@ -106,6 +106,59 @@ describe('Change to in play', () => {
     expect(documentEvents).toBe(0)
   })
 
+  test('a Smart animate Change to moves from the variant it left to the one it shows', () => {
+    const { graph, screen, instance, bar, on, off } = toggleScreen()
+    const scenes = createPlayScenes(() => graph)
+    const session = startSession(screen.id)
+    const action = changeTo(on.id).actions[0]
+    const smart = {
+      ...action,
+      transition: { type: 'SMART_ANIMATE' as const, duration: 0.3, easing: 'LINEAR' as const }
+    }
+
+    const result = scenes.run(session, {
+      sourceId: instance.id,
+      action: smart,
+      transition: smart.transition
+    })
+    const animation = result.animation
+    if (!animation) throw new Error('no animation')
+
+    expect(animation.rootId).toBe(screen.id)
+    animation.seek(0)
+    expect(animation.graph.getNode(instance.id)?.height).toBe(20)
+    expect(animation.graph.getNode(bar.id)?.y).toBe(20)
+    const knob = animation.graph.getChildren(instance.id).find((child) => child.name === 'Knob')
+    expect(knob?.opacity).toBe(0)
+    animation.seek(0.5)
+    expect(animation.graph.getNode(instance.id)?.height).toBe(30)
+    expect(animation.graph.getNode(bar.id)?.y).toBe(30)
+    // The copy play keeps shows the new variant at once; the animation is drawn over it.
+    const played = scenes.graphFor(screen.id)
+    expect(mainOf(played, played.getNode(instance.id))).toBe(on.id)
+
+    // Switching back animates from the copy as it is now, which the animation left alone.
+    const back = scenes.run(result.session, {
+      sourceId: instance.id,
+      action: { ...smart, nodeId: off.id },
+      transition: smart.transition
+    })
+    back.animation?.seek(0)
+    expect(back.animation?.graph.getNode(instance.id)?.height).toBe(40)
+  })
+
+  test('a Change to that does not Smart animate has no animation', () => {
+    const { graph, screen, instance, on } = toggleScreen()
+    const scenes = createPlayScenes(() => graph)
+
+    const result = scenes.run(
+      startSession(screen.id),
+      click(instance.id, changeTo(on.id).actions[0])
+    )
+
+    expect(result.animation ?? null).toBeNull()
+  })
+
   test('lays out the auto layout around the switched instance, and nothing else', () => {
     const { graph, screen, instance, on, other } = toggleScreen()
     // A size the document recorded but never laid out, which a full layout would change.

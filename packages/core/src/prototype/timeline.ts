@@ -95,6 +95,21 @@ export function transitionMs(action: PrototypeAction): number {
   return Math.max(0, action.transition.duration * 1000)
 }
 
+/** How play shows a step: a cut, a crossfade, or Smart animate. */
+export type PlayAnimation = 'cut' | 'dissolve' | 'smart'
+
+/**
+ * How play animates `action` from `session`: a cut when it takes no time; Smart animate for a
+ * Smart animate Change to, or a navigation between screens while no overlay is open, as Figma
+ * has no Smart animate for overlays; a crossfade otherwise.
+ */
+export function animationFor(session: PlaySession, action: PrototypeAction): PlayAnimation {
+  if (transitionMs(action) === 0 || action.type !== 'NODE') return 'cut'
+  if (action.transition.type !== 'SMART_ANIMATE') return 'dissolve'
+  if (action.navigation === 'CHANGE_TO') return 'smart'
+  return action.navigation === 'NAVIGATE' && session.overlays.length === 0 ? 'smart' : 'dissolve'
+}
+
 /**
  * The curve a dissolve fades along, CSS `ease-out`, which Figma's dissolve uses by default: the
  * x and y of its two cubic Bézier control points. The player draws its crossfade with

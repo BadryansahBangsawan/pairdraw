@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  animationFor,
   DISSOLVE_EASING_CSS,
   frameAt,
   planTimeline,
@@ -106,6 +107,21 @@ describe('a prototype timeline', () => {
 })
 
 describe('a Smart animate step', () => {
+  test('moves layers between screens and variants, and crossfades an overlay', () => {
+    const screen = { frameId: 'a', startFrameId: 'a', history: [], overlays: [] }
+    const overOverlay = { ...screen, overlays: ['menu'] }
+    const smart = goTo('b', 'SMART_ANIMATE', 0.3)
+    expect(animationFor(screen, smart)).toBe('smart')
+    expect(animationFor(screen, { ...smart, navigation: 'CHANGE_TO' })).toBe('smart')
+    expect(animationFor(overOverlay, { ...smart, navigation: 'CHANGE_TO' })).toBe('smart')
+    expect(animationFor(screen, { ...smart, navigation: 'OVERLAY' })).toBe('dissolve')
+    expect(animationFor(overOverlay, smart)).toBe('dissolve')
+    expect(animationFor(screen, goTo('b', 'DISSOLVE', 0.3))).toBe('dissolve')
+    expect(animationFor(screen, goTo('b', 'SMART_ANIMATE', 0))).toBe('cut')
+    expect(animationFor(screen, goTo('b'))).toBe('cut')
+    expect(animationFor(screen, { type: 'BACK' })).toBe('cut')
+  })
+
   test('takes its own duration, and the step names its transition', () => {
     const { graph, ids } = frames(2)
     const [a, b] = ids

@@ -111,6 +111,17 @@ export function remapEffectBindings(
 ): Record<string, string> {
   if (!effects) return bindings
   const modeled = modeledEffectIndexes(effects)
+  return moveEffectBindings(bindings, (index) => modeled[index] ?? undefined)
+}
+
+/**
+ * `bindings` with each effect binding moved to the index `move` gives its effect's index, and
+ * left out where it gives none. Every other binding passes through.
+ */
+function moveEffectBindings(
+  bindings: Record<string, string>,
+  move: (index: number) => number | undefined
+): Record<string, string> {
   const remapped: Record<string, string> = {}
   for (const [field, variableId] of Object.entries(bindings)) {
     const match = EFFECT_BINDING.exec(field)
@@ -118,8 +129,8 @@ export function remapEffectBindings(
       remapped[field] = variableId
       continue
     }
-    const index = modeled[Number(match[1])]
-    if (index === null) continue
+    const index = move(Number(match[1]))
+    if (index === undefined) continue
     remapped[`effects/${index}/${match[2]}`] = variableId
   }
   return remapped
@@ -139,18 +150,7 @@ export function remapEffectBindingsToRaw(
   modeledEffectIndexes(effects).forEach((modeled, raw) => {
     if (modeled !== null) rawOfModeled.set(modeled, raw)
   })
-  const remapped: Record<string, string> = {}
-  for (const [field, variableId] of Object.entries(bindings)) {
-    const match = EFFECT_BINDING.exec(field)
-    if (!match) {
-      remapped[field] = variableId
-      continue
-    }
-    const raw = rawOfModeled.get(Number(match[1]))
-    if (raw === undefined) continue
-    remapped[`effects/${raw}/${match[2]}`] = variableId
-  }
-  return remapped
+  return moveEffectBindings(bindings, (index) => rawOfModeled.get(index))
 }
 
 /**

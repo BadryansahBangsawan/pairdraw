@@ -204,7 +204,10 @@ function createImagePattern(
         id,
         patternUnits: 'objectBoundingBox',
         width: 1,
-        height: 1
+        height: 1,
+        patternTransform: fill.imageRotation
+          ? `rotate(${round(fill.imageRotation)} 0.5 0.5)`
+          : undefined
       },
       svg('image', {
         href: `data:${mime};base64,${base64}`,

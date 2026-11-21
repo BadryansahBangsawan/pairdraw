@@ -6,7 +6,11 @@ import {
   type SceneGraph,
   type SceneNode
 } from '@pairdraw/scene-graph'
-import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
+import {
+  findInstanceAncestor,
+  instanceMainComponent,
+  walkInstanceSources
+} from '@pairdraw/scene-graph/instances'
 
 /** Whether two reactions do the same thing, whatever their ids. */
 export function sameReaction(a: PrototypeReaction, b: PrototypeReaction): boolean {
@@ -21,8 +25,8 @@ export function sameReaction(a: PrototypeReaction, b: PrototypeReaction): boolea
  * its own.
  */
 export function effectiveReactions(graph: SceneGraph, node: SceneNode): PrototypeReaction[] {
-  if (node.type !== 'INSTANCE') return node.prototypeReactions
-  const inherited = instanceMainComponent(graph, node)?.prototypeReactions ?? []
+  const inherited = inheritedReactions(graph, node)
+  if (inherited.length === 0) return node.prototypeReactions
   // Figma's copy of a main's interaction keeps the main's id; the main's own, as edited, runs.
   const own = node.prototypeReactions.filter(
     (reaction) => !inherited.some((main) => main.id === reaction.id)
@@ -33,6 +37,57 @@ export function effectiveReactions(graph: SceneGraph, node: SceneNode): Prototyp
       (reaction) => !own.some((mine) => mine.trigger.type === reaction.trigger.type)
     )
   ]
+}
+
+/**
+ * The reactions a layer takes from its component: an instance root from the component it shows,
+ * a layer inside an instance from the component layer it was copied from.
+ */
+function inheritedReactions(graph: SceneGraph, node: SceneNode): PrototypeReaction[] {
+  if (node.type === 'INSTANCE') {
+    return instanceMainComponent(graph, node)?.prototypeReactions ?? []
+  }
+  const source = componentLayer(graph, node)
+  return source && source.id !== node.id ? source.prototypeReactions : []
+}
+
+/**
+ * The component layer a copy stands for, followed through nested instances to the main that
+ * finally holds it. A nested copy points at the layer one level up, not at the main's layer.
+ */
+function componentLayer(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
+  const seen = new Set<string>()
+  let current = node
+  for (;;) {
+    if (seen.has(current.id)) return undefined
+    seen.add(current.id)
+    const owner = current.parentId ? findInstanceAncestor(graph, current.parentId) : undefined
+    if (!owner) return current
+    if (!instanceMainComponent(graph, owner)) return undefined
+    const source = copiedSource(graph, owner, current.id)
+    if (!source || source.id === current.id) return undefined
+    current = source
+  }
+}
+
+/** The component layer that an instance's copy of `copyId` stands for. */
+function copiedSource(
+  graph: SceneGraph,
+  instance: SceneNode,
+  copyId: string
+): SceneNode | undefined {
+  let source: SceneNode | undefined
+  walkInstanceSources(
+    graph,
+    instance,
+    (candidate, copy) => {
+      if (copy.id !== copyId) return true
+      source = candidate
+      return false
+    },
+    true
+  )
+  return source
 }
 
 /**

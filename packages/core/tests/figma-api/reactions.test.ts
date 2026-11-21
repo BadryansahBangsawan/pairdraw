@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
-import { effectiveReactions } from '@pairdraw/core/prototype'
+import { effectiveReactions, reactionAt, startSession } from '@pairdraw/core/prototype'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { setReactions } from '#core/tools/modify/reactions'
@@ -287,6 +287,130 @@ describe('interactive components and scrolling in the plugin shape', () => {
       Reflect.set(rect, 'overflowDirection', 'VERTICAL')
     }).toThrow('Only a frame, component or instance scrolls')
     expect(graph.getNode(rect.id)?.overflowDirection).toBe('NONE')
+  })
+})
+
+describe('reactions on layers inside a component', () => {
+  function childToggle() {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { name: 'Button' })
+    const main = graph.createNode('COMPONENT', set.id, { width: 60, height: 30 })
+    const label = graph.createNode('RECTANGLE', main.id, {
+      name: 'Label',
+      width: 60,
+      height: 30
+    })
+    const screen = graph.createNode('FRAME', pageId, { width: 200, height: 200 })
+    const elsewhere = graph.createNode('FRAME', pageId, { x: 300, name: 'Elsewhere' })
+    const instance = graph.createInstance(main.id, screen.id)
+    if (!instance) throw new Error('no instance')
+    const copy = graph.getChildren(instance.id)[0]
+    if (!copy) throw new Error('no copied label')
+    return { graph, main, label, screen, elsewhere, instance, copy }
+  }
+
+  const navigate = (id: string, nodeId: string) => ({
+    id,
+    trigger: { type: 'ON_CLICK' as const, delay: 0 },
+    actions: [
+      {
+        type: 'NODE' as const,
+        nodeId,
+        navigation: 'NAVIGATE' as const,
+        transition: { type: 'INSTANT' as const, duration: 0 },
+        overlayPosition: 'CENTER' as const
+      }
+    ]
+  })
+
+  test("a child's click reaction runs from its copy in play", () => {
+    const { graph, label, screen, elsewhere, copy } = childToggle()
+    graph.updateNode(label.id, { prototypeReactions: [navigate('child-nav', elsewhere.id)] })
+
+    const hit = reactionAt(graph, startSession(screen.id), 30, 15)
+    expect(hit?.action).toMatchObject({ nodeId: elsewhere.id, navigation: 'NAVIGATE' })
+    expect(effectiveReactions(graph, copy).map((reaction) => reaction.id)).toEqual([
+      'child-nav'
+    ])
+  })
+
+  test('hover, press, and After delay on a child are inherited from the main', () => {
+    const { graph, label, screen, elsewhere, copy } = childToggle()
+    const triggers = ['ON_HOVER', 'ON_PRESS', 'AFTER_TIMEOUT'] as const
+    graph.updateNode(label.id, {
+      prototypeReactions: triggers.map((type) => ({
+        ...navigate(`child-${type}`, elsewhere.id),
+        trigger: { type, delay: type === 'AFTER_TIMEOUT' ? 2 : 0 }
+      }))
+    })
+
+    expect(effectiveReactions(graph, copy).map((reaction) => reaction.id)).toEqual([
+      'child-ON_HOVER',
+      'child-ON_PRESS',
+      'child-AFTER_TIMEOUT'
+    ])
+    const session = startSession(screen.id)
+    for (const trigger of triggers)
+      expect(reactionAt(graph, session, 30, 15, trigger)?.action).toMatchObject({
+        nodeId: elsewhere.id
+      })
+  })
+
+  test('a child of a nested instance sees a reaction added to its main afterwards', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const leaf = graph.createNode('COMPONENT', pageId, { width: 60, height: 30 })
+    const label = graph.createNode('RECTANGLE', leaf.id, {
+      name: 'Label',
+      width: 60,
+      height: 30
+    })
+    const middle = graph.createNode('COMPONENT', pageId, { width: 60, height: 30 })
+    graph.createInstance(leaf.id, middle.id)
+    const outer = graph.createNode('COMPONENT', pageId, { width: 60, height: 30 })
+    graph.createInstance(middle.id, outer.id)
+    const screen = graph.createNode('FRAME', pageId, { width: 200, height: 200 })
+    const elsewhere = graph.createNode('FRAME', pageId, { x: 300, name: 'Elsewhere' })
+    const outerCopy = graph.createInstance(outer.id, screen.id)
+    if (!outerCopy) throw new Error('no outer instance')
+    const middleCopy = graph.getChildren(outerCopy.id)[0]
+    if (!middleCopy) throw new Error('no middle copy')
+    const leafCopy = graph.getChildren(middleCopy.id)[0]
+    if (!leafCopy) throw new Error('no leaf copy')
+    const deepLabel = graph.getChildren(leafCopy.id)[0]
+    if (!deepLabel) throw new Error('no deep label')
+
+    // The reaction arrives after every instance exists.
+    graph.updateNode(label.id, { prototypeReactions: [navigate('late-nav', elsewhere.id)] })
+
+    expect(effectiveReactions(graph, deepLabel).map((reaction) => reaction.id)).toEqual([
+      'late-nav'
+    ])
+    expect(reactionAt(graph, startSession(screen.id), 30, 15)?.action).toMatchObject({
+      nodeId: elsewhere.id
+    })
+  })
+
+  test("an edited child's own reaction replaces the main's, and a copied id follows the main", () => {
+    const { graph, label, elsewhere, copy, screen } = childToggle()
+    graph.updateNode(label.id, { prototypeReactions: [navigate('main-nav', elsewhere.id)] })
+    const copied = graph.getNode(copy.id)
+    if (!copied) throw new Error('no copy')
+    graph.updateNode(copy.id, {
+      prototypeReactions: [navigate('main-nav', 'old-destination')]
+    })
+    // The copy still carries the main's id, so the main's current edit is what runs.
+    expect(effectiveReactions(graph, copied)[0]?.actions[0]).toMatchObject({
+      nodeId: elsewhere.id
+    })
+
+    graph.updateNode(copy.id, {
+      prototypeReactions: [navigate('own-nav', screen.id)]
+    })
+    expect(effectiveReactions(graph, graph.getNode(copy.id) ?? copied).map((r) => r.id)).toEqual([
+      'own-nav'
+    ])
   })
 })
 

@@ -46,6 +46,7 @@ import {
 } from './sync'
 
 export { canCreateInstance, createsComponentCycle, cycleSafeParent } from './cycles'
+export { walkInstanceSources } from './source-walk'
 export { instanceMainComponent } from './main-component'
 export {
   isInShownReplacedLayer,

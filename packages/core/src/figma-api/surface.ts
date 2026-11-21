@@ -36,5 +36,8 @@ export const FIGMA_API_INCOMPLETE_MEMBERS = [
   'viewport'
 ] as const
 
-/** The `JSON.stringify` hook hosts use to report what a script returns. */
-export const SERIALIZATION_MEMBERS = ['toJSON'] as const
+/**
+ * Members hosts read or write beyond Figma's Plugin API: the `JSON.stringify` hook, and node
+ * fields stored in `.fig` that the installed typings do not name.
+ */
+export const SERIALIZATION_MEMBERS = ['toJSON', 'scrollBehavior'] as const

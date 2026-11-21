@@ -4,7 +4,7 @@ import type { LayoutAlign } from '@pairdraw/scene-graph'
 
 import type { FigmaNodeProxy } from '#core/figma-api'
 import { textFonts } from '#core/tools/modify/text'
-import { overflowDirectionInput, scrollRefusal } from '#core/tools/modify/update'
+import { overflowDirectionInput, scrollBehaviorInput, scrollRefusal } from '#core/tools/modify/update'
 import { defineTool, nodeNotFound, toolNumber } from '#core/tools/schema'
 
 const nonNegative = () => toolNumber(v.pipe(v.number(), v.minValue(0)))
@@ -35,7 +35,8 @@ const batchPropsSchema = v.strictObject({
   opacity: v.optional(toolNumber(v.pipe(v.number(), v.minValue(0), v.maxValue(1)))),
   auto_resize: v.optional(v.picklist(['NONE', 'WIDTH_AND_HEIGHT', 'HEIGHT', 'TRUNCATE'])),
   direction: v.optional(v.picklist(['HORIZONTAL', 'VERTICAL'])),
-  overflow_direction: v.optional(overflowDirectionInput())
+  overflow_direction: v.optional(overflowDirectionInput()),
+  scroll_behavior: v.optional(scrollBehaviorInput())
 })
 type BatchProps = v.InferOutput<typeof batchPropsSchema>
 
@@ -94,6 +95,7 @@ function applyBatchProps(node: FigmaNodeProxy, props: BatchProps): void {
   if (props.auto_resize !== undefined) node.textAutoResize = props.auto_resize
   if (props.direction !== undefined) node.layoutMode = props.direction
   if (props.overflow_direction !== undefined) node.overflowDirection = props.overflow_direction
+  if (props.scroll_behavior !== undefined) node.scrollBehavior = props.scroll_behavior
 }
 
 export const batchUpdate = defineTool({

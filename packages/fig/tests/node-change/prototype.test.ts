@@ -484,6 +484,47 @@ describe('overflow scrolling in .fig records', () => {
   })
 })
 
+describe('scroll behavior in .fig records', () => {
+  beforeAll(() => initCodec())
+
+  test('reads scrollBehavior as the layer behavior', () => {
+    expect(importNode({ type: 'FRAME', scrollBehavior: 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME' }).scrollBehavior).toBe('FIXED')
+    expect(importNode({ type: 'FRAME', scrollBehavior: 'STICKY_SCROLLS' }).scrollBehavior).toBe('STICKY_SCROLLS')
+    expect(importNode({ type: 'FRAME' }).scrollBehavior).toBe('SCROLLS')
+  })
+
+  test('writes the behavior a layer was given, and scrolls when it is default', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const fixed = graph.createNode('RECTANGLE', pageId, { scrollBehavior: 'FIXED' })
+    const sticky = graph.createNode('RECTANGLE', pageId, { scrollBehavior: 'STICKY_SCROLLS' })
+    const plain = graph.createNode('RECTANGLE', pageId)
+    expect(write(graph, fixed.id).scrollBehavior).toBe('FIXED_WHEN_CHILD_OF_SCROLLING_FRAME')
+    expect(write(graph, sticky.id).scrollBehavior).toBe('STICKY_SCROLLS')
+    expect(write(graph, plain.id).scrollBehavior).toBeUndefined()
+    expect(() => getCompiledSchema().encodeNodeChange(write(graph, sticky.id) as never)).not.toThrow()
+  })
+
+  test('an edited behavior replaces the one the file recorded', () => {
+    const graph = new SceneGraph()
+    const props = importNode({
+      type: 'FRAME',
+      name: 'Nav',
+      scrollBehavior: 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME'
+    })
+    const nav = graph.createNode('FRAME', graph.getPages()[0].id, {
+      ...props,
+      id: '3:2',
+      source: { ...createDefaultSourceMetadata(), ...props.source, id: '3:2' }
+    })
+    expect(write(graph, nav.id).scrollBehavior).toBe('FIXED_WHEN_CHILD_OF_SCROLLING_FRAME')
+    graph.updateNode(nav.id, { scrollBehavior: 'STICKY_SCROLLS' })
+    expect(write(graph, nav.id).scrollBehavior).toBe('STICKY_SCROLLS')
+    graph.updateNode(nav.id, { scrollBehavior: 'SCROLLS' })
+    expect(write(graph, nav.id).scrollBehavior).toBeUndefined()
+  })
+})
+
 describe('Scroll to animations in .fig records', () => {
   beforeAll(() => initCodec())
 

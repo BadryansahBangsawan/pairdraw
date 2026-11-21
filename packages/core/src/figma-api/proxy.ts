@@ -6,7 +6,8 @@ import type {
   NodeType,
   LayoutGrid,
   LayoutMode,
-  OverflowDirection
+  OverflowDirection,
+  ScrollBehavior
 } from '@pairdraw/scene-graph'
 import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import type { GroupFitOptions } from '@pairdraw/scene-graph/group-bounds'
@@ -143,6 +144,7 @@ export class FigmaNodeProxy {
   declare blendMode: string
   declare clipsContent: boolean
   declare overflowDirection: OverflowDirection
+  declare scrollBehavior: ScrollBehavior
   declare cornerRadius: number | typeof MIXED
   declare topLeftRadius: number
   declare topRightRadius: number

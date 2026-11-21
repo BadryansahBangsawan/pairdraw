@@ -96,3 +96,23 @@ describe('overflow scrolling', () => {
     expect(getNodeOrThrow(graph, instance.id).overflowDirection).toBe('BOTH')
   })
 })
+
+describe('scroll behavior', () => {
+  test('a new layer scrolls with its parent', () => {
+    const graph = new SceneGraph()
+    expect(graph.createNode('FRAME', firstPageId(graph)).scrollBehavior).toBe('SCROLLS')
+  })
+
+  test("an instance follows its main component's scroll behavior", () => {
+    const graph = new SceneGraph()
+    const component = graph.createNode('COMPONENT', firstPageId(graph), {
+      scrollBehavior: 'FIXED'
+    })
+    const instance = expectDefined(graph.createInstance(component.id, firstPageId(graph)))
+    expect(instance.scrollBehavior).toBe('FIXED')
+
+    graph.updateNode(component.id, { scrollBehavior: 'SCROLLS' })
+    graph.syncInstances(component.id)
+    expect(getNodeOrThrow(graph, instance.id).scrollBehavior).toBe('SCROLLS')
+  })
+})

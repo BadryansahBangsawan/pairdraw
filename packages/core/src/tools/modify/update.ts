@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
-import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
+import { OVERFLOW_DIRECTIONS, SCROLL_BEHAVIORS } from '@pairdraw/scene-graph/constants'
 import { styleDetachmentChanges } from '@pairdraw/scene-graph/shared-styles'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
@@ -52,6 +52,17 @@ export function overflowDirectionInput() {
   )
 }
 
+/** How a layer moves while its parent frame scrolls in prototype play. */
+export function scrollBehaviorInput() {
+  return v.pipe(
+    v.picklist(SCROLL_BEHAVIORS),
+    v.description(
+      'Scroll behavior in prototype play: SCROLLS moves with the content, FIXED stays in the ' +
+        "frame, STICKY_SCROLLS scrolls until it reaches the frame's top or left edge."
+    )
+  )
+}
+
 export const updateNode = defineTool({
   name: 'update_node',
 
@@ -90,7 +101,8 @@ export const updateNode = defineTool({
       )
     ),
     name: v.optional(v.pipe(v.string(), v.description('Layer name'))),
-    overflow_direction: v.optional(overflowDirectionInput())
+    overflow_direction: v.optional(overflowDirectionInput()),
+    scroll_behavior: v.optional(scrollBehaviorInput())
   }),
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
@@ -159,6 +171,10 @@ export const updateNode = defineTool({
     if (args.overflow_direction !== undefined) {
       node.overflowDirection = args.overflow_direction
       updated.push('overflowDirection')
+    }
+    if (args.scroll_behavior !== undefined) {
+      node.scrollBehavior = args.scroll_behavior
+      updated.push('scrollBehavior')
     }
     return { id: args.id, updated }
   }

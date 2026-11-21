@@ -34,7 +34,11 @@ import {
   mergePluginData,
   serializePluginRelaunchData
 } from '../plugin-data'
-import { applyPrototypeDestination, applyPrototypeReactions } from '../prototype'
+import {
+  applyPrototypeDestination,
+  applyPrototypeReactions,
+  scrollBehaviorToFigma
+} from '../prototype'
 import { serializeNodeStatus } from '../status'
 import {
   componentPropAssignment,
@@ -893,6 +897,15 @@ function applyOverflow(node: SceneNode, nc: KiwiNodeChange): void {
   if (scrolls && node.overflowDirection !== 'NONE') nc.scrollDirection = node.overflowDirection
 }
 
+/**
+ * A layer's scroll behavior as `scrollBehavior`. The default scrolls, so a record that says
+ * otherwise only keeps the field when the layer was given one.
+ */
+function applyScrollBehavior(node: SceneNode, nc: KiwiNodeChange): void {
+  if (node.scrollBehavior === 'SCROLLS') delete nc.scrollBehavior
+  else nc.scrollBehavior = scrollBehaviorToFigma(node.scrollBehavior)
+}
+
 function applyNodeVisualProps(
   context: SceneNodeToKiwiContext,
   node: SceneNode,
@@ -923,6 +936,7 @@ function applyNodeVisualProps(
 
   if (node.type !== 'VECTOR') nc.frameMaskDisabled = !node.clipsContent
   applyOverflow(node, nc)
+  applyScrollBehavior(node, nc)
   applySharedStyleProps(context, node, nc)
   if (node.horizontalConstraint !== 'MIN') nc.horizontalConstraint = node.horizontalConstraint
   if (node.verticalConstraint !== 'MIN') nc.verticalConstraint = node.verticalConstraint

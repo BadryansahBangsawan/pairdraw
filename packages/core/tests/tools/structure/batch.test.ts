@@ -168,3 +168,12 @@ test('sets overflow scrolling on frames and refuses the batch for a layer that c
   })
   expect(node.overflowDirection).toBe('HORIZONTAL')
 })
+
+test('sets scroll behavior in a batch', () => {
+  const { figma, node } = frame()
+  const result = batchUpdate.execute(figma, {
+    operations: [{ id: node.id, props: { scroll_behavior: 'STICKY_SCROLLS' } }]
+  }) as BatchResult
+  expect(result.error).toBeUndefined()
+  expect(node.scrollBehavior).toBe('STICKY_SCROLLS')
+})

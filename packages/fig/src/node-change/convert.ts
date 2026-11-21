@@ -34,7 +34,11 @@ import {
   extractPluginRelaunchData,
   readNodeChangePluginData
 } from './plugin-data'
-import { extractPrototypeReactions, overflowFromFigma } from './prototype'
+import {
+  extractPrototypeReactions,
+  overflowFromFigma,
+  scrollBehaviorFromFigma
+} from './prototype'
 import { extractNodeStatus } from './status'
 import { styleRefId } from './style/refs'
 import { importStyleRuns } from './style/runs'
@@ -927,6 +931,7 @@ export function nodeChangeToProps(
     pluginRelaunchData: extractPluginRelaunchData(nc),
     clipsContent: nc.frameMaskDisabled === false && nc.resizeToFit !== true,
     overflowDirection: overflowFromFigma(nc.scrollDirection),
+    scrollBehavior: scrollBehaviorFromFigma(nc.scrollBehavior),
     componentId: extractSymbolId(nc),
     componentPropertyDefinitions: nodeType === 'INSTANCE' ? [] : extractComponentPropertyDefs(nc),
     componentPropertyReferences: extractComponentPropertyRefs(nc),

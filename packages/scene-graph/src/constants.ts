@@ -1,5 +1,10 @@
 import type { Color } from './primitives'
-import type { NoiseEffectParams, OverflowDirection, TextureEffectParams } from './types'
+import type {
+  NoiseEffectParams,
+  OverflowDirection,
+  ScrollBehavior,
+  TextureEffectParams
+} from './types'
 
 export const BLACK: Color = { r: 0, g: 0, b: 0, a: 1 }
 export const WHITE: Color = { r: 1, g: 1, b: 1, a: 1 }
@@ -49,3 +54,6 @@ export const OVERFLOW_DIRECTIONS = [
   'VERTICAL',
   'BOTH'
 ] as const satisfies readonly OverflowDirection[]
+
+/** How a layer moves while its parent frame scrolls in play, in Figma's names. */
+export const SCROLL_BEHAVIORS = ['SCROLLS', 'FIXED', 'STICKY_SCROLLS'] as const satisfies readonly ScrollBehavior[]

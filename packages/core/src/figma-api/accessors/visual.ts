@@ -2,10 +2,11 @@ import type {
   Effect,
   OverflowDirection,
   SceneNode,
+  ScrollBehavior,
   ShaderEffect,
   Stroke
 } from '@pairdraw/scene-graph'
-import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
+import { OVERFLOW_DIRECTIONS, SCROLL_BEHAVIORS } from '@pairdraw/scene-graph/constants'
 import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
 import { independentCornerChanges } from '@pairdraw/scene-graph/variables'
 
@@ -31,6 +32,16 @@ function checkedOverflowDirection(value: unknown): OverflowDirection {
   const expected = OVERFLOW_DIRECTIONS.map((candidate) => `'${candidate}'`).join(' | ')
   throw new Error(
     `in set_overflowDirection: Property "overflowDirection" failed validation: Invalid enum value. Expected ${expected}, received '${String(value)}'`
+  )
+}
+
+/** `value` as a layer's scroll behavior, refused in the words Figma's plugin API uses. */
+function checkedScrollBehavior(value: unknown): ScrollBehavior {
+  const behavior = SCROLL_BEHAVIORS.find((candidate) => candidate === value)
+  if (behavior) return behavior
+  const expected = SCROLL_BEHAVIORS.map((candidate) => `'${candidate}'`).join(' | ')
+  throw new Error(
+    `in set_scrollBehavior: Property "scrollBehavior" failed validation: Invalid enum value. Expected ${expected}, received '${String(value)}'`
   )
 }
 
@@ -203,6 +214,14 @@ export function installVisualNodeProxyAccessors(
           )
         }
         updateNode(this, internals, { overflowDirection: checkedOverflowDirection(value) })
+      }
+    },
+    scrollBehavior: {
+      get(this: ProxyThis): ScrollBehavior {
+        return raw(this, internals).scrollBehavior
+      },
+      set(this: ProxyThis, value: unknown) {
+        updateNode(this, internals, { scrollBehavior: checkedScrollBehavior(value) })
       }
     },
     cornerRadius: {

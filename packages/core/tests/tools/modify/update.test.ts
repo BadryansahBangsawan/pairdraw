@@ -76,4 +76,20 @@ describe('update_node', () => {
     })
     expect(rect.name).toBe('Rectangle')
   })
+
+  test('sets how a layer moves while its parent scrolls', async () => {
+    const figma = new FigmaAPI(new SceneGraph())
+    const list = figma.createFrame()
+    const nav = figma.createRectangle()
+
+    const result = await updateNode.execute(figma, { id: nav.id, scroll_behavior: 'FIXED' })
+    expect(result).toEqual({ id: nav.id, updated: ['scrollBehavior'] })
+    expect(nav.scrollBehavior).toBe('FIXED')
+
+    await updateNode.execute(figma, { id: nav.id, scroll_behavior: 'STICKY_SCROLLS' })
+    expect(nav.scrollBehavior).toBe('STICKY_SCROLLS')
+    await updateNode.execute(figma, { id: nav.id, scroll_behavior: 'SCROLLS' })
+    expect(nav.scrollBehavior).toBe('SCROLLS')
+    expect(list.scrollBehavior).toBe('SCROLLS')
+  })
 })

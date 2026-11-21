@@ -141,6 +141,7 @@ export function createDefaultNode(
     locked: false,
     clipsContent: false,
     overflowDirection: 'NONE',
+    scrollBehavior: 'SCROLLS',
     text: '',
     fontSize: 14,
     fontFamily: DEFAULT_FONT_FAMILY,

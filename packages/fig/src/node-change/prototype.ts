@@ -10,6 +10,7 @@ import type {
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTrigger,
+  ScrollBehavior,
   PrototypeTriggerType,
   SceneNode
 } from '@pairdraw/scene-graph'
@@ -159,6 +160,19 @@ function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | n
 /** A record's `scrollDirection` as the frame's overflow; a missing or unknown one does not scroll. */
 export function overflowFromFigma(scrollDirection: unknown): OverflowDirection {
   return OVERFLOW_DIRECTIONS.find((direction) => direction === scrollDirection) ?? 'NONE'
+}
+
+/** The `scrollBehavior` a record stores; the Kiwi name for fixed is the one Figma's file uses. */
+export function scrollBehaviorFromFigma(value: unknown): ScrollBehavior {
+  if (value === 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME') return 'FIXED'
+  if (value === 'STICKY_SCROLLS') return 'STICKY_SCROLLS'
+  return 'SCROLLS'
+}
+
+/** A layer's scroll behavior as the Kiwi schema stores it. */
+export function scrollBehaviorToFigma(behavior: ScrollBehavior): string {
+  if (behavior === 'FIXED') return 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME'
+  return behavior
 }
 
 /**

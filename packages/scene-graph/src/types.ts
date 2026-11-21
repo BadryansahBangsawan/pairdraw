@@ -757,6 +757,12 @@ export type PrototypeNavigationType = 'NAVIGATE' | 'OVERLAY' | 'CHANGE_TO' | 'SC
 /** Which way a frame's content scrolls in play, as Figma's `overflowDirection`. */
 export type OverflowDirection = 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'BOTH'
 
+/**
+ * How a layer moves when its parent frame scrolls in play: with the content, fixed in the frame,
+ * or scrolled until it reaches the frame's top/left edge and then stuck there.
+ */
+export type ScrollBehavior = 'SCROLLS' | 'FIXED' | 'STICKY_SCROLLS'
+
 /** How a reaction animates between frames, as `TransitionType` keeps them. */
 export type PrototypeTransitionType = 'INSTANT' | 'DISSOLVE'
 
@@ -861,6 +867,8 @@ export interface SceneNode {
   clipsContent: boolean
   /** Which way the frame's content scrolls in play; a nested frame scrolls only while it clips. */
   overflowDirection: OverflowDirection
+  /** How this layer moves while its parent frame scrolls in play. */
+  scrollBehavior: ScrollBehavior
 
   blendMode: BlendMode
 

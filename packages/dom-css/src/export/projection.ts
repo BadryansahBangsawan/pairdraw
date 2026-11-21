@@ -519,6 +519,59 @@ function vectorDesignNode(
   }
 }
 
+/** The outline a vector mask clips siblings to, in the sibling's own box; null where CSS cannot. */
+function vectorMaskClip(mask: SceneNode, sibling: SceneNode): string | null {
+  // The renderer clips to the rotated outline; a polygon built from the unrotated box would
+  // cut a different region, so a rotated mask stays unclipped as the export documents.
+  if (mask.maskType !== 'VECTOR' || mask.childIds.length > 0 || mask.rotation !== 0) return null
+  const left = mask.x - sibling.x
+  const top = mask.y - sibling.y
+  if (mask.type === 'RECTANGLE') {
+    const right = left + mask.width
+    const bottom = top + mask.height
+    return `polygon(${px(left)} ${px(top)}, ${px(right)} ${px(top)}, ${px(right)} ${px(bottom)}, ${px(left)} ${px(bottom)})`
+  }
+  if (mask.type === 'ELLIPSE') {
+    const rx = mask.width / 2
+    const ry = mask.height / 2
+    return `ellipse(${px(rx)} ${px(ry)} at ${px(left + rx)} ${px(top + ry)})`
+  }
+  return null
+}
+
+/**
+ * Projects a parent's children as the canvas draws them: a mask layer is never a layer of its
+ * own, and one vector mask clips the siblings after it. Alpha and luminance masks have no
+ * faithful CSS form over several elements, and two masks combine, so those stay unclipped.
+ */
+function projectChildren(
+  context: ProjectionContext,
+  parent: SceneNode,
+  modes: CSSModes,
+  root: boolean
+): DesignNode[] {
+  const projected: DesignNode[] = []
+  let masks: SceneNode[] = []
+  let afterMask = false
+  for (const child of nodeChildren(context.graph, parent)) {
+    if (child.visible && child.isMask) {
+      masks = afterMask ? [...masks, child] : [child]
+      afterMask = true
+      continue
+    }
+    afterMask = false
+    const node = sceneNodeToDesignNode(context, child, modes, root)
+    if (!node) continue
+    const mask = masks.length === 1 ? masks[0] : null
+    if (mask && node.type === 'element') {
+      const clip = vectorMaskClip(mask, child)
+      if (clip) node.inlineStyle = { ...node.inlineStyle, 'clip-path': clip }
+    }
+    projected.push(node)
+  }
+  return projected
+}
+
 function sceneNodeToDesignNode(
   context: ProjectionContext,
   node: SceneNode,
@@ -552,9 +605,7 @@ function sceneNodeToDesignNode(
     if (vector) return vector
   }
 
-  const children = nodeChildren(graph, node)
-    .map((child) => sceneNodeToDesignNode(context, child, modes, false))
-    .filter((child): child is DesignNode => child !== null)
+  const children = projectChildren(context, node, modes, false)
 
   if (node.type === 'CANVAS') {
     return {
@@ -609,11 +660,7 @@ export function sceneGraphToDesignDocument(
   const root = graph.getNode(options.rootId ?? graph.rootId)
   const context = projectionContext(graph, options)
   const modes = context.tokens?.defaultModes() ?? new Map<string, string>()
-  const children = root
-    ? nodeChildren(graph, root)
-        .map((child) => sceneNodeToDesignNode(context, child, modes, true))
-        .filter((child): child is DesignNode => child !== null)
-    : []
+  const children = root ? projectChildren(context, root, modes, true) : []
 
   return { type: 'document', sourceGraph: graph, tokens: context.tokens, children }
 }

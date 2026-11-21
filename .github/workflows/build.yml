@@ -185,6 +185,9 @@ jobs:
             delimiter="EOF_$(openssl rand -hex 16)"
             printf '%s<<%s\n%s\n%s\n' "$name" "$delimiter" "$value" "$delimiter" >> "$GITHUB_ENV"
           done
+      - name: Give actool an open stdin for the Icon Composer icon
+        if: runner.os == 'macOS'
+        uses: ./.pipeline/.github/actions/actool-stdin
       - name: Build and sign native bundles (no release uploads)
         id: tauri
         timeout-minutes: 30

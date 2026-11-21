@@ -276,6 +276,10 @@ jobs:
       - name: Generate desktop brand assets
         run: bun run generate:icons --target desktop
 
+      # The release build compiles the icon through this shim (build.yml); the step below calls
+      # it with stdin closed, as tauri-bundler under Node does, so the shim is what passes here.
+      - uses: ./.github/actions/actool-stdin
+
       - name: Compile the icon catalog with actool
         run: |
           set -euo pipefail
@@ -298,7 +302,7 @@ jobs:
             --development-region en \
             --target-device mac \
             --minimum-deployment-target 26.0 \
-            --platform macosx 2>&1 | tee "$work/actool.log"
+            --platform macosx <&- 2>&1 | tee "$work/actool.log"
           if grep -qE 'com\.apple\.actool\.errors|error:' "$work/actool.log"; then
             echo "::error title=macOS icon::actool reported catalog errors"
             cat "$work/actool.log"

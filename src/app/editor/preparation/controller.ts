@@ -33,8 +33,9 @@ export interface EditorPreparationController {
   acknowledgePresentation(sceneVersion: number): void
   waitForPresentation(id: number, sceneVersion: number): Promise<void>
   /**
-   * A canvas started showing the document; returns its detach. A tab in the background has no
-   * canvas, so its scene waits to be presented until the tab is shown, without timing out.
+   * A canvas started showing the document; returns its detach. A scene nothing draws waits up
+   * to the presentation timeout and then stops waiting without failing, so a call that opened
+   * it cannot hang on a tab nobody shows.
    */
   attachCanvas(): () => void
   /**
@@ -71,7 +72,11 @@ export function createEditorPreparationController(
   function startTimer(id: number, waiter: PresentationWaiter) {
     if (waiter.timer !== null) return
     waiter.startedAt = Date.now()
-    waiter.timer = setTimeout(() => settle(id, new TimeoutError()), waiter.remainingMs)
+    waiter.timer = setTimeout(() => {
+      // A tab nothing draws cannot present; the page is committed, so stop waiting for it
+      // rather than leave the open or switch hanging. A canvas that is drawing but late fails.
+      settle(id, canvases > 0 ? new TimeoutError() : null)
+    }, waiter.remainingMs)
   }
 
   function pauseTimer(waiter: PresentationWaiter) {
@@ -145,14 +150,18 @@ export function createEditorPreparationController(
         },
         complete() {
           if (!isActive(id)) return
+          // A document open finishes before its first frame; keep the phase until the pane draws
+          // or fails, so a canvas failure still fails this preparation instead of going unheard.
+          if (presentationWaiters.has(id)) return
           clear()
           events?.emit('preparation:finished', { id, kind, status: 'completed' })
         },
         fail(failure) {
-          if (!isActive(id)) return
+          if (!isActive(id)) return false
           const event: EditorPreparationFailure = { id, kind, ...failure }
           clear()
           events?.emit('preparation:failed', event)
+          return true
         },
         cancel
       }
@@ -176,8 +185,8 @@ export function createEditorPreparationController(
           remainingMs: presentationTimeoutMs
         }
         presentationWaiters.set(id, waiter)
-        if (canvases > 0) startTimer(id, waiter)
-        else if (canvasFailure) settle(id, canvasFailure)
+        if (canvases === 0 && canvasFailure) settle(id, canvasFailure)
+        else startTimer(id, waiter)
       })
     },
     attachCanvas() {

@@ -28,7 +28,7 @@ import {
   createEditorStoreModules,
   defineEditorStoreAccessors
 } from '@/app/editor/session/modules'
-import { waitForCommittedPage } from '@/app/editor/session/presentation'
+import { presentCommittedPage } from '@/app/editor/session/presentation'
 import { scopedStoreFactory } from '@/app/editor/session/scope'
 import { createInitialAppEditorState, type AppEditorState } from '@/app/editor/session/types'
 import { createDeferred } from '@/app/runtime/deferred'
@@ -143,6 +143,8 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     pageId: string,
     options: {
       preparation?: EditorPreparationHandle
+      /** Whether to wait for the pane to draw the page; a document open does not need it. */
+      awaitPresentation?: boolean
       onProgress?: Parameters<typeof editor.switchPage>[1] extends infer Options
         ? Options extends { onProgress?: infer Progress }
           ? Progress
@@ -174,15 +176,15 @@ function buildEditorStore(initialGraph?: SceneGraph) {
       preparation.signal.throwIfAborted()
       if (prepared) {
         editor.commitPageSwitch(prepared)
-        preparation.update({ phase: 'preparing-render', detail: page?.name ?? null })
-        const shown = await waitForCommittedPage(
+        const shown = await presentCommittedPage(
+          preparation,
+          page?.name ?? null,
+          options.awaitPresentation !== false,
           // A tab behind another has no canvas; it presents when it is brought forward.
           () =>
             isEditorStoreInFront(store)
               ? preparationController.waitForPresentation(preparation.id, editor.state.sceneVersion)
-              : Promise.resolve(),
-          preparation,
-          preparation.signal
+              : Promise.resolve()
         )
         if (!shown) return
         preparation.signal.throwIfAborted()

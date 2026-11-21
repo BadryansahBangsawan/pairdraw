@@ -90,7 +90,8 @@ export interface EditorPreparationHandle {
   readonly signal: AbortSignal
   update(update: EditorPreparationUpdate): void
   complete(): void
-  fail(failure: Omit<EditorPreparationFailure, 'id' | 'kind'>): void
+  /** Reports a failure; false when this preparation already finished or was cancelled. */
+  fail(failure: Omit<EditorPreparationFailure, 'id' | 'kind'>): boolean
   cancel(reason?: EditorPreparationCancelReason): void
 }
 

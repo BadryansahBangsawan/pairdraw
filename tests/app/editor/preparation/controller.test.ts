@@ -92,7 +92,7 @@ describe('editor preparation controller', () => {
     handle.fail({ code: 'render-failed', message: 'Timed out', retryable: true })
     expect(state.preparation).toBeNull()
   })
-  test('waits without a timeout while no canvas shows the document', async () => {
+  test('stops waiting quietly when no canvas shows the document', async () => {
     jest.useFakeTimers()
     try {
       const state = createInitialAppEditorState('page')
@@ -104,21 +104,11 @@ describe('editor preparation controller', () => {
       const waiting = controller.waitForPresentation(handle.id, 7).finally(() => {
         settled = true
       })
-      // A tab opened in the background: nothing draws it, and that is not a failure.
+      // Nothing draws a background tab, so the wait gives up without failing the switch.
       jest.advanceTimersByTime(1_000)
       await Promise.resolve()
-      expect(settled).toBe(false)
-
-      // Shown, it gets the usual time to draw; leaving it again pauses that.
-      const detach = controller.attachCanvas()
-      jest.advanceTimersByTime(50)
-      detach()
+      expect(settled).toBe(true)
       jest.advanceTimersByTime(1_000)
-      await Promise.resolve()
-      expect(settled).toBe(false)
-
-      controller.attachCanvas()
-      controller.acknowledgePresentation(7)
       await waiting
       handle.complete()
     } finally {

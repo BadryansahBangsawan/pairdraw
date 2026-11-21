@@ -384,7 +384,9 @@ async function showImportedGraph(
   load?.signal.throwIfAborted()
   const pageId = store.graph.getPages()[0]?.id ?? store.graph.rootId
   load?.update({ phase: 'populating-page', detail: store.graph.getNode(pageId)?.name ?? null })
-  await store.switchPage(pageId, { preparation: load })
+  // The open is done when the page is applied; its first frame is the canvas's concern, so an
+  // open cannot hang on a window that draws nothing.
+  await store.switchPage(pageId, { preparation: load, awaitPresentation: false })
   load?.signal.throwIfAborted()
   load?.update({ phase: 'preparing-render', detail: store.state.documentName })
   await store.fitCurrentPageToViewport()

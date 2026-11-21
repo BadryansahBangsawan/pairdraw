@@ -15,7 +15,7 @@ export const LEVEL_STEP = 15
 const CELL_VALUE_STEP = 2 ** -32
 
 /** A cell's uniform value from its index and the seed: a 32-bit integer hash. */
-function cellValue(x: number, y: number, seed: number, salt: number): number {
+export function cellValue(x: number, y: number, seed: number, salt: number): number {
   let h = Math.imul(x, 0x27d4eb2d) ^ Math.imul(y, 0x165667b1) ^ Math.imul(seed + salt, 0x9e3779b9)
   h ^= h >>> 16
   h = Math.imul(h, 0x7feb352d)

@@ -45,6 +45,15 @@ function bakedHash(paint: Fill | Stroke, baked: Map<string, string>): string | n
   return baked.get(`${paint.imageHash}:${JSON.stringify(paint.filters)}`) ?? null
 }
 
+/** `paint` drawing its baked PNG with no adjustments left, when one was baked for it. */
+function withBakedImage<P extends Fill | Stroke>(paint: P, baked: Map<string, string>): P {
+  const hash = bakedHash(paint, baked)
+  if (!hash || paint.type !== 'IMAGE') return paint
+  const copy = { ...paint, imageHash: hash }
+  delete copy.filters
+  return copy
+}
+
 /**
  * The graph with every adjusted image paint replaced by the PNG the raster pipeline draws for it
  * at the image's own size, so a vector format embeds the adjusted pixels instead of the untouched
@@ -105,18 +114,8 @@ export async function bakeAdjustedImages(
   for (const [hash, png] of pngs) clone.images.set(hash, png)
   clone.nodes = new Map()
   for (const [id, node] of graph.nodes) {
-    const fills = node.fills.map((paint) => {
-      const hash = bakedHash(paint, baked)
-      if (!hash || paint.type !== 'IMAGE') return paint
-      const { filters: _filters, ...rest } = paint
-      return { ...rest, imageHash: hash }
-    })
-    const strokes = node.strokes.map((paint) => {
-      const hash = bakedHash(paint, baked)
-      if (!hash || paint.type !== 'IMAGE') return paint
-      const { filters: _filters, ...rest } = paint
-      return { ...rest, imageHash: hash }
-    })
+    const fills = node.fills.map((paint) => withBakedImage(paint, baked))
+    const strokes = node.strokes.map((paint) => withBakedImage(paint, baked))
     const changed =
       fills.some((paint, i) => paint !== node.fills[i]) ||
       strokes.some((paint, i) => paint !== node.strokes[i])

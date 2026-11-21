@@ -2,23 +2,11 @@ import type { Canvas, Image, ImageFilter, Shader } from 'canvaskit-wasm'
 
 import type { SceneNode, TextureEffect } from '@pairdraw/scene-graph'
 
+import { cellValue } from './noise/tile'
 import type { SkiaRenderer } from './renderer'
 
 /** Cells on each side of a texture's displacement tile; it repeats beyond them. */
 const TEXTURE_TILE_CELLS = 256
-
-/** The step between a cell's possible values, the hash's 32 bits. */
-const CELL_VALUE_STEP = 2 ** -32
-
-function cellValue(x: number, y: number, seed: number, salt: number): number {
-  let h = Math.imul(x, 0x27d4eb2d) ^ Math.imul(y, 0x165667b1) ^ Math.imul(seed + salt, 0x9e3779b9)
-  h ^= h >>> 16
-  h = Math.imul(h, 0x7feb352d)
-  h ^= h >>> 15
-  h = Math.imul(h, 0x846ca68b)
-  h ^= h >>> 16
-  return (h >>> 0) * CELL_VALUE_STEP
-}
 
 function smooth(t: number): number {
   return t * t * (3 - 2 * t)

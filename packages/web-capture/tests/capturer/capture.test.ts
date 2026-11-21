@@ -133,6 +133,20 @@ describe('capturing an element', () => {
     expect(label?.tagName).toBe('span')
   })
 
+  test('records the order of a flex item a page moves', async () => {
+    const document = open(
+      '<div id="row" style="display: flex"><span style="order: 2">Picker</span><span>Send</span></div>'
+    )
+    const row = document.getElementById('row')
+    if (!row) throw new Error('fixture has a row')
+
+    const capture = await captureElement(row, { inlineImages: false })
+
+    const [picker, send] = elements(capture.root.children)
+    expect(picker?.computedStyle.order).toBe('2')
+    expect(send?.computedStyle).not.toHaveProperty('order')
+  })
+
   test('refuses an element that is not displayed', async () => {
     const document = open('<p class="hidden" id="gone">Hi</p>')
     const gone = document.getElementById('gone')

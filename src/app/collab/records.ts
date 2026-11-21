@@ -1,4 +1,4 @@
-import { isEqual, isPlainObject } from 'es-toolkit'
+import { cloneDeep, isEqual, isPlainObject } from 'es-toolkit'
 import * as Y from 'yjs'
 
 /**
@@ -46,7 +46,10 @@ export function writeRecord(
     }
     if (value === undefined) {
       if (target.has(key)) target.delete(key)
-    } else if (!isEqual(target.get(key), value)) target.set(key, structuredClone(value))
+    } else if (!isEqual(target.get(key), value)) {
+      // eslint-disable-next-line unicorn/prefer-structured-clone -- copies a byte array view's own bytes, not its whole buffer.
+      target.set(key, cloneDeep(value))
+    }
   }
 }
 

@@ -1,0 +1,1 @@
+- Joining a room with many vector layers is much faster and lighter: each layer's geometry and glyph byte arrays are copied as their own bytes instead of the whole update they arrived in.

@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { effectScope, nextTick, ref } from 'vue'
 
+import { shownFrame, type PlaySession } from '@pairdraw/core/prototype'
 import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
-import { shownFrame, type PlaySession } from '@/app/editor/prototype/session'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { createEditorStore } from '@/app/editor/session'
 

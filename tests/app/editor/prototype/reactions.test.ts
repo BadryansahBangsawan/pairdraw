@@ -1,13 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 
+import { framesOnPage, primaryAction } from '@pairdraw/core/prototype'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { framesOnPage } from '@/app/editor/prototype/frames'
 import {
   DEFAULT_TIMEOUT_DELAY,
   DEFAULT_TRANSITION_DURATION,
   createReaction,
-  primaryAction,
   setActionType,
   setDelay,
   setNavigation,

@@ -3,12 +3,6 @@ import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
 import { resolveEditorProfile, type VisibleCanvas } from '@pairdraw/core'
 import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
-import type { PrototypeAction } from '@pairdraw/scene-graph'
-import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
-
-import type { EditorStore } from '@/app/editor/active-store'
-import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
-
 import {
   reactionAt,
   restartSession,
@@ -18,7 +12,12 @@ import {
   step,
   timeoutReactions,
   type PlaySession
-} from './session'
+} from '@pairdraw/core/prototype'
+import type { PrototypeAction } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+
+import type { EditorStore } from '@/app/editor/active-store'
+import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
 /** How long a dissolve takes, matching the transition's own duration in seconds. */
 const DISSOLVE_MS = 300

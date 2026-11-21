@@ -43,6 +43,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./prototype": {
+      "types": "./dist/prototype/index.d.ts",
+      "import": "./dist/prototype/index.js",
+      "default": "./dist/prototype/index.js"
+    },
     "./geometry": {
       "types": "./dist/geometry/index.d.ts",
       "import": "./dist/geometry/index.js",

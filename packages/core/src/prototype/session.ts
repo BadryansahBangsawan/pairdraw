@@ -1,5 +1,6 @@
 import type {
   PrototypeAction,
+  PrototypeReaction,
   PrototypeTransition,
   SceneGraph,
   SceneNode
@@ -7,7 +8,14 @@ import type {
 import { isPointInNode } from '@pairdraw/scene-graph/hit-test'
 
 import { framesOnPage } from './frames'
-import { primaryAction } from './reactions'
+
+/**
+ * The action a reaction runs: its first, which the prototype panel edits alone in this version, as
+ * Figma's first action row; `actions` keeps the array the `.fig` model and Figma's plugin API use.
+ */
+export function primaryAction(reaction: PrototypeReaction): PrototypeAction | null {
+  return reaction.actions[0] ?? null
+}
 
 /** Where play is: the frame it shows, the frame it started from, and the frames it came through. */
 export interface PlaySession {

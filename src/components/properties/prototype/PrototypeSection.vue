@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   PrototypeNodeAction,
   PrototypeReaction,
@@ -9,7 +10,7 @@ import type {
 } from '@pairdraw/scene-graph'
 import { useI18n } from '@pairdraw/vue/i18n'
 
-import { actionChoice, primaryAction, type ActionChoice } from '@/app/editor/prototype/reactions'
+import { actionChoice, type ActionChoice } from '@/app/editor/prototype/reactions'
 import { usePrototype } from '@/app/editor/prototype/use'
 import NumberField from '@/components/inputs/NumberField.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'

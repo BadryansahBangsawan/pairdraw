@@ -1,7 +1,5 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
-
 import {
   reactionAt,
   restartSession,
@@ -11,7 +9,8 @@ import {
   step,
   timeoutReactions,
   topFrameOf
-} from '@/app/editor/prototype/session'
+} from '@pairdraw/core/prototype'
+import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
 function page(graph: SceneGraph) {
   return graph.getPages()[0].id

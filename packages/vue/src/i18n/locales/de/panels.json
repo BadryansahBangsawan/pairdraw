@@ -823,7 +823,7 @@
   "prototypeVideoNothingToFollow": "„{frame}“ hat keine Interaktion „Nach Verzögerung“. Füge im Prototyp-Bereich eine hinzu oder beginne bei einem anderen Frame.",
   "prototypeVideoFormatsHere": "Dieser Browser kann {formats} aufnehmen.",
   "prototypeVideoExport": "Exportieren",
-  "prototypeVideoRecording": "Nehme Bild {done} von {total} auf",
+  "prototypeVideoRecording": "Nehme Frame {done} von {total} auf",
   "imageExposure": "Belichtung",
   "imageContrast": "Kontrast",
   "imageSaturation": "Sättigung",

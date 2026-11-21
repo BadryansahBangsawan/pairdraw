@@ -38,7 +38,7 @@
   "fontStyle": "字体样式",
   "replaceSelected": "替换所选字体",
   "nothingToReplace": "此文档尚未使用字体。",
-  "chooseReplacement": "至少为一行为选择另一种字体。",
+  "chooseReplacement": "请为至少一行选择另一种字体。",
   "unsupportedFormatShort": "不支持的格式",
   "unsupportedFormat": "已安装，但 Pairdraw 暂时无法绘制这种字体格式",
   "settingsDesktopDescription": "访问系统字体、在线提供商、后备字体包和缓存下载。",

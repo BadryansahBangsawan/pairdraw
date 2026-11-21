@@ -21,6 +21,7 @@ import {
 } from '#core/constants'
 import { withTextMeasurer } from '#core/layout/text-measurement'
 import { EMOJI_METRICS_FAMILY } from '#core/text/emoji'
+import { resetFontCollection } from '#core/text/font/collection'
 import { fontManager } from '#core/text/font/manager'
 import { prepareGraphFonts } from '#core/text/prepare'
 import {
@@ -112,6 +113,7 @@ function registerSectionTitleFont(r: SkiaRenderer, data: ArrayBuffer) {
   if (provider && !sectionTitleProviders.has(provider)) {
     sectionTitleProviders.add(provider)
     provider.registerFont(data, SECTION_TITLE_FONT_FAMILY)
+    resetFontCollection(provider)
     fontManager.registerFontInBrowser(SECTION_TITLE_FONT_FAMILY, 'SemiBold', data)
   }
   const typeface = r.ck.Typeface.MakeFreeTypeFaceFromData(data)

@@ -23,7 +23,7 @@ import {
 } from '#core/text/fallbacks'
 import { BundledFonts, type BundledFontLocator } from '#core/text/font/bundled'
 import { FamilyFaceCatalog, type HostFontFamily } from '#core/text/font/catalog'
-import { resetFontCollection } from '#core/text/font/collection'
+import { makeParagraphBuilder, resetFontCollection } from '#core/text/font/collection'
 import { fontFaceRenderFamily, type FamilyFace } from '#core/text/font/faces'
 import { loadHarfBuzz } from '#core/text/font/harfbuzz'
 import { LocalFonts } from '#core/text/font/local'
@@ -851,7 +851,7 @@ export class FontManager {
     const style = new canvasKit.ParagraphStyle({
       textStyle: { fontFamilies: [...families], fontSize: 16 }
     })
-    const builder = canvasKit.ParagraphBuilder.MakeFromFontProvider(style, provider)
+    const builder = makeParagraphBuilder(canvasKit, style, provider)
     try {
       builder.addText(characters.join(''))
       const paragraph = builder.build()

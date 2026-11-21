@@ -175,6 +175,48 @@ describe('brand generation', () => {
     }
   }, 30_000)
 
+  test('ships an Icon Composer icon that keeps the orange tile in the dark appearance', async () => {
+    const desktop = await generateDesktop(repositoryRoot)
+    const manifest = desktop.get('icon.icon/icon.json')
+    if (!manifest) throw new Error('Missing icon.icon/icon.json')
+    const orange = 'srgb:1.00000,0.35686,0.18039,1.00000'
+    const white = 'srgb:1.00000,1.00000,1.00000,1.00000'
+    expect(JSON.parse(manifest.toString())).toMatchObject({
+      'fill-specializations': [
+        { value: { solid: orange } },
+        { appearance: 'dark', value: { solid: orange } }
+      ],
+      groups: [
+        {
+          layers: [
+            {
+              'image-name': 'mark.png',
+              glass: false,
+              'fill-specializations': [
+                { value: { solid: white } },
+                { appearance: 'dark', value: { solid: white } }
+              ]
+            }
+          ]
+        }
+      ]
+    })
+    const layer = desktop.get('icon.icon/Assets/mark.png')
+    if (!layer) throw new Error('Missing icon.icon/Assets/mark.png')
+    const pixels = await sharp(layer).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    expect([pixels.info.width, pixels.info.height]).toEqual([1024, 1024])
+    // The full-bleed tile composition, without the tile: the system draws the background.
+    for (const [x, y, rgba] of [
+      [701, 317, [255, 255, 255, 255]],
+      [237, 719, [255, 255, 255, 255]],
+      [310, 719, [0, 0, 0, 0]],
+      [512, 40, [0, 0, 0, 0]]
+    ] as const) {
+      const offset = (y * 1024 + x) * 4
+      expect([...pixels.data.subarray(offset, offset + 4)]).toEqual([...rgba])
+    }
+  }, 30_000)
+
   test('web and docs output is byte-reproducible across repeated adapter instances', async () => {
     await checkBrandAssets(repositoryRoot, ['web', 'docs'])
   })

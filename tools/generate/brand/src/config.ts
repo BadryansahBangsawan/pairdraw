@@ -80,6 +80,8 @@ export const desktopFiles = [
   'icon.png',
   'icon.icns',
   'icon.ico',
+  'icon.icon/icon.json',
+  'icon.icon/Assets/mark.png',
   'Square30x30Logo.png',
   'Square44x44Logo.png',
   'Square71x71Logo.png',

@@ -2,10 +2,55 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { appArtwork, loadArtwork } from './artwork.ts'
+import sharp from 'sharp'
+
+import { appArtwork, loadArtwork, markLayer } from './artwork.ts'
 import { desktopFiles, pairdraw } from './config.ts'
 import { canonicalIcns } from './validate.ts'
 import type { BrandFiles } from './web.ts'
+
+/** `#RRGGBB` as an Icon Composer color. */
+function iconColor(hex: string): string {
+  const channels = [1, 3, 5].map((offset) =>
+    (Number.parseInt(hex.slice(offset, offset + 2), 16) / 255).toFixed(5)
+  )
+  return `srgb:${channels.join(',')},1.00000`
+}
+
+/**
+ * Icon Composer manifest for macOS 26. Without a dark appearance of its own, the system segments
+ * the ICNS and swaps its flat orange tile for a dark one; this keeps the tile and the white mark
+ * in the default and dark appearances. Earlier macOS versions read `icon.icns`.
+ */
+function iconComposerManifest(artwork: typeof pairdraw): string {
+  const both = (color: string) => [
+    { value: { solid: iconColor(color) } },
+    { appearance: 'dark', value: { solid: iconColor(color) } }
+  ]
+  return `${JSON.stringify(
+    {
+      'fill-specializations': both(artwork.background),
+      groups: [
+        {
+          layers: [
+            {
+              'fill-specializations': both(artwork.tileMark),
+              glass: false,
+              'image-name': 'mark.png',
+              name: 'mark',
+              position: { scale: 1, 'translation-in-points': [0, 0] }
+            }
+          ],
+          shadow: { kind: 'none', opacity: 0.5 },
+          translucency: { enabled: false, value: 0.5 }
+        }
+      ],
+      'supported-platforms': { squares: ['macOS'] }
+    },
+    null,
+    2
+  )}\n`
+}
 
 export async function generateDesktop(root: string): Promise<BrandFiles> {
   const directory = await mkdtemp(join(tmpdir(), 'pairdraw-icons-'))
@@ -18,9 +63,15 @@ export async function generateDesktop(root: string): Promise<BrandFiles> {
     await run(['icon', source, '--output', join(directory, 'icons')], 'tauri')
     const files: BrandFiles = new Map()
     for (const name of desktopFiles) {
+      // Tauri writes no Icon Composer icon; it is composed below.
+      if (name.startsWith('icon.icon/')) continue
       const bytes = await readFile(join(directory, 'icons', name))
       files.set(name, name.endsWith('.icns') ? canonicalIcns(bytes) : bytes)
     }
+    files.set('icon.icon/icon.json', Buffer.from(iconComposerManifest(pairdraw)))
+    // A bitmap layer: Icon Composer reads only part of SVG, and 1024px is 1024pt at scale 1.
+    const layer = Buffer.from(markLayer(main, adapter, pairdraw))
+    files.set('icon.icon/Assets/mark.png', await sharp(layer).png().toBuffer())
     return files
   } finally {
     await rm(directory, { recursive: true, force: true })

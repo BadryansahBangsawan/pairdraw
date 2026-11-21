@@ -1,2 +1,3 @@
 - An inline SVG icon keeps its nearly closed circles when it is scaled, instead of drawing them as a dot.
 - Home shows previews of recent and stored files again instead of a placeholder icon.
+- A code edit's top-level elements preview together, so a connector can join layers another element draws and an instance can name a component written after it.

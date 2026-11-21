@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { renderTree } from '@pairdraw/core/design-jsx'
+import { renderJSX, renderTree } from '@pairdraw/core/design-jsx'
 import type { TreeNode } from '@pairdraw/design-jsx'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -49,5 +49,30 @@ describe('renderTree sizing', () => {
     expect(text?.width).not.toBe(100)
     expect(text?.height).toBeLessThan(100)
     expect(text?.width).toBeGreaterThan(text?.height ?? 0)
+  })
+})
+
+describe('renderJSX fragment roots', () => {
+  test('an instance written before the component its ref() marks finds it, in written order', async () => {
+    const graph = new SceneGraph()
+    const roots = await renderJSX(
+      graph,
+      `const card = ref()
+return <>
+  <Frame name="Start" w={200} h={100} />
+  <Instance name="Card copy" of={card} />
+  <Component ref={card} name="Card" w={100} h={50} />
+</>`
+    )
+
+    expect(roots.map((root) => root.name)).toEqual(['Start', 'Card copy', 'Card'])
+    const [, copy, card] = roots
+    expect(graph.getNode(copy.id)?.componentId).toBe(card.id)
+    const pageId = graph.getPages()[0].id
+    expect(graph.getChildren(pageId).map((node) => node.name)).toEqual([
+      'Start',
+      'Card copy',
+      'Card'
+    ])
   })
 })

@@ -1,0 +1,1 @@
+- Style lint accepts a layer linked to a shared effect or text style, so it no longer reports typography and shadows that already use a shared preset.

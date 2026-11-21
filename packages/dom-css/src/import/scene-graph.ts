@@ -687,7 +687,33 @@ function createDesignNode(
     return createTextNode(graph, parentId, node.text, inheritedStyle, display, parentFlow)
   }
 
-  return createElementNode(graph, parentId, node, parentFlow)
+  return createElementNode(graph, parentId, withFieldText(node), parentFlow)
+}
+
+/** Input types whose value is text a person reads in the field. */
+const TEXT_INPUT_TYPES = new Set([
+  '',
+  'text',
+  'email',
+  'search',
+  'url',
+  'tel',
+  'number',
+  'password'
+])
+
+/**
+ * A text field with the text a browser draws in it, its value or else its placeholder, as a
+ * child: an `<input>` holds no content of its own. A password shows as dots.
+ */
+function withFieldText(element: DesignElement): DesignElement {
+  if (element.tagName.toLowerCase() !== 'input' || element.children.length > 0) return element
+  const type = Object.hasOwn(element.attrs, 'type') ? element.attrs.type.trim().toLowerCase() : ''
+  if (!TEXT_INPUT_TYPES.has(type)) return element
+  const value = element.attrs.value || element.attrs.placeholder
+  if (!value) return element
+  const text = type === 'password' && element.attrs.value ? '•'.repeat(value.length) : value
+  return { ...element, children: [{ type: 'text', text }] }
 }
 
 function fitPageToChildren(page: SceneNode, graph: SceneGraph): void {

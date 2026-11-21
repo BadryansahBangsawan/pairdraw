@@ -6,3 +6,4 @@
 - Imported HTML and web captures place flex items in their CSS `order`.
 - Imported HTML and web captures lay content out inside its box's border, as CSS does, instead of over it.
 - A web capture imported as HTML, through `pairdraw import` or the `import_html` tool, builds the same layers as pasting the capture.
+- Imported HTML shows the value or placeholder of a text field as its text.

@@ -83,6 +83,15 @@ describe('HTML flow as auto layout', () => {
     expect(byName('plain').strokesIncludedInLayout).toBe(false)
   })
 
+  it('shows the value of a text field, or its placeholder, as its text', async () => {
+    const { graph, byName } = await importHTML(
+      `<div><input id="name" style="width:120px" value="Rename"><input id="search" placeholder="Search"><input id="check" type="checkbox" value="on"></div>`
+    )
+    expect(textIn(graph, byName('name')).text).toBe('Rename')
+    expect(textIn(graph, byName('search')).text).toBe('Search')
+    expect(graph.getChildren(byName('check').id)).toHaveLength(0)
+  })
+
   it('places flex items in their CSS order', async () => {
     const { graph, byName } = await importHTML(
       `<div id="row" style="display:flex;flex-wrap:wrap"><div id="picker" style="order:2;width:80px;height:8px"></div><div id="send" style="width:20px;height:8px"></div><div id="first" style="order:-1;width:20px;height:8px"></div></div>`

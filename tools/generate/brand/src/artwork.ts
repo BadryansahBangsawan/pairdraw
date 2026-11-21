@@ -54,25 +54,7 @@ export function appArtwork(
     .move(inset, inset)
     .fill(artwork.background)
   if (rounded) background.radius(artwork.tileRadius)
-  return placeMark(svg, source, adapter, artwork, artwork.scales[kind])
-}
-
-/**
- * The tile composition's mark alone, for an Icon Composer layer: the system draws the background
- * and masks the platform shape around it.
- */
-export function markLayer(source: string, adapter: ImageAdapter, artwork: BrandArtwork) {
-  const svg = adapter.createSvg().size(1024, 1024).viewbox(0, 0, 1024, 1024)
-  return placeMark(svg, source, adapter, artwork, artwork.scales.tile)
-}
-
-function placeMark(
-  svg: ReturnType<ImageAdapter['createSvg']>,
-  source: string,
-  adapter: ImageAdapter,
-  artwork: BrandArtwork,
-  scale: number
-) {
+  const scale = artwork.scales[kind]
   const mark = stringToSVG(recolor(source, adapter, artwork, 'tile'), adapter).size(
     1024 * scale,
     1024 * scale

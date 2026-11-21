@@ -4,7 +4,7 @@
 
 ## 0.19.1 — 2026-11-21
 
-Pairdraw 0.19.1 makes the built-in browser's screenshots and page imports work, keeps the macOS icon orange in the dark icon style, updates installed CLI, MCP, and Harness companions together with the app, and shows each agent's logo. Pairdraw 0.16.1 and later offer this release in the app.
+Pairdraw 0.19.1 makes the built-in browser's screenshots and page imports work, updates installed CLI, MCP, and Harness companions together with the app, and shows each agent's logo. Pairdraw 0.16.1 and later offer this release in the app.
 
 ### Changed
 
@@ -16,7 +16,6 @@ Pairdraw 0.19.1 makes the built-in browser's screenshots and page imports work, 
 
 - The built-in browser's screenshots work on macOS: each button places a picture instead of failing with "The page returned no picture", a page screenshot holds the whole page down to its last line (up to 4096 points, and at any zoom) instead of only the part the screen fits, and the view screenshot no longer ends in an empty strip.
 - **Import page**, **Import element**, and **Screenshot of an element** in the built-in browser no longer fail at once with "The page returned nothing"; they wait for the capture or for the click in the page.
-- On macOS 26 in the dark icon style, the Dock shows the Pairdraw icon on its orange tile instead of a dark gray one.
 
 ### Security
 

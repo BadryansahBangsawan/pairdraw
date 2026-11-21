@@ -104,6 +104,16 @@ export function prepareNodeTransfer(
       node: (id) => refs.nodes.get(id) ?? id
     })
   }
+  // A reaction's destination keeps its name when the transfer leaves it behind; a copied frame
+  // with a copy of its destination points at the copy, as Figma's paste does.
+  result.prototypeReactions = (result.prototypeReactions ?? []).map((reaction) => ({
+    ...reaction,
+    actions: reaction.actions.map((action) =>
+      action.type === 'NODE' && action.nodeId
+        ? { ...action, nodeId: refs.nodes.get(action.nodeId) ?? action.nodeId }
+        : action
+    )
+  }))
   // A connector keeps the layers it was attached to when they are left behind; the end becomes
   // free where nothing by that ID exists, as a pasted Figma connector does.
   for (const field of ['connectorStart', 'connectorEnd'] as const) {

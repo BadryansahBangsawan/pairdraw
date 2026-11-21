@@ -1,0 +1,2 @@
+- Clicking a played frame's own background runs the frame's click reaction, as Figma's presentation does, instead of only reactions on layers inside it.
+- A pasted frame whose layer links to another pasted frame now keeps the link inside the copy, as Figma's paste does, instead of naming the copied frame by its original Figma id.

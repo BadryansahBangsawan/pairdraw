@@ -54,6 +54,10 @@ export default defineCommand({
     if (args.import && args.project) {
       throw new Error('Pass either --import or --project, not both.')
     }
+    // --out is where `--format dtcg` writes its files; an import writes the document itself.
+    if (args.out && (args.import || args.project)) {
+      throw new Error('--out writes dtcg token files; an import writes the document with --write or --output.')
+    }
     if (args.import) {
       await importStylesheet(args.file, args.import, args)
       return

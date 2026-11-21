@@ -44,6 +44,23 @@ describe('tokens CLI', () => {
   })
 })
 
+describe('tokens import targets', () => {
+  test('refuses --out, which writes dtcg files and would drop the import', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-out-'))
+    const file = join(dir, 'tokens.pen')
+    const css = join(dir, 'theme.css')
+    await writeFile(file, JSON.stringify({ version: '2.21', children: [] }))
+    await writeFile(css, ':root {\n  --brand: #2947ff;\n}\n')
+    const out = join(dir, 'out')
+    const result = await cli(['tokens', '--import', css, file, '--out', out])
+    expect(result.exitCode).toBe(1)
+    expect(result.stderr).toContain('--out writes dtcg token files')
+    expect(result.stderr).toContain('--write or --output')
+    expect(result.stdout).toBe('')
+    expect(await Bun.file(join(out, 'tokens.resolver.json')).exists()).toBe(false)
+  })
+})
+
 describe('tokens --project', () => {
   test('imports a project folder and reports JavaScript config', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-project-'))

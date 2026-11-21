@@ -18,6 +18,8 @@ use tauri::{
 use tokio::sync::oneshot;
 use url::Url;
 
+use super::browser_await::eval_awaited;
+
 /// The label of the browser window. No capability file lists it, and none may.
 pub const BROWSER_WINDOW_LABEL: &str = "browser";
 
@@ -260,9 +262,21 @@ pub fn browser_close<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// initialization script: nothing of the app is stored on the page, and the page cannot call us.
 const CAPTURE_RUNTIME: &str = include_str!("browser-capture.js");
 const CAPTURE_ERROR_PREFIX: &str = "pairdraw-capture-error:";
+const CAPTURE_WAIT: Duration = Duration::from_secs(60);
 
+/// The body of the async function that loads the capturer and returns `call`'s promise.
 fn capture_call(call: &str) -> String {
-    format!("{CAPTURE_RUNTIME}\n;{call}")
+    format!("{CAPTURE_RUNTIME}\nreturn {call};")
+}
+
+async fn eval_capture<R: Runtime>(window: &WebviewWindow<R>, call: &str) -> Result<String, String> {
+    eval_awaited(
+        window,
+        &capture_call(call),
+        CAPTURE_WAIT,
+        "The capture timed out",
+    )
+    .await
 }
 
 /// The text a script returns. The webview JSON-encodes it, and a thrown script returns nothing.
@@ -299,8 +313,9 @@ pub(crate) async fn until_deadline<T>(
 }
 
 async fn eval_pick<R: Runtime>(window: &WebviewWindow<R>) -> Result<String, String> {
-    until_deadline(
-        eval_text(window, PICK_ELEMENT),
+    eval_awaited(
+        window,
+        &format!("{PICK_ELEMENT}\nreturn pickElement();"),
         Duration::from_secs(30),
         "The pick timed out",
     )
@@ -321,7 +336,7 @@ fn capture_html(html: String) -> Result<String, String> {
 #[tauri::command]
 pub async fn browser_capture_page<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
     let window = browser_window(&app)?;
-    capture_html(eval_text(&window, &capture_call("__pairdrawCapturePage()")).await?)
+    capture_html(eval_capture(&window, "__pairdrawCapturePage()").await?)
 }
 
 /// What the picker returns when the user does not choose an element. The toolbar shows it as a
@@ -339,9 +354,7 @@ fn picked_selector(picked: &str) -> Result<&str, String> {
 
 fn element_call(selector: &str) -> Result<String, String> {
     let quoted = serde_json::to_string(selector).map_err(|error| error.to_string())?;
-    Ok(capture_call(&format!(
-        "__pairdrawCaptureElement({quoted})"
-    )))
+    Ok(format!("__pairdrawCaptureElement({quoted})"))
 }
 
 /// One element of the open page, chosen by a click in that page. The overlay is gone before the
@@ -351,7 +364,7 @@ pub async fn browser_capture_element<R: Runtime>(app: AppHandle<R>) -> Result<St
     let window = browser_window(&app)?;
     let picked = eval_pick(&window).await?;
     let selector = picked_selector(&picked)?;
-    capture_html(eval_text(&window, &element_call(selector)?).await?)
+    capture_html(eval_capture(&window, &element_call(selector)?).await?)
 }
 
 #[derive(Deserialize)]
@@ -362,10 +375,15 @@ struct JsonBox {
     height: f64,
 }
 
-#[derive(Deserialize)]
-struct JsonSize {
-    width: f64,
-    height: f64,
+/// The session's page zoom: CSS pixels times this are the webview's points.
+fn session_zoom<R: Runtime>(app: &AppHandle<R>) -> f64 {
+    app.state::<BrowserWindowState>()
+        .0
+        .lock()
+        .ok()
+        .map(|state| state.zoom)
+        .filter(|zoom| zoom.is_finite() && *zoom > 0.0)
+        .unwrap_or(1.0)
 }
 
 async fn element_rect<R: Runtime>(
@@ -398,57 +416,23 @@ async fn element_rect<R: Runtime>(
     })
 }
 
-async fn grow_to_page<R: Runtime>(window: &WebviewWindow<R>) -> Result<LogicalSize<f64>, String> {
-    let physical = window.inner_size().map_err(|error| error.to_string())?;
-    let scale = window.scale_factor().map_err(|error| error.to_string())?;
-    let previous = physical.to_logical::<f64>(scale);
-    let reported = eval_text(
-        window,
-        "JSON.stringify({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight})",
-    )
-    .await?;
-    let size: JsonSize =
-        serde_json::from_str(&reported).map_err(|_| "The page has no size".to_owned())?;
-    let (width, height) = crate::system::browser_shot::capped_document(size.width, size.height)?;
-    window
-        .set_size(LogicalSize::new(width, height))
-        .map_err(|error| error.to_string())?;
-    Ok(previous)
-}
-
 /// A PNG of the open page, as base64. `kind` is `visible`, `full`, or `element`.
 #[tauri::command]
 pub async fn browser_screenshot<R: Runtime>(
     app: AppHandle<R>,
     kind: String,
 ) -> Result<String, String> {
-    use crate::system::browser_shot::{capture_png, shot_kind, ShotKind};
+    use crate::system::browser_shot::{
+        capture_png, in_points, page_area, shot_kind, ShotArea, ShotKind,
+    };
 
     let window = browser_window(&app)?;
-    let mode = shot_kind(&kind)?;
-    let previous = if mode == ShotKind::Full {
-        Some(grow_to_page(&window).await?)
-    } else {
-        None
+    let zoom = session_zoom(&app);
+    let area = match shot_kind(&kind)? {
+        ShotKind::Element => ShotArea::Rect(in_points(element_rect(&window).await?, zoom)),
+        kind => page_area(&window, kind, zoom).await?,
     };
-    let rect = if mode == ShotKind::Element {
-        match element_rect(&window).await {
-            Ok(rect) => Some(rect),
-            Err(error) => {
-                if let Some(size) = previous {
-                    let _ = window.set_size(size);
-                }
-                return Err(error);
-            }
-        }
-    } else {
-        None
-    };
-    let shot = capture_png(&window, rect).await;
-    if let Some(size) = previous {
-        let _ = window.set_size(size);
-    }
-    shot
+    capture_png(&window, area).await
 }
 
 /// The open page's own account of itself: its URL, its title, and the characters `innerText`
@@ -508,9 +492,9 @@ mod tests {
 
     #[test]
     fn an_element_selector_is_quoted_into_the_capturer_call() {
-        let call = super::element_call("a[href=\"x\"]").expect("quoted");
+        let call = super::capture_call(&super::element_call("a[href=\"x\"]").expect("quoted"));
         assert!(call.contains("__pairdrawCaptureElement"));
-        assert!(call.ends_with("__pairdrawCaptureElement(\"a[href=\\\"x\\\"]\")"));
+        assert!(call.ends_with("return __pairdrawCaptureElement(\"a[href=\\\"x\\\"]\");"));
     }
 
     #[test]

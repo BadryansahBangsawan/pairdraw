@@ -3,6 +3,7 @@
 
 pub mod browser;
 pub mod browser_act;
+pub mod browser_await;
 pub mod browser_mark;
 pub mod browser_read;
 pub mod browser_shot;

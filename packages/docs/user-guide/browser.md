@@ -44,7 +44,7 @@ Both read the browser's own capture. Only that capture is accepted; other HTML i
 The three screenshot buttons put a PNG on the canvas as an image layer, named after the button — **Screenshot of the view**, **Screenshot of the page**, or **Screenshot of an element**:
 
 - **Screenshot of the view** is the part of the page the window shows.
-- **Screenshot of the page** grows the window to the document's size first — up to 2048 by 4096 — and restores the size afterwards. A longer page is cut there.
+- **Screenshot of the page** grows the page's view inside the window to the document's size first — up to 2048 by 4096 points — and restores it afterwards. A longer page is cut there.
 - **Screenshot of an element** asks you to click the element in the browser window, as the element import does.
 
 Screenshots are available in the macOS build.

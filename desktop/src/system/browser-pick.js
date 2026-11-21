@@ -1,6 +1,7 @@
 /* The page picks one element. The overlay is removed before this resolves, so the capture that
- * follows does not include it. Escape, or a click that hits nothing, cancels. */
-;(() => {
+ * follows does not include it. Escape, or a click that hits nothing, cancels. The caller calls
+ * `pickElement()` and waits for the selector it resolves to. */
+function pickElement() {
   const cancelled = 'The pick was cancelled'
   const escape =
     window.CSS && CSS.escape
@@ -87,4 +88,4 @@
     window.addEventListener('mousemove', onMove, true)
     window.addEventListener('click', onClick, true)
   })
-})()
+}

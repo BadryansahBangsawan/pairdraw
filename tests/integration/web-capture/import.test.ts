@@ -142,6 +142,61 @@ describe('importing a web capture', () => {
     expect(editor.graph.getChildren(editor.state.currentPageId)).toHaveLength(0)
   })
 
+  test('joins words a page boxed one by one back into one paragraph of text', () => {
+    // Streaming Markdown renderers fade words in, each in an inline-block that draws nothing.
+    // Tailwind's reset gives every element a solid border of no width.
+    const reset = { 'border-top-style': 'solid', 'border-top-width': '0px' }
+    const word = (text: string, width: number, style: Record<string, string> = {}) => ({
+      ...element(
+        'span',
+        {
+          ...reset,
+          display: 'inline-block',
+          'box-sizing': 'border-box',
+          'white-space': 'pre-wrap',
+          'line-height': '16px',
+          'max-width': '100%',
+          width: `${width}px`,
+          height: '16px',
+          ...style
+        },
+        [{ type: 'text', text }]
+      ),
+      box: { x: 0, y: 0, width, height: 16 }
+    })
+    const space = element('span', { ...reset, display: 'inline', 'white-space': 'pre-wrap' }, [
+      { type: 'text', text: ' ' }
+    ])
+    const paragraph: WebCapture = {
+      ...CAPTURE,
+      root: {
+        ...element('p', { display: 'block', 'line-height': '16px', width: '352px' }, [
+          element('span', { ...reset, display: 'inline' }, [
+            word('Created', 44),
+            space,
+            word('the', 18)
+          ]),
+          space,
+          element('strong', { display: 'inline', 'font-weight': '600' }, [
+            word('expense', 48, { 'font-weight': '600' }),
+            space,
+            word('dashboard', 62, { 'font-weight': '600' })
+          ]),
+          word('.', 3)
+        ]),
+        box: { x: 0, y: 0, width: 352, height: 16 }
+      }
+    }
+    const read = readWebCaptureClipboard(encodeWebCaptureClipboard(paragraph).html)
+    if (!read?.ok) throw new Error('the capture survives the clipboard')
+
+    const graph = sceneGraphFromStyledHTML(webCaptureDesignDocument(read.capture))
+
+    const texts = [...graph.getAllNodes()].filter((node) => node.type === 'TEXT')
+    expect(texts.map((node) => node.text)).toEqual(['Created the expense dashboard.'])
+    expect(texts[0]?.styleRuns).toEqual([{ start: 12, length: 17, style: { fontWeight: 600 } }])
+  })
+
   test('paints a captured gradient background as a gradient fill behind the text', () => {
     const panel: WebCapture = {
       ...CAPTURE,

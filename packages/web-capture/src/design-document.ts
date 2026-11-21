@@ -281,11 +281,58 @@ function glyphBox(
   return SIDES.some((side) => margins[side] > 0) ? marginBox(wrapped, margins) : wrapped
 }
 
+/** What a box records of its size and border, which a word box drawn as a run of text drops. */
+const WORD_BOX_PROPERTIES = [
+  'display',
+  'width',
+  'height',
+  'min-width',
+  'max-width',
+  'min-height',
+  'max-height',
+  'box-sizing',
+  ...SIDES.flatMap((side) => ['style', 'width', 'color'].map((part) => `border-${side}-${part}`))
+]
+
+/** Properties that make a box draw something besides its text, or change where its text sits. */
+const DRAWN_BOX_PROPERTIES = [
+  'background-color',
+  'background-image',
+  'box-shadow',
+  'opacity',
+  'overflow',
+  ...SIDES.map((side) => `padding-${side}` as const)
+]
+
+/**
+ * An inline-block that holds one line of text and draws nothing else, as pages that fade words
+ * in box each word. It reads as a run of the text around it, not a box: kept as a box, every word
+ * becomes a layer of its own and wraps at its own width.
+ */
+function isWordBox(element: WebCaptureElement, style: Record<string, string>): boolean {
+  if (style.display !== 'inline-block' || !INLINE_TEXT_TAGS.has(element.tagName)) return false
+  if (!element.children.every((child) => child.type === 'text')) return false
+  if (DRAWN_BOX_PROPERTIES.some((property) => ownValue(style, property) !== undefined)) return false
+  if (SIDES.some((side) => pixels(style[`margin-${side}`]) !== 0)) return false
+  if (SIDES.some((side) => pixels(style[`border-${side}-width`]) > 0)) return false
+  const lineHeight = pixels(style['line-height']) || pixels(style['font-size']) * 1.5
+  return element.box !== undefined && element.box.height < lineHeight * 1.5
+}
+
 function convertElement(
   element: WebCaptureElement,
   parentBox?: WebCaptureBox
 ): WebCaptureDesignElement {
   const { displayed, children } = layoutOf(element)
+  if (isWordBox(element, displayed)) {
+    return {
+      type: 'element',
+      tagName: element.tagName,
+      attrs: { ...element.attrs },
+      computedStyle: omit(displayed, [...WORD_BOX_PROPERTIES, ...MARGINS]),
+      children
+    }
+  }
   const inline = isInline(displayed)
   const split = splitMargins(displayed)
   const { margins } = split

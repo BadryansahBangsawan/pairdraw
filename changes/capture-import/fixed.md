@@ -1,1 +1,2 @@
 - Imported web captures and Tailwind HTML keep a paragraph's styled words in one text layer, instead of splitting every span into a layer of its own.
+- Imported web captures keep words a page boxes one by one, as streaming chat replies do, in one paragraph instead of breaking each word at its own width.

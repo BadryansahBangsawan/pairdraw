@@ -29,6 +29,11 @@ export {
   type SelectionColor
 } from './selection/colors'
 export {
+  DOCUMENT_COLOR_LIMIT,
+  documentColors,
+  type DocumentColor
+} from './document-colors'
+export {
   copyEditorViewState,
   createDefaultEditorViewState,
   pickEditorViewState

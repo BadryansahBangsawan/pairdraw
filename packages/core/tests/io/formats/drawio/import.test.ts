@@ -2,10 +2,14 @@ import { describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import { connectorSublayers } from '@pairdraw/scene-graph/connectors'
 import { shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
-import { groupFitCount, resetGroupFitCount } from '@pairdraw/scene-graph/group-bounds'
+import {
+  fitEnclosingGroups,
+  groupFitCount,
+  resetGroupFitCount
+} from '@pairdraw/scene-graph/group-bounds'
 
 import { BUILTIN_IO_FORMATS, IORegistry } from '#core/io'
 
@@ -372,10 +376,8 @@ describe('draw.io pages and layers', () => {
 
   test('fits a deep group chain once per ancestor, not once per group and ancestor', async () => {
     const cellsFor = (depth: number) =>
-      Array.from(
-        { length: depth },
-        (_, i) =>
-          vertex(`g${i}`, 'group;', [0, 0, 100, 100], `G${i}`, i === 0 ? '1' : `g${i - 1}`)
+      Array.from({ length: depth }, (_, i) =>
+        vertex(`g${i}`, 'group;', [0, 0, 100, 100], `G${i}`, i === 0 ? '1' : `g${i - 1}`)
       ).join('') + vertex('leaf', '', [1, 1, 20, 20], 'Leaf', `g${depth - 1}`)
 
     // A fit walks the chain above its group, so one call per group refitted every ancestor again
@@ -390,5 +392,65 @@ describe('draw.io pages and layers', () => {
 
     expect(await refitsFor(50)).toBe(50)
     expect(await refitsFor(100)).toBe(100)
+    // The depths the cubic import showed seconds at: one fit per group, not per ancestor pair.
+    expect(await refitsFor(300)).toBe(300)
+    expect(await refitsFor(600)).toBe(600)
+    expect(await refitsFor(900)).toBe(900)
+  })
+
+  test('one pass fits a nested chain with siblings to the same bounds as the per-group loop', async () => {
+    // A chain three deep with a sibling leaf beside the inner group at two levels, so a fit moves
+    // boxes holding more than one child. Fitting the whole id set once must land every group on the
+    // same bounds as the old innermost-first loop over single ids.
+    const cells =
+      vertex('outer', 'group;', [0, 0, 10, 10], 'Outer') +
+      vertex('mid', 'group;', [0, 0, 10, 10], 'Mid', 'outer') +
+      vertex('inner', 'group;', [0, 0, 10, 10], 'Inner', 'mid') +
+      vertex('leafA', '', [2, 3, 20, 20], 'A', 'inner') +
+      vertex('leafB', '', [40, 5, 10, 10], 'B', 'mid') +
+      vertex('leafC', '', [70, 60, 15, 15], 'C', 'outer')
+    const names = ['Outer', 'Mid', 'Inner', 'A', 'B', 'C']
+    const boundsOf = (graph: SceneGraph) =>
+      names.map((name) => {
+        const node = byName(graph, name)
+        return [name, node.x, node.y, node.width, node.height]
+      })
+
+    resetGroupFitCount()
+    const once = await read(file(cells))
+    const onceFits = groupFitCount()
+
+    // The old loop on a fresh raw graph: build the same chain without the importer's fit, then fit
+    // each group on its own, innermost first.
+    const raw = new SceneGraph()
+    const page = raw.getPages()[0].id
+    const outer = raw.createNode('GROUP', page, {
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+      name: 'Outer'
+    })
+    const mid = raw.createNode('GROUP', outer.id, {
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+      name: 'Mid'
+    })
+    const inner = raw.createNode('GROUP', mid.id, {
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+      name: 'Inner'
+    })
+    raw.createNode('RECTANGLE', inner.id, { x: 2, y: 3, width: 20, height: 20, name: 'A' })
+    raw.createNode('RECTANGLE', mid.id, { x: 40, y: 5, width: 10, height: 10, name: 'B' })
+    raw.createNode('RECTANGLE', outer.id, { x: 70, y: 60, width: 15, height: 15, name: 'C' })
+    for (const id of [outer.id, mid.id, inner.id].toReversed()) fitEnclosingGroups(raw, [id])
+
+    expect(boundsOf(once)).toEqual(boundsOf(raw))
+    expect(onceFits).toBe(3)
   })
 })

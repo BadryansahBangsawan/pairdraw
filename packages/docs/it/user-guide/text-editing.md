@@ -67,6 +67,16 @@ Il testo può contenere un collegamento a una pagina web o a un indirizzo email,
 | Copia | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Incolla | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
 
+## Ridimensionamento e troncamento
+
+Il controllo **Ridimensionamento** nella sezione Layout stabilisce come la casella di testo segue il suo contenuto:
+
+- **Larghezza automatica** — la casella cresce perché ogni riga stia su una sola riga (il ridimensionamento automatico di larghezza e altezza di Figma).
+- **Altezza automatica** — la larghezza resta fissa e la casella cresce in altezza quando il testo va a capo.
+- **Fisso** — la casella mantiene la dimensione che le dai.
+
+**Troncamento** nella sezione Tipografia taglia il testo che supera la casella: **Puntini finali** aggiunge un’ellissi, e **Righe massime** limita quante righe vengono disegnate prima di troncare. Un testo troncato mantiene la sua casella nella disposizione automatica, così un frame adattato al contenuto si dimensiona a quella casella invece di ridursi a zero.
+
 ## Selettore dei font
 
 Apri il selettore dei font nella sezione **Tipografia** del pannello delle proprietà per cambiare la famiglia. Il selettore offre:

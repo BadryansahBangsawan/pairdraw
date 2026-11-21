@@ -94,6 +94,8 @@ W samodzielnym wyniku Tailwind jest kompilowany podczas eksportu, więc nie zale
 
 Eksport HTML zapisuje nazwę każdej warstwy w atrybucie `data-name`. `--no-layer-names` pomija nazwy, a `--layer-ids` dodaje identyfikator każdej warstwy jako `data-pairdraw-node-id` dla narzędzi, które łączą znaczniki z dokumentem.
 
+Rozmiar czcionki, którego Tailwind nie nazywa jako stopień (np. 40px lub 28px), eksportuje się jako wartość arbitralna, `text-[40px]`, zamiast jako klasa użytkowa taka jak `text-10`, której żaden arkusz stylów nie generuje. Nazwane stopnie i rozmiary powiązane z tokenami zachowują swoją klasę.
+
 Eksport HTML jest dostępny w trybie plikowym.
 
 ### Tokeny w eksportowanym kodzie

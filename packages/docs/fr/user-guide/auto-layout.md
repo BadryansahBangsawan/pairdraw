@@ -67,6 +67,8 @@ La première modification réelle d’une dimension ne rend fixe que cet axe. Do
 
 Par défaut, un cadre en disposition automatique dispose son contenu comme si aucun calque n’avait de contour, comme le fait Figma. Activez **Inclure les contours dans la mise en page** dans la section Disposition pour faire de la place aux contours : le contour du cadre lui-même repousse son contenu vers l’intérieur, et les contours extérieurs de ses enfants occupent de l’espace entre eux.
 
+Un cadre en disposition automatique fixe n’est jamais plus petit que la place occupée par ses marges intérieures, plus les contours intérieurs qu’il compte lorsque **Inclure les contours dans la mise en page** est activé. Le définir plus petit le fait grandir jusqu’à cette place, comme dans Figma. Un cadre enregistré plus petit que ses marges intérieures avant ce changement conserve sa taille enregistrée à l’ouverture du fichier, et grandit jusqu’à ses marges intérieures à la prochaine modification.
+
 ## Réordonner par glisser-déposer
 
 Dans un cadre en disposition automatique, faites glisser un enfant pour le réordonner parmi ses frères. Un indicateur d’insertion montre où l’enfant sera déposé. Un objet amené depuis ailleurs dans un cadre en disposition automatique est inséré de la même façon ; dans un cadre avec retour à la ligne, il va dans la ligne située sous le pointeur. Dessiner dans un cadre en disposition automatique ajoute le nouvel objet à la fin de son flux.
@@ -100,6 +102,8 @@ Définissez les pistes de colonnes et de lignes avec trois modes de dimensionnem
 - **auto :** s’adapte au contenu.
 
 Exemple : trois colonnes `1fr 200px 1fr` créent une mise en page avec une colonne centrale fixe et des côtés flexibles.
+
+Réglez un cadre en grille sur **Ajuster au contenu** pour le dimensionner selon ses pistes et ses espacements. Sur un axe ajusté, une piste fractionnaire (`fr`) prend la taille de son contenu au lieu de partager l’espace, et le minimum et le maximum du cadre s’appliquent toujours.
 
 ### Espacements de la grille
 

@@ -67,6 +67,16 @@ Tekst może zawierać link do strony internetowej lub adresu e-mail, w całym te
 | Kopiuj | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Wklej | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
 
+## Zmiana rozmiaru i skracanie
+
+Ustawienie **Zmiana rozmiaru** w sekcji Układ określa, jak pole tekstowe podąża za swoją zawartością:
+
+- **Automatyczna szerokość** — pole rośnie, aby każdy wiersz mieścił się w jednej linii (automatyczne dopasowanie szerokości i wysokości Figmy).
+- **Automatyczna wysokość** — szerokość pozostaje stała, a pole rośnie w górę, gdy tekst zawija się do nowej linii.
+- **Stały** — pole zachowuje rozmiar, który mu nadasz.
+
+**Skracanie** w sekcji Typografia przycina tekst wykraczający poza pole: **Wielokropek na końcu** dodaje elipsę, a **Maksymalna liczba wierszy** ogranicza, ile wierszy jest rysowanych przed skróceniem. Skracany tekst zachowuje swoje pole w automatycznym układzie, więc ramka dopasowana do zawartości wymiaruje się do tego pola zamiast kurczyć się do zera.
+
 ## Wybór czcionki
 
 Otwórz wybór czcionki w sekcji „Typografia” panelu właściwości, aby zmienić rodzinę czcionek. Wybór czcionki oferuje:

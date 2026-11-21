@@ -38,6 +38,7 @@ Wyeksportowany plik zapisuje się przez systemowe okno dialogowe (aplikacja na k
 - **PDF** przy kilku zaznaczonych warstwach tworzy jeden plik PDF ze stroną na każdą warstwę, w kolejności zaznaczenia, każdą w rozmiarze swojej warstwy.
 - **Plik › Eksportuj ramki do PDF…** zapisuje ramki strony jako jeden plik PDF, ze stroną na każdą ramkę w kolejności warstw, każdą w rozmiarze swojej ramki. Liczą się też ramki w sekcjach, a luźne kształty, teksty i grupy nie. Przy zaznaczonych warstwach eksportowane są tylko one.
 - **HTML** zapisuje warstwę jako stronę internetową. Przycisk opcji obok formatu decyduje, czy dołączyć szkielet HTML (cała strona albo fragment do wklejenia), czy stylować przez CSS czy Tailwind, czy osadzić obrazy, czy zapisać je jako osobne pliki (razem w pliku `.zip`), oraz czy zapisywać jako atrybuty nazwy warstw (`data-name`, domyślnie włączone) i identyfikatory warstw (`data-pairdraw-node-id`, domyślnie wyłączone). Widok HTML panelu Kod eksportuje tak samo, ze stylowaniem, które pokazuje.
+- Eksport HTML przenosi tryb mieszania warstwy jako `mix-blend-mode`, tak jak już robił to eksport SVG. „Rozjaśnianie liniowe” staje się `plus-lighter`; „Ściemnianie liniowe” eksportuje się płasko, ponieważ Chrome, Edge i Firefox nie implementują `plus-darker`. „Normalny” i „Przepuszczanie” nie dodają trybu mieszania.
 - W panelu Kod komponenty Vue i React mogą brać ikony z Lucide, Heroicons lub Font Awesome zamiast z Iconify, a komponenty React także z React Icons; ikona, której pakiet nie ma, zostaje przy Iconify.
 
 ## Kopiuj/Wklej jako

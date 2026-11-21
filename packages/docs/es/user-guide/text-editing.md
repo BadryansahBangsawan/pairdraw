@@ -67,6 +67,16 @@ El texto puede enlazar a una página web o a una dirección de correo, en el tex
 | Copiar | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Pegar | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
 
+## Redimensionado y truncamiento
+
+El control **Redimensionado** de la sección **Diseño** define cómo el cuadro de texto sigue a su contenido:
+
+- **Anchura automática**: el cuadro crece para que cada línea quepa en una sola línea (el autoajuste de anchura y altura de Figma).
+- **Altura automática**: la anchura queda fija y el cuadro crece a lo alto cuando el texto salta de línea.
+- **Fijo**: el cuadro conserva el tamaño que le des.
+
+**Truncamiento** en la sección **Tipografía** recorta el texto que desborda el cuadro: **Puntos suspensivos finales** añade una elipsis, y **Líneas máximas** limita cuántas líneas se dibujan antes de truncar. Un texto truncado conserva su cuadro dentro de la disposición automática, así que un marco que se ajusta al contenido se dimensiona a ese cuadro en lugar de reducirse a cero.
+
 ## Selector de fuentes
 
 Abre el selector de fuentes en la sección **Tipografía** del panel de propiedades para cambiar la familia tipográfica. El selector ofrece:

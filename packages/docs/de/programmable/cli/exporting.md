@@ -94,6 +94,8 @@ Eigenständige Tailwind-Ausgabe wird während des Exports kompiliert und hängt 
 
 Der HTML-Export schreibt den Namen jeder Ebene als Attribut `data-name`. `--no-layer-names` lässt die Namen weg, und `--layer-ids` ergänzt die ID jeder Ebene als `data-pairdraw-node-id` für Werkzeuge, die das Markup zurück auf das Dokument beziehen.
 
+Eine Schriftgröße, die Tailwind nicht als Stufe benennt (etwa 40px oder 28px), wird als willkürlicher Wert exportiert, `text-[40px]`, statt als eine Utility wie `text-10`, die kein Stylesheet erzeugt. Benannte Stufen und an Tokens gebundene Größen behalten ihre Klasse.
+
 Der HTML-Export ist im Dateimodus verfügbar.
 
 ### Tokens im exportierten Code

@@ -67,6 +67,16 @@ Le texte peut pointer vers une page web ou une adresse de courriel, sur tout le 
 | Copier | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Coller | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
 
+## Redimensionnement et troncature
+
+Le contrôle **Redimensionnement** de la section Disposition définit comment la zone de texte suit son contenu :
+
+- **Largeur automatique** — la zone grandit pour que chaque ligne tienne sur une seule ligne (le redimensionnement automatique en largeur et hauteur de Figma).
+- **Hauteur automatique** — la largeur reste fixe et la zone grandit en hauteur quand le texte passe à la ligne.
+- **Fixe** — la zone garde la taille que vous lui donnez.
+
+**Troncature** dans la section Typographie coupe le texte qui dépasse la zone : **Points de suspension finaux** ajoute une ellipse, et **Lignes maximales** limite le nombre de lignes dessinées avant la troncature. Un texte tronqué garde sa zone dans la disposition automatique, ainsi un cadre ajusté au contenu se dimensionne à cette zone au lieu de se réduire à zéro.
+
 ## Sélecteur de police
 
 Ouvrez le sélecteur de police dans la section Typographie du panneau des propriétés pour changer de famille. Le sélecteur offre :

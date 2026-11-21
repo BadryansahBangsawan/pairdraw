@@ -94,6 +94,8 @@ La sortie Tailwind autonome est compilée pendant l’export ; elle ne dépend p
 
 L’export HTML écrit le nom de chaque calque dans l’attribut `data-name`. `--no-layer-names` omet les noms et `--layer-ids` ajoute l’ID de chaque calque en `data-pairdraw-node-id` pour les outils qui relient le balisage au document.
 
+Une taille de police que Tailwind ne nomme pas comme palier (comme 40px ou 28px) s’exporte en valeur arbitraire, `text-[40px]`, plutôt qu’en un utilitaire comme `text-10` qu’aucune feuille de style ne génère. Les paliers nommés et les tailles liées à des tokens gardent leur classe.
+
 L’export HTML est disponible en mode fichier.
 
 ### Tokens dans le code exporté

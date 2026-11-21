@@ -67,6 +67,8 @@ Pierwsza rzeczywista zmiana szerokości lub wysokości przełącza tylko tę oś
 
 Domyślnie ramka z automatycznym układem rozmieszcza zawartość tak, jakby żadna warstwa nie miała obrysu, tak jak Figma. Włącz **Uwzględnij obrysy w układzie** w sekcji Układ, aby zrobić miejsce na obrysy: obrys samej ramki odsuwa zawartość do wewnątrz, a zewnętrzne obrysy elementów zajmują miejsce między nimi.
 
+Ramka z automatycznym układem o stałym rozmiarze nigdy nie jest mniejsza niż miejsce, które zajmuje jej dopełnienie, plus wewnętrzne obrysy, które liczy, gdy włączone jest **Uwzględnij obrysy w układzie**. Ustawienie jej mniejszej powiększa ją do tego miejsca, jak w Figmie. Ramka zapisana mniejsza niż jej dopełnienie przed tą zmianą zachowuje swój zapisany rozmiar przy otwieraniu pliku i powiększa się do dopełnienia przy następnej edycji.
+
 ## Zmiana kolejności przeciąganiem
 
 Wewnątrz ramki z automatycznym układem przeciągnij element, aby zmienić jego miejsce wśród sąsiadów. Wskaźnik wstawiania pokazuje, gdzie element zostanie upuszczony. Obiekt przeciągnięty z innego miejsca do ramki z automatycznym układem jest wstawiany w ten sam sposób; w ramce z zawijaniem trafia do wiersza pod kursorem. Obiekt narysowany wewnątrz ramki z automatycznym układem trafia na koniec jej przepływu.
@@ -100,6 +102,8 @@ Kolumny i wiersze mają trzy tryby rozmiaru:
 - **auto** — rozmiar dopasowany do zawartości.
 
 Przykład: trzy kolumny `1fr 200px 1fr` dają układ ze stałą kolumną środkową i elastycznymi bokami.
+
+Ustaw ramkę siatki na **Dopasuj do zawartości**, aby wymiarować ją według ścieżek i odstępów. Na dopasowanej osi ścieżka ułamkowa (`fr`) przyjmuje rozmiar swojej zawartości zamiast dzielić miejsce, a minimum i maksimum ramki nadal obowiązują.
 
 ### Odstępy siatki
 

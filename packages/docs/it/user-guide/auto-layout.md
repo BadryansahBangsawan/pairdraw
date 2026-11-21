@@ -67,6 +67,8 @@ La prima modifica reale di una dimensione rende fisso solo quell’asse. Portare
 
 Per impostazione predefinita un frame con disposizione automatica dispone il contenuto come se nessun livello avesse un contorno, come fa Figma. Attiva **Includi i contorni nel layout** nella sezione Layout per fare spazio ai contorni: il contorno del frame spinge il contenuto verso l’interno, e i contorni esterni dei figli occupano spazio tra di loro.
 
+Un frame con disposizione automatica fissa non è mai più piccolo dello spazio occupato dai suoi margini interni, più i contorni interni che conta quando **Includi i contorni nel layout** è attivo. Impostarlo più piccolo lo fa crescere fino a quello spazio, come in Figma. Un frame salvato più piccolo dei suoi margini interni prima di questa modifica mantiene la sua dimensione salvata all’apertura del file, e cresce fino ai suoi margini interni alla modifica successiva.
+
 ## Riordinare trascinando
 
 In un frame con disposizione automatica, trascina un figlio per riordinarlo tra i fratelli. Un indicatore di inserimento mostra dove verrà rilasciato. Trascinare un oggetto da un altro punto dentro un frame con disposizione automatica lo inserisce allo stesso modo; in un frame che va a capo, finisce nella riga sotto il cursore. Disegnare dentro un frame con disposizione automatica aggiunge il nuovo oggetto alla fine del suo flusso.
@@ -100,6 +102,8 @@ Definisci le tracce di colonne e righe con tre modalità:
 - **auto**: si adatta al contenuto.
 
 Esempio: tre colonne `1fr 200px 1fr` creano un layout con una colonna centrale fissa e lati flessibili.
+
+Imposta un frame a griglia su **Adatta al contenuto** per dimensionarlo secondo le sue tracce e le sue spaziature. Su un asse adattato, una traccia frazionaria (`fr`) prende la dimensione del suo contenuto invece di dividere lo spazio, e il minimo e il massimo del frame continuano ad applicarsi.
 
 ### Spazi della griglia
 

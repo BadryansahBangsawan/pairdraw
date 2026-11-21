@@ -96,6 +96,8 @@ L'output Tailwind autonomo viene compilato durante l'esportazione e non dipende 
 
 L'esportazione HTML scrive il nome di ogni livello nell'attributo `data-name`. `--no-layer-names` omette i nomi e `--layer-ids` aggiunge l'ID di ogni livello come `data-pairdraw-node-id`, per gli strumenti che collegano il markup al documento.
 
+Una dimensione del font che Tailwind non nomina come passo (come 40px o 28px) si esporta come valore arbitrario, `text-[40px]`, invece che come un’utilità come `text-10` che nessun foglio di stile genera. I passi con nome e le dimensioni legate ai token mantengono la loro classe.
+
 L'esportazione HTML è disponibile in modalità file.
 
 ### Token nel codice esportato

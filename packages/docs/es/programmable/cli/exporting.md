@@ -96,6 +96,8 @@ La salida independiente con Tailwind se compila durante la exportación; no depe
 
 La exportación HTML escribe el nombre de cada capa en el atributo `data-name`. `--no-layer-names` omite los nombres y `--layer-ids` añade el ID de cada capa como `data-pairdraw-node-id` para las herramientas que vinculan el marcado con el documento.
 
+Un tamaño de fuente que Tailwind no nombra como paso (como 40px o 28px) se exporta como valor arbitrario, `text-[40px]`, en lugar de una utilidad como `text-10` que ninguna hoja de estilos genera. Los pasos con nombre y los tamaños vinculados a tokens conservan su clase.
+
 La exportación HTML está disponible en el modo archivo.
 
 ### Tokens en el código exportado

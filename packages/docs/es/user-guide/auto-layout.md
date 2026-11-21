@@ -67,6 +67,8 @@ El primer cambio real de anchura o altura convierte solo ese eje a fijo. El foco
 
 Por defecto, un marco con disposición automática coloca su contenido como si ninguna capa tuviera trazo, igual que Figma. Activa **Incluir trazos en el diseño** en la sección **Diseño** para dejar sitio a los trazos: el trazo del propio marco empuja su contenido hacia dentro, y los trazos exteriores de sus hijos ocupan espacio entre ellos.
 
+Un marco con disposición automática fija nunca es más pequeño que el espacio que ocupa su relleno, más los trazos interiores que cuenta cuando **Incluir trazos en el diseño** está activado. Si se fija más pequeño, crece hasta ese espacio, como en Figma. Un marco guardado más pequeño que su relleno antes de este cambio conserva su tamaño guardado al abrir el archivo, y crece hasta su relleno en la siguiente edición.
+
 ## Reordenar arrastrando
 
 Dentro de un marco con disposición automática, arrastra un hijo para cambiar su orden entre sus hermanos. Un indicador de inserción muestra dónde se soltará. Arrastrar un objeto desde otro lugar a un marco con disposición automática lo inserta de la misma manera; en un marco con salto de línea, entra en la línea que hay bajo el puntero. Dibujar dentro de un marco con disposición automática añade el objeto nuevo al final de su flujo.
@@ -100,6 +102,8 @@ Define las pistas de columnas y filas con tres modos de tamaño:
 - **auto:** se ajusta al contenido.
 
 Ejemplo: tres columnas `1fr 200px 1fr` crean una disposición con una columna central fija y laterales flexibles.
+
+Pon un marco de cuadrícula en **Ajustar al contenido** para dimensionarlo según sus pistas y espacios. En un eje ajustado, una pista fraccionaria (`fr`) toma el tamaño de su contenido en lugar de repartir espacio, y el mínimo y el máximo del marco siguen aplicándose.
 
 ### Separaciones de la cuadrícula
 

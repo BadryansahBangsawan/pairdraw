@@ -67,6 +67,16 @@ Ein ⌘-Klick (Strg-Klick unter Windows und Linux) auf einen Link auf der Arbeit
 | Kopieren | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Strg</kbd> + <kbd>C</kbd> |
 | Einfügen | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Strg</kbd> + <kbd>V</kbd> |
 
+## Größenänderung und Kürzung
+
+Die Steuerung **Größenänderung** im Bereich „Layout“ legt fest, wie das Textfeld seinem Inhalt folgt:
+
+- **Automatische Breite** — das Feld wächst, damit jede Zeile in eine Zeile passt (Figmas automatische Breiten- und Höhenanpassung).
+- **Automatische Höhe** — die Breite bleibt fest, und das Feld wächst in die Höhe, wenn der Text umbricht.
+- **Fest** — das Feld behält die Größe, die Sie ihm geben.
+
+**Kürzung** im Bereich „Typografie“ schneidet Text ab, der über das Feld hinausgeht: **Auslassung am Ende** fügt eine Ellipse hinzu, und **Maximale Zeilen** begrenzt, wie viele Zeilen gezeichnet werden, bevor gekürzt wird. Ein gekürzter Text behält sein Feld in Auto-Layout, sodass ein sich anpassender Rahmen auf dieses Feld bemessen wird, statt auf null zu schrumpfen.
+
 ## Schriftauswahl
 
 Öffnen Sie die Schriftauswahl im Bereich „Typografie“ des Eigenschaften-Panels, um die Schriftfamilie zu ändern. Die Auswahl bietet:

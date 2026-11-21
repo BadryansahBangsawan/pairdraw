@@ -67,6 +67,8 @@ Die erste tatsächliche Änderung einer Breite oder Höhe schaltet nur diese Ach
 
 Standardmäßig ordnet ein Auto-Layout-Rahmen seinen Inhalt so an, als hätte keine Ebene eine Kontur, wie in Figma. Schalten Sie im Bereich „Layout“ **Konturen ins Layout einbeziehen** ein, um Platz für Konturen zu schaffen: Die Kontur des Rahmens selbst schiebt seinen Inhalt nach innen, und die äußeren Konturen seiner Kinder belegen Raum zwischen ihnen.
 
+Ein fester Auto-Layout-Rahmen ist nie kleiner als der Raum, den sein Innenabstand beansprucht, zuzüglich der inneren Konturen, die er zählt, wenn **Konturen ins Layout einbeziehen** eingeschaltet ist. Wird er kleiner gesetzt, wächst er auf diesen Raum, wie in Figma. Ein Rahmen, der vor dieser Änderung kleiner als sein Innenabstand gespeichert wurde, behält beim Öffnen der Datei seine gespeicherte Größe und wächst bei der nächsten Bearbeitung auf seinen Innenabstand.
+
 ## Per Ziehen umsortieren
 
 Innerhalb eines Auto-Layout-Rahmens ziehen Sie ein Kind, um es zwischen seinen Geschwistern neu einzuordnen. Eine Einfügemarke zeigt, wo das Kind abgelegt wird. Ein Objekt, das Sie von anderswo in einen Auto-Layout-Rahmen ziehen, wird auf dieselbe Weise eingefügt; in einem umbrechenden Rahmen landet es in der Zeile unter dem Cursor. Zeichnen Sie innerhalb eines Auto-Layout-Rahmens, wird das neue Objekt am Ende seines Verlaufs angefügt.
@@ -100,6 +102,8 @@ Spalten- und Zeilenspuren lassen sich mit drei Größenmodi festlegen:
 - **auto:** passt sich dem Inhalt an.
 
 Beispiel: Drei Spalten mit `1fr 200px 1fr` ergeben eine feste mittlere Spalte mit flexiblen Seiten.
+
+Setzen Sie einen Grid-Rahmen auf **An Inhalt anpassen**, um ihn auf seine Spuren und Abstände zu bemessen. Auf einer angepassten Achse nimmt eine Bruchteil-Spur (`fr`) die Größe ihres Inhalts an, statt Raum aufzuteilen, und Minimum und Maximum des Rahmens gelten weiterhin.
 
 ### Grid-Abstände
 

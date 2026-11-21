@@ -228,7 +228,13 @@ describe('--page and --page-id', () => {
       { command: 'eval', args: { code: 'return 1', document_id: 'doc-2', page_id: '0:2' } },
       {
         command: 'tool',
-        args: { document_id: 'doc-2', page_id: '0:2', name: 'get_selection', args: {} }
+        args: {
+          document_id: 'doc-2',
+          page_id: '0:2',
+          name: 'get_selection',
+          args: {},
+          designMemory: 'warn'
+        }
       }
     ])
   })

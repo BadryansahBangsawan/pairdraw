@@ -195,3 +195,94 @@ describe('variable token undo', () => {
     expect(attribute()).toBeUndefined()
   })
 })
+
+describe('undoing a variable delete', () => {
+  test('gives a layer back the binding the delete removed', () => {
+    const editor = themeEditor()
+    const page = editor.graph.getPages()[0].id
+    const frame = editor.graph.createNode('FRAME', page, {
+      name: 'Card',
+      width: 10,
+      height: 10,
+      cornerRadius: 24
+    })
+    editor.graph.bindVariable(frame.id, 'cornerRadius', 'gutter')
+
+    editor.removeVariable('gutter')
+    expect(editor.graph.getNode(frame.id)?.boundVariables.cornerRadius).toBeUndefined()
+
+    editor.undo.undo()
+
+    expect(editor.graph.getNode(frame.id)?.boundVariables.cornerRadius).toBe('gutter')
+    expect(editor.graph.getNode(frame.id)?.cornerRadius).toBe(24)
+  })
+
+  test('gives an instance back the binding and overrides the delete claimed', () => {
+    const editor = themeEditor()
+    const page = editor.graph.getPages()[0].id
+    const component = editor.graph.createNode('COMPONENT', page, { name: 'Card' })
+    const layer = editor.graph.createNode('FRAME', component.id, {
+      name: 'Body',
+      width: 10,
+      height: 10,
+      cornerRadius: 24
+    })
+    editor.graph.bindVariable(layer.id, 'cornerRadius', 'gutter')
+    const instance = editor.graph.createInstance(component.id, page)
+    if (!instance) throw new Error('No instance')
+    const copy = editor.graph.getChildren(instance.id)[0]
+
+    editor.removeVariable('gutter')
+    expect(editor.graph.getNode(copy.id)?.boundVariables.cornerRadius).toBeUndefined()
+
+    editor.undo.undo()
+
+    expect(editor.graph.getNode(copy.id)?.boundVariables.cornerRadius).toBe('gutter')
+    expect(editor.graph.getNode(copy.id)?.cornerRadius).toBe(24)
+    expect(editor.graph.getNode(instance.id)?.instanceOverrides.self.size).toBe(0)
+  })
+})
+
+test('undoing a collection delete gives its layers back their bindings', () => {
+  const editor = themeEditor()
+  const page = editor.graph.getPages()[0].id
+  const frame = editor.graph.createNode('FRAME', page, {
+    name: 'Card',
+    width: 10,
+    height: 10,
+    cornerRadius: 24
+  })
+  editor.graph.bindVariable(frame.id, 'cornerRadius', 'gutter')
+
+  editor.removeCollection('theme')
+  expect(editor.graph.getNode(frame.id)?.boundVariables.cornerRadius).toBeUndefined()
+
+  editor.undo.undo()
+
+  expect(editor.graph.getNode(frame.id)?.boundVariables.cornerRadius).toBe('gutter')
+  expect(editor.graph.getNode(frame.id)?.cornerRadius).toBe(24)
+})
+
+test('undoing a collection delete gives layers back the mode they chose', () => {
+  const editor = themeEditor()
+  const page = editor.graph.getPages()[0].id
+  const size = editor.graph.createVariable('Size', 'FLOAT', 'theme', 10)
+  size.valuesByMode.dark = 30
+  const frame = editor.graph.createNode('FRAME', page, {
+    name: 'Card',
+    width: 10,
+    height: 10,
+    variableModes: { theme: 'dark' }
+  })
+  editor.graph.bindVariable(frame.id, 'width', size.id)
+  editor.setActiveMode('theme', 'dark')
+  editor.refreshVariables({ variables: [size.id] })
+  expect(editor.graph.getNode(frame.id)?.width).toBe(30)
+
+  editor.removeCollection('theme')
+  editor.undo.undo()
+
+  expect(editor.graph.getNode(frame.id)?.variableModes).toEqual({ theme: 'dark' })
+  expect(editor.graph.getActiveModeId('theme')).toBe('dark')
+  expect(editor.graph.getNode(frame.id)?.width).toBe(30)
+})

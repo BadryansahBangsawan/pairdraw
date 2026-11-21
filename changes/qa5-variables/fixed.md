@@ -1,0 +1,3 @@
+- Undoing the deletion of a variable or a collection gives layers back the bindings the deletion removed.
+- Undoing the deletion of a variable or a collection gives layers back the bindings the deletion removed; undoing a collection delete also restores the mode each layer chose and the collection’s active mode.
+- Writing a `.pen` file keeps variable references on padding and corner radius, so they read back bound.

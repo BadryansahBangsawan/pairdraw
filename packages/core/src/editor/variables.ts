@@ -9,7 +9,13 @@ import {
   type VariableType,
   type VariableValue
 } from '@pairdraw/scene-graph'
-import { tokenExpressionForValue, type BindingScope } from '@pairdraw/scene-graph/variables'
+import { findInstanceAncestor } from '@pairdraw/scene-graph/instances'
+import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  tokenExpressionForValue,
+  variableBindingOwner,
+  type BindingScope
+} from '@pairdraw/scene-graph/variables'
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
@@ -168,6 +174,14 @@ export function createVariableActions(ctx: EditorContext) {
       .map((vid) => ctx.graph.variables.get(vid))
       .filter((v): v is Variable => v != null)
       .map((v) => structuredClone(v))
+    const bindings = bindingSnapshots(snapshot.variableIds)
+    // The mode the collection showed and the one each layer chose, which the removal drops, so
+    // undo resolves the restored bindings to the values they had before it.
+    const activeMode = ctx.graph.activeMode.get(id)
+    const modeChoices = new Map<string, string>()
+    for (const node of ctx.graph.getAllNodes()) {
+      if (Object.hasOwn(node.variableModes, id)) modeChoices.set(node.id, node.variableModes[id])
+    }
     ctx.graph.removeCollection(id)
     ctx.undo.push({
       label: 'Remove collection',
@@ -178,6 +192,15 @@ export function createVariableActions(ctx: EditorContext) {
       inverse: () => {
         ctx.graph.addCollection(snapshot)
         for (const v of variables) ctx.graph.addVariable(v)
+        if (activeMode !== undefined) ctx.graph.setActiveMode(id, activeMode)
+        for (const [nodeId, modeId] of modeChoices) {
+          const node = ctx.graph.getNode(nodeId)
+          if (!node) continue
+          ctx.graph.updateNode(nodeId, {
+            variableModes: { ...node.variableModes, [id]: modeId }
+          })
+        }
+        restoreBindings(bindings)
         refreshVariables(scope)
       }
     })
@@ -200,11 +223,58 @@ export function createVariableActions(ctx: EditorContext) {
     ctx.requestRefresh()
   }
 
+  /**
+   * The bindings removing these variables strips from layers, and the instance overrides it
+   * records, so undo can put both back. A layer keeps the value its variable last gave it.
+   */
+  function bindingSnapshots(ids: Iterable<string>) {
+    const removed = new Set(ids)
+    const snapshots = []
+    for (const node of ctx.graph.getAllNodes()) {
+      const entries = Object.entries(node.boundVariables).filter(([, id]) => removed.has(id))
+      if (entries.length === 0) continue
+      const owner = variableBindingOwner(ctx.graph, node)
+      const nearest = findInstanceAncestor(ctx.graph, node.id)
+      snapshots.push({
+        nodeId: node.id,
+        boundVariables: Object.fromEntries(entries),
+        variableBindingScales: Object.fromEntries(
+          entries
+            .map(([field]) => field)
+            .filter((field) => field in node.variableBindingScales)
+            .map((field) => [field, node.variableBindingScales[field]])
+        ),
+        owners: new Map(
+          [owner, ...(nearest ? [nearest] : [])].map((item) => [
+            item.id,
+            cloneInstanceOverrideState(item.instanceOverrides)
+          ])
+        )
+      })
+    }
+    return snapshots
+  }
+
+  function restoreBindings(snapshots: ReturnType<typeof bindingSnapshots>) {
+    for (const snapshot of snapshots) {
+      for (const [ownerId, state] of snapshot.owners) {
+        ctx.graph.updateNode(ownerId, { instanceOverrides: cloneInstanceOverrideState(state) })
+      }
+      const node = ctx.graph.getNode(snapshot.nodeId)
+      if (!node) continue
+      ctx.graph.updateNode(snapshot.nodeId, {
+        boundVariables: { ...node.boundVariables, ...snapshot.boundVariables },
+        variableBindingScales: { ...node.variableBindingScales, ...snapshot.variableBindingScales }
+      })
+    }
+  }
+
   function removeVariable(id: string) {
     const variable = ctx.graph.variables.get(id)
     if (!variable) return
     const snapshot = structuredClone(variable)
     const order = [...(ctx.graph.variableCollections.get(variable.collectionId)?.variableIds ?? [])]
+    const bindings = bindingSnapshots([id])
     ctx.graph.removeVariable(id)
     ctx.undo.push({
       label: 'Remove variable',
@@ -212,10 +282,12 @@ export function createVariableActions(ctx: EditorContext) {
         ctx.graph.removeVariable(id)
         refreshVariables({ variables: [id] })
       },
-      // Undo puts the variable back where it was, not at the end of its collection.
+      // Undo puts the variable back where it was, not at the end of its collection, with the
+      // bindings deleting it stripped.
       inverse: () => {
         ctx.graph.addVariable(structuredClone(snapshot))
         placeVariables(snapshot.collectionId, order)
+        restoreBindings(bindings)
         refreshVariables({ variables: [id] })
       }
     })

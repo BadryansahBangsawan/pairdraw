@@ -238,6 +238,59 @@ function captureBackground(
   node.children.unshift(image)
 }
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
+
+/** An SVG that paints `color` through the alpha of the mask image at `url`, as CSS masks do. */
+function maskedColorMarkup(
+  view: CaptureWindow,
+  url: string,
+  color: string,
+  size: { width: number; height: number },
+  fit: string
+): string {
+  const document = view.document
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg')
+  svg.setAttribute('xmlns', SVG_NAMESPACE)
+  svg.setAttribute('width', String(size.width))
+  svg.setAttribute('height', String(size.height))
+  const mask = document.createElementNS(SVG_NAMESPACE, 'mask')
+  mask.setAttribute('id', 'icon')
+  mask.setAttribute('style', 'mask-type: alpha')
+  const image = document.createElementNS(SVG_NAMESPACE, 'image')
+  image.setAttribute('href', url)
+  image.setAttribute('width', '100%')
+  image.setAttribute('height', '100%')
+  image.setAttribute('preserveAspectRatio', fit === 'cover' ? 'xMidYMid slice' : 'xMidYMid meet')
+  mask.append(image)
+  const rect = document.createElementNS(SVG_NAMESPACE, 'rect')
+  rect.setAttribute('width', '100%')
+  rect.setAttribute('height', '100%')
+  rect.setAttribute('fill', color)
+  rect.setAttribute('mask', 'url(#icon)')
+  svg.append(mask, rect)
+  return new view.XMLSerializer().serializeToString(svg)
+}
+
+/**
+ * A box painted through a mask, as CSS icon sets draw icons: its background color shows only
+ * where the mask image is opaque. Layers have no masks, so the box becomes an image of the
+ * colored shape rather than a box of solid color. Only an inline mask image can be drawn.
+ */
+function captureMask(style: CSSStyleDeclaration, node: WebCaptureElement, context: WalkContext) {
+  const mask = style.getPropertyValue('mask-image') || style.getPropertyValue('-webkit-mask-image')
+  const url = BACKGROUND_URL.exec(mask)?.[2]
+  if (!url || node.tagName === 'img' || node.children.length > 0) return
+  const color = node.computedStyle['background-color']
+  node.tagName = 'img'
+  delete node.computedStyle['background-color']
+  const box = node.box
+  if (!color || !url.startsWith('data:') || !box || box.width <= 0 || box.height <= 0) return
+  const size = imageSize(box)
+  const fit = style.getPropertyValue('mask-size') || style.getPropertyValue('-webkit-mask-size')
+  const markup = maskedColorMarkup(context.view, url, color, size, fit)
+  inlineSource(context, node, () => context.images.rasterizeSVG(markup, size))
+}
+
 function captureChildren(element: Element, context: WalkContext, depth: number): WebCaptureNode[] {
   return renderedChildren(element, context.view).flatMap((child) => {
     if (child.nodeType === 3) {
@@ -278,6 +331,7 @@ export function walkElement(element: Element, context: WalkContext, depth = 0): 
   if (hasDirectText(element) || node.children.some((child) => child.type === 'text')) {
     context.fonts.add(style)
   }
+  captureMask(style, node, context)
   captureBackground(style, node, context)
   return [node]
 }

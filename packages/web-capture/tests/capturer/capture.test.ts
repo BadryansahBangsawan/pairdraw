@@ -116,6 +116,23 @@ describe('capturing an element', () => {
     ])
   })
 
+  test('reads a box an icon set paints through a mask as an image, not a box of solid color', async () => {
+    // CSS icon sets draw an icon as the text color shown through the icon's shape.
+    const icon = `url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 4h16v16H4z%22/%3E%3C/svg%3E")`
+    const document = open(
+      `<div id="row"><span style='display: inline-block; width: 12px; height: 12px; background-color: #ededef; mask-image: ${icon}'></span><span>Vector</span></div>`
+    )
+    const row = document.getElementById('row')
+    if (!row) throw new Error('fixture has a row')
+
+    const capture = await captureElement(row, { inlineImages: false })
+
+    const [masked, label] = elements(capture.root.children)
+    expect(masked?.tagName).toBe('img')
+    expect(masked?.computedStyle).not.toHaveProperty('background-color')
+    expect(label?.tagName).toBe('span')
+  })
+
   test('refuses an element that is not displayed', async () => {
     const document = open('<p class="hidden" id="gone">Hi</p>')
     const gone = document.getElementById('gone')

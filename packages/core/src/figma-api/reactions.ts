@@ -14,6 +14,7 @@ import type {
 import { variantSetsAround } from '@pairdraw/scene-graph/components'
 
 import { issuePath } from '#core/figma-api/effects'
+import { asInstanceEdit, sameReaction } from '#core/prototype/reactions'
 
 /**
  * Triggers Figma's plugin API offers that a prototype in Pairdraw cannot start from, and the
@@ -137,6 +138,12 @@ export interface ReactionContext {
   pageId: string
   /** The reactions the layer has now, whose ids this keeps by position. */
   previous?: readonly PrototypeReaction[]
+  /**
+   * An instance's main component's reactions: a reaction kept under one of their ids that an
+   * edit changed, from what the layer held at its place and from the main's, becomes the
+   * instance's own, with an id of its own.
+   */
+  inherited?: readonly PrototypeReaction[]
 }
 
 /**
@@ -157,11 +164,16 @@ export function parseFigmaReactions(value: unknown, context: ReactionContext): P
   }
   return result.output.map((reaction, index) => {
     const id = context.previous?.[index]?.id ?? generateId()
-    return {
+    const parsed: PrototypeReaction = {
       id,
       trigger: toTrigger(reaction.trigger),
       actions: reaction.actions.map((action) => toAction(action, context, index))
     }
+    // One the layer already held unchanged stays as it was, a copy of the main's included, so
+    // writing reactions back as read never re-ids a copy whose main was edited since.
+    const held = context.previous?.[index]
+    if (held && sameReaction(held, parsed)) return parsed
+    return asInstanceEdit(parsed, context.inherited ?? [])
   })
 }
 

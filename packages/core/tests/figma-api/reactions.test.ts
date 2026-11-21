@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { effectiveReactions } from '@pairdraw/core/prototype'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { setReactions } from '#core/tools/modify/reactions'
@@ -204,6 +205,80 @@ describe('interactive components and scrolling in the plugin shape', () => {
     expect(() => {
       Reflect.set(proxy(screen.id), 'overflowDirection', 'SIDEWAYS')
     }).toThrow('overflowDirection')
+  })
+
+  test("an edit to Figma's copy of the main's interaction on an instance is the instance's own", () => {
+    const { proxy, graph, off, on, instance, elsewhere } = toggle()
+    graph.updateNode(off.id, {
+      prototypeReactions: [
+        {
+          id: '9:1',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: on.id,
+              navigation: 'CHANGE_TO',
+              transition: { type: 'INSTANT', duration: 0 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    // As Figma writes it: the instance carries the main's interaction under the main's id.
+    graph.updateNode(instance.id, {
+      prototypeReactions: graph.getNode(off.id)?.prototypeReactions ?? []
+    })
+    const node = proxy(instance.id)
+    Reflect.set(node, 'reactions', node.reactions)
+    expect(graph.getNode(instance.id)?.prototypeReactions[0]?.id).toBe('9:1')
+
+    Reflect.set(node, 'reactions', [
+      {
+        trigger: { type: 'ON_CLICK' },
+        actions: [{ type: 'NODE', destinationId: elsewhere.id, navigation: 'NAVIGATE' }]
+      }
+    ])
+    expect(graph.getNode(instance.id)?.prototypeReactions[0]?.id).not.toBe('9:1')
+  })
+
+  test("writing an instance's reactions back unchanged keeps Figma's copy, which runs the main's edit", async () => {
+    const { figma, graph, off, on, instance, elsewhere } = toggle()
+    const changeTo = {
+      id: '9:1',
+      trigger: { type: 'ON_CLICK' as const, delay: 0 },
+      actions: [
+        {
+          type: 'NODE' as const,
+          nodeId: on.id,
+          navigation: 'CHANGE_TO' as const,
+          transition: { type: 'INSTANT' as const, duration: 0 },
+          overlayPosition: 'CENTER' as const
+        }
+      ]
+    }
+    graph.updateNode(off.id, { prototypeReactions: [changeTo] })
+    graph.updateNode(instance.id, { prototypeReactions: [{ ...changeTo }] })
+    // The designer edits the main; the instance still carries the old copy.
+    graph.updateNode(off.id, {
+      prototypeReactions: [
+        {
+          ...changeTo,
+          actions: [
+            { ...changeTo.actions[0], nodeId: elsewhere.id, navigation: 'NAVIGATE' as const }
+          ]
+        }
+      ]
+    })
+    const read = await getReactions.execute(figma, { id: instance.id })
+    if (!('reactions' in read)) throw new Error('no reactions')
+    await setReactions.execute(figma, { id: instance.id, reactions: [...read.reactions] })
+
+    const held = graph.getNode(instance.id)
+    expect(held?.prototypeReactions[0]?.id).toBe('9:1')
+    if (!held) throw new Error('no instance')
+    expect(effectiveReactions(graph, held)[0]?.actions[0]).toMatchObject({ nodeId: elsewhere.id })
   })
 
   test('refuses overflow scrolling on a layer that cannot scroll', () => {

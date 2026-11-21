@@ -112,6 +112,29 @@ describe('a click in play', () => {
     expect(reactionAt(graph, startSession(first.id), 500, 100)).toBeNull()
   })
 
+  test("runs a nested frame's reaction from its empty area, as a button's background", () => {
+    const { graph, first, second } = fixture()
+    const card = graph.createNode('FRAME', first.id, { x: 200, y: 20, width: 80, height: 60 })
+    graph.createNode('TEXT', card.id, { x: 0, y: 0, width: 10, height: 10 })
+    withReaction(graph, card.id, navigatesTo(second.id))
+    expect(reactionAt(graph, startSession(first.id), 260, 60)?.sourceId).toBe(card.id)
+  })
+
+  test('looks past a clipping frame for the part of a child it hides', () => {
+    const { graph, first, second } = fixture()
+    const clip = graph.createNode('FRAME', first.id, {
+      x: 200,
+      y: 20,
+      width: 50,
+      height: 50,
+      clipsContent: true
+    })
+    const wide = graph.createNode('RECTANGLE', clip.id, { x: 0, y: 0, width: 90, height: 20 })
+    withReaction(graph, wide.id, navigatesTo(second.id))
+    expect(reactionAt(graph, startSession(first.id), 220, 30)?.sourceId).toBe(wide.id)
+    expect(reactionAt(graph, startSession(first.id), 270, 30)).toBeNull()
+  })
+
   // Live-verified in Figma: a frame's background click runs the frame's own reaction.
   test("runs the played frame's own reaction when its background is clicked", () => {
     const { graph, first, second } = fixture()

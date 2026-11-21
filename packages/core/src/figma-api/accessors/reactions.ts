@@ -1,4 +1,5 @@
 import type { PrototypeReaction } from '@pairdraw/scene-graph'
+import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import type { NodeProxyInternals, ProxyThis } from '#core/figma-api/accessor-utils'
 import { graph, raw, updateNode } from '#core/figma-api/accessor-utils'
@@ -25,7 +26,11 @@ export function installReactionAccessors(prototype: object, internals: NodeProxy
             graph: sceneGraph,
             nodeId: node.id,
             pageId,
-            previous
+            previous,
+            inherited:
+              node.type === 'INSTANCE'
+                ? instanceMainComponent(sceneGraph, node)?.prototypeReactions
+                : undefined
           })
         })
       }

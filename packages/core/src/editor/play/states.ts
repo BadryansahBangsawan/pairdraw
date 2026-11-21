@@ -57,7 +57,7 @@ function variantFor(
 }
 
 /** Let auto layout size a changed layer's ancestors again, not as a `.fig` file recorded them. */
-function reflow(graph: SceneGraph, nodeId: string): void {
+export function reflow(graph: SceneGraph, nodeId: string): void {
   let current = graph.getNode(nodeId)
   while (current) {
     if (current.derivedLayout) graph.updateNode(current.id, { derivedLayout: null })

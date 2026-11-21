@@ -1,4 +1,19 @@
 export { framesOnPage } from './frames'
+export { effectiveReactions, sameReaction } from './reactions'
+export {
+  changeTarget,
+  createPlayScene,
+  type PlayChange,
+  type PlayScene,
+  type PlaySceneView
+} from './scene'
+export {
+  PLAY_SCENE_LIMIT,
+  createPlayScenes,
+  type PlayScenes,
+  type PlayStep,
+  type PlayTimeout
+} from './scenes'
 export {
   primaryAction,
   reactionAt,

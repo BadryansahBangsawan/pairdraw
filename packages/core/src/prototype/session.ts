@@ -2,12 +2,14 @@ import type {
   PrototypeAction,
   PrototypeReaction,
   PrototypeTransition,
+  PrototypeTriggerType,
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
-import { isPointInNode } from '@pairdraw/scene-graph/hit-test'
 
 import { framesOnPage } from './frames'
+import { playHitTest } from './hit'
+import { effectiveReactions } from './reactions'
 
 /**
  * The action a reaction runs: its first, which the prototype panel edits alone in this version, as
@@ -29,8 +31,13 @@ export interface PlaySession {
   overlays: string[]
 }
 
-/** One click's result: the action it ran, and the transition that action asked for. */
+/**
+ * One reaction a pointer or a timer runs: the layer it runs from, its action, and the transition
+ * that action asked for.
+ */
 export interface PlayClick {
+  /** The layer whose reaction runs, which a Change to switches the instance of. */
+  sourceId: string
   action: PrototypeAction
   transition: PrototypeTransition | null
 }
@@ -84,27 +91,30 @@ export function restartSession(session: PlaySession): PlaySession {
 
 /**
  * The reaction a click at a document point runs, as Figma resolves one: the layer under the point
- * or its nearest ancestor inside the shown frame that has an `ON_CLICK` reaction, with the
- * reaction's first action.
+ * or its nearest ancestor inside the shown frame that has a reaction to `trigger`, with the
+ * reaction's first action. An instance runs the reactions of the variant it shows.
  */
 export function reactionAt(
   graph: SceneGraph,
   session: PlaySession,
   x: number,
-  y: number
+  y: number,
+  trigger: PrototypeTriggerType = 'ON_CLICK'
 ): PlayClick | null {
-  const shown = shownFrame(session)
   // A click on the frame's own background is the frame's, not a layer's; one outside it hits
   // nothing.
-  let node = graph.hitTestDeep(x, y, shown)
-  if (!node && isPointInNode(graph, shown, x, y)) node = graph.getNode(shown) ?? null
+  let node = playHitTest(graph, shownFrame(session), x, y)
   while (node) {
-    const reaction = node.prototypeReactions.find(
-      (candidate) => candidate.trigger.type === 'ON_CLICK'
+    const reaction = effectiveReactions(graph, node).find(
+      (candidate) => candidate.trigger.type === trigger
     )
     const action = reaction ? primaryAction(reaction) : null
     if (action) {
-      return { action, transition: action.type === 'NODE' ? action.transition : null }
+      return {
+        sourceId: node.id,
+        action,
+        transition: action.type === 'NODE' ? action.transition : null
+      }
     }
     if (node.id === shownFrame(session)) return null
     node = node.parentId ? (graph.getNode(node.parentId) ?? null) : null

@@ -1,5 +1,4 @@
 - An inline SVG icon keeps its nearly closed circles when it is scaled, instead of drawing them as a dot.
 - Home shows previews of recent and stored files again instead of a placeholder icon.
 - A code edit's top-level elements preview together, so a connector can join layers another element draws and an instance can name a component written after it.
-- Flatten keeps each layer's own geometry and keeps strokes as strokes instead of turning them into shape. The flattened vector takes the topmost layer's fill, since per-region fills are not supported yet.
 - A rounded rectangle shape with text keeps its corners at 0.4 of its shorter side through resizes, as FigJam does, instead of a fixed 6 px radius.

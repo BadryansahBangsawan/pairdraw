@@ -1,0 +1,1 @@
+- SVG and PDF export draw a pattern, noise or custom fill as the colour the canvas falls back to, instead of dropping the layer.

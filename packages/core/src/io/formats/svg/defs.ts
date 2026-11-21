@@ -292,6 +292,12 @@ export function resolveFill(fill: Fill, node: SceneNode, ctx: SVGExportContext):
     return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
   }
 
+  // The canvas draws a pattern, noise or custom paint as its own colour when the format has no
+  // element for it, so the export must not drop the layer.
+  if (fill.type === 'PATTERN' || fill.type === 'NOISE' || fill.type === 'CUSTOM') {
+    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
+  }
+
   if (fill.type.startsWith('GRADIENT')) {
     const grad = createGradientDef(fill, node, ctx)
     if (grad) {

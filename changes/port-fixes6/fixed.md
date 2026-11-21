@@ -1,0 +1,1 @@
+- An inline SVG icon keeps its nearly closed circles when it is scaled, instead of drawing them as a dot.

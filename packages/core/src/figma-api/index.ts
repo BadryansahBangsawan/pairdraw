@@ -719,6 +719,32 @@ export class FigmaAPI implements NodeProxyHost {
     return toUint8Array(data)
   }
 
+  /**
+   * A script run in the editor has no UI to talk to, and Figma still gives every plugin a UI
+   * object, so scripts that guard on `figma.ui` keep working here: the calls do nothing.
+   */
+  readonly ui: {
+    onmessage: ((message: unknown, props: unknown) => void) | undefined
+    postMessage(message: unknown): void
+    resize(width: number, height: number): void
+    close(): void
+    show(): void
+    hide(): void
+  } = {
+    onmessage: undefined,
+    postMessage: noop,
+    resize: noop,
+    close: noop,
+    show: noop,
+    hide: noop
+  }
+
+  showUI(html?: string, options?: unknown): void {
+    void html
+    void options
+  }
+
+
   notify(message: string): { cancel: () => void } {
     if (typeof console !== 'undefined') console.warn(`[figma.notify] ${message}`)
     return { cancel: noop }

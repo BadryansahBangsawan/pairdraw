@@ -30,6 +30,7 @@ export const FIGMA_API_INCOMPLETE_MEMBERS = [
   'getNodeByIdAsync',
   'mixed',
   'root',
+  'ui',
   'variables',
   'viewport'
 ] as const

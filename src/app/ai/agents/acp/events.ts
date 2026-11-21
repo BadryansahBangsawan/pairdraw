@@ -201,7 +201,14 @@ export function createUpdateMapper(idPrefix: string) {
   function map(update: SessionUpdate): UIMessageChunk[] {
     switch (update.sessionUpdate) {
       case 'agent_message_chunk':
-        if (update.content.type === 'text') return stream.text(update.content.text)
+        if (update.content.type === 'text') {
+          // This SDK's schema has no message id yet; agents that send one still stream it.
+          const messageId = 'messageId' in update ? update.messageId : undefined
+          return stream.text(
+            update.content.text,
+            typeof messageId === 'string' ? messageId : undefined
+          )
+        }
         console.warn('[ACP] Unhandled content type:', update.content.type)
         return []
       case 'agent_thought_chunk':

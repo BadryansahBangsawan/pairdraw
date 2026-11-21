@@ -32,8 +32,14 @@ async function transcript(updates: SessionUpdate[]): Promise<UIMessage['parts']>
   return (message?.parts ?? []).filter((part) => part.type !== 'step-start')
 }
 
-function text(value: string): SessionUpdate {
-  return { sessionUpdate: 'agent_message_chunk', content: { type: 'text', text: value } }
+function text(value: string, messageId?: string): SessionUpdate {
+  // The schema of the SDK this tree pins has no message id; agents that send one stream it.
+  const chunk = {
+    sessionUpdate: 'agent_message_chunk' as const,
+    content: { type: 'text' as const, text: value },
+    messageId
+  }
+  return chunk
 }
 
 function thought(value: string): SessionUpdate {
@@ -93,6 +99,18 @@ describe('an ACP turn in the chat', () => {
     expect(parts.filter((part) => part.type === 'text').map((part) => part.text)).toEqual([
       'I’ll inspect the page.',
       'Done.'
+    ])
+  })
+
+  test('a new message the agent starts is a new part, though nothing comes between', async () => {
+    const parts = await transcript([
+      text('Both are running. ', 'msg-1'),
+      text('I’ll wait.', 'msg-1'),
+      text('The circles are done.', 'msg-2')
+    ])
+    expect(parts.filter((part) => part.type === 'text').map((part) => part.text)).toEqual([
+      'Both are running. I’ll wait.',
+      'The circles are done.'
     ])
   })
 

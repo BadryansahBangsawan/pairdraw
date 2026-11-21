@@ -1,11 +1,17 @@
 import { hitsConnectorLine } from './connectors/hit'
 import { getAxisAlignedBoundsAt, getNodeLocalMatrix, getWorldMatrix } from './coordinate'
-import { geometryBlobPolylines } from './geometry'
 import type { SceneGraph } from './graph'
+import { containsPoint } from './hit-test/geometry'
+import { clippingMasks, isMaskedOut } from './hit-test/masks'
+import { showsPaint } from './hit-test/paint'
 import { drawnChildIds } from './layout/draw-order'
 import Matrix, { type Mat3 } from './matrix'
-import type { Rect, Vector } from './primitives'
+import type { Rect } from './primitives'
 import type { SceneNode, NodeType } from './types'
+
+export { clippingMasks, isPointMaskedOut } from './hit-test/masks'
+export { hitTestDropTarget, type DropTargetOptions } from './hit-test/drop'
+export { showsPaint } from './hit-test/paint'
 
 const CONTAINER_TYPES = new Set<NodeType>([
   'CANVAS',
@@ -17,34 +23,6 @@ const CONTAINER_TYPES = new Set<NodeType>([
   'INSTANCE'
 ])
 const OPAQUE_CONTAINER_TYPES = new Set<NodeType>(['COMPONENT', 'INSTANCE'])
-/**
- * How far from a zero-width or zero-height layer, in canvas units, a point still lands on it, so
- * a flat line or an empty box stays clickable; matches a connector line's slop (`connectors/hit.ts`).
- */
-const DEGENERATE_AXIS_SLOP = 4
-
-/**
- * Whether a paint shows, so its container's empty area counts when a click reaches past
- * containers: a paint at 0% opacity, or a gradient whose stops are all transparent, does not,
- * while 1% does, and the layer's own opacity does not matter.
- */
-function isHitPaint(paint: SceneNode['fills'][number]): boolean {
-  if (!paint.visible || !(paint.opacity > 0)) return false
-  if (paint.type === 'SOLID') return paint.color.a > 0
-  if (
-    paint.type === 'GRADIENT_LINEAR' ||
-    paint.type === 'GRADIENT_RADIAL' ||
-    paint.type === 'GRADIENT_ANGULAR' ||
-    paint.type === 'GRADIENT_DIAMOND'
-  )
-    return (paint.gradientStops ?? []).some((stop) => stop.color.a > 0)
-  return true
-}
-
-function showsPaint(node: SceneNode): boolean {
-  return node.fills.some(isHitPaint) || node.strokes.some(isHitPaint)
-}
-
 /**
  * Whether a container's empty area takes the click. Figma counts it only where a paint shows,
  * except a main component's, which always counts, and an instance's when the click is a plain one.
@@ -67,152 +45,6 @@ function isTopLevel(graph: SceneGraph, node: SceneNode): boolean {
  */
 function ownsItsEmptyArea(graph: SceneGraph, node: SceneNode): boolean {
   return node.type === 'FRAME' && node.layoutMode !== 'NONE' && isTopLevel(graph, node)
-}
-
-function hasTransformedAncestor(
-  node: SceneNode,
-  graph: SceneGraph,
-  cache: Map<string, boolean>
-): boolean {
-  const cached = cache.get(node.id)
-  if (cached !== undefined) return cached
-  const parent = node.parentId ? graph.getNode(node.parentId) : undefined
-  const transformed =
-    node.rotation !== 0 ||
-    node.flipX ||
-    node.flipY ||
-    (parent ? hasTransformedAncestor(parent, graph, cache) : false)
-  cache.set(node.id, transformed)
-  return transformed
-}
-
-/**
- * Where the point lies in the node's own coordinates: its offset from the position when nothing
- * above it is turned, else through the inverse world matrix. Null when that cannot be inverted.
- */
-function localPoint(
-  px: number,
-  py: number,
-  node: SceneNode,
-  graph: SceneGraph,
-  transformCache: Map<string, boolean>
-): Vector | null {
-  if (!hasTransformedAncestor(node, graph, transformCache)) {
-    const absolute = graph.getAbsolutePosition(node.id)
-    return { x: px - absolute.x, y: py - absolute.y }
-  }
-  const inv = Matrix.invert(getWorldMatrix(node, graph))
-  if (!inv) return null
-  const [x, y] = Matrix.mapPoints(inv, [px, py])
-  return { x, y }
-}
-
-/** Whether the point lies in the node's box, grown by `pad` canvas units on every side. */
-function containsPoint(
-  px: number,
-  py: number,
-  node: SceneNode,
-  graph: SceneGraph,
-  transformCache: Map<string, boolean>,
-  pad = 0
-): boolean {
-  const local = localPoint(px, py, node, graph, transformCache)
-  if (!local) return false
-  const padX = node.width > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
-  const padY = node.height > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
-  return (
-    local.x >= -padX &&
-    local.x <= node.width + padX &&
-    local.y >= -padY &&
-    local.y <= node.height + padY
-  )
-}
-
-/** Whether a rounded rectangle of `width` × `height` holds the point. */
-function roundedRectContains(
-  point: Vector,
-  width: number,
-  height: number,
-  radius: number
-): boolean {
-  if (point.x < 0 || point.y < 0 || point.x > width || point.y > height) return false
-  const r = Math.max(0, Math.min(radius, width / 2, height / 2))
-  const cx = Math.min(Math.max(point.x, r), width - r)
-  const cy = Math.min(Math.max(point.y, r), height - r)
-  return Math.hypot(point.x - cx, point.y - cy) <= r
-}
-
-/** Whether the point is inside a closed polyline, by the even-odd rule. */
-function insidePolyline(polyline: readonly Vector[], x: number, y: number): boolean {
-  let inside = false
-  for (let i = 0, j = polyline.length - 1; i < polyline.length; j = i++) {
-    const a = polyline[i]
-    const b = polyline[j]
-    if (a.y > y === b.y > y) continue
-    if (x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x) inside = !inside
-  }
-  return inside
-}
-
-/**
- * Whether a mask lets the point through, by the outline it draws: an ellipse's curve, a rounded
- * rectangle's corners, or a vector's filled path. Other shapes clip by their box.
- */
-function maskContainsPoint(
-  px: number,
-  py: number,
-  mask: SceneNode,
-  graph: SceneGraph,
-  transformCache: Map<string, boolean>
-): boolean {
-  const outlined =
-    (mask.type === 'ELLIPSE' && mask.width > 0 && mask.height > 0) ||
-    (mask.type === 'RECTANGLE' && mask.cornerRadius > 0) ||
-    (mask.type === 'VECTOR' && mask.fillGeometry.length > 0)
-  if (!outlined) return containsPoint(px, py, mask, graph, transformCache)
-  const local = localPoint(px, py, mask, graph, transformCache)
-  if (!local) return false
-  if (mask.type === 'ELLIPSE') {
-    const rx = mask.width / 2
-    const ry = mask.height / 2
-    const dx = (local.x - rx) / rx
-    const dy = (local.y - ry) / ry
-    return dx * dx + dy * dy <= 1
-  }
-  if (mask.type === 'RECTANGLE') {
-    return roundedRectContains(local, mask.width, mask.height, mask.cornerRadius)
-  }
-  return geometryBlobPolylines(mask.fillGeometry).some((points) =>
-    insidePolyline(points, local.x, local.y)
-  )
-}
-
-function isVisibleMask(node: SceneNode | undefined): node is SceneNode {
-  return node !== undefined && node.visible && node.isMask
-}
-
-/**
- * The masks that clip each child, by index, as the renderer groups them (`core/canvas/masks.ts`):
- * a run of visible masks clips the layers after it up to the next visible mask. Empty when the
- * container has no visible mask.
- */
-function clippingMasks(graph: SceneGraph, childIds: readonly string[]): SceneNode[][] {
-  const children = childIds.map((childId) => graph.nodes.get(childId))
-  if (!children.some(isVisibleMask)) return []
-  const result: SceneNode[][] = []
-  let run: SceneNode[] = []
-  let previousWasMask = false
-  for (const child of children) {
-    if (isVisibleMask(child)) {
-      run = previousWasMask ? [...run, child] : [child]
-      previousWasMask = true
-      result.push([])
-      continue
-    }
-    previousWasMask = false
-    result.push(run)
-  }
-  return result
 }
 
 /**
@@ -293,21 +125,6 @@ function hitTestContainer(
  */
 function standIn(container: SceneNode, hit: SceneNode, deep: boolean): SceneNode {
   return container.locked || !deep ? container : hit
-}
-
-/** Whether the masks that clip a layer leave the point outside every one of their outlines. */
-function isMaskedOut(
-  px: number,
-  py: number,
-  masks: readonly SceneNode[] | undefined,
-  graph: SceneGraph,
-  transformCache: Map<string, boolean>
-): boolean {
-  if (!masks) return false
-  return (
-    masks.length > 0 &&
-    !masks.some((mask) => maskContainsPoint(px, py, mask, graph, transformCache))
-  )
 }
 
 /**
@@ -633,90 +450,4 @@ export function hitTestDeepInRect(graph: SceneGraph, rect: Rect, scopeId: string
 export function isPointInNode(graph: SceneGraph, nodeId: string, px: number, py: number): boolean {
   const node = graph.nodes.get(nodeId)
   return node !== undefined && containsPoint(px, py, node, graph, new Map())
-}
-
-/** Which layers take a drop, and which are only looked through, as in Figma. */
-interface DropRules {
-  takes: (node: SceneNode) => boolean
-  passThrough: ReadonlySet<NodeType>
-}
-
-const LAYER_TARGETS = new Set<NodeType>(['FRAME', 'SECTION', 'COMPONENT', 'INSTANCE'])
-const COMPONENT_TARGETS = new Set<NodeType>(['FRAME', 'SECTION', 'INSTANCE'])
-
-function dropRules(options: DropTargetOptions): DropRules {
-  const { componentSetIds } = options
-  if (!componentSetIds) {
-    return {
-      takes: (node) => LAYER_TARGETS.has(node.type),
-      passThrough: new Set(['GROUP', 'COMPONENT_SET'])
-    }
-  }
-  // Components never go into other components, and a set only takes back its own variants.
-  return {
-    takes: (node) =>
-      COMPONENT_TARGETS.has(node.type) ||
-      (node.type === 'COMPONENT_SET' && componentSetIds.has(node.id)),
-    passThrough: new Set(['GROUP'])
-  }
-}
-
-function dropTargetIn(
-  graph: SceneGraph,
-  px: number,
-  py: number,
-  parent: SceneNode,
-  excludeIds: ReadonlySet<string>,
-  rules: DropRules,
-  transformCache: Map<string, boolean>
-): SceneNode | null {
-  // A clipped-away part of a child is not under the cursor.
-  if (
-    parent.type !== 'CANVAS' &&
-    parent.clipsContent &&
-    !containsPoint(px, py, parent, graph, transformCache)
-  )
-    return null
-
-  for (let i = parent.childIds.length - 1; i >= 0; i--) {
-    const childId = parent.childIds[i]
-    if (excludeIds.has(childId)) continue
-    const child = graph.nodes.get(childId)
-    if (!child || child.internalOnly || !child.visible || child.locked) continue
-    const target = rules.takes(child)
-    if (!target && !rules.passThrough.has(child.type)) continue
-
-    const deeper = dropTargetIn(graph, px, py, child, excludeIds, rules, transformCache)
-    if (deeper) return deeper
-    if (target && containsPoint(px, py, child, graph, transformCache)) return child
-  }
-
-  return null
-}
-
-export interface DropTargetOptions {
-  /**
-   * Set when the dropped layers are all main components: the component sets they come from.
-   * Components then go only into frames, sections, instances, and those sets.
-   */
-  componentSetIds?: ReadonlySet<string>
-}
-
-/**
- * The topmost unlocked frame, section, component, or instance under the point, in its rotated
- * shape and inside its clipping ancestors. Groups and component sets are looked through but never
- * returned, except that a set takes dropped components; locked layers and their contents are
- * skipped.
- */
-export function hitTestDropTarget(
-  graph: SceneGraph,
-  px: number,
-  py: number,
-  excludeIds: ReadonlySet<string>,
-  scopeId?: string,
-  options: DropTargetOptions = {}
-): SceneNode | null {
-  const scope = graph.nodes.get(scopeId ?? graph.rootId)
-  if (!scope) return null
-  return dropTargetIn(graph, px, py, scope, excludeIds, dropRules(options), new Map())
 }

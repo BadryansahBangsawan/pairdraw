@@ -1,5 +1,6 @@
 import type { PrototypeAction, SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { PlayRevert } from './pointer'
 import { effectiveReactions } from './reactions'
@@ -10,6 +11,7 @@ import {
   type PlayScene,
   type PlaySceneView
 } from './scene'
+import { clampScroll, scrollAlong } from './scroll'
 import { primaryAction, shownFrame, step, type PlayClick, type PlaySession } from './session'
 
 /** How many changed frames play keeps; a frame dropped beyond them starts again as designed. */
@@ -42,6 +44,13 @@ export interface PlayScenes {
   graphFor(rootId: string): SceneGraph
   /** The changed frames the canvas draws from their copies, by frame id. */
   readonly views: ReadonlyMap<string, PlaySceneView>
+  /** How far play scrolled each frame that scrolls, by frame id. */
+  readonly scroll: ReadonlyMap<string, Vector>
+  /**
+   * Scrolls the frames along `path`, a pointer's path in `rootId`, innermost first, and returns
+   * what none of them could take, for the canvas to pan by.
+   */
+  scrollBy(rootId: string, path: readonly string[], dx: number, dy: number): Vector
   /** Runs a reaction of a layer in `rootId`, the shown frame unless a timer names another. */
   run(session: PlaySession, click: PlayClick, rootId?: string): PlayStep
   /**
@@ -62,6 +71,7 @@ export function createPlayScenes(
 ): PlayScenes {
   // Insertion order is use order: a frame changed again moves to the end, and the first goes.
   const scenes = new Map<string, PlayScene>()
+  const scroll = new Map<string, Vector>()
 
   function graphFor(rootId: string): SceneGraph {
     return scenes.get(rootId)?.graph ?? getDocument()
@@ -78,12 +88,18 @@ export function createPlayScenes(
       if (scenes.size <= limit) break
       scenes.delete(oldest)
     }
+    // What the switched instance holds may be shorter now than a frame scrolled past.
+    if (change) clampScroll(scene.graph, scroll)
     return change
   }
 
   return {
     graphFor,
     views: scenes,
+    scroll,
+    scrollBy(rootId, path, dx, dy) {
+      return scrollAlong(graphFor(rootId), scroll, path, dx, dy)
+    },
     run(session, { sourceId, action }, rootId = shownFrame(session)) {
       if (action.type === 'NODE' && action.navigation === 'CHANGE_TO') {
         const changed = action.nodeId ? changeIn(rootId, sourceId, action.nodeId) : null
@@ -141,6 +157,7 @@ export function createPlayScenes(
     },
     clear() {
       scenes.clear()
+      scroll.clear()
     }
   }
 }

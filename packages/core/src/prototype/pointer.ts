@@ -1,4 +1,5 @@
-import type { PrototypeTriggerType, SceneGraph } from '@pairdraw/scene-graph'
+import type { PrototypeTriggerType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { playHitTest } from './hit'
 import { effectiveReactions } from './reactions'
@@ -35,10 +36,20 @@ export type PlayRevert =
   | { kind: 'overlay'; watchId: string; frameId: string }
   | { kind: 'back'; watchId: string; frameId: string }
 
-/** The layers under a point inside `rootId`, from the frame down to the deepest; none outside. */
-export function pointerPath(graph: SceneGraph, rootId: string, x: number, y: number): string[] {
+/**
+ * The layers under a point inside `rootId`, from the frame down to the deepest one `takes` the
+ * pointer, any layer unless told otherwise; none outside.
+ */
+export function pointerPath(
+  graph: SceneGraph,
+  rootId: string,
+  x: number,
+  y: number,
+  scroll?: ReadonlyMap<string, Vector>,
+  takes?: (node: SceneNode) => boolean
+): string[] {
   const path: string[] = []
-  const deepest = playHitTest(graph, rootId, x, y)
+  const deepest = playHitTest(graph, rootId, x, y, scroll, takes)
   if (!deepest) return path
   graph.closest(deepest.id, (node) => {
     path.unshift(node.id)

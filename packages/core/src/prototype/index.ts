@@ -1,4 +1,5 @@
 export { framesOnPage } from './frames'
+export { playHitTest } from './hit'
 export {
   hasPointerTriggers,
   pathChanges,
@@ -16,6 +17,7 @@ export {
   type PlayScene,
   type PlaySceneView
 } from './scene'
+export { scrollRange } from './scroll'
 export {
   PLAY_SCENE_LIMIT,
   createPlayScenes,

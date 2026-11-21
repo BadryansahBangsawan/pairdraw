@@ -135,6 +135,35 @@ describe('a click in play', () => {
     expect(reactionAt(graph, startSession(first.id), 270, 30)).toBeNull()
   })
 
+  test('lets a click through a layer on top that has no reaction, such as a safe-area frame', () => {
+    const { graph, first, second, button } = fixture()
+    withReaction(graph, button.id, navigatesTo(second.id))
+    // An unfilled frame over the whole screen, drawn above the button.
+    graph.createNode('FRAME', first.id, { width: 300, height: 200, fills: [] })
+    expect(reactionAt(graph, startSession(first.id), 100, 100)?.sourceId).toBe(button.id)
+  })
+
+  test('a filled layer on top takes the click, so a button hidden under a sheet does not run', () => {
+    const { graph, first, second, button } = fixture()
+    withReaction(graph, button.id, navigatesTo(second.id))
+    graph.createNode('FRAME', first.id, {
+      width: 300,
+      height: 200,
+      fills: [{ type: 'SOLID', color: { r: 0, g: 0, b: 1, a: 1 }, opacity: 1, visible: true }]
+    })
+    expect(reactionAt(graph, startSession(first.id), 100, 100)).toBeNull()
+  })
+
+  test('takes no click where a mask hides a layer', () => {
+    const { graph, first, second } = fixture()
+    const group = graph.createNode('GROUP', first.id, { x: 200, y: 20, width: 80, height: 80 })
+    graph.createNode('RECTANGLE', group.id, { width: 40, height: 40, isMask: true })
+    const masked = graph.createNode('RECTANGLE', group.id, { width: 80, height: 80 })
+    withReaction(graph, masked.id, navigatesTo(second.id))
+    expect(reactionAt(graph, startSession(first.id), 210, 30)?.sourceId).toBe(masked.id)
+    expect(reactionAt(graph, startSession(first.id), 270, 90)).toBeNull()
+  })
+
   // Live-verified in Figma: a frame's background click runs the frame's own reaction.
   test("runs the played frame's own reaction when its background is clicked", () => {
     const { graph, first, second } = fixture()

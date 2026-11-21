@@ -6,6 +6,7 @@ import type {
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { framesOnPage } from './frames'
 import { playHitTest } from './hit'
@@ -90,20 +91,25 @@ export function restartSession(session: PlaySession): PlaySession {
 }
 
 /**
- * The reaction a click at a document point runs, as Figma resolves one: the layer under the point
- * or its nearest ancestor inside the shown frame that has a reaction to `trigger`, with the
- * reaction's first action. An instance runs the reactions of the variant it shows.
+ * The reaction a click at a document point runs: the topmost layer under the point inside the
+ * shown frame that has a reaction to `trigger`, over its whole box, or that shows a paint there,
+ * and then its nearest ancestor with one, up to the frame, with the reaction's first action. An
+ * unpainted layer without one lets the click through. An instance runs the reactions of the variant it shows, and a frame
+ * play scrolled finds its layers where they are drawn.
  */
 export function reactionAt(
   graph: SceneGraph,
   session: PlaySession,
   x: number,
   y: number,
-  trigger: PrototypeTriggerType = 'ON_CLICK'
+  trigger: PrototypeTriggerType = 'ON_CLICK',
+  scroll?: ReadonlyMap<string, Vector>
 ): PlayClick | null {
   // A click on the frame's own background is the frame's, not a layer's; one outside it hits
   // nothing.
-  let node = playHitTest(graph, shownFrame(session), x, y)
+  const reacts = (layer: SceneNode) =>
+    effectiveReactions(graph, layer).some((reaction) => reaction.trigger.type === trigger)
+  let node = playHitTest(graph, shownFrame(session), x, y, scroll, reacts)
   while (node) {
     const reaction = effectiveReactions(graph, node).find(
       (candidate) => candidate.trigger.type === trigger

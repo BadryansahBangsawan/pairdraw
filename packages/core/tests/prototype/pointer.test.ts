@@ -44,7 +44,8 @@ function buttonScreen() {
     width: 40,
     height: 20
   })
-  graph.createNode('TEXT', base.id, { name: 'Label', width: 10, height: 10 })
+  // An unpainted label, which takes the pointer only when asked to.
+  graph.createNode('TEXT', base.id, { name: 'Label', width: 10, height: 10, fills: [] })
   const hover = graph.createNode('COMPONENT', set.id, {
     name: 'State=Hover',
     x: 60,
@@ -65,10 +66,16 @@ function shows(graph: SceneGraph, node: SceneNode | undefined): string | undefin
 }
 
 describe('the pointer in play', () => {
-  test('lies over a path of layers from the frame down to the deepest', () => {
+  test('lies over a path of layers from the frame down to the deepest one that takes it', () => {
     const { graph, screen, card, button } = buttonScreen()
     const label = graph.getChildren(button.id)[0]
     expect(pointerPath(graph, screen.id, 22, 22)).toEqual([screen.id, card.id, button.id, label.id])
+    const reacting = (node: SceneNode) => node.id === button.id
+    expect(pointerPath(graph, screen.id, 22, 22, undefined, reacting)).toEqual([
+      screen.id,
+      card.id,
+      button.id
+    ])
     expect(pointerPath(graph, screen.id, 150, 150)).toEqual([screen.id])
     expect(pointerPath(graph, screen.id, 900, 900)).toEqual([])
   })

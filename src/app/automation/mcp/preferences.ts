@@ -1,8 +1,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { ref } from 'vue'
 
-import { type MCPToolScope, type ToolDescriptor } from '@pairdraw/mcp/tools'
-import { createToolDescriptors } from '@pairdraw/mcp/tools'
+import { type MCPToolScope, type ToolDescriptor, createToolDescriptors } from '@pairdraw/mcp/tools'
 
 const DISABLED_TOOLS_STORAGE_KEY = 'pairdraw:mcp:disabled-tools'
 const ROOT_DIRECTORY_STORAGE_KEY = 'pairdraw:mcp:root-directory'

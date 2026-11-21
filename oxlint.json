@@ -42,6 +42,8 @@
     ],
     "prefer-const": "error",
     "radix": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
     "no-restricted-imports": [
       "error",
       {
@@ -243,7 +245,6 @@
     "no-case-declarations": "error",
     "no-caller": "error",
     "no-constructor-return": "error",
-    "no-dupe-keys": "error",
     "no-else-return": "error",
     "no-empty-pattern": "error",
     "no-eval": "error",

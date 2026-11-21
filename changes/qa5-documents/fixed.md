@@ -1,1 +1,0 @@
-- Opening a document completes once its page is applied instead of waiting for the first painted frame, so an automation `open_file` no longer times out and leaves an empty tab when nothing draws the window.

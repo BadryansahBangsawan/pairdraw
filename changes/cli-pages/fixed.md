@@ -1,3 +1,0 @@
-- A CLI command that names a page the document lacks reports it in the same words for `tree`, `find`, `query`, and `eval`, where `find` and `query` used to return no matches instead.
-- `pairdraw export --page` no longer ignores `--page-id`, and the app applies `--page-id` to `tree`, `find`, and `query` instead of dropping it before the command runs.
-- A page-scoped `.fig` save renders the Cover page's thumbnail, which it used to replace with the placeholder when the cover was not loaded.

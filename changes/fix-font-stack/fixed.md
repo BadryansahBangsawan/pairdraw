@@ -1,1 +1,0 @@
-- Imported HTML picks a concrete family from a CSS font stack, so a stack that starts with `ui-monospace`, `system-ui`, or another generic keyword draws a mono or sans face instead of falling back to Inter.

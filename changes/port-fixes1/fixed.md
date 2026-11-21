@@ -1,3 +1,0 @@
-- Style lint accepts a layer linked to a shared effect or text style, so it no longer reports typography and shadows that already use a shared preset.
-- Text on a path keeps its path when the Scale tool scales it, so it no longer falls back to one flat line.
-- How far a fixed-size text's lines reach scales with the layer when the Scale tool scales it, so lines that overflow its box stay drawn.

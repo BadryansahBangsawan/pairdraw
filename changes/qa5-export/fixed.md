@@ -1,1 +1,0 @@
-- HTML export keeps a layer’s blend mode as `mix-blend-mode`, as SVG export already did; linear dodge uses `plus-lighter`, while linear burn exports flat because Chrome, Edge, and Firefox do not implement `plus-darker`. Normal and pass-through add none.

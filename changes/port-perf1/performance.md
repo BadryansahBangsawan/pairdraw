@@ -1,2 +1,0 @@
-- Deleting, hiding, reordering, or outlining a layer, or moving it to another page, no longer lays out every auto layout frame on its page, including on undo and redo.
-- Pages with many component instances load sooner and use less memory, as each copy shares its component's saved values instead of deep-copying them.

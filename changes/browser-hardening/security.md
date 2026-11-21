@@ -1,1 +1,0 @@
-- The built-in browser refuses a page answer larger than its bound, removes its wait slots when a wait ends early, and caps an element screenshot to the same box as a full page, so a hostile page cannot exhaust memory through captures, picks, or snapshots.

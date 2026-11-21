@@ -1,2 +1,0 @@
-- A grid frame set to Hug takes the smallest size around its tracks and gaps, its fractional tracks take their content's size there, and its minimum and maximum apply.
-- A fixed auto layout frame keeps the room its padding and included inside strokes take once the user or a tool lays it out, instead of a size too small for them. A frame saved that way before this change keeps its size when the file opens and grows to its padding on the next edit.

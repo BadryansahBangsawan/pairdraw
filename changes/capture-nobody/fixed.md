@@ -1,1 +1,0 @@
-- Copying a page whose document has no body, such as a frameset page, captures its document root instead of failing with a missing-element error.

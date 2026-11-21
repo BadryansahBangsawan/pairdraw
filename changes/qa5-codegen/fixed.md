@@ -1,1 +1,0 @@
-- Tailwind export keeps a font size Tailwind does not name (40px, 28px) as an arbitrary value instead of writing a utility such as `text-10` that no stylesheet generates.

@@ -1,1 +1,0 @@
-- HTML that Pairdraw puts on the clipboard for other apps, such as document editors and email, is the layout the import uses: grids come out as placed boxes and tables and list items as plain blocks, so it looks the same in a browser but keeps no table structure.

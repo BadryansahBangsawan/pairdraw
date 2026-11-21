@@ -1,1 +1,0 @@
-- A CLI command that works on one page of a `.fig` loads only that page, so `eval`, `tool call`, and `export --node` no longer build every page before running on a large file.

@@ -91,7 +91,8 @@ const {
   letterbox,
   scrim,
   dissolvingFrom,
-  frameId: previewFrameId
+  frameId: previewFrameId,
+  playScenes
 } = usePrototypeStage(store, canvasRef)
 
 function activatePane() {
@@ -180,6 +181,7 @@ useCanvas(sceneCanvasRef, store, {
   showRulers: false,
   getRenderState,
   getSceneScope: () => sceneScopeId.value,
+  getPlayScenes: playScenes,
   onViewportResize,
   onPresented: ({ sceneVersion }) =>
     store.preparationController.acknowledgePresentation(sceneVersion),

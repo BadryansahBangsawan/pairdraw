@@ -12,6 +12,7 @@ import {
   step,
   timeoutReactions,
   transitionMs,
+  type PlayClick,
   type PlaySession
 } from '@pairdraw/core/prototype'
 import type { PrototypeAction } from '@pairdraw/scene-graph'
@@ -19,6 +20,8 @@ import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
+
+import { usePlayScenes } from './scenes'
 
 /** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
 const DISSOLVE_SETTLE_MS = 100
@@ -78,24 +81,28 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     )
   }
 
+  /** The frames play changed, which the canvas draws from their copies. */
+  const play = usePlayScenes(store, session, live)
+
   /** Whether an overlay is open, which dims everything but the overlay frame. */
   const scrim = computed(() => (session.value?.overlays.length ?? 0) > 0)
 
   /**
-   * The previous frame drawn to a PNG the canvas crossfades from during a dissolve. A frame that
-   * cannot be drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
+   * The previous frame drawn to a PNG the canvas crossfades from during a dissolve, from `graph`,
+   * the copy play shows of a frame it changed. A frame that cannot be drawn leaves none, so the
+   * transition falls back to a cut instead of wrong pixels.
    */
-  function snapshotBefore(durationMs: number): VisibleCanvas | null {
+  function snapshotBefore(durationMs: number, graph = store.graph): VisibleCanvas | null {
     const shown = session.value
     if (!shown) return null
-    const node = store.graph.getNode(shownFrame(shown))
+    const node = graph.getNode(shownFrame(shown))
     if (!node || !store.renderer) return null
-    const bounds = getAxisAlignedWorldBounds(node, store.graph)
+    const bounds = getAxisAlignedWorldBounds(node, graph)
     const scale = Math.min(1, 640 / Math.max(bounds.width, bounds.height, 1))
     const bytes = renderNodesToImage(
       store.renderer.ck,
       store.renderer,
-      store.graph,
+      graph,
       store.state.currentPageId,
       [node.id],
       { scale, format: 'PNG' }
@@ -122,13 +129,20 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   }
 
   /**
-   * Runs an action from a click or a timeout with the transition it asks for: a dissolve crossfades
-   * for its own duration, and the next frame's timers wait until it ends.
+   * Runs a reaction from a click or a timeout with the transition it asks for: a dissolve
+   * crossfades for its own duration, and the next frame's timers wait until it ends. A Change to
+   * runs on play's copy of the frame instead of moving the session.
    */
-  function runAction(current: PlaySession, action: PrototypeAction) {
+  function runAction(current: PlaySession, click: PlayClick) {
+    const { action } = click
+    const durationMs = transitionMs(action)
+    if (action.type === 'NODE' && action.navigation === 'CHANGE_TO') {
+      if (durationMs > 0) snapshotBefore(durationMs, play.graphFor(shownFrame(current)))
+      play.run(click)
+      return
+    }
     const next = step(store.graph, current, action)
     if (next === current) return
-    const durationMs = transitionMs(action)
     if (durationMs > 0) snapshotBefore(durationMs)
     enteringMs = durationMs
     session.value = next
@@ -177,7 +191,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
         if (generation !== timerGeneration) return
         const current = session.value
         if (!current || shownFrame(current) !== frameId) return
-        runAction(current, action)
+        runAction(current, { sourceId: frameId, action, transition: null })
       }, readyInMs + delayMs)
       timers.add(timer)
     }
@@ -212,11 +226,20 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       if (!shown || !(event.target instanceof HTMLCanvasElement)) return
       const bounds = event.target.getBoundingClientRect()
       const point = store.screenToCanvas(event.clientX - bounds.left, event.clientY - bounds.top)
-      const click = reactionAt(store.graph, shown, point.x, point.y)
-      if (click) runAction(shown, click.action)
+      const graph = play.graphFor(shownFrame(shown))
+      const click = reactionAt(graph, shown, point.x, point.y)
+      if (click) runAction(shown, click)
     },
     { capture: true }
   )
 
-  return { session, letterbox, frameRect: shownRect, frameId, scrim, dissolvingFrom }
+  return {
+    session,
+    letterbox,
+    frameRect: shownRect,
+    frameId,
+    scrim,
+    dissolvingFrom,
+    playScenes: play.views
+  }
 }

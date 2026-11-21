@@ -1,11 +1,12 @@
 import { mkdir, stat } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 
-import { FEATURE_KINDS } from '#docs-config/theme/landing/content/features'
 import {
   POSTER_CAPTURE_PARAM,
-  posterParts,
+  POSTER_PAGE,
+  POSTER_PARTS,
   posterPath,
+  STAGE_KINDS,
   type PosterLayout,
   type PosterTarget
 } from '#docs-config/theme/landing/posters'
@@ -70,8 +71,8 @@ async function capturePage(browser: Browser, origin: string, target: PosterTarge
   try {
     const page = await context.newPage()
     const prefix = target.locale === 'root' ? '' : `${target.locale}/`
-    await page.goto(`${origin}/${prefix}?${POSTER_CAPTURE_PARAM}`)
-    for (const kind of FEATURE_KINDS) {
+    await page.goto(`${origin}/${prefix}${POSTER_PAGE}?${POSTER_CAPTURE_PARAM}`)
+    for (const kind of STAGE_KINDS) {
       const frame = page.locator(`.stage-frame[data-kind="${kind}"]`)
       await frame.scrollIntoViewIfNeeded()
       await page
@@ -80,8 +81,8 @@ async function capturePage(browser: Browser, origin: string, target: PosterTarge
       // The page's web fonts swap in when they arrive; a still must show the final ones.
       await page.evaluate(() => document.fonts.ready)
       await page.waitForTimeout(SETTLE_MS)
-      for (const part of posterParts(kind)) {
-        const element = part === 'frame' ? frame : frame.locator(`[data-poster-part="${part}"]`)
+      for (const part of POSTER_PARTS) {
+        const element = frame.locator(`[data-poster-part="${part}"]`)
         const png = await element.screenshot({ animations: 'disabled' })
         const file = join(out, posterPath(target, kind, part))
         await mkdir(dirname(file), { recursive: true })
@@ -94,7 +95,7 @@ async function capturePage(browser: Browser, origin: string, target: PosterTarge
 }
 
 /**
- * Captures every stage of the `targets` landing pages from the built site in `dist`, writing
+ * Captures every stage of the `targets` download pages from the built site in `dist`, writing
  * WebP stills under `out` at their poster paths.
  */
 export async function capturePosters({

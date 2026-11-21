@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FEATURE_KINDS } from '#docs-config/theme/landing/content/features'
-import { posterParts, posterPath } from '#docs-config/theme/landing/posters'
+import { POSTER_PARTS, posterPath, STAGE_KINDS } from '#docs-config/theme/landing/posters'
 
 const TARGET = {
   fingerprint: '0123456789abcdef',
@@ -12,20 +11,14 @@ const TARGET = {
 
 describe('landing poster paths', () => {
   test('name the fingerprint, locale, theme, layout, stage, and part', () => {
-    expect(posterPath(TARGET, 'design', 'panel')).toBe(
-      'landing-posters/0123456789abcdef/ru/dark-phone/design-panel.webp'
+    expect(posterPath(TARGET, 'interactive', 'panel')).toBe(
+      'landing-posters/0123456789abcdef/ru/dark-phone/interactive-panel.webp'
     )
   })
 
-  test('split single-editor stages into canvas and panel, and keep collaboration whole', () => {
-    expect(posterParts('design')).toEqual(['canvas', 'panel'])
-    expect(posterParts('ai')).toEqual(['canvas', 'panel'])
-    expect(posterParts('collab')).toEqual(['frame'])
-  })
-
   test('are unique across every stage and part of a page', () => {
-    const paths = FEATURE_KINDS.flatMap((kind) =>
-      posterParts(kind).map((part) => posterPath(TARGET, kind, part))
+    const paths = STAGE_KINDS.flatMap((kind) =>
+      POSTER_PARTS.map((part) => posterPath(TARGET, kind, part))
     )
     expect(new Set(paths).size).toBe(paths.length)
   })

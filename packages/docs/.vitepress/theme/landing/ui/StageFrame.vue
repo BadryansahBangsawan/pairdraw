@@ -3,9 +3,8 @@ import { useEventListener } from '@vueuse/core'
 import { defineClientComponent, useData, withBase } from 'vitepress'
 import { computed, onMounted, ref } from 'vue'
 
-import type { FeatureKind } from '../content/features'
 import { useLandingMessages } from '../content/messages'
-import { isPosterCapture } from '../posters'
+import { isPosterCapture, type StageKind } from '../posters'
 import StagePoster from './StagePoster.vue'
 
 /**
@@ -17,11 +16,8 @@ const SERVER_ONLY = () => Promise.reject(new Error('Landing stages render only i
 const FeatureStage = defineClientComponent(() =>
   import.meta.env.SSR ? SERVER_ONLY() : import('../stage/FeatureStage.vue')
 )
-const CollabStage = defineClientComponent(() =>
-  import.meta.env.SSR ? SERVER_ONLY() : import('../stage/collab/CollabStage.vue')
-)
 
-const { kind } = defineProps<{ kind: FeatureKind }>()
+const { kind } = defineProps<{ kind: StageKind }>()
 
 const messages = useLandingMessages()
 const { frontmatter, localeIndex } = useData()
@@ -65,8 +61,7 @@ onMounted(() => {
       <span />
     </div>
     <template v-if="live">
-      <CollabStage v-if="kind === 'collab'" @start="loading = true" @ready="ready = true" />
-      <FeatureStage v-else :kind="kind" @start="loading = true" @ready="ready = true" />
+      <FeatureStage :kind="kind" @start="loading = true" @ready="ready = true" />
     </template>
     <!-- The live stage is already drawn underneath, so the still fades into it. -->
     <Transition name="stage-poster">

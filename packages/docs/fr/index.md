@@ -1,6 +1,6 @@
 ---
 layout: page
-landing: true
+navbar: false
 sidebar: false
 aside: false
 title: Pairdraw — Éditeur de design open source

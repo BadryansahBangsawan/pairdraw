@@ -1,269 +1,302 @@
 import type { LandingMessages } from './types'
 
 export const it: LandingMessages = {
-  hero: {
-    title: 'Design senza lock‑in.',
-    lede: 'Un editor di design open source che apre i tuoi file Figma, gira sul tuo computer e lascia a te o al tuo agente AI il controllo di ogni livello.',
-    download: 'Scarica',
-    github: 'GitHub'
+  nav: {
+    label: 'Pairdraw',
+    home: 'Pairdraw, torna in cima',
+    howItWorks: 'Come funziona',
+    features: 'Funzioni',
+    agents: 'Agenti',
+    scripting: 'Scripting',
+    faq: 'FAQ',
+    docs: 'Documentazione',
+    github: 'GitHub',
+    download: 'Scarica'
   },
-  loading: 'Caricamento dell’editor',
+  hero: {
+    frame: 'Hero',
+    kicker: 'Editor di design open source, con licenza MIT',
+    title: 'Progetta accanto al tuo agente.',
+    lede: 'Pairdraw apre i tuoi file .fig e .pen e lascia che un agente AI disegni sulla stessa tela mentre continui a modificare.',
+    download: 'Scarica per {platform}',
+    downloadAny: 'Scarica Pairdraw',
+    github: 'Vedi su GitHub',
+    finePrint:
+      'Gratis per macOS, Windows e Linux. Usa il tuo modello o il tuo agente di programmazione.',
+    prompt: 'Scrivi il titolo dell’hero: «Progetta accanto al tuo agente.» Tienilo su due righe.',
+    status: {
+      reading: '{agent} sta leggendo la pagina',
+      adding: '{agent} sta aggiungendo H1',
+      writing: '{agent} sta scrivendo H1'
+    },
+    comment: 'Tieni il titolo su due righe.',
+    reply: 'Impostato a 890 di larghezza, così va a capo dopo «accanto».',
+    now: 'ora',
+    measure: 'W 890 × H 280',
+    layers: 'Livelli',
+    layer: {
+      frame: { name: 'Cornice Hero', detail: 'Cornice, 1200 × 980' },
+      heading: {
+        name: 'H1',
+        adding: '{agent} lo sta aggiungendo',
+        writing: '{agent} lo sta scrivendo',
+        detail: '{agent} lo sta ridimensionando'
+      },
+      comment: { name: 'Commento', detail: '{human}, 1 risposta' },
+      lead: { name: 'Introduzione', detail: 'Testo, 24 px' }
+    },
+    pause: 'Metti in pausa l’animazione',
+    play: 'Riproduci l’animazione'
+  },
+  how: {
+    title: 'Da una frase a livelli che puoi modificare.',
+    lede: 'L’agente raggiunge la tela tramite il server MCP di Pairdraw e modifica il file che hai aperto. Niente viene esportato, incollato o ricostruito.',
+    steps: [
+      {
+        title: 'Chiedi in chat',
+        detail:
+          'Descrivi la schermata in chat, nella Pagina iniziale o nel campo sotto la tela. Usa la tua chiave API o un agente di programmazione già presente sul tuo computer.'
+      },
+      {
+        title: 'Guardalo disegnare',
+        detail:
+          'I livelli compaiono uno dopo l’altro mentre la cornice su cui sta lavorando luccica. Quando l’agente si ferma, un avviso conta cosa è cambiato.'
+      },
+      {
+        title: 'Modifica il risultato',
+        detail:
+          'Quello che l’agente ha disegnato sono normali livelli nel tuo file. Selezionali, cambiali o chiedi un altro passaggio. Ogni turno si può annullare.'
+      }
+    ],
+    frames: ['1  Chiedi in chat', '2  Guardalo disegnare', '3  Modifica il risultato'],
+    request: 'Aggiungi una schermata Obiettivi con un anello di risparmio e tre obiettivi.',
+    reading: 'Lettura di Budget app.fig, pagina 1',
+    placeholder: 'Chiedi modifiche a Obiettivi',
+    send: 'Invia',
+    card: {
+      title: 'Obiettivi',
+      amount: '$2,400',
+      saved: 'di $3,500 risparmiati',
+      goals: [
+        { title: 'Nuovo portatile', detail: '$900 / $1,400' },
+        { title: 'Viaggio a Bali', detail: '$1,100 / $1,500' },
+        { title: 'Emergenze', detail: '$400 / $600' }
+      ]
+    },
+    progress: '{count} di {total} livelli',
+    props: { title: 'Anello di risparmio', ring: 'Anello', size: 'Dimensione' },
+    toast: '{count} livelli aggiunti',
+    undo: 'Annulla'
+  },
   features: {
-    figma: {
-      title: 'Apri quello che hai già',
-      detail:
-        'Pairdraw legge direttamente i file .fig: pagine, componenti, istanze, variabili e auto layout arrivano come livelli modificabili, e puoi salvare di nuovo in .fig. Incolla SVG o apri HTML e CSS, e diventano livelli anche loro, disposti come li dispone un browser.',
-      hint: 'Questo è il tour dell’app stessa, un vero file .fig. Apri un capitolo nei livelli ed esplora.'
-    },
-    design: {
-      title: 'Progetta con strumenti veri',
-      detail:
-        'Auto layout, vincoli, riempimenti, tratti, effetti e tipografia, con i controlli dove te li aspetti. I componenti hanno slot: un’istanza mantiene il design e porta il proprio contenuto. Tutto si può annullare, e niente aspetta un server.',
-      hint: 'Passa sopra la copertina selezionata e trascina un angolo per arrotondarlo. Gli altri lettori portano la propria copertina tramite lo slot Artwork.'
-    },
-    interactive: {
-      title: 'Componenti che funzionano',
-      detail:
-        'Dai a un componente un comportamento, come un interruttore, una casella, uno slider, delle schede o un campo di testo, e l’anteprima lo esegue come un vero controllo Reka UI. Le varianti diventano i suoi stati, e gli stessi componenti si esportano in Storybook con controlli cliccabili.',
-      hint: 'Questa tela è in anteprima: premi play, trascina la barra di avanzamento, attiva la riproduzione casuale. Esci dall’anteprima per modificare.'
-    },
-    tokens: {
-      title: 'Le variabili sono design token',
-      detail:
-        'Colori, spaziature e tipografia stanno in raccolte con modalità e si modificano come token. Il codice esportato scrive i valori collegati come proprietà personalizzate CSS, così il codice usa gli stessi nomi del design.',
-      hint: 'Ogni lettore legge la collezione Theme nella propria modalità. Cambia il valore di un token ed entrambi lo seguono.'
-    },
-    shaders: {
-      title: 'Riempimenti che si muovono',
-      detail:
-        'Uno shader è un riempimento come gli altri: sceglilo nel selettore di riempimento, impila effetti, regola i cursori o incolla un preset da shaders.com. I file ne conservano un fotogramma fisso, così si aprono ovunque, e l’anteprima lo riproduce.',
-      hint: 'Questa tela è in anteprima, per questo gli shader si muovono. Esci dall’anteprima, seleziona un quadrato e apri il suo riempimento.'
-    },
-    linting: {
-      title: 'Linting',
-      detail:
-        'Pairdraw controlla il design mentre lavori: contrasto, testo troppo piccolo, nomi predefiniti, livelli nascosti e vuoti, gruppi superflui. La scheda Verifica elenca ogni problema, molti si correggono con un clic, e le stesse regole funzionano nella CLI e per gli agenti.',
-      hint: 'Passa sopra un problema per trovarne il livello, oppure applica una correzione dall’elenco.'
+    title: 'Un editor completo, con ogni strumento aperto all’agente.',
+    lede: 'Quello che puoi fare a mano, l’agente può richiamarlo. Lavorate entrambi sugli stessi livelli, nello stesso file.',
+    frame: 'Funzioni, fai clic su un livello per cambiare',
+    list: 'Livelli',
+    tabs: {
+      ai: {
+        label: 'L’AI crea design',
+        title: 'L’AI crea design',
+        detail:
+          'Descrivi quello che vuoi in chat, nella Pagina iniziale o nel campo sotto la tela. {count} strumenti creano e modificano i livelli.'
+      },
+      browser: {
+        label: 'Browser integrato',
+        title: 'Browser integrato',
+        detail:
+          'Apri una pagina nella sua finestra, importa la pagina o un elemento come livelli e lascia che la chat la legga e ci faccia clic con la tua approvazione.'
+      },
+      controls: {
+        label: 'Controlli funzionanti',
+        title: 'Controlli funzionanti',
+        detail:
+          'Dai a un componente un comportamento Reka UI come interruttore, cursore o schede, e provalo dal vivo con input reali e tastiera.'
+      },
+      prototypes: {
+        label: 'Prototipi',
+        title: 'Prototipi',
+        detail:
+          'Collega le cornici con interazioni al clic o dopo un ritardo, poi riproducile sulla tela con transizioni istantanee o in dissolvenza.'
+      },
+      layout: {
+        label: 'Auto layout e CSS Grid',
+        title: 'Auto layout e CSS Grid',
+        detail:
+          'Layout flex e a griglia con padding, spaziatura, allineamento e tracce che si adattano quando cambia il contenuto.'
+      }
     },
     ai: {
-      title: 'Progetta con l’AI, con le tue chiavi',
-      detail:
-        'Chiedi con parole tue e l’agente modifica il documento con gli stessi strumenti che usi tu, mostrando il lavoro sulla tela man mano che arriva. Collega qualsiasi provider con la tua chiave, oppure usa l’agente di programmazione che già utilizzi.',
-      hint: 'Un turno registrato passa per il vero ciclo dell’agente. Guarda la tela costruirsi mentre arriva.'
+      prompt:
+        'Progetta una schermata di impostazioni con interruttori per le notifiche e un pulsante per uscire.',
+      settings: 'Impostazioni',
+      alerts: 'Avvisi di budget',
+      summary: 'Riepilogo settimanale',
+      signIn: 'Nuovo accesso',
+      signOut: 'Esci'
     },
-    collab: {
-      title: 'Lavorare insieme, persone e agenti',
-      detail:
-        'Tieni un documento sul server Cloud del tuo team e chiunque lo apra lo modifica dal vivo, con cursori, modalità segui e commenti fissati ai livelli. Gli agenti di IA mostrano i loro cursori sulla stessa tela, così li guardi costruire mentre trasmettono.',
-      hint: 'Entrambi gli schermi sono tuoi. Trascina un livello su uno e guardalo muoversi sull’altro, poi chiedi all’agente.'
+    browser: {
+      url: 'https://example.com/pricing',
+      import: 'Importa come livelli',
+      imported: 'Importato come livelli'
     },
-    code: {
-      title: 'Dal design al codice',
-      detail:
-        'Ogni selezione è un componente Vue o React, con le varianti come props e Reka UI o Radix dietro quelli interattivi, oppure HTML, Tailwind e design JSX con le variabili scritte come token. I componenti si esportano come storie di Storybook, e il design JSX resta collegato alla tela: modificalo e la tela lo segue.',
-      hint: 'Passa a React, HTML o design JSX, oppure seleziona un altro livello.'
+    controls: {
+      period: 'Periodo di fatturazione',
+      monthly: 'Mensile',
+      yearly: 'Annuale',
+      limit: 'Limite di budget',
+      roundUp: 'Arrotonda',
+      notify: 'Avvisami'
     },
-    script: {
-      title: 'Automatizza tutto',
-      detail:
-        'La CLI pairdraw lavora su un file senza che l’app sia aperta, oppure controlla l’app in esecuzione. Ispeziona un documento, interrogalo con XPath, controllalo con il linter, esportalo o esegui codice dei plugin Figma con eval. Il server MCP offre agli agenti le stesse possibilità tramite stdio o HTTP.',
-      hint: 'Esegui un comando e osserva la tela.'
+    prototypes: {
+      overview: 'Panoramica',
+      budgets: 'Budget',
+      action: 'Vedi i budget',
+      back: 'Indietro'
     },
-    sdk: {
-      title: 'Integralo nel tuo prodotto',
-      detail:
-        'Pairdraw è tanto un insieme di strumenti quanto un’app: un motore indipendente dal framework, un SDK Vue headless e pacchetti separati per il grafo di scena e i formati di file. Incorpora una tela nel tuo prodotto, genera e controlla i design in CI oppure costruisci un altro editor sullo stesso motore. Ogni tela di questa pagina è quell’SDK in esecuzione dentro un sito di documentazione.',
-      hint: 'Il codice accanto alla tela è tutto ciò che serve per montarne una.'
+    layout: {
+      alignment: 'Allineamento',
+      vertical: ['In alto', 'Al centro', 'In basso'],
+      horizontal: ['a sinistra', 'al centro', 'a destra']
     }
   },
   agents: {
-    heading: 'Funziona con',
-    rest: 'e qualsiasi client MCP'
+    title: 'Porta l’agente che usi già.',
+    lede: 'Funziona con il tuo abbonamento e raggiunge la tela tramite il server MCP dell’editor. «Connetti» installa l’adattatore e fa accedere l’agente, passo dopo passo.',
+    frame: 'Report mensile, 5 agenti sulla tela',
+    report: 'Report mensile',
+    month: 'nov',
+    server: 'Server MCP di Pairdraw',
+    connect: { before: 'Nel browser, esegui', after: 'e apri il link che mostra.' }
   },
-  commands: {
-    cli: '{count} comandi',
-    mcp: '{count} strumenti MCP',
-    mcpDetail:
-      'Creare, applicare stili, impaginare, ispezionare ed esportare. Ognuno è disponibile anche per l’agente integrato.'
+  scripting: {
+    title: 'Automatizza ogni parte.',
+    lede: 'Il documento che l’agente modifica è aperto anche ai tuoi script. Ogni comando supporta --json.',
+    items: [
+      {
+        title: 'CLI',
+        detail:
+          'Ispeziona, interroga, esporta, converti e controlla file .fig e .pen senza aprire l’editor.'
+      },
+      {
+        title: 'Server MCP',
+        detail:
+          'Collega Claude Code, Cursor o qualsiasi client MCP all’app in esecuzione o ai file su disco.'
+      },
+      {
+        title: 'Vue SDK',
+        detail: 'Primitive e composable headless per costruire un editor tutto tuo.'
+      }
+    ],
+    terminal: 'Terminale'
   },
-  ownership: {
-    title: 'I tuoi file restano tuoi',
+  privacy: {
+    frame: 'Privacy',
+    title: 'Pairdraw non invia dati di utilizzo.',
+    lede: 'Nessun ping giornaliero, analytics o statistiche di utilizzo. La pagina sulla privacy elenca a cosa si collega l’app e quando.',
+    link: 'Leggi la pagina sulla privacy',
     items: [
       {
         title: 'Prima in locale',
+        detail: 'I documenti restano sul tuo computer, a meno che tu non li metta su un server.'
+      },
+      {
+        title: 'Le tue chiavi',
         detail:
-          'I documenti sono file sul tuo disco. Nessun account, nessun server, nessuna connessione necessaria.'
+          'Usa la tua chiave o lascia che la chat usi un agente di programmazione che hai già in funzione.'
       },
       {
-        title: 'Il tuo spazio di archiviazione',
-        detail: 'Sincronizza tramite il tuo bucket compatibile con S3 quando ti serve.'
-      },
-      {
-        title: 'Formati aperti',
-        detail: 'Esporta in .fig, PDF, SVG, HTML e JSX. Andarsene è sempre possibile.'
-      },
-      {
-        title: 'Licenza MIT',
-        detail: 'L’editor, il motore di rendering, il codec .fig e la CLI.'
+        title: 'Un cloud tuo',
+        detail:
+          'Per modificare insieme, tieni il documento su un server Pairdraw Cloud gestito dal tuo team.'
       }
     ]
   },
-  roadmap: {
-    title: 'Roadmap',
-    more: 'Roadmap completa',
-    shipped: {
-      label: 'Rilasciato',
-      entries: [
-        { title: 'Componenti interattivi e anteprima' },
-        { title: 'Variabili come design token' },
-        { title: 'Linting con correzioni in un clic' },
-        { title: 'Agenti AI come collaboratori, con modalità segui' },
-        { title: 'Annulla, rigenera e modifica i turni dell’AI' },
-        { title: 'Codice collegato ai livelli' },
-        { title: 'Diff visivo e patch' },
-        { title: 'Commenti fissati ai livelli' },
-        { title: 'Componenti Vue e React nella scheda Codice' },
-        { title: 'Importazione di SVG e HTML come livelli modificabili' },
-        { title: 'Riempimenti con shader' },
-        { title: 'Design token W3C' },
-        { title: 'Un tour guidato dell’editor' },
-        { title: 'Elenchi e stili per qualsiasi porzione di testo' },
-        { title: 'Cronologia delle versioni per i documenti Cloud' }
-      ]
-    },
-    now: {
-      label: 'Ora',
-      entries: [
-        {
-          title: 'Storybook da componenti reali',
-          detail: 'Storie che usano Reka UI per Vue e Radix UI per React.'
-        },
-        {
-          title: 'Creazione di componenti',
-          detail: 'Modifica delle varianti più rapida e selezione dentro i componenti.'
-        }
-      ]
-    },
-    next: {
-      label: 'Poi',
-      lead: {
-        title: 'Pairdraw self-hosted',
-        detail:
-          'L’intero spazio di lavoro dentro la tua rete: sincronizzazione, condivisione, commenti e librerie di team senza inviare un file a nessun altro.',
-        features: [
-          {
-            title: 'Il tuo spazio di archiviazione',
-            detail: 'I documenti restano nel tuo bucket, nella tua regione.'
-          },
-          {
-            title: 'La tua identità',
-            detail: 'Accesso tramite il tuo provider OIDC o SSO, con ruoli.'
-          },
-          {
-            title: 'La tua rete',
-            detail: 'Un relay di collaborazione che funziona dietro il tuo firewall.'
-          },
-          {
-            title: 'La tua gestione',
-            detail: 'Distribuzione guidata, aggiornamenti, backup e conservazione.'
-          }
-        ]
-      },
-      entries: [
-        {
-          title: 'Conservazione e audit',
-          detail:
-            'Regole di conservazione delle versioni e un registro delle modifiche a documenti e membri.'
-        }
-      ],
-      cloud: {
-        title: 'Pairdraw Cloud',
-        detail:
-          'Un server facoltativo che gestisci per il tuo team: sincronizzazione in diretta, condivisione, commenti e librerie del team.'
-      }
-    },
-    later: {
-      label: 'Più avanti',
-      entries: [
-        {
-          title: 'Design system governati',
-          detail: 'Proporre, rivedere, pubblicare e migrare.'
-        },
-        {
-          title: 'Editor incorporabile',
-          detail: 'Porta l’editor di questa pagina nel tuo prodotto.'
-        }
-      ]
-    }
-  },
-  cloud: {
-    badge: 'Self-hosted',
-    title: 'Pairdraw Cloud',
-    lede: 'Lo spazio di design del tuo team su un server che gestisci tu. Tutti modificano gli stessi file in diretta, li condividono con un invito o un link e progettano con l’IA offerta dal tuo server. Pairdraw non lo ospita per te, e i tuoi file restano aperti: esportali come .fig quando vuoi.',
-    features: [
+  faq: {
+    title: 'Domande',
+    lede: 'Il resto è nella {docs}, oppure apri una issue su {github}.',
+    docs: 'documentazione',
+    github: 'GitHub',
+    items: [
       {
-        title: 'Sincronizzazione del team in tempo reale',
-        detail:
-          'Ogni modifica raggiunge tutto il team nel momento in cui avviene, su qualsiasi dispositivo.'
+        question: 'Pairdraw è gratuito?',
+        answer:
+          'Sì. Pairdraw ha licenza MIT. Pairdraw Cloud, il server opzionale, ha licenza Apache 2.0.'
       },
       {
-        title: 'Link di condivisione e commenti',
-        detail: 'Invia un link per rivedere un design e discuterne direttamente sulla tela.'
+        question: 'Su quali piattaforme posso usarlo?',
+        answer:
+          'macOS 13 o successivo, Windows 10 o successivo e Linux con WebKitGTK 2.40 o successivo. L’app web si avvia da una copia del repository.'
       },
       {
-        title: 'Cronologia delle versioni',
-        detail:
-          'Versioni con nome e salvataggi automatici, con ripristino e un link a ogni versione.'
+        question: 'Mi serve una chiave API?',
+        answer:
+          'No. Usa la tua chiave per i principali provider o lascia che la chat usi un agente di programmazione già presente sul tuo computer.'
       },
       {
-        title: 'IA sul tuo server',
-        detail:
-          'I membri usano i modelli offerti dal tuo server, con crediti invece delle proprie chiavi.'
+        question: 'Può aprire i miei file Figma?',
+        answer:
+          'Pairdraw legge e scrive file .fig nativi, apre i documenti .pen supportati e copia e incolla livelli tra le app.'
       },
       {
-        title: 'Account e ruoli',
-        detail:
-          'Accesso con email, Google o Apple, approvazione dei nuovi account e ruoli nello spazio di lavoro.'
+        question: 'Cosa invia l’app?',
+        answer:
+          'Niente su come la usi: nessun ping giornaliero, analytics o statistiche di utilizzo. La pagina sulla privacy elenca ogni connessione.'
       }
     ]
   },
   closing: {
-    title: 'Porta i tuoi design con te.',
-    download: 'Scarica Pairdraw',
-    docs: 'Leggi la documentazione'
+    frame: 'Download',
+    title: 'I tuoi file. Il tuo agente. Una sola tela.',
+    you: 'Tu',
+    platforms: {
+      mac: 'Apple Silicon e Intel',
+      windows: 'Windows 10 o successivo',
+      linux: 'WebKitGTK 2.40 o successivo'
+    },
+    updates: 'Le copie installate si aggiornano da sole dall’app.'
   },
+  overlay: {
+    title: 'Scarica Pairdraw',
+    version: 'Versione {version}. Gratuito e con licenza MIT.',
+    close: 'Chiudi',
+    platforms: {
+      mac: 'Apple Silicon e Intel, macOS 13 o successivo',
+      windows: 'x64 e ARM64, Windows 10 o successivo',
+      linux: 'x64 e ARM64, WebKitGTK 2.40+'
+    },
+    note: 'Le copie installate si aggiornano da sole dall’app. La build non è ancora firmata, quindi la prima volta aprila con clic destro, poi Apri.',
+    allFiles: 'Tutti i file, con checksum',
+    unavailable:
+      'Non è stato possibile caricare l’elenco dei download. Tutti i file sono nella pagina delle versioni su GitHub.'
+  },
+  footer: {
+    tagline: 'Un editor di design open source dove tu e un agente AI disegnate sulla stessa tela.',
+    product: 'Prodotto',
+    roadmap: 'Roadmap',
+    changelog: 'Changelog',
+    cloud: 'Pairdraw Cloud',
+    docs: 'Documentazione',
+    gettingStarted: 'Per iniziare',
+    cli: 'Riferimento CLI',
+    mcp: 'Server MCP',
+    sdk: 'Vue SDK',
+    community: 'Community',
+    issues: 'Issue',
+    security: 'Segnala un problema di sicurezza',
+    legal: 'Note legali',
+    mit: 'Licenza MIT',
+    apache: 'Apache 2.0 per Cloud',
+    privacy: 'Privacy',
+    license: 'Pairdraw ha licenza MIT. Pairdraw Cloud ha licenza Apache 2.0.',
+    language: 'Lingua'
+  },
+  loading: 'Caricamento dell’editor',
   clipboard: {
     copy: 'Copia',
     copied: 'Copiato'
   },
   stage: {
-    activate: 'Provalo dal vivo',
-    terminal: {
-      tree: 'Albero dei livelli',
-      restyle: 'Ricolora l’accento',
-      addPlayer: 'Aggiungi un lettore',
-      selection: 'Selezione',
-      export: 'Esporta in Tailwind'
-    },
-    ai: {
-      recorded: 'Turno registrato',
-      play: 'Riproduci',
-      replay: 'Riproduci di nuovo',
-      request: 'Aggiungi una coda «Up next» accanto al lettore.',
-      reasoning:
-        'Il lettore è da solo nel frame dell’hero, che dispone i figli in riga, quindi una scheda aggiunta lì finisce proprio accanto. Collego sfondo, raggio e colori del testo della scheda alle variabili Theme usate dal lettore, così passa con lui da scuro a chiaro, ed elenco tre brani, ciascuno con una piccola copertina, un titolo e un artista.',
-      reply:
-        'Ho aggiunto una scheda **Up next** accanto al lettore con tre brani. Colori e raggio vengono dalle variabili Theme, quindi segue il lettore tra scuro e chiaro.'
-    },
-    collab: {
-      you: 'Tu',
-      yourScreen: 'Il tuo schermo',
-      theirScreen: 'Lo schermo di Sam',
-      askAgent: 'Chiedi all’agente'
-    },
-    sdk: {
-      install: 'Installa'
-    }
+    activate: 'Provalo dal vivo'
   },
   download: {
     title: 'Scarica Pairdraw',

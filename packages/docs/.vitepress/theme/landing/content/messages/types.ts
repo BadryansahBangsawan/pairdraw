@@ -1,106 +1,216 @@
-import type { FileFormat } from '#docs/theme/landing/download/releases'
+import type { FileFormat, Platform } from '#docs/theme/landing/download/releases'
 
-import type { FeatureKind } from '../features'
+import type { FeatureTab } from '../features'
 
 export interface TitledDetail {
   title: string
   detail: string
 }
 
-interface RoadmapEntryMessages {
-  title: string
-  detail?: string
+/** A layer row in the hero's layers strip: its name, and what is happening to it. */
+interface LayerRowMessages {
+  name: string
+  detail: string
 }
 
 /**
  * Everything the landing page says. English (`en.ts`) is the source; every other catalog is
- * typed against this interface, so a missing or extra string fails type-checking.
+ * typed against this interface, so a missing or extra string fails type-checking. `{agent}`
+ * and `{human}` are replaced with the names of the people on the canvas, which stay the same
+ * in every language.
  */
 export interface LandingMessages {
+  /** The page's own toolbar, which stands in for the docs navigation on the landing. */
+  nav: {
+    /** Accessible name of the toolbar's landmark. */
+    label: string
+    /** Accessible name of the logo, which links to the top of the page. */
+    home: string
+    howItWorks: string
+    features: string
+    agents: string
+    scripting: string
+    faq: string
+    docs: string
+    github: string
+    download: string
+  }
   hero: {
+    /** The frame's name, shown above it as on the canvas. */
+    frame: string
+    kicker: string
     title: string
     lede: string
+    /** The main button for the visitor's system; `{platform}` is replaced. */
     download: string
+    /** The main button when the browser does not say which system it runs on. */
+    downloadAny: string
     github: string
+    finePrint: string
+    /** What the person asks the agent at the start of the scene. */
+    prompt: string
+    status: { reading: string; adding: string; writing: string }
+    comment: string
+    reply: string
+    /** When the comment was written. */
+    now: string
+    /** The size label under the headline, in the frame's units. */
+    measure: string
+    /** Accessible name of the layers strip under the hero. */
+    layers: string
+    layer: {
+      frame: LayerRowMessages
+      heading: LayerRowMessages & { adding: string; writing: string }
+      comment: LayerRowMessages
+      lead: LayerRowMessages
+    }
+    /** The button that stops and restarts the scene. */
+    pause: string
+    play: string
+  }
+  how: {
+    title: string
+    lede: string
+    steps: [TitledDetail, TitledDetail, TitledDetail]
+    /** Each step's frame name, above it as on the canvas. */
+    frames: [string, string, string]
+    request: string
+    reading: string
+    placeholder: string
+    /** Accessible name of the composer's send button. */
+    send: string
+    card: {
+      title: string
+      amount: string
+      saved: string
+      goals: [TitledDetail, TitledDetail, TitledDetail]
+    }
+    /** `{count}` and `{total}` are replaced. */
+    progress: string
+    props: { title: string; ring: string; size: string }
+    /** `{count}` is replaced. */
+    toast: string
+    undo: string
+  }
+  features: {
+    title: string
+    lede: string
+    frame: string
+    /** The tab list's heading, as the layers panel names itself. */
+    list: string
+    /** In the AI tab's detail, `{count}` is replaced with the number of tools the MCP server exposes. */
+    tabs: Record<FeatureTab, TitledDetail & { label: string }>
+    ai: {
+      prompt: string
+      settings: string
+      alerts: string
+      summary: string
+      signIn: string
+      signOut: string
+    }
+    browser: { url: string; import: string; imported: string }
+    controls: {
+      period: string
+      monthly: string
+      yearly: string
+      limit: string
+      roundUp: string
+      notify: string
+    }
+    prototypes: { overview: string; budgets: string; action: string; back: string }
+    /** The alignment grid's cells are named "{vertical}, {horizontal}", as the app names them. */
+    layout: {
+      alignment: string
+      vertical: [string, string, string]
+      horizontal: [string, string, string]
+    }
+  }
+  agents: {
+    title: string
+    lede: string
+    frame: string
+    report: string
+    month: string
+    server: string
+    /** Around the command that connects an agent. */
+    connect: { before: string; after: string }
+  }
+  scripting: {
+    title: string
+    lede: string
+    items: [TitledDetail, TitledDetail, TitledDetail]
+    /** Accessible name of the terminal. */
+    terminal: string
+  }
+  privacy: {
+    frame: string
+    title: string
+    lede: string
+    link: string
+    items: [TitledDetail, TitledDetail, TitledDetail]
+  }
+  faq: {
+    title: string
+    /** `{docs}` and `{github}` are replaced with links named by `docs` and `github`. */
+    lede: string
+    docs: string
+    github: string
+    items: { question: string; answer: string }[]
+  }
+  closing: {
+    frame: string
+    title: string
+    you: string
+    platforms: Record<Platform, string>
+    updates: string
+  }
+  /** The download dialog the page's download buttons open. */
+  overlay: {
+    title: string
+    /** `{version}` is replaced. */
+    version: string
+    close: string
+    platforms: Record<Platform, string>
+    note: string
+    /** Links to the download page, which explains every file. */
+    allFiles: string
+    /** Shown when the site was built without the release list. */
+    unavailable: string
+  }
+  footer: {
+    tagline: string
+    product: string
+    roadmap: string
+    changelog: string
+    cloud: string
+    docs: string
+    gettingStarted: string
+    cli: string
+    mcp: string
+    sdk: string
+    community: string
+    issues: string
+    security: string
+    legal: string
+    mit: string
+    apache: string
+    privacy: string
+    license: string
+    language: string
   }
   /** Accessible label of the placeholder shown before the editor code arrives. */
   loading: string
-  features: Record<FeatureKind, TitledDetail & { hint: string }>
-  agents: {
-    heading: string
-    /** Closes the list of named agents. */
-    rest: string
-  }
-  commands: {
-    /** `{count}` is replaced with the number of CLI commands. */
-    cli: string
-    /** `{count}` is replaced with the number of MCP tools. */
-    mcp: string
-    mcpDetail: string
-  }
-  ownership: {
-    title: string
-    items: TitledDetail[]
-  }
-  roadmap: {
-    title: string
-    more: string
-    shipped: { label: string; entries: RoadmapEntryMessages[] }
-    now: { label: string; entries: RoadmapEntryMessages[] }
-    next: {
-      label: string
-      /** The entry presented as a feature block of its own. */
-      lead: TitledDetail & { features: TitledDetail[] }
-      entries: RoadmapEntryMessages[]
-      /** Pairdraw Cloud, after self-hosting. */
-      cloud: TitledDetail
-    }
-    later: { label: string; entries: RoadmapEntryMessages[] }
-  }
-  /** The hosted product. */
-  cloud: {
-    badge: string
-    title: string
-    lede: string
-    features: TitledDetail[]
-  }
-  closing: {
-    title: string
-    download: string
-    docs: string
-  }
   /** A copy button's label, and what it says once it copied. */
   clipboard: {
     copy: string
     copied: string
   }
-  /** Strings shown inside the live stages, next to the app's own translated panels. */
+  /** Strings shown on the download page's live stage. */
   stage: {
     /** Starts a stage from its still on a touch screen, where stages wait to be asked. */
     activate: string
-    terminal: Record<'tree' | 'restyle' | 'addPlayer' | 'selection' | 'export', string>
-    ai: {
-      recorded: string
-      play: string
-      replay: string
-      request: string
-      reasoning: string
-      reply: string
-    }
-    collab: {
-      /** How the visitor appears on the other screen. */
-      you: string
-      yourScreen: string
-      /** The other screen, belonging to the teammate named Sam. */
-      theirScreen: string
-      askAgent: string
-    }
-    sdk: {
-      /** Heads the install command under the snippet. */
-      install: string
-    }
   }
-  /** The download page, which shares the landing's look and catalog. */
+  /** The download page, which shares the landing's catalog. */
   download: {
     title: string
     lede: string

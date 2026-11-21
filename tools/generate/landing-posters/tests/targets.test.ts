@@ -36,6 +36,8 @@ describe('landing poster targets', () => {
     if (!target) throw new Error('no targets')
     const files = posterFiles(target)
     expect(new Set(files).size).toBe(files.length)
-    expect(files).toContain(`landing-posters/${FINGERPRINT}/root/light-desktop/collab-frame.webp`)
+    expect(files).toContain(
+      `landing-posters/${FINGERPRINT}/root/light-desktop/interactive-canvas.webp`
+    )
   })
 })

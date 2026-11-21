@@ -1,10 +1,10 @@
 import { LOCALE_PREFIXES } from '#docs-config/seo'
-import { FEATURE_KINDS } from '#docs-config/theme/landing/content/features'
 import {
   POSTER_LAYOUTS,
+  POSTER_PARTS,
   POSTER_THEMES,
-  posterParts,
   posterPath,
+  STAGE_KINDS,
   type PosterTarget
 } from '#docs-config/theme/landing/posters'
 
@@ -27,7 +27,7 @@ export function parseShard(text: string): PosterShard {
   return { index, count }
 }
 
-/** Every page captured: each locale's landing in each theme and layout. */
+/** Every page captured: each locale's download page in each theme and layout. */
 export function posterTargets(fingerprint: string): PosterTarget[] {
   return ['root', ...LOCALE_PREFIXES].flatMap((locale) =>
     POSTER_THEMES.flatMap((theme) =>
@@ -43,7 +43,5 @@ export function shardTargets(targets: PosterTarget[], shard: PosterShard): Poste
 
 /** The site paths of every still captured of one page. */
 export function posterFiles(target: PosterTarget): string[] {
-  return FEATURE_KINDS.flatMap((kind) =>
-    posterParts(kind).map((part) => posterPath(target, kind, part))
-  )
+  return STAGE_KINDS.flatMap((kind) => POSTER_PARTS.map((part) => posterPath(target, kind, part)))
 }

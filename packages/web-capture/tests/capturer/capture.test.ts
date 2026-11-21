@@ -190,3 +190,35 @@ describe('capturing a page', () => {
     expect(elements(capture.root.children).map((child) => child.tagName)).toEqual(['main'])
   })
 })
+
+describe('capturing a page without a body', () => {
+  test('falls back to a root that is not HTML', async () => {
+    const document = createPage('').document
+    if (!document.documentElement) throw new Error('fixture has a root')
+    document.removeChild(document.documentElement)
+    const root = document.createElement('html')
+    const main = document.createElement('main')
+    main.textContent = 'Fallback'
+    root.appendChild(main)
+    document.appendChild(root)
+
+    expect(document.body).toBeNull()
+    const capture = await capturePage(document, { inlineImages: false })
+
+    expect(capture.scope).toBe('page')
+    expect(capture.root.tagName).toBe('html')
+    expect(capture.root.children).toContainEqual(expect.objectContaining({ tagName: 'main' }))
+    expect(capture.root.box).toMatchObject({ x: 0, y: 0 })
+    expect(capture.root.computedStyle['background-color']).toBe('rgb(255, 255, 255)')
+  })
+
+  test('says when there is nothing to capture', async () => {
+    const document = createPage('').document
+    if (!document.documentElement) throw new Error('fixture has a root')
+    document.removeChild(document.documentElement)
+
+    await expect(capturePage(document, { inlineImages: false })).rejects.toThrow(
+      'nothing to capture'
+    )
+  })
+})

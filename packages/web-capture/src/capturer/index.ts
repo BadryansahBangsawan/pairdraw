@@ -143,25 +143,33 @@ export async function capturePage(
 ): Promise<WebCapture> {
   options.signal?.throwIfAborted()
   const view = windowOf(document)
-  const { body, documentElement } = document
-  const pageRect = documentElement.getBoundingClientRect()
+  // lib.dom types both as always present, but a frameset page has no body and a document can
+  // lack a root element.
+  const body = document.body as HTMLElement | null
+  const documentElement = document.documentElement as HTMLElement | null
+  const target = body ?? documentElement
+  if (!target) throw new Error('The page has nothing to capture')
+  const page = documentElement ?? target
+  const pageRect = page.getBoundingClientRect()
   const context = createContext(view, { x: pageRect.left, y: pageRect.top }, options)
-  const root = rootElement(body, context)
-  const bodyStyle = view.getComputedStyle(body)
+  const root = rootElement(target, context)
+  const bodyStyle = body ? view.getComputedStyle(body) : null
   const style = root.computedStyle
-  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
-    const margin = Number.parseFloat(bodyStyle.getPropertyValue(`margin-${side}`)) || 0
-    const padding = Number.parseFloat(bodyStyle.getPropertyValue(`padding-${side}`)) || 0
-    if (margin + padding > 0) style[`padding-${side}`] = `${margin + padding}px`
-    delete style[`margin-${side}`]
+  if (bodyStyle) {
+    for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+      const margin = Number.parseFloat(bodyStyle.getPropertyValue(`margin-${side}`)) || 0
+      const padding = Number.parseFloat(bodyStyle.getPropertyValue(`padding-${side}`)) || 0
+      if (margin + padding > 0) style[`padding-${side}`] = `${margin + padding}px`
+      delete style[`margin-${side}`]
+    }
   }
-  const background = [bodyStyle, view.getComputedStyle(documentElement)]
-    .map((computed) => computed.getPropertyValue('background-color'))
-    .find((color) => !isTransparent(color))
+  const background = [bodyStyle, view.getComputedStyle(page)]
+    .map((computed) => computed?.getPropertyValue('background-color'))
+    .find((color) => color !== undefined && !isTransparent(color))
   style['background-color'] = background ?? 'rgb(255, 255, 255)'
   // The page's size, not the body's, which may be shorter than the window.
-  const width = documentElement.clientWidth || pageRect.width
-  const height = Math.max(documentElement.scrollHeight, view.innerHeight)
+  const width = page.clientWidth || pageRect.width
+  const height = Math.max(page.scrollHeight, view.innerHeight)
   style.width = `${width}px`
   style.height = `${height}px`
   style['box-sizing'] = 'border-box'

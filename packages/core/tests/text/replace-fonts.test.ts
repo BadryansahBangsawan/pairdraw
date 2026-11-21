@@ -52,7 +52,7 @@ describe('listDocumentFonts', () => {
     text(graph, page, { fontFamily: 'Present', fontWeight: 400, fontStyle: 'Regular' })
     text(graph, page, { fontFamily: 'Absent', fontWeight: 700, fontStyle: 'Bold' })
     const manager = {
-      loadedFontSource: (family: string) => (family === 'Present' ? 'installed' : null)
+      loadedFontSource: (family: string) => (family === 'Present' ? 'local' : null)
     }
     expect(listDocumentFonts(graph, manager)).toEqual([
       { family: 'Absent', style: 'Bold', missing: true, layerCount: 1 },

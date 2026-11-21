@@ -92,7 +92,8 @@ const {
   scrim,
   dissolvingFrom,
   frameId: previewFrameId,
-  playScenes
+  playScenes,
+  playScroll
 } = usePrototypeStage(store, canvasRef)
 
 function activatePane() {
@@ -182,6 +183,7 @@ useCanvas(sceneCanvasRef, store, {
   getRenderState,
   getSceneScope: () => sceneScopeId.value,
   getPlayScenes: playScenes,
+  getPlayScroll: playScroll,
   onViewportResize,
   onPresented: ({ sceneVersion }) =>
     store.preparationController.acknowledgePresentation(sceneVersion),

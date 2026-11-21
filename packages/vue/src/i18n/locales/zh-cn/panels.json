@@ -818,5 +818,11 @@
   "imageTemperature": "色温",
   "imageTint": "色调",
   "imageHighlights": "高光",
-  "imageShadows": "阴影"
+  "imageShadows": "阴影",
+  "prototypeOverflow": "溢出滚动",
+  "prototypeOverflowNone": "不滚动",
+  "prototypeOverflowVertical": "垂直",
+  "prototypeOverflowHorizontal": "水平",
+  "prototypeOverflowBoth": "双向",
+  "prototypeOverflowNeedsClip": "开启“裁剪内容”后，此画框才能在播放时滚动。"
 }

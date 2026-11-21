@@ -6,10 +6,12 @@ import {
   type PlayRevert,
   type PlaySession,
   type PlayStep,
-  type PlayTimeout
+  type PlayTimeout,
+  shownFrame
 } from '@pairdraw/core/prototype'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorStore } from '@/app/editor/active-store'
 
@@ -56,8 +58,20 @@ export function usePlayScenes(
     if (result.changed) changed()
   }
 
+  /**
+   * Scrolls the frames under the pointer by a wheel or drag, innermost first, and returns what
+   * none of them could take, which the canvas pans by instead.
+   */
+  function scrollBy(path: readonly string[], dx: number, dy: number): Vector {
+    const current = session.value
+    if (!current) return { x: dx, y: dy }
+    const rest = scenes.scrollBy(shownFrame(current), path, dx, dy)
+    if (rest.x !== dx || rest.y !== dy) store.requestRepaint()
+    return rest
+  }
+
   function clear(): void {
-    if (scenes.views.size === 0) return
+    if (scenes.views.size === 0 && scenes.scroll.size === 0) return
     scenes.clear()
     changed()
   }
@@ -137,6 +151,9 @@ export function usePlayScenes(
     /** The changed frames the canvas draws from their copies. */
     views: () => scenes.views,
     graphFor: (rootId: string) => scenes.graphFor(rootId),
+    /** How far play scrolled each frame's content, which the canvas and the pointer follow. */
+    scroll: () => scenes.scroll,
+    scrollBy,
     /** Grows whenever what play shows of a frame changes. */
     revision,
     run,

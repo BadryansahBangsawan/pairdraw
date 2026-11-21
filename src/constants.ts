@@ -138,3 +138,6 @@ export const ACTION_TOAST_DURATION = 800
 export const ACP_PERMISSION_TIMEOUT_MS = 60_000
 /** How long a request waits unanswered before a notification says an agent needs you. */
 export const AGENT_INPUT_NOTIFY_DELAY_MS = 6_000
+
+/** The pixels one line of a wheel that scrolls by lines moves, as browsers count a line. */
+export const WHEEL_LINE_HEIGHT = 16

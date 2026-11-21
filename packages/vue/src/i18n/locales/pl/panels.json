@@ -840,5 +840,11 @@
   "imageTemperature": "Temperatura",
   "imageTint": "Odcień",
   "imageHighlights": "Światła",
-  "imageShadows": "Cienie"
+  "imageShadows": "Cienie",
+  "prototypeOverflow": "Przewijanie nadmiaru",
+  "prototypeOverflowNone": "Bez przewijania",
+  "prototypeOverflowVertical": "Pionowo",
+  "prototypeOverflowHorizontal": "Poziomo",
+  "prototypeOverflowBoth": "W obu kierunkach",
+  "prototypeOverflowNeedsClip": "Włącz Przytnij zawartość, aby ta ramka przewijała się podczas odtwarzania."
 }

@@ -23,6 +23,8 @@ import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
 import { usePlayPointer } from './pointer'
 import { usePlayScenes } from './scenes'
+import { usePlayScroll } from './scroll'
+import { playFitArea } from './viewport'
 
 /** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
 const DISSOLVE_SETTLE_MS = 100
@@ -69,22 +71,34 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       : []
   )
 
-  /** Fits the shown frame edge to edge, which is what play shows. */
+  /**
+   * Fits the shown frame edge to edge, which is what play shows; a frame that scrolls and is
+   * longer than the stage fits across, and the canvas pans through the rest.
+   */
   function fit() {
     const rect = shownRect.value
     if (!rect) return
     const { panX, panY, zoom } = store.state
-    store.zoomToArea(
-      (rect.left - panX) / zoom,
-      (rect.top - panY) / zoom,
-      (rect.left - panX + rect.width) / zoom,
-      (rect.top - panY + rect.height) / zoom
+    // An overlay fits whole, as it opens over the screen.
+    const base = session.value?.overlays.length === 0 ? frameId.value : null
+    const overflow = base ? store.graph.getNode(base)?.overflowDirection : 'NONE'
+    const area = playFitArea(
+      {
+        x: (rect.left - panX) / zoom,
+        y: (rect.top - panY) / zoom,
+        width: rect.width / zoom,
+        height: rect.height / zoom
+      },
+      overflow ?? 'NONE',
+      { width: size.width.value, height: size.height.value }
     )
+    store.zoomToArea(area.x, area.y, area.x + area.width, area.y + area.height)
   }
 
   /** The frames play changed, which the canvas draws from their copies. */
   const play = usePlayScenes(store, session, live)
   usePlayPointer(store, area, session, play, live)
+  usePlayScroll(store, area, session, play)
 
   /** Whether an overlay is open, which dims everything but the overlay frame. */
   const scrim = computed(() => (session.value?.overlays.length ?? 0) > 0)
@@ -229,7 +243,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       const bounds = event.target.getBoundingClientRect()
       const point = store.screenToCanvas(event.clientX - bounds.left, event.clientY - bounds.top)
       const graph = play.graphFor(shownFrame(shown))
-      const click = reactionAt(graph, shown, point.x, point.y)
+      const click = reactionAt(graph, shown, point.x, point.y, 'ON_CLICK', play.scroll())
       if (click) runAction(shown, click)
     },
     { capture: true }
@@ -242,6 +256,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     frameId,
     scrim,
     dissolvingFrom,
-    playScenes: play.views
+    playScenes: play.views,
+    playScroll: play.scroll
   }
 }

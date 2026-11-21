@@ -829,5 +829,11 @@
   "imageTemperature": "Temperatura",
   "imageTint": "Matiz",
   "imageHighlights": "Iluminaciones",
-  "imageShadows": "Sombras"
+  "imageShadows": "Sombras",
+  "prototypeOverflow": "Desplazamiento del desbordamiento",
+  "prototypeOverflowNone": "Sin desplazamiento",
+  "prototypeOverflowVertical": "Vertical",
+  "prototypeOverflowHorizontal": "Horizontal",
+  "prototypeOverflowBoth": "Ambas direcciones",
+  "prototypeOverflowNeedsClip": "Activa Recortar contenido para que este marco se desplace al reproducir."
 }

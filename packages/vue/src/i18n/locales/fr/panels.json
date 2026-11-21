@@ -829,5 +829,11 @@
   "imageTemperature": "Température",
   "imageTint": "Teinte",
   "imageHighlights": "Hautes lumières",
-  "imageShadows": "Ombres"
+  "imageShadows": "Ombres",
+  "prototypeOverflow": "Défilement du débordement",
+  "prototypeOverflowNone": "Aucun défilement",
+  "prototypeOverflowVertical": "Vertical",
+  "prototypeOverflowHorizontal": "Horizontal",
+  "prototypeOverflowBoth": "Les deux directions",
+  "prototypeOverflowNeedsClip": "Activez Rogner le contenu pour faire défiler ce cadre pendant la lecture."
 }

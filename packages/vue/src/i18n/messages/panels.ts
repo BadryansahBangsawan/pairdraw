@@ -845,7 +845,13 @@ export const panelMessageDefaults = {
   ),
   prototypeVideoFormatsHere: params('This browser can record {formats}.'),
   prototypeVideoExport: 'Export',
-  prototypeVideoRecording: params('Recording frame {done} of {total}')
+  prototypeVideoRecording: params('Recording frame {done} of {total}'),
+  prototypeOverflow: 'Overflow scrolling',
+  prototypeOverflowNone: 'No scrolling',
+  prototypeOverflowVertical: 'Vertical',
+  prototypeOverflowHorizontal: 'Horizontal',
+  prototypeOverflowBoth: 'Both directions',
+  prototypeOverflowNeedsClip: 'Turn on Clip content to scroll this frame in play.'
 } as const
 
 export const panelMessages = i18n('panels', panelMessageDefaults)

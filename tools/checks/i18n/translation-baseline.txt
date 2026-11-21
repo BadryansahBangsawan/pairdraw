@@ -654,3 +654,8 @@ de:settings.prompts
 fr:settings.prompts
 de:variables.syncKeepCode
 fr:variables.syncKeepCode
+de:panels.prototypeOverflowHorizontal
+es:panels.prototypeOverflowVertical
+es:panels.prototypeOverflowHorizontal
+fr:panels.prototypeOverflowVertical
+fr:panels.prototypeOverflowHorizontal

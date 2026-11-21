@@ -2,6 +2,7 @@ import { computed } from 'vue'
 
 import { framesOnPage } from '@pairdraw/core/prototype'
 import type {
+  OverflowDirection,
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
@@ -56,6 +57,28 @@ export function usePrototype() {
     return node ? inheritedReactionCount(store.graph, node.id) : 0
   })
 
+  /** Whether the selected layer can scroll in play: a frame, component, or instance. */
+  const scrolls = computed(() => {
+    const type = selectedNode.value?.type
+    return type === 'FRAME' || type === 'COMPONENT' || type === 'INSTANCE'
+  })
+
+  /**
+   * Whether the selected frame scrolls but will not in play: a frame inside another scrolls only
+   * while it clips its content, as in Figma.
+   */
+  const scrollNeedsClip = useSceneComputed(() => {
+    const node = selectedNode.value
+    if (!node || node.overflowDirection === 'NONE' || node.clipsContent) return false
+    return store.graph.getNode(node.parentId ?? '')?.type !== 'CANVAS'
+  })
+
+  function setOverflow(overflowDirection: OverflowDirection) {
+    const node = selectedNode.value
+    if (!node || node.overflowDirection === overflowDirection) return
+    store.updateNodeWithUndo(node.id, { overflowDirection }, 'Change overflow scrolling')
+  }
+
   /** Selects the main component of the selected instance, where its inherited interactions live. */
   function selectMain() {
     const node = selectedNode.value
@@ -79,6 +102,10 @@ export function usePrototype() {
     variantTargets,
     inheritedCount,
     selectMain,
+    scrolls,
+    overflow: computed(() => selectedNode.value?.overflowDirection ?? 'NONE'),
+    scrollNeedsClip,
+    setOverflow,
     play: () => store.startPlay(),
     add: () => commit(withReaction(reactions.value, createReaction()), 'Add interaction'),
     remove: (id: string) => commit(withoutReaction(reactions.value, id), 'Remove interaction'),

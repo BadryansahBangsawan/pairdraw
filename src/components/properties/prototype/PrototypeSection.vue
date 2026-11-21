@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 import { primaryAction } from '@pairdraw/core/prototype'
 import type {
+  OverflowDirection,
   PrototypeNodeAction,
   PrototypeReaction,
   PrototypeTransitionType,
@@ -27,6 +28,10 @@ const {
   variantTargets,
   inheritedCount,
   selectMain,
+  scrolls,
+  overflow,
+  scrollNeedsClip,
+  setOverflow,
   play,
   add,
   remove,
@@ -80,6 +85,13 @@ function destinationPlaceholder(reaction: PrototypeReaction): string {
     : panels.value.prototypeDestinationPlaceholder
 }
 
+const overflowOptions = computed<{ value: OverflowDirection; label: string }[]>(() => [
+  { value: 'NONE', label: panels.value.prototypeOverflowNone },
+  { value: 'VERTICAL', label: panels.value.prototypeOverflowVertical },
+  { value: 'HORIZONTAL', label: panels.value.prototypeOverflowHorizontal },
+  { value: 'BOTH', label: panels.value.prototypeOverflowBoth }
+])
+
 const transitionOptions = computed<{ value: PrototypeTransitionType; label: string }[]>(() => [
   { value: 'INSTANT', label: panels.value.prototypeAnimationInstant },
   { value: 'DISSOLVE', label: panels.value.prototypeAnimationDissolve }
@@ -122,6 +134,23 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
         <icon-lucide-plus class="size-3.5" />
       </IconButton>
     </template>
+
+    <div v-if="scrolls" class="flex flex-col gap-1 pb-1.5">
+      <div class="flex min-w-0 items-center gap-1.5">
+        <span class="shrink-0 px-2 text-[11px] text-muted">{{ panels.prototypeOverflow }}</span>
+        <AppSelect
+          :model-value="overflow"
+          :options="overflowOptions"
+          :label="panels.prototypeOverflow"
+          data-property="prototype-overflow"
+          class="min-w-0 flex-1"
+          @update:model-value="(value: OverflowDirection) => setOverflow(value)"
+        />
+      </div>
+      <p v-if="scrollNeedsClip" class="px-2 text-[11px] text-muted">
+        {{ panels.prototypeOverflowNeedsClip }}
+      </p>
+    </div>
 
     <button
       v-if="inheritedCount > 0"

@@ -2,6 +2,7 @@ import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, watch, type Ref } from 'vue'
 
 import {
+  effectiveReactions,
   hasPointerTriggers,
   pathChanges,
   pointerPath,
@@ -15,7 +16,7 @@ import {
   type PlaySession,
   type PlayStep
 } from '@pairdraw/core/prototype'
-import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorStore } from '@/app/editor/active-store'
@@ -23,9 +24,21 @@ import type { EditorStore } from '@/app/editor/active-store'
 /** What the pointer needs of play: the graph a frame shows, and running and undoing reactions. */
 export interface PointerPlay {
   graphFor: (rootId: string) => SceneGraph
+  scroll: () => ReadonlyMap<string, Vector>
   run: (click: PlayClick) => PlayStep | null
   revert: (undo: PlayRevert) => void
   readonly revision: Readonly<Ref<number>>
+}
+
+/** Runs a callback on the next frame, and cancels one, as `requestAnimationFrame` does. */
+export interface FrameScheduler {
+  request: (callback: () => void) => number
+  cancel: (id: number) => void
+}
+
+const ANIMATION_FRAMES: FrameScheduler = {
+  request: (callback) => requestAnimationFrame(() => callback()),
+  cancel: (id) => cancelAnimationFrame(id)
 }
 
 /**
@@ -34,13 +47,21 @@ export interface PointerPlay {
  * undo themselves as it leaves or lifts. A frame with none of these reactions is not hit-tested
  * as the pointer moves.
  */
-export function createPlayPointer(session: Ref<PlaySession | null>, play: PointerPlay) {
+export function createPlayPointer(
+  session: Ref<PlaySession | null>,
+  play: PointerPlay,
+  frames: FrameScheduler = ANIMATION_FRAMES
+) {
   /** The layers under the pointer, from the shown frame down. */
   let path: string[] = []
   let pathRoot: string | null = null
   const hovering: PlayRevert[] = []
   const pressing: PlayRevert[] = []
-  const delayed = new Map<string, number>()
+  /** The Mouse enter and Mouse leave timers waiting, by `enter:` or `leave:` and the layer. */
+  const delayed = new Map<string, number[]>()
+  /** A move waiting for the next frame, and where to. */
+  let queued: number | null = null
+  let latest: Vector | null = null
 
   function runNow(reaction: PlayClick, undoes?: PlayRevert[]): void {
     const before = session.value
@@ -54,16 +75,17 @@ export function createPlayPointer(session: Ref<PlaySession | null>, play: Pointe
   function runAfterDelay(key: string, reaction: PlayPointerReaction): void {
     if (reaction.delayMs <= 0) return runNow(reaction)
     const timer = window.setTimeout(() => {
-      delayed.delete(key)
+      const waiting = delayed.get(key)?.filter((other) => other !== timer) ?? []
+      if (waiting.length > 0) delayed.set(key, waiting)
+      else delayed.delete(key)
       runNow(reaction)
     }, reaction.delayMs)
-    delayed.set(key, timer)
+    delayed.set(key, [...(delayed.get(key) ?? []), timer])
   }
 
+  /** Cancels every timer a layer's Mouse enter, or Mouse leave, has waiting. */
   function cancelDelayed(key: string): void {
-    const timer = delayed.get(key)
-    if (timer === undefined) return
-    window.clearTimeout(timer)
+    for (const timer of delayed.get(key) ?? []) window.clearTimeout(timer)
     delayed.delete(key)
   }
 
@@ -108,18 +130,45 @@ export function createPlayPointer(session: Ref<PlaySession | null>, play: Pointe
     const graph = play.graphFor(rootId)
     if (pathRoot !== rootId) reset()
     pathRoot = rootId
-    follow(pointerPath(graph, rootId, x, y))
+    // A layer with a reaction takes the pointer, and so does one a While hovering keeps showing,
+    // whose new variant may have none.
+    const takes = (node: SceneNode) =>
+      hovering.some((entry) => entry.watchId === node.id) ||
+      effectiveReactions(graph, node).length > 0
+    follow(pointerPath(graph, rootId, x, y, play.scroll(), takes))
   }
 
-  /** The pointer gone from the canvas: it leaves every layer it was over. */
+  /** Moves the pointer on the next frame, so a burst of moves hit-tests once. */
+  function queueMove(x: number, y: number): void {
+    latest = { x, y }
+    if (queued !== null) return
+    queued = frames.request(() => {
+      queued = null
+      if (latest) move(latest.x, latest.y)
+    })
+  }
+
+  function cancelQueuedMove(): void {
+    if (queued !== null) frames.cancel(queued)
+    queued = null
+    latest = null
+  }
+
+  /**
+   * The pointer gone from the canvas: it leaves every layer it was over, lets go of what it
+   * pressed, and a move still waiting for its frame does nothing.
+   */
   function leaveAll(): void {
+    cancelQueuedMove()
     follow([])
+    release()
   }
 
   function press(x: number, y: number): void {
     const current = session.value
     if (!current) return
-    const hit = reactionAt(play.graphFor(shownFrame(current)), current, x, y, 'ON_PRESS')
+    const graph = play.graphFor(shownFrame(current))
+    const hit = reactionAt(graph, current, x, y, 'ON_PRESS', play.scroll())
     if (hit) runNow(hit, pressing)
   }
 
@@ -133,7 +182,8 @@ export function createPlayPointer(session: Ref<PlaySession | null>, play: Pointe
    * the layer that opened it.
    */
   function reset(): void {
-    for (const timer of delayed.values()) window.clearTimeout(timer)
+    cancelQueuedMove()
+    for (const timers of delayed.values()) for (const timer of timers) window.clearTimeout(timer)
     delayed.clear()
     for (const undoes of [hovering, pressing]) {
       const changes = undoes.filter((entry) => entry.kind === 'change')
@@ -144,7 +194,7 @@ export function createPlayPointer(session: Ref<PlaySession | null>, play: Pointe
     pathRoot = null
   }
 
-  return { move, leaveAll, press, release, reset }
+  return { move, queueMove, leaveAll, press, release, reset }
 }
 
 /** Wires the play pointer to the canvas, sampling a moving pointer once per frame. */
@@ -186,27 +236,19 @@ export function usePlayPointer(
     return store.screenToCanvas(event.clientX - bounds.left, event.clientY - bounds.top)
   }
 
-  let frame: number | null = null
-  let latest: Vector | null = null
   useEventListener(area, 'pointermove', (event: PointerEvent) => {
     if (!tracking) return
-    latest = documentPoint(event)
-    if (frame !== null) return
-    frame = requestAnimationFrame(() => {
-      frame = null
-      if (latest) pointer.move(latest.x, latest.y)
-    })
+    const point = documentPoint(event)
+    if (point) pointer.queueMove(point.x, point.y)
   })
   useEventListener(area, 'pointerleave', () => pointer.leaveAll())
   useEventListener(area, 'pointerdown', (event: PointerEvent) => {
     const point = documentPoint(event)
     if (point) pointer.press(point.x, point.y)
   })
-  useEventListener(area, 'pointerup', () => pointer.release())
-  useEventListener(area, 'pointercancel', () => pointer.release())
+  // A press lifts wherever the pointer is by then, on the canvas or off it.
+  useEventListener(window, 'pointerup', () => pointer.release())
+  useEventListener(window, 'pointercancel', () => pointer.release())
 
-  onScopeDispose(() => {
-    if (frame !== null) cancelAnimationFrame(frame)
-    pointer.reset()
-  })
+  onScopeDispose(() => pointer.reset())
 }

@@ -818,5 +818,11 @@
   "imageTemperature": "色温度",
   "imageTint": "色かぶり補正",
   "imageHighlights": "ハイライト",
-  "imageShadows": "シャドウ"
+  "imageShadows": "シャドウ",
+  "prototypeOverflow": "オーバーフロースクロール",
+  "prototypeOverflowNone": "スクロールなし",
+  "prototypeOverflowVertical": "縦",
+  "prototypeOverflowHorizontal": "横",
+  "prototypeOverflowBoth": "両方向",
+  "prototypeOverflowNeedsClip": "再生中にこのフレームをスクロールするには「コンテンツをクリップ」をオンにしてください。"
 }

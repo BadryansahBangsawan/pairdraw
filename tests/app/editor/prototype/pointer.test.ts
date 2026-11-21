@@ -166,4 +166,76 @@ describe('the pointer in play', () => {
     expect(shows()).toBe(document.base.id)
     stop()
   })
+
+  test('While pressing goes back when the pointer leaves the canvas before it lifts', () => {
+    const document = buttonDocument(({ pressed }) => [changeTo(pressed, 'ON_PRESS')])
+    const { pointer, shows, stop } = setUp(document)
+    pointer.press(OVER.x, OVER.y)
+    expect(shows()).toBe(document.pressed.id)
+    pointer.leaveAll()
+    expect(shows()).toBe(document.base.id)
+    stop()
+  })
+
+  test('a move still waiting for its frame does nothing once the pointer left', () => {
+    const document = buttonDocument(({ hover }) => [changeTo(hover, 'ON_HOVER')])
+    const store = createEditorStore(document.graph)
+    const session = ref<PlaySession | null>(startSession(document.screen.id))
+    const frames = new Map<number, () => void>()
+    let next = 1
+    const scope = effectScope()
+    const parts = scope.run(() => {
+      const play = usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 }))
+      )
+      const pointer = createPlayPointer(session, play, {
+        request: (callback) => {
+          frames.set(next, callback)
+          return next++
+        },
+        cancel: (id) => frames.delete(id)
+      })
+      return { play, pointer }
+    })
+    if (!parts) throw new Error('no play')
+    parts.pointer.queueMove(OVER.x, OVER.y)
+    parts.pointer.leaveAll()
+    for (const callback of frames.values()) callback()
+    const played = parts.play.graphFor(document.screen.id)
+    const node = played.getNode(document.button.id)
+    expect(node && instanceMainComponent(played, node)?.id).toBe(document.base.id)
+    scope.stop()
+    store.dispose()
+  })
+
+  test('leaving cancels every delayed Mouse enter of the layer', () => {
+    if (globalThis.window === undefined) Object.assign(globalThis, { window: globalThis })
+    const realSet = window.setTimeout
+    const realClear = window.clearTimeout
+    const armed: { fn: () => void; cleared: boolean }[] = []
+    window.setTimeout = ((fn: () => void) => {
+      armed.push({ fn, cleared: false })
+      return armed.length
+    }) as typeof window.setTimeout
+    window.clearTimeout = ((id: number) => {
+      const entry = armed[id - 1]
+      if (entry) entry.cleared = true
+    }) as typeof window.clearTimeout
+    restore = () => {
+      window.setTimeout = realSet
+      window.clearTimeout = realClear
+    }
+    const document = buttonDocument(({ hover, lit }) => [
+      changeTo(lit, 'MOUSE_ENTER', 0.5),
+      { ...changeTo(hover, 'MOUSE_ENTER', 2), id: 'slow-enter' }
+    ])
+    const { pointer, stop } = setUp(document)
+    pointer.move(OVER.x, OVER.y)
+    expect(armed).toHaveLength(2)
+    pointer.move(AWAY.x, AWAY.y)
+    expect(armed.map((timer) => timer.cleared)).toEqual([true, true])
+    stop()
+  })
 })

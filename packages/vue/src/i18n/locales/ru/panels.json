@@ -840,5 +840,11 @@
   "imageTemperature": "Температура",
   "imageTint": "Оттенок",
   "imageHighlights": "Света",
-  "imageShadows": "Тени"
+  "imageShadows": "Тени",
+  "prototypeOverflow": "Прокрутка переполнения",
+  "prototypeOverflowNone": "Без прокрутки",
+  "prototypeOverflowVertical": "По вертикали",
+  "prototypeOverflowHorizontal": "По горизонтали",
+  "prototypeOverflowBoth": "В обоих направлениях",
+  "prototypeOverflowNeedsClip": "Включите «Обрезать содержимое», чтобы этот фрейм прокручивался при воспроизведении."
 }

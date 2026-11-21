@@ -829,5 +829,11 @@
   "imageTemperature": "Temperatura",
   "imageTint": "Tinta",
   "imageHighlights": "Luci",
-  "imageShadows": "Ombre"
+  "imageShadows": "Ombre",
+  "prototypeOverflow": "Scorrimento dell’overflow",
+  "prototypeOverflowNone": "Nessuno scorrimento",
+  "prototypeOverflowVertical": "Verticale",
+  "prototypeOverflowHorizontal": "Orizzontale",
+  "prototypeOverflowBoth": "Entrambe le direzioni",
+  "prototypeOverflowNeedsClip": "Attiva Ritaglia contenuto per far scorrere questo frame durante la riproduzione."
 }

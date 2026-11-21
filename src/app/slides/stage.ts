@@ -5,6 +5,7 @@ import type { PresentationState, VisibleCanvas } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
+import { WHEEL_LINE_HEIGHT } from '@/constants'
 
 import { usePresentationFullscreen } from './fullscreen'
 import { presentationKeyAction, presentationScrollStep, type PresentationKeyAction } from './keys'
@@ -13,9 +14,6 @@ import { createWheelStepper } from './wheel'
 
 /** WebKit's pinch events, which the DOM's event maps do not list. */
 const WEBKIT_GESTURE_EVENTS: string[] = ['gesturestart', 'gesturechange', 'gestureend']
-
-/** Pixels a wheel line scrolls, for wheels that report lines rather than pixels. */
-const WHEEL_LINE_HEIGHT = 16
 
 /**
  * What a click belongs to instead of the deck: the live controls, anything editable, and media a

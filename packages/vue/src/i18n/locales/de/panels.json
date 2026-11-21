@@ -829,5 +829,11 @@
   "imageTemperature": "Temperatur",
   "imageTint": "Tönung",
   "imageHighlights": "Lichter",
-  "imageShadows": "Tiefen"
+  "imageShadows": "Tiefen",
+  "prototypeOverflow": "Überlauf-Scrollen",
+  "prototypeOverflowNone": "Kein Scrollen",
+  "prototypeOverflowVertical": "Vertikal",
+  "prototypeOverflowHorizontal": "Horizontal",
+  "prototypeOverflowBoth": "Beide Richtungen",
+  "prototypeOverflowNeedsClip": "Aktiviere „Inhalt zuschneiden“, damit dieser Frame beim Abspielen scrollt."
 }

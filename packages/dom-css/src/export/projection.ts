@@ -1,7 +1,7 @@
 import { isEqual } from 'es-toolkit/predicate'
 import { fromUint8Array } from 'js-base64'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import { BLACK } from '@pairdraw/scene-graph/constants'
 import { readIcon } from '@pairdraw/scene-graph/icons'
 import { imageMimeType } from '@pairdraw/scene-graph/images'
@@ -167,7 +167,7 @@ function addCornerRadii(style: DesignStyleDeclaration, node: SceneNode, css: Fie
 }
 
 function addStroke(style: DesignStyleDeclaration, node: SceneNode, css: FieldCSS): void {
-  const stroke = node.strokes.at(0)
+  const stroke = node.strokes.find((item) => item.visible)
   const literalColor = strokeColorToCSS(stroke)
   if (!literalColor || !stroke) return
   const color = css('strokes/0/color', literalColor)
@@ -184,6 +184,35 @@ function addStroke(style: DesignStyleDeclaration, node: SceneNode, css: FieldCSS
   style['border-right-width'] = css('borderRightWeight', px(node.borderRightWeight))
   style['border-bottom-width'] = css('borderBottomWeight', px(node.borderBottomWeight))
   style['border-left-width'] = css('borderLeftWeight', px(node.borderLeftWeight))
+}
+
+/**
+ * CSS gives an element one border, so the visible strokes after the first become rings in
+ * `box-shadow`, in layer order. An outside ring grows from the border's outer edge, an inside one
+ * from its inner edge, and a centred stroke gets a ring on each side of the border. Rings cannot
+ * dash or take per-side weights, and outer and inner rings paint in separate CSS layers, so a
+ * stroke order that alternates them is approximated.
+ */
+function extraStrokeShadows(strokes: Stroke[], first: Stroke): string[] {
+  const outer: string[] = []
+  const inner: string[] = []
+  let outside = 0
+  let inside = first.weight
+  for (const stroke of strokes) {
+    if (!stroke.visible) continue
+    const color = strokeColorToCSS(stroke)
+    if (!color) continue
+    if (stroke.align !== 'OUTSIDE') {
+      inside += stroke.align === 'CENTER' ? stroke.weight / 2 : stroke.weight
+      inner.push(`inset 0 0 0 ${px(inside)} ${color}`)
+    }
+    if (stroke.align !== 'INSIDE') {
+      outside += stroke.align === 'CENTER' ? stroke.weight / 2 : stroke.weight
+      outer.push(`0 0 0 ${px(outside)} ${color}`)
+    }
+  }
+  // The first ring listed paints on top, so each group stays nearest first.
+  return [...outer, ...inner]
 }
 
 const PADDING_FIELDS = ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'] as const
@@ -336,6 +365,15 @@ function styleFromSceneNode(
   addImageStyle(style, node)
   addStroke(style, node, css)
   Object.assign(style, effectsToCSS(node.effects))
+  const visibleStrokes = node.strokes.filter((stroke) => stroke.visible)
+  if (visibleStrokes.length > 1) {
+    const rings = extraStrokeShadows(visibleStrokes.slice(1), visibleStrokes[0])
+    if (rings.length > 0) {
+      style['box-shadow'] = [rings.join(', '), style['box-shadow']]
+        .filter((shadow): shadow is string => Boolean(shadow))
+        .join(', ')
+    }
+  }
   if (node.opacity < 1) style.opacity = css('opacity', String(node.opacity))
   const blend = CSS_BLEND_MODES[node.blendMode]
   if (blend) style['mix-blend-mode'] = blend

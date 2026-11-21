@@ -107,9 +107,10 @@ export type BorderSide = 'top' | 'right' | 'bottom' | 'left'
  * border insets the box its absolutely positioned children are placed in, where a stroke does not.
  */
 export function borderWidths(node: SceneNode): Record<BorderSide, number> {
-  if (!strokeColorToCSS(node.strokes.at(0))) return { top: 0, right: 0, bottom: 0, left: 0 }
+  const stroke = node.strokes.find((item) => item.visible)
+  if (!strokeColorToCSS(stroke)) return { top: 0, right: 0, bottom: 0, left: 0 }
   if (!node.independentStrokeWeights) {
-    const weight = node.strokes[0]?.weight ?? 0
+    const weight = stroke?.weight ?? 0
     return { top: weight, right: weight, bottom: weight, left: weight }
   }
   return {

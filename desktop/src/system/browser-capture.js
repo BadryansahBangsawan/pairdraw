@@ -60,6 +60,15 @@
     }
     return result;
   }
+  // ../../node_modules/.bun/es-toolkit@1.52.0/node_modules/es-toolkit/dist/object/omit.mjs
+  function omit(obj, keys) {
+    const result = { ...obj };
+    for (let i = 0;i < keys.length; i++) {
+      const key = keys[i];
+      delete result[key];
+    }
+    return result;
+  }
   // ../../node_modules/.bun/fflate@0.8.3/node_modules/fflate/esm/browser.js
   var u8 = Uint8Array;
   var u16 = Uint16Array;
@@ -634,8 +643,308 @@
     return Object.hasOwn(record, key) ? record[key] : undefined;
   }
 
+  // src/design-document.ts
+  var SIDES = ["top", "right", "bottom", "left"];
+  var DISPLAY_FALLBACKS = {
+    grid: { display: "flex", "flex-direction": "row", "flex-wrap": "wrap" },
+    "inline-grid": { display: "inline-flex", "flex-direction": "row", "flex-wrap": "wrap" },
+    "table-row": { display: "flex", "flex-direction": "row", "flex-wrap": "nowrap" },
+    table: { display: "block" },
+    "inline-table": { display: "inline-block" },
+    "table-row-group": { display: "block" },
+    "table-header-group": { display: "block" },
+    "table-footer-group": { display: "block" },
+    "table-cell": { display: "block" },
+    "table-caption": { display: "block" },
+    "list-item": { display: "block" },
+    "flow-root": { display: "block" }
+  };
+  var INLINE_TEXT_TAGS = new Set(["a", "b", "code", "em", "i", "small", "span", "strong", "u"]);
+  function pixels(value) {
+    if (!value?.endsWith("px"))
+      return 0;
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  function px(value) {
+    return `${Math.round(value * 100) / 100}px`;
+  }
+  var MARGINS = SIDES.map((side) => `margin-${side}`);
+  function splitMargins(style) {
+    const margins = { top: 0, right: 0, bottom: 0, left: 0 };
+    for (const side of SIDES)
+      margins[side] = pixels(style[`margin-${side}`]);
+    return { margins, style: omit(style, MARGINS) };
+  }
+  function isAbsolute(style) {
+    return style.position === "absolute" || style.position === "fixed";
+  }
+  function isInline(style) {
+    return (ownValue(style, "display") ?? "").startsWith("inline");
+  }
+  function placeAbsolute(style, margins, box, parentBox) {
+    if (box && parentBox) {
+      style.left = px(box.x - parentBox.x);
+      style.top = px(box.y - parentBox.y);
+      return;
+    }
+    if (ownValue(style, "left") !== undefined)
+      style.left = px(pixels(style.left) + margins.left);
+    if (ownValue(style, "top") !== undefined)
+      style.top = px(pixels(style.top) + margins.top);
+  }
+  function marginBox(element, margins) {
+    const style = { display: "block" };
+    for (const side of SIDES) {
+      if (margins[side] > 0)
+        style[`padding-${side}`] = px(margins[side]);
+    }
+    const alignSelf = ownValue(element.computedStyle, "align-self");
+    if (alignSelf === undefined) {
+      return { type: "element", tagName: "div", attrs: {}, computedStyle: style, children: [element] };
+    }
+    style["align-self"] = alignSelf;
+    const child = { ...element, computedStyle: omit(element.computedStyle, ["align-self"]) };
+    return { type: "element", tagName: "div", attrs: {}, computedStyle: style, children: [child] };
+  }
+  function convertChildren(children, parentBox) {
+    return children.map((child) => child.type === "text" ? child : convertElement(child, parentBox));
+  }
+  var GRID_DISPLAYS = new Set(["grid", "inline-grid"]);
+  function hasBox(element) {
+    return element.box !== undefined;
+  }
+  function placeableGrid(element) {
+    if (!GRID_DISPLAYS.has(ownValue(element.computedStyle, "display") ?? "") || !hasBox(element)) {
+      return null;
+    }
+    const items = [];
+    for (const child of element.children) {
+      if (child.type === "text") {
+        if (child.text.trim().length > 0)
+          return null;
+      } else if (hasBox(child)) {
+        items.push(child);
+      } else {
+        return null;
+      }
+    }
+    return { box: element.box, items };
+  }
+  function gridStyle(style, box) {
+    return {
+      ...omit(style, ["gap", "row-gap", "column-gap"]),
+      display: style.display === "inline-grid" ? "inline-block" : "block",
+      width: px(box.width),
+      height: px(box.height),
+      "box-sizing": "border-box"
+    };
+  }
+  var PLACEMENT = [...MARGINS, "position", ...SIDES];
+  function placeGridItem(item, grid) {
+    const converted = convertElement({ ...item, computedStyle: omit(item.computedStyle, PLACEMENT) });
+    converted.computedStyle = {
+      ...converted.computedStyle,
+      position: "absolute",
+      left: px(item.box.x - grid.x),
+      top: px(item.box.y - grid.y),
+      width: px(item.box.width),
+      height: px(item.box.height),
+      "box-sizing": "border-box"
+    };
+    return converted;
+  }
+  function layoutOf(element) {
+    const grid = placeableGrid(element);
+    if (grid) {
+      return {
+        displayed: gridStyle(element.computedStyle, grid.box),
+        children: grid.items.map((item) => placeGridItem(item, grid.box))
+      };
+    }
+    const display = ownValue(element.computedStyle, "display") ?? "";
+    return {
+      displayed: { ...element.computedStyle, ...DISPLAY_FALLBACKS[display] },
+      children: convertChildren(element.children, element.box)
+    };
+  }
+  var GLYPH_INPUT_TYPES = { checkbox: true, radio: true };
+  function glyphBox(element, converted, margins, parentBox) {
+    const box = element.box;
+    if (element.tagName !== "input" || !Object.hasOwn(GLYPH_INPUT_TYPES, element.attrs.type) || !box || box.width <= 0 || box.height <= 0) {
+      return null;
+    }
+    const side = Math.min(box.width, box.height);
+    if (box.width - side < 1)
+      return null;
+    const style = converted.computedStyle;
+    const absolute = isAbsolute(style);
+    style.width = px(side);
+    style.height = px(side);
+    style["box-sizing"] = "border-box";
+    delete style.position;
+    delete style.left;
+    delete style.top;
+    delete style.right;
+    delete style.bottom;
+    const wrapper = {
+      display: "flex",
+      "justify-content": "center",
+      "align-items": "center",
+      width: px(box.width),
+      height: px(box.height),
+      "box-sizing": "border-box"
+    };
+    const alignSelf = ownValue(style, "align-self");
+    if (alignSelf !== undefined) {
+      wrapper["align-self"] = alignSelf;
+      delete style["align-self"];
+    }
+    const wrapped = {
+      type: "element",
+      tagName: "div",
+      attrs: {},
+      computedStyle: wrapper,
+      children: [converted]
+    };
+    if (absolute) {
+      wrapper.position = element.computedStyle.position === "fixed" ? "fixed" : "absolute";
+      for (const key of ["left", "top"]) {
+        const value = ownValue(element.computedStyle, key);
+        if (value !== undefined)
+          wrapper[key] = value;
+      }
+      placeAbsolute(wrapper, margins, box, parentBox);
+      return wrapped;
+    }
+    return SIDES.some((side2) => margins[side2] > 0) ? marginBox(wrapped, margins) : wrapped;
+  }
+  var WORD_BOX_PROPERTIES = [
+    "display",
+    "width",
+    "height",
+    "min-width",
+    "max-width",
+    "min-height",
+    "max-height",
+    "box-sizing",
+    ...SIDES.flatMap((side) => ["style", "width", "color"].map((part) => `border-${side}-${part}`))
+  ];
+  var DRAWN_BOX_PROPERTIES = [
+    "background-color",
+    "background-image",
+    "box-shadow",
+    "opacity",
+    "overflow",
+    ...SIDES.map((side) => `padding-${side}`)
+  ];
+  function isWordBox(element, style) {
+    if (style.display !== "inline-block" || !INLINE_TEXT_TAGS.has(element.tagName))
+      return false;
+    if (!element.children.every((child) => child.type === "text"))
+      return false;
+    if (DRAWN_BOX_PROPERTIES.some((property) => ownValue(style, property) !== undefined))
+      return false;
+    if (SIDES.some((side) => pixels(style[`margin-${side}`]) !== 0))
+      return false;
+    if (SIDES.some((side) => pixels(style[`border-${side}-width`]) > 0))
+      return false;
+    const lineHeight = pixels(style["line-height"]) || pixels(style["font-size"]) * 1.5;
+    return element.box !== undefined && element.box.height < lineHeight * 1.5;
+  }
+  function convertElement(element, parentBox) {
+    const { displayed, children } = layoutOf(element);
+    if (isWordBox(element, displayed)) {
+      return {
+        type: "element",
+        tagName: element.tagName,
+        attrs: { ...element.attrs },
+        computedStyle: omit(displayed, [...WORD_BOX_PROPERTIES, ...MARGINS]),
+        children
+      };
+    }
+    const inline = isInline(displayed);
+    const split = splitMargins(displayed);
+    const { margins } = split;
+    const style = displayed.display === "inline" && INLINE_TEXT_TAGS.has(element.tagName) ? omit(split.style, ["display"]) : split.style;
+    const converted = {
+      type: "element",
+      tagName: element.tagName,
+      attrs: { ...element.attrs },
+      computedStyle: style,
+      children
+    };
+    const glyph = glyphBox(element, converted, margins, parentBox);
+    if (glyph)
+      return glyph;
+    if (isAbsolute(style)) {
+      placeAbsolute(style, margins, element.box, parentBox);
+      return converted;
+    }
+    const spaced = SIDES.some((side) => margins[side] > 0);
+    return spaced && !inline ? marginBox(converted, margins) : converted;
+  }
+  function webCaptureDesignDocument(capture) {
+    const { root } = capture;
+    const { displayed, children } = layoutOf(root);
+    const style = omit(splitMargins(displayed).style, ["position", ...SIDES]);
+    if (root.box) {
+      style.width = px(root.box.width);
+      style.height = px(root.box.height);
+      style["box-sizing"] = "border-box";
+    }
+    return {
+      type: "document",
+      children: [
+        {
+          type: "element",
+          tagName: root.tagName,
+          attrs: { ...root.attrs },
+          computedStyle: style,
+          children
+        }
+      ]
+    };
+  }
+
   // src/html.ts
   var VOID_TAGS = new Set(["area", "br", "col", "hr", "img", "input", "source", "wbr"]);
+  var CLOSES_PARAGRAPH = new Set([
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "details",
+    "div",
+    "dl",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hgroup",
+    "hr",
+    "main",
+    "menu",
+    "nav",
+    "ol",
+    "p",
+    "pre",
+    "section",
+    "table",
+    "ul"
+  ]);
+  function writtenTag(element) {
+    const holdsBlock = element.children.some((child) => child.type === "element" && CLOSES_PARAGRAPH.has(child.tagName));
+    return element.tagName === "p" && holdsBlock ? "div" : element.tagName;
+  }
   function styleAttribute(style) {
     return Object.entries(style).map(([property, value]) => `${property}: ${value}`).join("; ");
   }
@@ -643,6 +952,11 @@
     const attrs = { ...element.attrs };
     if (options.images === false && ownValue(attrs, "src")?.startsWith("data:"))
       delete attrs.src;
+    if (element.tagName === "input") {
+      const text = element.children.map((child) => child.type === "text" ? child.text : "").join("");
+      if (text)
+        attrs.value = text;
+    }
     const style = styleAttribute(element.computedStyle);
     if (style)
       attrs.style = style;
@@ -651,14 +965,15 @@
   function serialize(node, options) {
     if (node.type === "text")
       return escapeText(node.text);
-    const open = `<${node.tagName}${attributes(node, options)}>`;
-    if (VOID_TAGS.has(node.tagName))
+    const tag = writtenTag(node);
+    const open = `<${tag}${attributes(node, options)}>`;
+    if (VOID_TAGS.has(tag))
       return open;
     const children = node.children.map((child) => serialize(child, options)).join("");
-    return `${open}${children}</${node.tagName}>`;
+    return `${open}${children}</${tag}>`;
   }
   function webCaptureToHTML(capture, options = {}) {
-    return serialize(capture.root, options);
+    return webCaptureDesignDocument(capture).children.map((node) => serialize(node, options)).join("");
   }
 
   // src/limits.ts
@@ -875,6 +1190,10 @@
     "align-self",
     "aspect-ratio",
     "background-color",
+    "background-image",
+    "background-position",
+    "background-repeat",
+    "background-size",
     "border-bottom-color",
     "border-bottom-left-radius",
     "border-bottom-right-radius",
@@ -919,6 +1238,7 @@
     "min-width",
     "object-fit",
     "opacity",
+    "order",
     "overflow",
     "padding-bottom",
     "padding-left",
@@ -944,12 +1264,16 @@
   function isCapturedStyleProperty(property) {
     return CAPTURED.has(property);
   }
-  var SIDES = ["top", "right", "bottom", "left"];
+  var SIDES2 = ["top", "right", "bottom", "left"];
   var IMPLIED_VALUES = {
     "align-items": ["normal"],
     "align-self": ["auto"],
     "aspect-ratio": ["auto"],
     "background-color": ["rgba(0, 0, 0, 0)", "transparent"],
+    "background-image": ["none"],
+    "background-position": ["0% 0%"],
+    "background-repeat": ["repeat"],
+    "background-size": ["auto"],
     "box-shadow": ["none"],
     "column-gap": ["normal"],
     "flex-direction": ["row"],
@@ -963,6 +1287,7 @@
     "min-width": ["auto", "0px"],
     "object-fit": ["fill"],
     opacity: ["1"],
+    order: ["0"],
     overflow: ["visible"],
     "row-gap": ["normal"],
     "text-indent": ["0px"],
@@ -973,8 +1298,8 @@
     "border-bottom-right-radius",
     "border-top-left-radius",
     "border-top-right-radius",
-    ...SIDES.map((side) => `padding-${side}`),
-    ...SIDES.map((side) => `margin-${side}`)
+    ...SIDES2.map((side) => `padding-${side}`),
+    ...SIDES2.map((side) => `margin-${side}`)
   ];
   var TEXT_DECORATION_DETAILS = [
     "text-decoration-color",
@@ -992,7 +1317,7 @@
       if (style[property] === "0px")
         dropped.add(property);
     }
-    for (const side of SIDES) {
+    for (const side of SIDES2) {
       const borderStyle = ownValue(style, `border-${side}-style`);
       if (borderStyle !== undefined && borderStyle !== "none" && borderStyle !== "hidden")
         continue;
@@ -1003,7 +1328,7 @@
     const inFlow = position === undefined || position === "static" || position === "sticky";
     if (inFlow)
       dropped.add("position");
-    for (const side of SIDES) {
+    for (const side of SIDES2) {
       if (inFlow || style[side] === "auto")
         dropped.add(side);
     }
@@ -1050,6 +1375,7 @@
     "src",
     "alt",
     "title",
+    "type",
     "role",
     "aria-label",
     "lang",
@@ -1090,8 +1416,55 @@
     }
     return kept;
   }
-  function keptStyle(style) {
-    return Object.fromEntries(Object.entries(style).filter(([property]) => isCapturedStyleProperty(property)));
+  var BACKGROUND_URL = /url\(\s*(['"]?)(.*?)\1\s*\)/g;
+  function keptBackgroundImage(value, base) {
+    const layers = [];
+    let cursor = 0;
+    let dropped = false;
+    for (const match of value.matchAll(BACKGROUND_URL)) {
+      const source = safeImageSource(match[2], base);
+      if (source)
+        layers.push(value.slice(cursor, match.index) + `url("${source}")`);
+      else
+        dropped = true;
+      cursor = match.index + match[0].length;
+    }
+    if (cursor === 0 && !dropped)
+      return value;
+    layers.push(value.slice(cursor));
+    const kept = [];
+    let depth = 0;
+    let current = "";
+    for (const character of layers.join("")) {
+      if (character === "(")
+        depth++;
+      else if (character === ")")
+        depth--;
+      if (character === "," && depth === 0) {
+        kept.push(current);
+        current = "";
+        continue;
+      }
+      current += character;
+    }
+    kept.push(current);
+    const painted = kept.map((layer) => layer.trim()).filter((layer) => layer.length > 0 && layer !== "none");
+    return painted.length > 0 ? painted.join(", ") : null;
+  }
+  function keptStyle(style, base) {
+    const kept = {};
+    for (const [property, value] of Object.entries(style)) {
+      if (!isCapturedStyleProperty(property))
+        continue;
+      if (property === "background-image") {
+        const image = keptBackgroundImage(value, base);
+        if (image)
+          kept[property] = image;
+        continue;
+      }
+      kept[property] = value;
+    }
+    return kept;
   }
   function normalizeElement(element, base, depth, budget) {
     const children = [];
@@ -1113,8 +1486,8 @@
       type: "element",
       tagName: element.tagName,
       attrs: keptAttributes(element.attrs, base),
-      computedStyle: keptStyle(element.computedStyle),
       ...element.box ? { box: element.box } : {},
+      computedStyle: keptStyle(element.computedStyle, base),
       children
     };
   }
@@ -1356,7 +1729,7 @@
     "track",
     "param"
   ]);
-  var KEPT_ATTRIBUTES2 = ["id", "class", "alt", "title", "role", "aria-label", "lang", "dir"];
+  var KEPT_ATTRIBUTES2 = ["id", "class", "alt", "title", "type", "role", "aria-label", "lang", "dir"];
   var TEXT_INPUT_TYPES = new Set([
     "",
     "text",
@@ -1367,7 +1740,7 @@
     "number",
     "password"
   ]);
-  var BACKGROUND_URL = /url\(\s*(['"]?)(.*?)\1\s*\)/;
+  var BACKGROUND_URL2 = /url\(\s*(['"]?)(.*?)\1\s*\)/;
   function boxOf(element, origin) {
     const rect = element.getBoundingClientRect();
     return {
@@ -1490,7 +1863,7 @@
     return false;
   }
   function captureBackground(style, node, context) {
-    const match = BACKGROUND_URL.exec(style.getPropertyValue("background-image"));
+    const match = BACKGROUND_URL2.exec(style.getPropertyValue("background-image"));
     const url = match?.[2];
     const box = node.box;
     if (!url || !box || box.width <= 0 || box.height <= 0)
@@ -1524,6 +1897,46 @@
     };
     inlineSource(context, image, () => context.images.inline(url));
     node.children.unshift(image);
+  }
+  var SVG_NAMESPACE2 = "http://www.w3.org/2000/svg";
+  function maskedColorMarkup(view, url, color, size, fit) {
+    const document2 = view.document;
+    const svg = document2.createElementNS(SVG_NAMESPACE2, "svg");
+    svg.setAttribute("xmlns", SVG_NAMESPACE2);
+    svg.setAttribute("width", String(size.width));
+    svg.setAttribute("height", String(size.height));
+    const mask = document2.createElementNS(SVG_NAMESPACE2, "mask");
+    mask.setAttribute("id", "icon");
+    mask.setAttribute("style", "mask-type: alpha");
+    const image = document2.createElementNS(SVG_NAMESPACE2, "image");
+    image.setAttribute("href", url);
+    image.setAttribute("width", "100%");
+    image.setAttribute("height", "100%");
+    image.setAttribute("preserveAspectRatio", fit === "cover" ? "xMidYMid slice" : "xMidYMid meet");
+    mask.append(image);
+    const rect = document2.createElementNS(SVG_NAMESPACE2, "rect");
+    rect.setAttribute("width", "100%");
+    rect.setAttribute("height", "100%");
+    rect.setAttribute("fill", color);
+    rect.setAttribute("mask", "url(#icon)");
+    svg.append(mask, rect);
+    return new view.XMLSerializer().serializeToString(svg);
+  }
+  function captureMask(style, node, context) {
+    const mask = style.getPropertyValue("mask-image") || style.getPropertyValue("-webkit-mask-image");
+    const url = BACKGROUND_URL2.exec(mask)?.[2];
+    if (!url || node.tagName === "img" || node.children.length > 0)
+      return;
+    const color = node.computedStyle["background-color"];
+    node.tagName = "img";
+    delete node.computedStyle["background-color"];
+    const box = node.box;
+    if (!color || !url.startsWith("data:") || !box || box.width <= 0 || box.height <= 0)
+      return;
+    const size = imageSize(box);
+    const fit = style.getPropertyValue("mask-size") || style.getPropertyValue("-webkit-mask-size");
+    const markup = maskedColorMarkup(context.view, url, color, size, fit);
+    inlineSource(context, node, () => context.images.rasterizeSVG(markup, size));
   }
   function captureChildren(element, context, depth) {
     return renderedChildren(element, context.view).flatMap((child) => {
@@ -1563,6 +1976,7 @@
     if (hasDirectText(element) || node.children.some((child) => child.type === "text")) {
       context.fonts.add(style);
     }
+    captureMask(style, node, context);
     captureBackground(style, node, context);
     return [node];
   }

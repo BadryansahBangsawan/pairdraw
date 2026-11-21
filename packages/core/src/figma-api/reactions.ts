@@ -217,7 +217,7 @@ function assertDestination(
 
 function assertVariant(destination: SceneNode, context: ReactionContext, at: string): void {
   const sets = variantSetsAround(context.graph, context.nodeId)
-  const [nearest] = sets
+  const nearest = sets.at(0)
   if (!nearest) {
     throw failure(
       `${at}: only a variant, an instance of one, or a layer inside one can Change to another variant`

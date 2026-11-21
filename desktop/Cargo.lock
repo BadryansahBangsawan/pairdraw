@@ -3387,6 +3387,7 @@ dependencies = [
  "block2",
  "fix-path-env",
  "fontique",
+ "getrandom 0.2.17",
  "httparse",
  "keyring",
  "objc2",

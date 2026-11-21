@@ -39,6 +39,8 @@ tauri-plugin-notification = "2.8.0"
 zstd = "0.13"
 zip = { version = "2", default-features = false }
 which = "7.0.3"
+# The slot names the built-in browser parks awaited answers under come from the OS CSPRNG.
+getrandom = "0.2"
 semver = "1"
 fontique = "0.11"
 # The same read-fonts fontique uses, to read each face's style names and named instances.

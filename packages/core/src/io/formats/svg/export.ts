@@ -128,6 +128,27 @@ function vectorShapeElements(
   } else if (node.vectorNetwork) {
     elements.push(...networkElements(node, node.vectorNetwork, common))
   }
+  elements.push(...vectorStrokeTail(node, strokeAttrs))
+  return withVectorFallback(elements, node, common)
+}
+
+/** The empty vector's fallback shape, after both paints have contributed their elements. */
+function withVectorFallback(
+  elements: SVGNode[],
+  node: SceneNode,
+  common: Record<string, string | number | undefined>
+): SVGNode[] {
+  return elements.length > 0
+    ? elements
+    : [svg('rect', { width: round(node.width), height: round(node.height), ...common })]
+}
+
+/** The stored stroke geometry and arrowheads both vector paints share after their outlines. */
+function vectorStrokeTail(
+  node: SceneNode,
+  strokeAttrs: Record<string, string | number | undefined>
+): SVGNode[] {
+  const elements: SVGNode[] = []
   if (node.strokeGeometry.length > 0 && strokeAttrs.stroke && strokeAttrs.stroke !== 'none') {
     for (const geo of node.strokeGeometry) {
       const d = geometryBlobToSVGPath(geo.commandsBlob)
@@ -144,9 +165,7 @@ function vectorShapeElements(
     }
   }
   if (node.vectorNetwork) elements.push(...vectorArrowHeads(node, node.vectorNetwork, strokeAttrs))
-  return elements.length > 0
-    ? elements
-    : [svg('rect', { width: round(node.width), height: round(node.height), ...common })]
+  return elements
 }
 
 /** A vector layer's outlines as strokes alone, for a second stroke over the painted fills. */
@@ -172,25 +191,8 @@ function vectorStrokeElements(
   } else if (node.vectorNetwork) {
     elements.push(...networkElements(node, node.vectorNetwork, common))
   }
-  if (node.strokeGeometry.length > 0 && strokeAttrs.stroke && strokeAttrs.stroke !== 'none') {
-    for (const geo of node.strokeGeometry) {
-      const d = geometryBlobToSVGPath(geo.commandsBlob)
-      if (d) {
-        elements.push(
-          svg('path', {
-            d,
-            fill: strokeAttrs.stroke,
-            'fill-opacity': strokeAttrs['stroke-opacity'],
-            stroke: 'none'
-          })
-        )
-      }
-    }
-  }
-  if (node.vectorNetwork) elements.push(...vectorArrowHeads(node, node.vectorNetwork, strokeAttrs))
-  return elements.length > 0
-    ? elements
-    : [svg('rect', { width: round(node.width), height: round(node.height), ...common })]
+  elements.push(...vectorStrokeTail(node, strokeAttrs))
+  return withVectorFallback(elements, node, common)
 }
 
 /** A line's dashes stretched along it as the canvas lays them, half a dash at each end. */

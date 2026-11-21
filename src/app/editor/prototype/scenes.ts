@@ -23,6 +23,18 @@ const SCROLL_ANIMATION_MS = 300
 /** What the stage reads of play: whether it runs, and the Reset count that starts it over. */
 type PlayLive = Readonly<Ref<{ revision: number } | null>>
 
+/** What the stage gives play, and what play tells the stage. */
+export interface PlayScenesOptions {
+  onReveal?: (reveal: Vector) => void
+  /** Called before a dissolving reaction runs, to draw the frame as it was for the crossfade. */
+  beforeDissolve?: (rootId: string, durationMs: number) => void
+  /**
+   * Called after a reaction changed the shown frame or overlay, with how long its transition takes.
+   * The stage counts the next frame's After delays from the end of that transition.
+   */
+  onFrameTransition?: (durationMs: number) => void
+}
+
 /**
  * The frames a playing prototype changed, for one canvas: a Change to switches an instance on
  * its frame's private copy, which the canvas draws instead of the document. Reset, leaving play,
@@ -35,11 +47,7 @@ export function usePlayScenes(
   store: EditorStore,
   session: Ref<PlaySession | null>,
   live: PlayLive,
-  options: {
-    onReveal?: (reveal: Vector) => void
-    /** Called before a dissolving reaction runs, to draw the frame as it was for the crossfade. */
-    beforeDissolve?: (rootId: string, durationMs: number) => void
-  } = {}
+  options: PlayScenesOptions = {}
 ) {
   const scenes = createPlayScenes(() => store.graph)
   /** Grows whenever what play shows of a frame changes, so timers and the canvas follow. */
@@ -61,6 +69,9 @@ export function usePlayScenes(
     }
     const result = scenes.run(current, click, rootId)
     session.value = result.session
+    if (!result.changed && result.session !== current) {
+      options.onFrameTransition?.(transitionMs(click.action))
+    }
     if (result.changed) changed()
     if (result.scrolled?.length) {
       if (click.transition && click.transition.type !== 'INSTANT') animate(result.scrolled)

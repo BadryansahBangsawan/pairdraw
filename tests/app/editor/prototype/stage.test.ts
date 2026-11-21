@@ -66,6 +66,7 @@ function installTimerProbe() {
   }) as typeof window.clearTimeout
   return {
     prototypeTimers: () => [...armed.values()].filter((entry) => entry.ms === DELAY_MS),
+    allTimers: () => [...armed.values()].filter((entry) => !entry.cleared),
     armedFor: (ms: number) =>
       [...armed.values()].filter((entry) => entry.ms === ms && !entry.cleared),
     restore: () => {
@@ -133,6 +134,65 @@ describe('prototype play transitions on a timeout', () => {
     restore = null
   })
 
+  test('count the next frame’s delay from the end of an instance timer’s dissolve', async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const start = graph.createNodeWithId(START, 'FRAME', pageId, {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 200
+    })
+    graph.createNodeWithId(TARGET, 'FRAME', pageId, { x: 400, y: 0, width: 300, height: 200 })
+    const set = graph.createNode('COMPONENT_SET', pageId, { y: 400 })
+    const loading = graph.createNode('COMPONENT', set.id, {
+      name: 'State=Loading',
+      width: 20,
+      height: 20
+    })
+    graph.updateNode(loading.id, {
+      prototypeReactions: [
+        {
+          id: 'instance-navigate',
+          trigger: { type: 'AFTER_TIMEOUT', delay: 0.1 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: TARGET,
+              navigation: 'NAVIGATE',
+              transition: { type: 'DISSOLVE', duration: 0.5 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    graph.updateNode(TARGET, { prototypeReactions: [timeoutToTarget] })
+    if (!graph.createInstance(loading.id, start.id, { x: 10, y: 10 })) {
+      throw new Error('no instance')
+    }
+    const store = createEditorStore(graph)
+    store.startPlay()
+    const scope = effectScope()
+    const stage = scope.run(() => usePrototypeStage(store, ref<HTMLCanvasElement | null>(null)))
+    if (!stage) throw new Error('Play stage did not start')
+    await nextTick()
+
+    const instanceTimer = probe.allTimers().find((timer) => timer.ms === 100)
+    if (!instanceTimer) throw new Error('the instance armed no timeout')
+    instanceTimer.fn()
+    await nextTick()
+
+    expect(shown(stage.session.value)).toBe(TARGET)
+    expect(probe.armedFor(DELAY_MS + 500)).toHaveLength(1)
+    expect(probe.armedFor(DELAY_MS)).toHaveLength(0)
+
+    scope.stop()
+    store.dispose()
+  })
+
   test('count the next frame’s delay from when its dissolve ends, as Figma does', async () => {
     const probe = installTimerProbe()
     restore = probe.restore
@@ -164,7 +224,7 @@ describe('prototype play transitions on a timeout', () => {
     await nextTick()
 
     const [first] = probe.prototypeTimers()
-    if (!first) throw new Error('The start frame armed no timeout')
+    if (!first) throw new Error('the start frame armed no timeout')
     first.fn()
     await nextTick()
 

@@ -110,7 +110,10 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   /** The frames play changed, which the canvas draws from their copies. */
   const play = usePlayScenes(store, session, live, {
     onReveal: reveal,
-    beforeDissolve: (rootId, durationMs) => snapshotBefore(durationMs, rootId)
+    beforeDissolve: (rootId, durationMs) => snapshotBefore(durationMs, rootId),
+    onFrameTransition: (durationMs) => {
+      enteringMs = durationMs
+    }
   })
   usePlayPointer(store, area, session, play, live)
   usePlayScroll(store, area, session, play)

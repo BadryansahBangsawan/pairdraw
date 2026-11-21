@@ -1,1 +1,2 @@
 - Editing a prototype interaction imported from Figma keeps its Smart animate, slide, push, or move animation instead of turning it into an instant cut.
+- A frame’s After delay starts when a hover, press, or instance timer’s dissolve ends, instead of while it is still running.

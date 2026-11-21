@@ -2,12 +2,12 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { computed, effectScope, ref } from 'vue'
 
-import { startSession, type PlaySession } from '@pairdraw/core/prototype'
+import { startSession, shownFrame, type PlaySession } from '@pairdraw/core/prototype'
 import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { createPlayPointer } from '@/app/editor/prototype/pointer'
-import { usePlayScenes } from '@/app/editor/prototype/scenes'
+import { usePlayScenes, type PlayScenesOptions } from '@/app/editor/prototype/scenes'
 import { createEditorStore } from '@/app/editor/session'
 
 type Trigger = PrototypeReaction['trigger']['type']
@@ -50,13 +50,13 @@ function buttonDocument(
   return { graph, screen, button, base, hover, pressed, lit }
 }
 
-function setUp(document: ReturnType<typeof buttonDocument>) {
+function setUp(document: ReturnType<typeof buttonDocument>, options?: PlayScenesOptions) {
   const store = createEditorStore(document.graph)
   const session = ref<PlaySession | null>(startSession(document.screen.id))
   const scope = effectScope()
   const live = computed(() => ({ revision: 0 }))
   const parts = scope.run(() => {
-    const play = usePlayScenes(store, session, live)
+    const play = usePlayScenes(store, session, live, options)
     return { play, pointer: createPlayPointer(session, play) }
   })
   if (!parts) throw new Error('no play')
@@ -98,6 +98,45 @@ describe('the pointer in play', () => {
     pointer.move(OVER.x, OVER.y)
     pointer.leaveAll()
     expect(shows()).toBe(document.base.id)
+    stop()
+  })
+
+  test('a While hovering Navigate reports the transition length', () => {
+    const document = buttonDocument(() => [])
+    const pageId = document.graph.getPages()[0].id
+    const target = document.graph.createNode('FRAME', pageId, {
+      x: 400,
+      width: 200,
+      height: 200
+    })
+    document.graph.updateNode(document.base.id, {
+      prototypeReactions: [
+        {
+          id: 'hover-navigate',
+          trigger: { type: 'ON_HOVER', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: target.id,
+              navigation: 'NAVIGATE',
+              transition: { type: 'DISSOLVE', duration: 0.5 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    const durations: number[] = []
+    const { pointer, session, stop } = setUp(document, {
+      onFrameTransition: (durationMs) => durations.push(durationMs)
+    })
+
+    pointer.move(OVER.x, OVER.y)
+
+    const current = session.value
+    if (!current) throw new Error('play ended')
+    expect(shownFrame(current)).toBe(target.id)
+    expect(durations).toEqual([500])
     stop()
   })
 

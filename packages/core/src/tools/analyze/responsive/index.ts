@@ -7,7 +7,11 @@ import { computeAbsoluteBounds } from '@pairdraw/scene-graph/geometry'
 import { extractExportGraph } from '#core/io/subgraph'
 import { computeLayout, measureTextForLayout, sizeAutoResizingText } from '#core/layout'
 import { collectNodeFontFaces } from '#core/text/requirements/collect'
-import { computeOverlaps, type OverlapItem, type OverlapSeverity } from '#core/tools/analyze/overlaps'
+import {
+  computeOverlaps,
+  type OverlapItem,
+  type OverlapSeverity
+} from '#core/tools/analyze/overlaps'
 import { defineTool, nodeIdInputSchema, toolNumber } from '#core/tools/schema'
 import { boundedRasterScale, rasterScaleInputs } from '#core/tools/vector/export'
 
@@ -126,11 +130,7 @@ function laterSibling(graph: SceneGraph, item: OverlapItem): { later: string; ea
     : { later: item.nodeA.id, earlier: item.nodeB.id }
 }
 
-function overlapWarnings(
-  graph: SceneGraph,
-  pageId: string,
-  limit: number
-): ResponsiveWarning[] {
+function overlapWarnings(graph: SceneGraph, pageId: string, limit: number): ResponsiveWarning[] {
   if (limit <= 0) return []
   const result = computeOverlaps(graph, { scope: 'same-parent', page_id: pageId, limit })
   const warnings: ResponsiveWarning[] = []
@@ -186,7 +186,9 @@ export const checkResponsive = defineTool({
         v.array(toolNumber(v.pipe(v.number(), v.minValue(1), v.maxValue(4096)))),
         v.minLength(1),
         v.maxLength(12),
-        v.description('Viewport widths to test in the same units as the frame (default: 375, 768, 1280)')
+        v.description(
+          'Viewport widths to test in the same units as the frame (default: 375, 768, 1280)'
+        )
       )
     ),
     max_warnings: v.optional(

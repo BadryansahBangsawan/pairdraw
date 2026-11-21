@@ -3,8 +3,8 @@ import { uniq } from 'es-toolkit'
 import { variableNamespace } from '@pairdraw/dom-css/export'
 import type { SceneGraph, SceneNode, SharedStyleType } from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
-import { sharedStyleLayers, sharedStyleTypeForKind } from '@pairdraw/scene-graph/shared-styles'
 import { cachedDesignMemory, DESIGN_MEMORY_GROUPS } from '@pairdraw/scene-graph/design-memory'
+import { sharedStyleLayers, sharedStyleTypeForKind } from '@pairdraw/scene-graph/shared-styles'
 
 import { currentDesignRules, designViolations, type DesignViolation } from '#core/design-memory'
 

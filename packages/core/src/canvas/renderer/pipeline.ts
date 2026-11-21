@@ -102,7 +102,6 @@ export function renderFromEditorState(
       imageEdit: state.imageEdit,
       transforming: state.transforming,
       measurementMode: state.measurementMode,
-      enteredContainerId: state.enteredContainerId,
       editingTextId: state.editingTextId,
       renamingLabelId: state.renamingLabelId,
       textEditor: textEditor as RenderOverlays['textEditor'],

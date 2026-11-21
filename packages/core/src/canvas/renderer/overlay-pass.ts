@@ -93,7 +93,6 @@ export function drawOverlayPass(
   if (!measuring) drawPrototypeConnections(r, canvas, graph, selectedIds, overlays.rotationPreview)
   r.drawHoverHighlight(canvas, graph, hoveredNodeId, overlays.rotationPreview)
   drawIssueHighlight(r, canvas, graph, overlays.designIssueHighlight, overlays.rotationPreview)
-  r.drawEnteredContainer(canvas, graph, overlays.enteredContainerId, overlays.rotationPreview)
   drawDropTarget(r, canvas, graph, overlays.dropTargetId, overlays.rotationPreview)
   drawConnectorTarget(r, canvas, graph, overlays.connectorTarget, overlays.rotationPreview)
   drawEditingText(r, canvas, graph, overlays)

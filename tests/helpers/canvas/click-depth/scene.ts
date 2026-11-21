@@ -80,3 +80,50 @@ export function createNestedBoard(graph: SceneGraph, pageId: string) {
   })
   return { grid: grid.id, cell: cell.id, label: label.id }
 }
+
+/**
+ * A section holding a top-level frame with a nested frame: `a` sits in the nested frame, `c`
+ * directly in the top-level frame. Both are selected and cleared, so their layer rows are open.
+ */
+export function createScopeTree(graph: SceneGraph, pageId: string) {
+  const grey = fill(0.9, 0.9, 0.9)
+  const section = graph.createNode('SECTION', pageId, {
+    name: 'Section',
+    width: 500,
+    height: 400,
+    fills: grey
+  })
+  const top = graph.createNode('FRAME', section.id, {
+    name: 'Top',
+    x: 40,
+    y: 40,
+    width: 400,
+    height: 300,
+    fills: grey
+  })
+  const inner = graph.createNode('FRAME', top.id, {
+    name: 'Inner',
+    x: 40,
+    y: 40,
+    width: 300,
+    height: 200,
+    fills: grey
+  })
+  const a = graph.createNode('RECTANGLE', inner.id, {
+    name: 'A',
+    x: 40,
+    y: 40,
+    width: 60,
+    height: 60,
+    fills: grey
+  })
+  const c = graph.createNode('RECTANGLE', top.id, {
+    name: 'C',
+    x: 20,
+    y: 260,
+    width: 30,
+    height: 30,
+    fills: grey
+  })
+  return { inner: inner.id, a: a.id, c: c.id }
+}

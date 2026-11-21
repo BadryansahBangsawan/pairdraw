@@ -166,19 +166,13 @@ onScopeDispose(() => {
   for (const stop of unsubscribe) stop()
 })
 
+/**
+ * Leaves canvas clicks as a click on the picked layer would, as in Figma: the panel enters what a
+ * double-click on it enters, and never a container that is open by itself.
+ */
 function syncCanvasScope(nodeId: string) {
-  const node = editor.graph.getNode(nodeId)
-  if (!node) return
-  let parentId = node.parentId
-  while (parentId && parentId !== editor.state.currentPageId) {
-    if (editor.graph.isContainer(parentId)) {
-      editor.enterContainer(parentId)
-      return
-    }
-    const parent = editor.graph.getNode(parentId)
-    parentId = parent?.parentId ?? null
-  }
-  editor.state.enteredContainerId = null
+  if (!editor.graph.getNode(nodeId)) return
+  editor.enterContainerOf(nodeId)
 }
 
 function select(id: string, selection: boolean | LayerSelectionMode) {
@@ -201,6 +195,7 @@ function select(id: string, selection: boolean | LayerSelectionMode) {
   } finally {
     applyingSelection = false
   }
+  // A layer picked here leaves canvas clicks as a click on it there would, as in Figma.
   if (!mode.additive && !mode.range) syncCanvasScope(id)
   scrollToNode(id)
 }

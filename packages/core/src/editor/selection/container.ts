@@ -11,6 +11,20 @@ export function createSelectionContainerActions(ctx: EditorContext) {
     ctx.state.enteredContainerId = id
   }
 
+  /**
+   * Enters the container a click reached the layer through, as a double-click would have: its
+   * direct parent, unless that is the page or a container a click looks into by itself (a top-level
+   * frame, a section, a component set), which is never entered.
+   */
+  function enterContainerOf(nodeId: string) {
+    const parentId = ctx.graph.getNode(nodeId)?.parentId ?? null
+    const entered =
+      parentId &&
+      parentId !== ctx.state.currentPageId &&
+      !ctx.graph.isOpenContainer(parentId)
+    ctx.state.enteredContainerId = entered ? parentId : null
+  }
+
   function exitContainer() {
     const entered = ctx.state.enteredContainerId
     if (!entered) return
@@ -29,5 +43,5 @@ export function createSelectionContainerActions(ctx: EditorContext) {
     ctx.state.enteredContainerId = null
   }
 
-  return { validateEnteredContainer, enterContainer, exitContainer, exitContainers }
+  return { validateEnteredContainer, enterContainer, enterContainerOf, exitContainer, exitContainers }
 }

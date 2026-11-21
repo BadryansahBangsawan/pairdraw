@@ -2,6 +2,7 @@ import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   PrototypeAction,
   PrototypeActionType,
+  PrototypeNavigationType,
   PrototypeNodeAction,
   PrototypeReaction,
   PrototypeTransitionType,
@@ -130,8 +131,8 @@ export function setTransitionDuration(
   })
 }
 
-/** The four actions the panel offers: Figma's two navigation kinds and its two returns. */
-export type ActionChoice = 'NAVIGATE' | 'OVERLAY' | 'BACK' | 'CLOSE'
+/** The actions the panel offers: Figma's node actions and its two returns. */
+export type ActionChoice = PrototypeNavigationType | 'BACK' | 'CLOSE'
 
 export function actionChoice(reaction: PrototypeReaction): ActionChoice {
   const current = primaryAction(reaction)

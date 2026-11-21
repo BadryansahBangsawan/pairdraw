@@ -38,15 +38,29 @@ const {
 /** One row per interaction, edited in place; the panel edits its first action, as Figma does. */
 const triggerOptions = computed<{ value: PrototypeTriggerType; label: string }[]>(() => [
   { value: 'ON_CLICK', label: panels.value.prototypeTriggerOnClick },
+  { value: 'ON_HOVER', label: panels.value.prototypeTriggerWhileHovering },
+  { value: 'ON_PRESS', label: panels.value.prototypeTriggerWhilePressing },
+  { value: 'MOUSE_ENTER', label: panels.value.prototypeTriggerMouseEnter },
+  { value: 'MOUSE_LEAVE', label: panels.value.prototypeTriggerMouseLeave },
   { value: 'AFTER_TIMEOUT', label: panels.value.prototypeTriggerAfterDelay }
 ])
 
-const actionOptions = computed<{ value: ActionChoice; label: string }[]>(() => [
-  { value: 'NAVIGATE', label: panels.value.prototypeActionNavigate },
-  { value: 'OVERLAY', label: panels.value.prototypeActionOverlay },
-  { value: 'BACK', label: panels.value.prototypeActionBack },
-  { value: 'CLOSE', label: panels.value.prototypeActionClose }
-])
+const actionLabels = computed<Record<ActionChoice, string>>(() => ({
+  NAVIGATE: panels.value.prototypeActionNavigate,
+  OVERLAY: panels.value.prototypeActionOverlay,
+  CHANGE_TO: panels.value.prototypeActionChangeTo,
+  SCROLL_TO: panels.value.prototypeActionScrollTo,
+  BACK: panels.value.prototypeActionBack,
+  CLOSE: panels.value.prototypeActionClose
+}))
+
+/** The actions offered for an interaction; one read from a file is listed so it shows. */
+function actionOptions(reaction: PrototypeReaction): { value: ActionChoice; label: string }[] {
+  const current = actionChoice(reaction)
+  const choices: ActionChoice[] = ['NAVIGATE', 'OVERLAY', 'BACK', 'CLOSE']
+  if (!choices.includes(current)) choices.splice(2, 0, current)
+  return choices.map((value) => ({ value, label: actionLabels.value[value] }))
+}
 
 const transitionOptions = computed<{ value: PrototypeTransitionType; label: string }[]>(() => [
   { value: 'INSTANT', label: panels.value.prototypeAnimationInstant },
@@ -129,7 +143,7 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
 
       <AppSelect
         :model-value="actionChoice(reaction)"
-        :options="actionOptions"
+        :options="actionOptions(reaction)"
         :label="panels.prototypeAction"
         data-property="prototype-action"
         @update:model-value="(value: ActionChoice) => setActionChoice(reaction.id, value)"

@@ -1,0 +1,1 @@
+- Editing a prototype interaction imported from Figma keeps its Smart animate, slide, push, or move animation instead of turning it into an instant cut.

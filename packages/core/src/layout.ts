@@ -22,7 +22,7 @@ import {
 import { keepsSavedLayout, usesDetachedDerivedLayout } from './layout/derived'
 import { applyEffectiveGeneratedTextLayout } from './layout/effective-generated-text'
 import { insertFlowBox, setFlexFlow, setFlowEdges } from './layout/flow-edges'
-import { buildGridTree, createGridChildNode } from './layout/grid'
+import { buildGridTree, createGridChildNode, gridTracksForAxis } from './layout/grid'
 import { sizeAutoResizingText } from './layout/text-auto-resize'
 export { sizeAutoResizingText } from './layout/text-auto-resize'
 export {
@@ -226,6 +226,39 @@ function configureFlexContainer(
   applyMinMaxConstraints(yogaNode, node)
 }
 
+/**
+ * A grid child's box in its flex parent: grow takes the free space, a fixed size is stored, and
+ * an axis the grid hugs takes its tracks' size there, as configureAsGrid lays it out.
+ */
+function applyGridChildBox(yogaChild: YogaNode, child: SceneNode, parent: SceneNode): void {
+  const isParentRow = parent.layoutMode === 'HORIZONTAL'
+  const selfOverride = child.layoutAlignSelf !== 'AUTO'
+  const stretchCross = selfOverride
+    ? child.layoutAlignSelf === 'STRETCH'
+    : parent.counterAxisAlign === 'STRETCH'
+  const hugWidth = ownAxisSizing(child, 'width') === 'HUG'
+  const hugHeight = ownAxisSizing(child, 'height') === 'HUG'
+  if (child.layoutGrow > 0) {
+    yogaChild.setFlexGrow(child.layoutGrow)
+    yogaChild.setFlexShrink(1)
+    yogaChild.setFlexBasis(0)
+    if (stretchCross) return
+    if (isParentRow) {
+      if (!hugHeight) yogaChild.setHeight(child.height)
+    } else if (!hugWidth) {
+      yogaChild.setWidth(child.width)
+    }
+    return
+  }
+  if (isParentRow) {
+    if (!hugWidth) yogaChild.setWidth(child.width)
+    if (!stretchCross && !hugHeight) yogaChild.setHeight(child.height)
+    return
+  }
+  if (child.gridTemplateRows.length > 0 && !hugHeight) yogaChild.setHeight(child.height)
+  if (!stretchCross && !hugWidth) yogaChild.setWidth(child.width)
+}
+
 function configureChildAsGrid(
   yogaChild: YogaNode,
   child: SceneNode,
@@ -238,40 +271,17 @@ function configureChildAsGrid(
   yogaChild.setDirection(direction === 'RTL' ? Direction.RTL : Direction.LTR)
 
   if (child.gridTemplateColumns.length > 0) {
-    yogaChild.setGridTemplateColumns(child.gridTemplateColumns.map(mapGridTrack))
+    yogaChild.setGridTemplateColumns(gridTracksForAxis(child, 'width').map(mapGridTrack))
   }
   if (child.gridTemplateRows.length > 0) {
-    yogaChild.setGridTemplateRows(child.gridTemplateRows.map(mapGridTrack))
+    yogaChild.setGridTemplateRows(gridTracksForAxis(child, 'height').map(mapGridTrack))
   }
 
   yogaChild.setGap(Gutter.Column, child.gridColumnGap)
   yogaChild.setGap(Gutter.Row, child.gridRowGap)
 
   applyContentInsets(yogaChild, child)
-
-  const isParentRow = parent.layoutMode === 'HORIZONTAL'
-  const selfOverride = child.layoutAlignSelf !== 'AUTO'
-  const stretchCross = selfOverride
-    ? child.layoutAlignSelf === 'STRETCH'
-    : parent.counterAxisAlign === 'STRETCH'
-
-  if (child.layoutGrow > 0) {
-    yogaChild.setFlexGrow(child.layoutGrow)
-    yogaChild.setFlexShrink(1)
-    yogaChild.setFlexBasis(0)
-    if (!stretchCross) {
-      if (isParentRow) yogaChild.setHeight(child.height)
-      else yogaChild.setWidth(child.width)
-    }
-  } else {
-    if (isParentRow) {
-      yogaChild.setWidth(child.width)
-      if (!stretchCross) yogaChild.setHeight(child.height)
-    } else {
-      if (child.gridTemplateRows.length > 0) yogaChild.setHeight(child.height)
-      if (!stretchCross) yogaChild.setWidth(child.width)
-    }
-  }
+  applyGridChildBox(yogaChild, child, parent)
 
   const selfAlign = mapAlignSelf(child.layoutAlignSelf)
   if (selfAlign != null) yogaChild.setAlignSelf(selfAlign)

@@ -161,9 +161,14 @@ function applyFrameSize(
   computeLayout: ComputeLayoutFn
 ): void {
   if (frame.layoutMode === 'GRID') {
-    if (frame.gridTemplateRows.length === 0) {
-      writeLayoutGeometry(graph, frame.id, { height: yogaNode.getComputedHeight() }, computeLayout)
+    // A grid with automatic rows takes the height they need; one that hugs either axis takes
+    // the size Yoga computed for its tracks, as Figma hugs a grid.
+    const updates: LayoutGeometry = {}
+    if (frame.primaryAxisSizing === 'HUG') updates.width = yogaNode.getComputedWidth()
+    if (frame.gridTemplateRows.length === 0 || frame.counterAxisSizing === 'HUG') {
+      updates.height = yogaNode.getComputedHeight()
     }
+    writeLayoutGeometry(graph, frame.id, updates, computeLayout)
     return
   }
 

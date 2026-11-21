@@ -1,11 +1,27 @@
 import { Direction, Display, Gutter, type Node as YogaNode } from 'yoga-layout'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { GridTrack, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import { resolveNodeLayoutDirection } from '@pairdraw/scene-graph/text/direction'
 
+import { ownAxisSizing } from './axis-sizing'
 import { applyContentInsets, applyStrokeMargins } from './strokes'
-import { configureAbsoluteChild, createYogaNode, mapGridTrack } from './yoga-helpers'
+import {
+  applyMinMaxConstraints,
+  configureAbsoluteChild,
+  createYogaNode,
+  mapGridTrack
+} from './yoga-helpers'
+
+/**
+ * A grid frame that hugs an axis has no space to share out, so its fractional tracks take their
+ * content's size there and the frame keeps the smallest box around them, as Figma hugs a grid.
+ */
+export function gridTracksForAxis(node: SceneNode, axis: 'width' | 'height'): GridTrack[] {
+  const tracks = axis === 'width' ? node.gridTemplateColumns : node.gridTemplateRows
+  if (ownAxisSizing(node, axis) !== 'HUG') return tracks
+  return tracks.map((track) => (track.sizing === 'FR' ? { sizing: 'AUTO', value: 0 } : track))
+}
 
 function configureAsGrid(
   yogaNode: YogaNode,
@@ -14,22 +30,23 @@ function configureAsGrid(
 ): void {
   yogaNode.setDisplay(Display.Grid)
   yogaNode.setDirection(direction === 'RTL' ? Direction.RTL : Direction.LTR)
-  yogaNode.setWidth(node.width)
-  if (node.gridTemplateRows.length > 0 || node.height > 0) {
-    yogaNode.setHeight(node.height)
+  if (ownAxisSizing(node, 'width') !== 'HUG') yogaNode.setWidth(node.width)
+  if (ownAxisSizing(node, 'height') !== 'HUG') {
+    if (node.gridTemplateRows.length > 0 || node.height > 0) yogaNode.setHeight(node.height)
   }
 
   if (node.gridTemplateColumns.length > 0) {
-    yogaNode.setGridTemplateColumns(node.gridTemplateColumns.map(mapGridTrack))
+    yogaNode.setGridTemplateColumns(gridTracksForAxis(node, 'width').map(mapGridTrack))
   }
   if (node.gridTemplateRows.length > 0) {
-    yogaNode.setGridTemplateRows(node.gridTemplateRows.map(mapGridTrack))
+    yogaNode.setGridTemplateRows(gridTracksForAxis(node, 'height').map(mapGridTrack))
   }
 
   yogaNode.setGap(Gutter.Column, node.gridColumnGap)
   yogaNode.setGap(Gutter.Row, node.gridRowGap)
 
   applyContentInsets(yogaNode, node)
+  applyMinMaxConstraints(yogaNode, node)
 }
 
 export function createGridChildNode(graph: SceneGraph, child: SceneNode): YogaNode {

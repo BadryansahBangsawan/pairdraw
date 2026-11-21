@@ -1,0 +1,1 @@
+- A grid frame set to Hug takes the smallest size around its tracks and gaps, its fractional tracks take their content's size there, and its minimum and maximum apply.

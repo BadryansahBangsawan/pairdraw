@@ -750,3 +750,5 @@ zh-cn:ai.chatAcpNotInstalled
 zh-cn:ai.chatAcpNotRunning
 zh-cn:ai.chatAcpSignInRequired
 zh-cn:ai.chatAcpTimeout
+ja:panels.prototypeVideoSizeLongEdge
+zh-cn:panels.prototypeVideoSizeLongEdge

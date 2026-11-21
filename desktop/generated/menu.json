@@ -93,6 +93,10 @@
         "label": "Export Frames to PDF…"
       },
       {
+        "id": "export-video",
+        "label": "Export Prototype as Video…"
+      },
+      {
         "type": "separator"
       },
       {

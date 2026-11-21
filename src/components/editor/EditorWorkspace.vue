@@ -9,6 +9,7 @@ import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
+import { videoExportOpen } from '@/app/document/export/video/open'
 import { provideTabEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { EDITOR_PANEL_LIMITS } from '@/app/shell/layout-storage'
@@ -53,6 +54,10 @@ const { tab } = defineProps<{ tab: Tab }>()
 const store = tab.store
 provideTabEditorStore(store)
 // The variables window loads with its first opening, not with the document.
+// The video dialog loads the encoders, so it comes with its own chunk when first opened.
+const PrototypeVideoDialog = defineAsyncComponent(
+  () => import('@/components/export/PrototypeVideoDialog.vue')
+)
 const VariablesDialog = defineAsyncComponent(
   () => import('@/components/variables/VariablesDialog.vue')
 )
@@ -238,6 +243,7 @@ const { pending: roomPending } = useRoomActions()
   </div>
 
   <LazyOverlay :open="store.state.variablesOpen"><VariablesDialog /></LazyOverlay>
+  <LazyOverlay :open="videoExportOpen(store).value"><PrototypeVideoDialog /></LazyOverlay>
   <StatusesDialog />
   <CommentDeleteDialog />
   <ComponentToFrameDialog />

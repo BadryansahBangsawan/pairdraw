@@ -71,9 +71,18 @@ export type TimelineFrame =
   | { session: PlaySession }
   | { from: PlaySession; to: PlaySession; mix: number }
 
+/** Why a flow cannot be played: the start frame has nothing to follow, or anything else. */
+export type TimelineErrorReason = 'nothing-to-follow' | 'invalid'
+
 /** A flow that cannot be played as asked, with a message naming the frame or click at fault. */
 export class TimelineError extends Error {
   override name = 'TimelineError'
+  constructor(
+    message: string,
+    readonly reason: TimelineErrorReason = 'invalid'
+  ) {
+    super(message)
+  }
 }
 
 /** Steps a timeline may take before it is refused, which stops cycles that take no time. */
@@ -202,7 +211,10 @@ function startWalk(graph: SceneGraph, options: TimelineOptions): { walk: Walk; s
     overlayPositions: {}
   }
   if (walk.timers.length === 0 && walk.clicks.length === 0) {
-    throw new TimelineError(`'${start.name}' has no After delay interaction to follow`)
+    throw new TimelineError(
+      `'${start.name}' has no After delay interaction to follow`,
+      'nothing-to-follow'
+    )
   }
   return { walk, start }
 }

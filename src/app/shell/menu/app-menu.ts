@@ -121,6 +121,7 @@ export function useAppMenu() {
     'version-history': 'showVersionHistory',
     'export-selection': 'exportSelection',
     'export-pdf': 'exportFramesToPDF',
+    'export-video': 'exportPrototypeVideo',
     autosave: 'autosave',
     close: 'closeTab',
     'previous-tab': 'selectPreviousTab',

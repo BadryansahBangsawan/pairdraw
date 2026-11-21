@@ -217,6 +217,12 @@ describe('where a timeline ends', () => {
     expect(() =>
       planTimeline(graph, { startFrameId: ids[0], maxMs: MAX_MS, tailMs: TAIL_MS })
     ).toThrow("'Hero 1' has no After delay interaction to follow")
+    // Front ends say this one in their own words, so it carries its reason.
+    try {
+      planTimeline(graph, { startFrameId: ids[0], maxMs: MAX_MS, tailMs: TAIL_MS })
+    } catch (error) {
+      expect(error).toMatchObject({ reason: 'nothing-to-follow' })
+    }
   })
 })
 

@@ -169,6 +169,15 @@ export const APP_MENU_SCHEMA = [
         label: 'Export Frames to PDF…',
         palette: { icon: 'download', keywords: ['pdf', 'slides', 'presentation', 'print'] }
       },
+      // Records the prototype from a frame, following its After delay chain, as a video.
+      {
+        id: 'export-video',
+        label: 'Export Prototype as Video…',
+        palette: {
+          icon: 'download',
+          keywords: ['video', 'mp4', 'gif', 'webm', 'animation', 'motion', 'record', 'prototype']
+        }
+      },
       { type: 'separator' },
       { id: 'autosave', label: 'Autosave', checkbox: true, feature: 'local-file' },
       { id: 'close', label: 'Close Tab', shortcut: 'MOD+W' },

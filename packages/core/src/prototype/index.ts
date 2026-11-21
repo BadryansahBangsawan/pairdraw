@@ -23,6 +23,7 @@ export {
   transitionMs,
   type Timeline,
   type TimelineClick,
+  type TimelineErrorReason,
   type TimelineFrame,
   type TimelineOptions,
   type TimelineSegment,

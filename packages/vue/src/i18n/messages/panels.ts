@@ -767,7 +767,31 @@ export const panelMessageDefaults = {
   prototypeAnimationInstant: 'Instant',
   prototypeAnimationDissolve: 'Dissolve',
   prototypeDuration: 'Duration',
-  prototypeNoFrames: 'Add a frame to this page to link to.'
+  prototypeNoFrames: 'Add a frame to this page to link to.',
+  prototypeExportVideo: 'Export as video',
+  prototypeVideoHeading: 'Export prototype as video',
+  prototypeVideoDescription:
+    'Plays the prototype from a frame and records what Play shows, following each After delay and its transition.',
+  prototypeVideoStart: 'Start frame',
+  prototypeVideoFormat: 'Format',
+  prototypeVideoSize: 'Size',
+  prototypeVideoSizeOriginal: 'Original size',
+  prototypeVideoSizeDouble: 'Double size',
+  prototypeVideoSizeLongEdge: params('Long edge {pixels} px'),
+  prototypeVideoFrameRate: 'Frame rate',
+  prototypeVideoFps: params('{fps} fps'),
+  prototypeVideoMaxLength: 'Max length',
+  prototypeVideoSummary: params('Lasts {seconds} s at {width}×{height}.'),
+  prototypeVideoLoops: 'Play returns to the start frame, so the video loops.',
+  prototypeVideoTruncated: 'The flow goes on longer, so the video stops at the max length.',
+  prototypeVideoNothingToRecord: 'Nothing to record',
+  prototypeVideoFailed: 'The video could not be exported',
+  prototypeVideoNothingToFollow: params(
+    '“{frame}” has no After delay interaction to follow. Add one in the Prototype panel, or start from another frame.'
+  ),
+  prototypeVideoFormatsHere: params('This browser can record {formats}.'),
+  prototypeVideoExport: 'Export',
+  prototypeVideoRecording: params('Recording frame {done} of {total}')
 } as const
 
 export const panelMessages = i18n('panels', panelMessageDefaults)

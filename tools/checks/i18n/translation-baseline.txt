@@ -612,3 +612,11 @@ fr:panels.prototype
 fr:panels.prototypeAction
 fr:panels.prototypeDestination
 fr:panels.prototypeAnimation
+de:panels.prototypeVideoFormat
+de:panels.prototypeVideoFps
+es:panels.prototypeVideoFps
+fr:panels.prototypeVideoFormat
+it:panels.prototypeVideoFps
+ja:panels.prototypeVideoFps
+pl:panels.prototypeVideoFormat
+zh-cn:panels.prototypeVideoFps

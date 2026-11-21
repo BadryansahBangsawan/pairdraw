@@ -17,3 +17,13 @@ export {
   VIDEO_FORMAT_LABELS,
   VideoFormatError
 } from './formats'
+export {
+  DEFAULT_VIDEO_TAIL_MS,
+  exportedFrameRenderer,
+  MAX_GIF_EDGE,
+  planPrototypeVideo,
+  recordPrototypeVideo,
+  VIDEO_DEFAULTS,
+  type PrototypeVideoOptions,
+  type PrototypeVideoPlan
+} from './plan'

@@ -44,6 +44,7 @@ export const menuMessageDefaults = {
   insertScript: 'Insert Script…',
   placeImage: 'Place image…',
   exportFramesToPDF: 'Export frames to PDF…',
+  exportPrototypeVideo: 'Export prototype as video…',
   /** The kind of file Place image's desktop dialog lists. */
   imageFiles: 'Images',
   rulers: 'Rulers',

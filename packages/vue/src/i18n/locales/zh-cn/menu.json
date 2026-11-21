@@ -81,6 +81,7 @@
   "insertScript": "插入脚本…",
   "placeImage": "置入图片…",
   "exportFramesToPDF": "将画框导出为 PDF…",
+  "exportPrototypeVideo": "将原型导出为视频…",
   "imageFiles": "图片",
   "splitRight": "向右拆分",
   "splitDown": "向下拆分",

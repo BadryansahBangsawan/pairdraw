@@ -237,4 +237,36 @@ describe('Tailwind JSX appearance classes', () => {
     expect(jsx).toContain('text-white')
     expect(jsx).not.toContain('#')
   })
+
+  test('a literal font size Tailwind does not name stays an arbitrary value', () => {
+    const graph = makeGraph()
+    const heading = graph.createNode('TEXT', pageId(graph), {
+      width: 300,
+      height: 56,
+      text: 'Title',
+      fontSize: 40
+    })
+    const jsx = tw(graph, heading.id)
+    expect(jsx).toContain('text-[40px]')
+    expect(jsx).not.toContain('text-10')
+
+    const small = graph.createNode('TEXT', pageId(graph), {
+      width: 300,
+      height: 40,
+      text: 'Sub',
+      fontSize: 28
+    })
+    expect(tw(graph, small.id)).toContain('text-[28px]')
+  })
+
+  test('a font size Tailwind names keeps its named class', () => {
+    const graph = makeGraph()
+    const node = graph.createNode('TEXT', pageId(graph), {
+      width: 300,
+      height: 32,
+      text: 'Body',
+      fontSize: 24
+    })
+    expect(tw(graph, node.id)).toContain('text-2xl')
+  })
 })

@@ -1,3 +1,4 @@
+import { validFontSizeClass } from '#dom-css/export/font-size-class'
 import { splitWhitespace } from '#dom-css/export/html'
 import type { DesignDocument, DesignNode, DesignStyleDeclaration } from '#dom-css/types'
 import { compact } from 'es-toolkit/array'
@@ -39,7 +40,9 @@ function utilities(style: DesignStyleDeclaration, options: StateTailwindOptions)
     .map(([property, value]) => `${property}: ${value}`)
     .join('; ')
   return css
-    ? splitWhitespace(twirl(css, { theme: { variables: options.themeVariables ?? [] } }))
+    ? splitWhitespace(
+        validFontSizeClass(twirl(css, { theme: { variables: options.themeVariables ?? [] } }), css)
+      )
     : []
 }
 

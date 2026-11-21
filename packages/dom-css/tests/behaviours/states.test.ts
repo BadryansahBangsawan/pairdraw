@@ -276,6 +276,35 @@ describe('state Tailwind', () => {
     ).toBe(true)
   })
 
+  test('keeps a state rule font size Tailwind does not name arbitrary', () => {
+    const state: StateStyles = {
+      name: 'card',
+      restId: 'rest',
+      root: {
+        type: 'element',
+        key: 'root',
+        kind: undefined,
+        name: 'Card',
+        tagName: 'div',
+        attrs: {},
+        base: { 'font-size': '28px' },
+        rules: [
+          {
+            conditions: [{ type: 'state', value: 'active' }],
+            style: { 'font-size': '40px' }
+          }
+        ],
+        children: []
+      }
+    }
+    const document = stateStylesToTailwind(state)
+    const root = elements(document.children[0] ?? { type: 'text', text: '' })[0]
+    const classes = root?.attrs.class.split(' ') ?? []
+    expect(classes).toContain('text-[28px]')
+    expect(classes).toContain('data-[state=active]:text-[40px]')
+    expect(classes.filter((item) => /(^|:)text-\d+$/.test(item))).toEqual([])
+  })
+
   test('names a group for the layer a rule tests, which the layers inside it test', async () => {
     const document = stateStylesToTailwind(anchoredTabs().root)
     const [, , trigger, label] = elements(document.children[0] ?? { type: 'text', text: '' })

@@ -1,3 +1,4 @@
+import { validFontSizeClass } from './font-size-class'
 import { escapeAttribute, escapeText } from 'entities'
 import { twirl } from 'twirlwind'
 
@@ -65,7 +66,10 @@ export function serializeTailwindClasses(
 ): string | undefined {
   const style = serializeStyle(node)
   if (!style) return undefined
-  const className = twirl(style, { theme: { variables: themeVariables } })
+  const className = validFontSizeClass(
+    twirl(style, { theme: { variables: themeVariables } }),
+    style
+  )
   return className.length > 0 ? className : undefined
 }
 

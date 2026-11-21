@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/fig",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "The .fig file format for Pairdraw: archive parsing, SceneGraph conversion, metadata policy, and the Figma clipboard format.",
   "keywords": [
     "pairdraw",

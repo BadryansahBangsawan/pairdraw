@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/pen",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Pencil.dev .pen document parser and SceneGraph adapter for Pairdraw.",
   "keywords": [
     "pairdraw",

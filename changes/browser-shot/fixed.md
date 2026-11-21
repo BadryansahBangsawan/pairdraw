@@ -1,2 +1,0 @@
-- The built-in browser's screenshots work on macOS: each button places a picture instead of failing with "The page returned no picture", a page screenshot holds the whole page down to its last line (up to 4096 points, and at any zoom) instead of only the part the screen fits, and the view screenshot no longer ends in an empty strip.
-- **Import page**, **Import element**, and **Screenshot of an element** in the built-in browser no longer fail at once with "The page returned nothing"; they wait for the capture or for the click in the page.

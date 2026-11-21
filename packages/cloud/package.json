@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/cloud",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Self-hostable Pairdraw Cloud: accounts, workspaces, document revisions, sharing, collaboration, and the AI relay, for Node and Cloudflare Workers.",
   "keywords": [
     "pairdraw",

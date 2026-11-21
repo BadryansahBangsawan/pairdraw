@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 0.19.1 — 2026-11-21
+
+Pairdraw 0.19.1 makes the built-in browser's screenshots and page imports work, keeps the macOS icon orange in the dark icon style, updates installed CLI, MCP, and Harness companions together with the app, and shows each agent's logo. Pairdraw 0.16.1 and later offer this release in the app.
+
+### Changed
+
+- The people list and the Following bar show each agent with the logo of the model or coding agent it runs on, such as Claude Code or OpenAI, and keep the sparkle for an agent they cannot identify.
+- Claude Code's Agent, Fast mode, and Ultracode controls in the chat composer each have their own icon instead of the same sliders.
+- When the desktop app updates itself, it also updates the Pairdraw MCP server, CLI, and Harness companion already installed on the computer to its own version, once per version, with the package manager that installed each; a failed update still offers guided setup.
+
+### Fixed
+
+- The built-in browser's screenshots work on macOS: each button places a picture instead of failing with "The page returned no picture", a page screenshot holds the whole page down to its last line (up to 4096 points, and at any zoom) instead of only the part the screen fits, and the view screenshot no longer ends in an empty strip.
+- **Import page**, **Import element**, and **Screenshot of an element** in the built-in browser no longer fail at once with "The page returned nothing"; they wait for the capture or for the click in the page.
+- On macOS 26 in the dark icon style, the Dock shows the Pairdraw icon on its orange tile instead of a dark gray one.
+
+### Security
+
+- Release builds of the desktop app no longer open the Web Inspector from Inspect Element or Safari's Develop menu; development builds keep it.
+
 ## 0.19.0 — 2026-11-21
 
 Pairdraw 0.19.0 moves the properties panel into the left sidebar as the Design tab, opens large `.fig` files faster and in less memory, lets agents read and write prototype connections, hardens Cloud access, and fixes a long list of round-trip, layout, text, component, desktop, collaboration, CLI, and export problems. Pairdraw 0.16.1 and later offer this release in the app.

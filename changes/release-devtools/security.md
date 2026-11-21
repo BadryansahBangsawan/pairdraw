@@ -1,1 +1,0 @@
-- Release builds of the desktop app no longer open the Web Inspector from Inspect Element or Safari's Develop menu; development builds keep it.

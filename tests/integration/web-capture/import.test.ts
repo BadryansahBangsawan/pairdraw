@@ -208,6 +208,35 @@ describe('importing a web capture', () => {
     }
   })
 
+  test('keeps a box inside a paragraph when imported as HTML, where a <div> would end the <p>', async () => {
+    // An icon with a margin is boxed in a spacer, which the HTML parser must not lift out.
+    const notice: WebCapture = {
+      ...CAPTURE,
+      root: {
+        ...element('p', { display: 'flex', 'column-gap': '6px', width: '210px' }, [
+          element(
+            'img',
+            { display: 'block', width: '12px', height: '12px', 'margin-top': '2px' },
+            [],
+            {
+              src: PIXEL
+            }
+          ),
+          { type: 'text', text: 'Still needed: Text.' }
+        ]),
+        box: { x: 0, y: 0, width: 210, height: 24 }
+      }
+    }
+
+    for (const graph of await importedBothWays(notice)) {
+      const [paragraph, ...rest] = graph.getChildren(graph.getPages()[0]?.id ?? '')
+      expect(rest).toHaveLength(0)
+      const children = graph.getChildren(paragraph?.id ?? '')
+      expect(children.map((child) => child.type)).toEqual(['FRAME', 'TEXT'])
+      expect(children[1]?.text).toBe('Still needed: Text.')
+    }
+  })
+
   test('paints a captured gradient background as a gradient fill behind the text', () => {
     const panel: WebCapture = {
       ...CAPTURE,

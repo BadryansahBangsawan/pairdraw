@@ -389,7 +389,7 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `replace_fonts`               | Replace font faces everywhere in the document — text layers, character runs, and text styles — as one undoable step, and report how many layers, runs, and styles changed                                                                                                             |
 | `set_stroke`                  | Set stroke color, weight, alignment                                                                                                                                                                                                                                                   |
 | `set_effects`                 | Add shadow or blur effects                                                                                                                                                                                                                                                            |
-| `update_node`                 | Update position, size, opacity, corner radius, text, font                                                                                                                                                                                                                             |
+| `update_node`                 | Update position, size, opacity, corner radius, text, font, and overflow scrolling (`overflow_direction`: `NONE`, `HORIZONTAL`, `VERTICAL`, `BOTH`)                                                                                                                                     |
 | `set_layout`                  | Set auto-layout (flexbox) — direction, spacing, padding, alignment                                                                                                                                                                                                                    |
 | `set_constraints`             | Set resize constraints                                                                                                                                                                                                                                                                |
 | `set_rotation`                | Set rotation angle in degrees                                                                                                                                                                                                                                                         |
@@ -411,7 +411,7 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `rescale`                     | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped`                               |
 | `node_replace_with`           | Replace a node with another node                                                                                                                                                                                                                                                      |
 | `arrange`                     | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network                                                                                                                      |
-| `batch_update`                | Update the position, size, layout, spacing, and name of many nodes with one layout recompute                                                                                                                                                                                          |
+| `batch_update`                | Update the position, size, layout, spacing, overflow scrolling (`overflow_direction`), and name of many nodes with one layout recompute                                                                                                                                                |
 | `expose_instance_swap`        | Expose nested instances as an instance-swap slot on their component                                                                                                                                                                                                                   |
 
 ### Prototype
@@ -467,7 +467,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `export_html`  | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
 | `export_svg`   | Export nodes as SVG markup                                                                                                                                                                                                                                                                                                                         |
 | `export_pdf`   | Export nodes as a vector PDF: `mode` `single` (default), one page per frame (`frames`), or one page per design page (`pages`); `embed_fonts` embeds each face the text uses so the text stays selectable                                                                                                                                           |
-| `export_video` | Record the prototype as Play shows it, from `start` (a top-level frame), following After delays, their Dissolves, and scripted `clicks` on a virtual clock; returns the file and the `steps` it recorded. `format` `mp4` (H.264, default), `gif`, or `webm` (VP9) where the app can encode it; `fps`, `scale`, `maxEdge`, `maxDuration`, `tail`; `path` writes the file |
+| `export_video` | Record the prototype as Play shows it, from `start` (a top-level frame), following After delays, their Dissolves, and scripted `clicks` on a virtual clock; returns the file and the `steps` it recorded. `format` `mp4` (H.264, default), `gif`, or `webm` (VP9) where the app can encode it; `fps`, `scale`, `maxEdge`, `maxDuration`, `tail`; `path` writes the file. Long-running: cancelling the request stops the recording, and a cancelled call returns no file |
 
 ### Viewport
 
@@ -493,14 +493,14 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `unbind_variable`      | Remove a variable binding from a node property                                               |
 | `import_design_tokens` | Import W3C design token files as variables, text styles, and effect styles, updating by name |
 | `design_to_tokens`     | Write variables as CSS custom properties, a Tailwind v4 theme, or W3C design token files     |
-| `token_drift`          | Compare tokens in code with the variables, and optionally list layers with raw token values  |
-| `sync_tokens`          | Bring changes from code into the variables and remember the link; canvas edits are kept      |
+| `token_drift`          | Compare tokens in code with the variables, and optionally list layers with raw token values; `files` takes CSS/Tailwind stylesheets or W3C design token files, `include_layers` adds unbound layers |
+| `sync_tokens`          | Bring changes from code into the variables and remember the link; canvas edits are kept; `conflicts` `skip` (default), `code`, or `canvas` |
 
 ### Analyze
 
 | Tool                      | Description                                                                                                     |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `analyze_colors`          | Analyze color palette usage across the document                                                                 |
+| `analyze_colors`          | Analyze color palette usage across the current page; `show_similar` clusters near-duplicates within `threshold` (0–50, default 15) |
 | `analyze_typography`      | Analyze font/size/weight distribution                                                                           |
 | `analyze_spacing`         | Analyze gap and padding values                                                                                  |
 | `analyze_clusters`        | Detect repeated patterns (potential components)                                                                 |

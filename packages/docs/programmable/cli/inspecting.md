@@ -189,6 +189,14 @@ pairdraw lint design.fig --fix -o fixed.fig
 
 Use `--json` for machine-readable output; each message carries its `fix` and `suggestions` as data. `--fix` applies the safe fixes — binding colors to the color variable they match and rounding geometry to whole pixels — and writes the result to the `.fig` file given with `-o`.
 
+## Import Warnings
+
+When a command opens a `.pen` file that names something it cannot resolve, it prints a warning on stderr and keeps stdout for the result: variables the file does not define (read as their fallbacks), image files it cannot read (their fills are left out), and node types this reader does not know (read as placeholder frames). The command still succeeds, so check stderr when a file renders differently than expected.
+
+```sh
+pairdraw info design.pen 2>warnings.txt
+```
+
 ## JSON Output
 
 All commands support `--json` for machine-readable output — pipe into `jq`, feed to CI scripts, or process with other tools:

@@ -131,6 +131,9 @@ pairdraw tokens app.fig --project ./app --write
 |--------|-------------|
 | `--import` | Local CSS file to import as variables |
 | `--project` | Local project folder whose CSS variables are imported |
+| `--check` | Compare the document's variables with a stylesheet or project folder and list what differs; exits 1 on a difference |
+| `--sync` | Bring a stylesheet's or project folder's changes into the variables and remember the link; tokens also changed on the canvas are left unless `--conflicts` says otherwise |
+| `--conflicts` | With `--sync`, what a token changed on both sides takes: `skip` (default), `code`, or `canvas` |
 | `--write` | Write the import back to the input file |
 | `--output` | Write to a different file instead |
 

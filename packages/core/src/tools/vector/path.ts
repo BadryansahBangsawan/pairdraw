@@ -1,11 +1,13 @@
 import * as v from 'valibot'
 
 import type { SceneNode, VectorNetwork } from '@pairdraw/scene-graph'
-import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
+import { cloneVectorNetwork, transformVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import type { FigmaAPI } from '#core/figma-api'
 import { defineTool, nodeIdInputSchema, nodeInputSchema, toolNumber } from '#core/tools/schema'
 import { parseVectorNetworkJSON } from '#core/tools/vector/network'
+import { computeAccurateBounds } from '#core/vector/curve-math'
+import { regenerateFillGeometry } from '#core/vector/fill-geometry'
 
 function getVectorNode(
   figma: FigmaAPI,
@@ -15,6 +17,28 @@ function getVectorNode(
   if (!node) return { error: `Node "${id}" not found` }
   if (!node.vectorNetwork) return { error: `Node "${id}" has no vector data` }
   return { node, vn: cloneVectorNetwork(node.vectorNetwork) }
+}
+
+/**
+ * Writes an edited path as the plugin API's vectorNetwork setter does: the layer's box fits the
+ * path, the vertices rebase to it, and imported fillGeometry rebuilds from the new path so fills
+ * follow the edit instead of drawing the old shape.
+ */
+function writePath(figma: FigmaAPI, node: SceneNode, network: VectorNetwork): void {
+  const bounds = computeAccurateBounds(network)
+  const hasGeometry = network.vertices.length > 0
+  const rebased = hasGeometry
+    ? transformVectorNetwork([1, 0, -bounds.x, 0, 1, -bounds.y, 0, 0, 1], network)
+    : network
+  figma.graph.updateNode(node.id, {
+    x: hasGeometry ? node.x + bounds.x : node.x,
+    y: hasGeometry ? node.y + bounds.y : node.y,
+    width: hasGeometry ? bounds.width : 0,
+    height: hasGeometry ? bounds.height : 0,
+    vectorNetwork: rebased,
+    fillGeometry: regenerateFillGeometry(rebased, node.fillGeometry, node.cornerRadius),
+    strokeGeometry: []
+  })
 }
 
 export const pathGet = defineTool({
@@ -45,7 +69,7 @@ export const pathSet = defineTool({
     if (!raw) return { error: `Node "${args.id}" not found` }
     const parsed = parseVectorNetworkJSON(args.path)
     if ('error' in parsed) return parsed
-    figma.graph.updateNode(args.id, { vectorNetwork: parsed.network })
+    writePath(figma, raw, parsed.network)
     return { id: args.id }
   }
 })
@@ -76,7 +100,7 @@ export const pathScale = defineTool({
       segment.tangentEnd.y *= factor
     }
 
-    figma.graph.updateNode(id, { vectorNetwork: vn })
+    writePath(figma, raw, vn)
     return { id, factor }
   }
 })
@@ -107,7 +131,7 @@ export const pathFlip = defineTool({
       else segment.tangentEnd.y = -segment.tangentEnd.y
     }
 
-    figma.graph.updateNode(id, { vectorNetwork: vn })
+    writePath(figma, raw, vn)
     return { id, axis }
   }
 })
@@ -125,13 +149,13 @@ export const pathMove = defineTool({
   execute: (figma, { id, dx, dy }) => {
     const result = getVectorNode(figma, id)
     if ('error' in result) return result
-    const { vn } = result
+    const { node: raw, vn } = result
     for (const vertex of vn.vertices) {
       vertex.x += dx
       vertex.y += dy
     }
 
-    figma.graph.updateNode(id, { vectorNetwork: vn })
+    writePath(figma, raw, vn)
     return { id, dx, dy }
   }
 })

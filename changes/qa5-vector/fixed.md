@@ -1,0 +1,1 @@
+- Editing a vector path with path_set, path_scale, path_flip, or path_move keeps the layer's box around the new path and rebuilds its saved fill geometry, so an imported vector's fill follows the edit instead of drawing the old shape.

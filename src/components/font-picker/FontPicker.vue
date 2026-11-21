@@ -22,6 +22,11 @@ const label = computed(() => labelProp ?? panels.value.fontFamily)
 const modelValue = defineModel<string>({ required: true })
 const emit = defineEmits<{ select: [family: string] }>()
 
+function replaceFonts(close: () => void) {
+  close()
+  openReplaceFontsDialog()
+}
+
 const cls = usePopoverUI({
   content: 'w-[var(--reka-combobox-trigger-width)] min-w-56 overflow-hidden p-0'
 })
@@ -107,10 +112,7 @@ function loadPreviewFont(family: string, source: string) {
         type="button"
         data-test-id="font-picker-replace"
         class="flex w-full items-center gap-2 border-t border-border px-3 py-2 text-left text-xs text-surface hover:bg-panel-field"
-        @click="
-          close()
-          openReplaceFontsDialog()
-        "
+        @click="replaceFonts(close)"
       >
         <icon-lucide-replace class="size-3.5 text-muted" />
         {{ fonts.replaceFonts }}

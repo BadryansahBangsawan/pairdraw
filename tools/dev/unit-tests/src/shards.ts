@@ -86,6 +86,7 @@ export const HEAVY_UNIT_TEST_PATTERNS = [
   'tests/engine/io/fig/heavy/',
   'packages/scene-graph/tests/node-defaults/memory.test.ts',
   'packages/core/tests/io/formats/fig/roundtrip/exhaustive.test.ts',
+  'packages/core/tests/io/formats/fig/roundtrip/grids.test.ts',
   'packages/core/tests/io/formats/fig/roundtrip/glyph-blob.test.ts',
   'packages/core/tests/io/formats/fig/roundtrip/variables.test.ts',
   'packages/core/tests/io/formats/fig/import/stale-overrides.test.ts',

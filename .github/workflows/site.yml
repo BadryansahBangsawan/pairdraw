@@ -1,0 +1,56 @@
+name: Site
+
+# The site goes live with each release: `main` moves at a release, so pairdraw.dev always matches
+# the released app. Run it by hand to publish the current `main` without a new commit.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Deploys must not overlap; a queued release publishes after the one ahead of it.
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+env:
+  PAIRDRAW_DOCS_SITE_URL: https://pairdraw.dev
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The landing posters capture the built site in Chromium; the build reads no LFS fixtures.
+      - uses: ./.github/actions/setup-bun
+
+      - name: Build packages the docs site imports
+        run: bun run build:packages
+
+      - name: Install Chromium for the landing posters
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build the site
+        working-directory: packages/docs
+        env:
+          # Reads the latest release for the download pages; without it a build that cannot reach
+          # GitHub links to the releases page instead.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun run build:production
+
+      # The Pages project `pairdraw` and its pairdraw.dev custom domain are set up in the
+      # Cloudflare account; this workflow only publishes the build to it.
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@9681c2997648301493e78cacbfb790a9f19c833f # v3.9.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/docs/.vitepress/dist --project-name=pairdraw --branch=main

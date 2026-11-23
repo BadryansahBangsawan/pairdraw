@@ -7,7 +7,7 @@ Open-source design editor. Opens `.fig` and `.pen` design files, includes built-
 
 > **Status:** Active development. Usable today, with some rough edges as features evolve.
 
-**[Download](https://github.com/BadryansahBangsawan/pairdraw/releases/latest)** · [Documentation](packages/docs/) · [Roadmap](packages/docs/development/roadmap.md)
+**[Download](https://github.com/BadryansahBangsawan/pairdraw/releases/latest)** · [Documentation](https://pairdraw.dev) · [Roadmap](packages/docs/development/roadmap.md)
 
 ![Pairdraw editor: an AI agent designing a five-screen budgeting app on the canvas while the chat explains its work](packages/docs/public/screenshot.png)
 

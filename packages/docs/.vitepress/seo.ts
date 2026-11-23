@@ -6,9 +6,9 @@ import * as v from 'valibot'
 import type { HeadConfig } from 'vitepress'
 
 /**
- * Where the site is published, from `PAIRDRAW_DOCS_SITE_URL`. Pairdraw has no website of its own,
- * so by default the site claims no address: it has no sitemap, canonical or alternate links, or
- * social image, which all need one.
+ * Where the site is published, from `PAIRDRAW_DOCS_SITE_URL`. Pairdraw's documentation and landing
+ * page are published at https://pairdraw.dev; the variable still gives canonical and alternate
+ * links, the sitemap, and social images their address, so a build without it stays domain-free.
  */
 export const SITE_URL = process.env.PAIRDRAW_DOCS_SITE_URL?.trim().replace(/\/+$/, '') || null
 

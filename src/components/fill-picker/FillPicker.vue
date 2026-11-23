@@ -268,6 +268,7 @@ function step(next: Fill) {
             :layer-size="layerSize"
             :fill-index="fillIndex"
             @update="step"
+            @adjust="change"
           />
         </PopoverContent>
       </PopoverPortal>

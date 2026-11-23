@@ -41,7 +41,12 @@ const {
   /** Where the fill sits in the layer's fills, when it is one; image AI writes into it there. */
   fillIndex?: number | null
 }>()
-const emit = defineEmits<{ update: [fill: Fill] }>()
+const emit = defineEmits<{
+  /** A discrete fill change, such as the image chosen, a step of its own. */
+  update: [fill: Fill]
+  /** An adjustment the sliders move continuously, coalesced into the held press. */
+  adjust: [fill: Fill]
+}>()
 
 const store = useEditorStore()
 const { panels, commands } = useI18n()
@@ -280,6 +285,6 @@ function cropOnCanvas() {
         <icon-lucide-rotate-cw class="size-3.5" />
       </IconButton>
     </div>
-    <ImageAdjustments :fill @update="emit('update', $event)" />
+    <ImageAdjustments :fill @update="emit('adjust', $event)" />
   </div>
 </template>

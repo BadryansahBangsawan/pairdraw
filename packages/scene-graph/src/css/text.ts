@@ -69,6 +69,30 @@ export function parseCSSFontFamilies(value: string | undefined): string[] {
   })
 }
 
+/** CSS generic `font-family` keywords: names no font provider serves, drawn by a concrete face instead. */
+export const GENERIC_FONT_FAMILIES: ReadonlySet<string> = new Set([
+  'serif',
+  'sans-serif',
+  'monospace',
+  'cursive',
+  'fantasy',
+  'system-ui',
+  'ui-serif',
+  'ui-sans-serif',
+  'ui-monospace',
+  'ui-rounded',
+  '-apple-system',
+  'blinkmacsystemfont',
+  'math',
+  'emoji',
+  'fangsong'
+])
+
+/** Whether `family` is a CSS generic keyword rather than a face a provider or the host can load. */
+export function isGenericFontFamily(family: string): boolean {
+  return GENERIC_FONT_FAMILIES.has(family.trim().toLowerCase())
+}
+
 /** A CSS dimension's number and lowercase unit, or null. */
 function dimension(value: string): { number: number; unit: string } | null {
   const parsed = valueParser.unit(value)

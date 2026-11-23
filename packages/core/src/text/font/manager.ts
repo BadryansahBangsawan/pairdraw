@@ -4,6 +4,7 @@ import type { CanvasKit, TypefaceFontProvider } from 'canvaskit-wasm'
 import { uniq } from 'es-toolkit'
 
 import type { FontVariation, SceneGraph } from '@pairdraw/scene-graph'
+import { isGenericFontFamily } from '@pairdraw/scene-graph/css'
 import {
   faceLoadKey,
   namesWeight,
@@ -479,6 +480,9 @@ export class FontManager {
     signal?: AbortSignal
   ): Promise<ArrayBuffer | null> {
     signal?.throwIfAborted()
+    // A CSS generic keyword is never a bundled, installed, or served face: fetching it only
+    // wastes a doomed network round-trip that can block a page's fonts (and an open) offline.
+    if (isGenericFontFamily(family)) return null
     const loaded = this.loadedData(family, style)
     if (loaded) {
       this.registerFontInCanvasKit(family, loaded)

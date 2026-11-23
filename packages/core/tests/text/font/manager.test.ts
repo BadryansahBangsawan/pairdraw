@@ -390,3 +390,18 @@ test('Hebrew, Thai, and Devanagari fallbacks load their own fonts, apart from th
   ])
   expect(manager.getCJKFallbackFamilies()).not.toContain('Segoe UI')
 })
+
+test('a CSS generic family loads nothing and never reaches the web font fetch', async () => {
+  const manager = new FontManager()
+  manager.setOnlineFontProviders({ google: true })
+  let fetched = false
+  manager.setWebFontFetch(async () => {
+    fetched = true
+    throw new Error('network is disabled in tests')
+  })
+
+  const data = await manager.loadFont('ui-monospace', 'Regular', '')
+
+  expect(data).toBeNull()
+  expect(fetched).toBe(false)
+})

@@ -1,0 +1,1 @@
+- Opening a document whose text uses a CSS generic family such as `ui-monospace` no longer tries to fetch it from a web font provider, so the document opens without hanging on a doomed network request.

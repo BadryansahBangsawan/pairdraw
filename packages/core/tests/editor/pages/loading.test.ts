@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { createEditor } from '@pairdraw/core'
 import { exportFigFile, parseFigFile, populateFigPage } from '@pairdraw/core/io/formats/fig'
+import { fontManager } from '@pairdraw/core/text'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -300,4 +301,34 @@ test('preparing a page loads the pages holding the component sets its instances 
   expect(variants('Switch')).toEqual(['State=Off', 'State=On'])
   expect(variants('Knob')).toEqual(['State=Off', 'State=On'])
   editor.dispose()
+})
+
+test('a page with a CSS generic font family prepares without asking a web provider', async () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  if (!page) throw new Error('Expected default page')
+  // A capture's text often keeps a CSS keyword such as ui-monospace as its family.
+  graph.createNode('TEXT', page.id, { text: 'mono', fontFamily: 'ui-monospace', fontWeight: 400 })
+
+  fontManager.setOnlineFontProviders({ google: true })
+  let fetched = false
+  fontManager.setWebFontFetch(async () => {
+    fetched = true
+    throw new Error('network is disabled in tests')
+  })
+  try {
+    const editor = createEditor({
+      graph,
+      skipInitialGraphSetup: true,
+      loadFont: (family, style, characters, signal) =>
+        fontManager.loadFont(family, style, characters, signal)
+    })
+    const prepared = await editor.preparePage(page.id)
+    expect(prepared).not.toBeNull()
+    expect(fetched).toBe(false)
+    editor.dispose()
+  } finally {
+    fontManager.setWebFontFetch(null)
+    fontManager.setOnlineFontProviders({})
+  }
 })

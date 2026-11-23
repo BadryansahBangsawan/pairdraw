@@ -11,6 +11,8 @@ export {
   parseCSSFontFamilies,
   parseCSSFontFamily,
   parseCSSLetterSpacing,
-  parseCSSLineHeight
+  parseCSSLineHeight,
+  GENERIC_FONT_FAMILIES,
+  isGenericFontFamily
 } from './text'
 export { parseCSSColor, parseCSSNumber, splitCSSValue } from './values'

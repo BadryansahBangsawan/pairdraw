@@ -261,15 +261,7 @@ export function renderChildIds(
           canvas.save()
           canvas.translate(shiftX, shiftY)
         }
-        renderMaskNodeContent(
-          r,
-          canvas,
-          graph,
-          child,
-          overlays,
-          absX + shiftX,
-          absY + shiftY
-        )
+        renderMaskNodeContent(r, canvas, graph, child, overlays, absX + shiftX, absY + shiftY)
         if (shiftX !== 0 || shiftY !== 0) canvas.restore()
       }
     },

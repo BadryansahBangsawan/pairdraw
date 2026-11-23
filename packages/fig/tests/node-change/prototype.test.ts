@@ -488,8 +488,13 @@ describe('scroll behavior in .fig records', () => {
   beforeAll(() => initCodec())
 
   test('reads scrollBehavior as the layer behavior', () => {
-    expect(importNode({ type: 'FRAME', scrollBehavior: 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME' }).scrollBehavior).toBe('FIXED')
-    expect(importNode({ type: 'FRAME', scrollBehavior: 'STICKY_SCROLLS' }).scrollBehavior).toBe('STICKY_SCROLLS')
+    expect(
+      importNode({ type: 'FRAME', scrollBehavior: 'FIXED_WHEN_CHILD_OF_SCROLLING_FRAME' })
+        .scrollBehavior
+    ).toBe('FIXED')
+    expect(importNode({ type: 'FRAME', scrollBehavior: 'STICKY_SCROLLS' }).scrollBehavior).toBe(
+      'STICKY_SCROLLS'
+    )
     expect(importNode({ type: 'FRAME' }).scrollBehavior).toBe('SCROLLS')
   })
 
@@ -502,7 +507,9 @@ describe('scroll behavior in .fig records', () => {
     expect(write(graph, fixed.id).scrollBehavior).toBe('FIXED_WHEN_CHILD_OF_SCROLLING_FRAME')
     expect(write(graph, sticky.id).scrollBehavior).toBe('STICKY_SCROLLS')
     expect(write(graph, plain.id).scrollBehavior).toBeUndefined()
-    expect(() => getCompiledSchema().encodeNodeChange(write(graph, sticky.id) as never)).not.toThrow()
+    expect(() =>
+      getCompiledSchema().encodeNodeChange(write(graph, sticky.id) as never)
+    ).not.toThrow()
   })
 
   test('an edited behavior replaces the one the file recorded', () => {

@@ -170,7 +170,9 @@ export function liftedChildIds(
 ): readonly string[] {
   if (!scroll) return childIds
   const nodes = childIds.map((id) => graph.getNode(id))
-  const lifts = nodes.map((node) => node !== undefined && !node.isMask && node.scrollBehavior !== 'SCROLLS')
+  const lifts = nodes.map(
+    (node) => node !== undefined && !node.isMask && node.scrollBehavior !== 'SCROLLS'
+  )
   if (!lifts.some(Boolean)) return childIds
   // A mask belongs to the layers after it until the next mask; a lifted layer inside a mask run
   // stays in the run so the mask still clips it.

@@ -56,4 +56,8 @@ export const OVERFLOW_DIRECTIONS = [
 ] as const satisfies readonly OverflowDirection[]
 
 /** How a layer moves while its parent frame scrolls in play, in Figma's names. */
-export const SCROLL_BEHAVIORS = ['SCROLLS', 'FIXED', 'STICKY_SCROLLS'] as const satisfies readonly ScrollBehavior[]
+export const SCROLL_BEHAVIORS = [
+  'SCROLLS',
+  'FIXED',
+  'STICKY_SCROLLS'
+] as const satisfies readonly ScrollBehavior[]

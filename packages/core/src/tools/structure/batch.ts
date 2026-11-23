@@ -4,7 +4,11 @@ import type { LayoutAlign } from '@pairdraw/scene-graph'
 
 import type { FigmaNodeProxy } from '#core/figma-api'
 import { textFonts } from '#core/tools/modify/text'
-import { overflowDirectionInput, scrollBehaviorInput, scrollRefusal } from '#core/tools/modify/update'
+import {
+  overflowDirectionInput,
+  scrollBehaviorInput,
+  scrollRefusal
+} from '#core/tools/modify/update'
 import { defineTool, nodeNotFound, toolNumber } from '#core/tools/schema'
 
 const nonNegative = () => toolNumber(v.pipe(v.number(), v.minValue(0)))

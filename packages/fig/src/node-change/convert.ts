@@ -34,11 +34,7 @@ import {
   extractPluginRelaunchData,
   readNodeChangePluginData
 } from './plugin-data'
-import {
-  extractPrototypeReactions,
-  overflowFromFigma,
-  scrollBehaviorFromFigma
-} from './prototype'
+import { extractPrototypeReactions, overflowFromFigma, scrollBehaviorFromFigma } from './prototype'
 import { extractNodeStatus } from './status'
 import { styleRefId } from './style/refs'
 import { importStyleRuns } from './style/runs'

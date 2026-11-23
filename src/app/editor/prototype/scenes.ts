@@ -64,18 +64,27 @@ export function usePlayScenes(
     store.requestRepaint()
   }
 
+  /** Draws the frame as it was before a crossfade, but not for a Scroll to or a cut. */
+  function dissolveBefore(current: PlaySession, click: PlayClick, rootId?: string): void {
+    if (!click.transition) return
+    if (animationFor(current, click.action) !== 'dissolve') return
+    if (click.action.type === 'NODE' && click.action.navigation === 'SCROLL_TO') return
+    const durationMs = transitionMs(click.action)
+    options.beforeDissolve?.(rootId ?? shownFrame(current), durationMs, click.transition.easing)
+  }
+
+  /** Eases the frames a Scroll to moved, or shows them at once when it does not animate. */
+  function showScrolled(click: PlayClick, scrolled: PlayStep['scrolled']): void {
+    if (!scrolled?.length) return
+    if (click.transition && click.transition.type !== 'INSTANT') animate(scrolled)
+    else store.requestRepaint()
+  }
+
   /** Runs a reaction of a layer in `rootId`, the shown frame unless a timer names another. */
   function run(click: PlayClick, rootId?: string): PlayStep | null {
     const current = session.value
     if (!current) return null
-    // A Scroll to animates by easing its frames, and Smart animate by moving layers, instead of
-    // crossfading.
-    const scrolls = click.action.type === 'NODE' && click.action.navigation === 'SCROLL_TO'
-    const crossfades = animationFor(current, click.action) === 'dissolve'
-    if (click.transition && crossfades && !scrolls) {
-      const durationMs = transitionMs(click.action)
-      options.beforeDissolve?.(rootId ?? shownFrame(current), durationMs, click.transition.easing)
-    }
+    dissolveBefore(current, click, rootId)
     const result = scenes.run(current, click, rootId)
     session.value = result.session
     if (!result.changed && result.session !== current) {
@@ -86,10 +95,7 @@ export function usePlayScenes(
     // A change with no animation of its own shows at once: a Smart animate still running over
     // the frame would draw its stale copy over what play now shows.
     else if (result.changed) options.onAnimationStopped?.(rootId ?? shownFrame(result.session))
-    if (result.scrolled?.length) {
-      if (click.transition && click.transition.type !== 'INSTANT') animate(result.scrolled)
-      else store.requestRepaint()
-    }
+    showScrolled(click, result.scrolled)
     if (result.reveal) options.onReveal?.(result.reveal)
     return result
   }

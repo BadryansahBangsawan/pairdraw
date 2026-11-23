@@ -410,4 +410,69 @@ describe('Change to in play', () => {
       }
     ])
   })
+
+  test('lists an After delay a plain child copy inherits from its main layer', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { name: 'Loader', y: 500 })
+    const idle = graph.createNode('COMPONENT', set.id, {
+      name: 'State=Idle',
+      width: 40,
+      height: 20
+    })
+    const busy = graph.createNode('COMPONENT', set.id, {
+      name: 'State=Busy',
+      x: 60,
+      width: 40,
+      height: 40
+    })
+    const done = graph.createNode('COMPONENT', set.id, { name: 'State=Done', x: 120 })
+    const spinner = graph.createNode('RECTANGLE', busy.id, { name: 'Spinner', width: 10, height: 10 })
+    graph.updateNode(spinner.id, { prototypeReactions: [changeTo(done.id, 'AFTER_TIMEOUT')] })
+    graph.updateNode(idle.id, { prototypeReactions: [changeTo(busy.id)] })
+    const screen = graph.createNode('FRAME', pageId, { name: 'Screen', width: 100, height: 100 })
+    const instance = graph.createInstance(idle.id, screen.id)
+    if (!instance) throw new Error('no instance')
+    const scenes = createPlayScenes(() => graph)
+
+    scenes.run(startSession(screen.id), click(instance.id, changeTo(busy.id).actions[0]))
+    const played = scenes.graphFor(screen.id)
+    const copy = played.getChildren(instance.id).find((node) => node.name === 'Spinner')
+    if (!copy) throw new Error('the copy has no Spinner')
+
+    expect(scenes.instanceTimeouts(screen.id)).toEqual([
+      {
+        sourceId: copy.id,
+        variantId: spinner.id,
+        reactionId: changeTo(done.id, 'AFTER_TIMEOUT').id,
+        action: changeTo(done.id).actions[0],
+        delayMs: 2000
+      }
+    ])
+  })
+
+  test('arms a wide instance in a walk proportional to its layers', () => {
+    const layers = 60
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const main = graph.createNode('COMPONENT', pageId, { name: 'Main', width: 100, height: 100 })
+    for (let i = 0; i < layers; i += 1) {
+      graph.createNode('RECTANGLE', main.id, { name: `Layer ${i}`, width: 1, height: 1 })
+    }
+    const screen = graph.createNode('FRAME', pageId, { name: 'Screen', width: 200, height: 200 })
+    if (!graph.createInstance(main.id, screen.id)) throw new Error('no instance')
+    const scenes = createPlayScenes(() => graph)
+
+    // Counting the tree reads rather than timing them keeps the bound stable; a copy resolved
+    // one instance search at a time reads the instance once per layer instead of once.
+    const getChildren = graph.getChildren.bind(graph)
+    let reads = 0
+    graph.getChildren = (id: string) => {
+      reads += 1
+      return getChildren(id)
+    }
+    scenes.instanceTimeouts(screen.id)
+
+    expect(reads).toBeLessThan(layers * 10)
+  })
 })

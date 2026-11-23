@@ -25,9 +25,19 @@ export function sameReaction(a: PrototypeReaction, b: PrototypeReaction): boolea
  * its own.
  */
 export function effectiveReactions(graph: SceneGraph, node: SceneNode): PrototypeReaction[] {
-  const inherited = inheritedReactions(graph, node)
+  return reactionsWithInherited(node, inheritedReactions(graph, node))
+}
+
+/**
+ * A layer's reactions with the ones it inherits: the inherited reactions run unless the layer
+ * overrides their trigger. Figma's copy of a main's interaction keeps the main's id; the main's
+ * own, as edited, runs.
+ */
+export function reactionsWithInherited(
+  node: SceneNode,
+  inherited: readonly PrototypeReaction[]
+): PrototypeReaction[] {
   if (inherited.length === 0) return node.prototypeReactions
-  // Figma's copy of a main's interaction keeps the main's id; the main's own, as edited, runs.
   const own = node.prototypeReactions.filter(
     (reaction) => !inherited.some((main) => main.id === reaction.id)
   )
@@ -55,7 +65,54 @@ function inheritedReactions(graph: SceneGraph, node: SceneNode): PrototypeReacti
  * The component layer a copy stands for, followed through nested instances to the main that
  * finally holds it. A nested copy points at the layer one level up, not at the main's layer.
  */
-function componentLayer(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
+export function componentLayer(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
+  return followComponentLayer(graph, node, (instance, copyId) =>
+    copiedSource(graph, instance, copyId)
+  )
+}
+
+/**
+ * A resolver for the component layers copies stand for, which reads each instance's copy-to-main
+ * map once. Arm many layers of one frame with it instead of calling `componentLayer` per layer,
+ * which searches an instance for every copy.
+ */
+export function componentLayerResolver(
+  graph: SceneGraph
+): (node: SceneNode) => SceneNode | undefined {
+  const sourcesByInstance = new Map<string, Map<string, SceneNode>>()
+  const resolved = new Map<string, SceneNode | undefined>()
+  const sourcesOf = (instance: SceneNode): Map<string, SceneNode> => {
+    const cached = sourcesByInstance.get(instance.id)
+    if (cached) return cached
+    const sources = new Map<string, SceneNode>()
+    walkInstanceSources(
+      graph,
+      instance,
+      (source, copy) => {
+        sources.set(copy.id, source)
+        return true
+      },
+      true
+    )
+    sourcesByInstance.set(instance.id, sources)
+    return sources
+  }
+  return (node) => {
+    if (resolved.has(node.id)) return resolved.get(node.id)
+    const layer = followComponentLayer(graph, node, (instance, copyId) =>
+      sourcesOf(instance).get(copyId)
+    )
+    resolved.set(node.id, layer)
+    return layer
+  }
+}
+
+/** Walks a copy up to its main layer, one instance at a time, using `sourceOf` to map each step. */
+function followComponentLayer(
+  graph: SceneGraph,
+  node: SceneNode,
+  sourceOf: (instance: SceneNode, copyId: string) => SceneNode | undefined
+): SceneNode | undefined {
   const seen = new Set<string>()
   let current = node
   for (;;) {
@@ -64,7 +121,7 @@ function componentLayer(graph: SceneGraph, node: SceneNode): SceneNode | undefin
     const owner = current.parentId ? findInstanceAncestor(graph, current.parentId) : undefined
     if (!owner) return current
     if (!instanceMainComponent(graph, owner)) return undefined
-    const source = copiedSource(graph, owner, current.id)
+    const source = sourceOf(owner, current.id)
     if (!source || source.id === current.id) return undefined
     current = source
   }

@@ -3,6 +3,7 @@ import { onScopeDispose, shallowRef, watch, type Ref } from 'vue'
 import {
   animationFor,
   createPlayScenes,
+  effectiveReactions,
   type PlayClick,
   type PlayRevert,
   type PlaySession,
@@ -217,9 +218,20 @@ export function usePlayScenes(
       const timer = window.setTimeout(() => {
         timers.delete(key)
         const graph = scenes.graphFor(timeout.rootId)
-        const instance = graph.getNode(timeout.sourceId)
-        // A timer that outlived its instance's variant, or its frame, runs nothing.
-        if (!instance || instanceMainComponent(graph, instance)?.id !== timeout.variantId) return
+        const layer = graph.getNode(timeout.sourceId)
+        // A timer that outlived its instance's variant, its copy's main layer, or its frame runs
+        // nothing.
+        if (!layer) return
+        if (layer.type === 'INSTANCE') {
+          if (instanceMainComponent(graph, layer)?.id !== timeout.variantId) return
+        } else if (
+          !effectiveReactions(graph, layer).some(
+            (reaction) =>
+              reaction.id === timeout.reactionId && reaction.trigger.type === 'AFTER_TIMEOUT'
+          )
+        ) {
+          return
+        }
         const { sourceId, action } = timeout
         const transition = action.type === 'NODE' ? action.transition : null
         run({ sourceId, action, transition }, timeout.rootId)

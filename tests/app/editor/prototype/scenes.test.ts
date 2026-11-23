@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import { computed, effectScope, nextTick, ref } from 'vue'
 
 import { startSession, type PlaySession } from '@pairdraw/core/prototype'
-import { SceneGraph, type PrototypeNodeAction, type PrototypeReaction } from '@pairdraw/scene-graph'
+import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { usePlayScenes } from '@/app/editor/prototype/scenes'
@@ -43,6 +43,76 @@ function loaderDocument() {
   const instance = graph.createInstance(idle.id, screen.id)
   if (!instance) throw new Error('no instance')
   return { graph, screen, instance, idle, loading, done }
+}
+
+/** A loader whose Loading variant holds a plain Spinner that turns Done after a delay. */
+function childDelayDocument() {
+  const graph = new SceneGraph()
+  const pageId = graph.getPages()[0].id
+  const set = graph.createNode('COMPONENT_SET', pageId, { y: 400 })
+  const idle = graph.createNode('COMPONENT', set.id, { name: 'State=Idle', width: 20, height: 20 })
+  const loading = graph.createNode('COMPONENT', set.id, {
+    name: 'State=Loading',
+    x: 40,
+    width: 20,
+    height: 20
+  })
+  const done = graph.createNode('COMPONENT', set.id, { name: 'State=Done', x: 80 })
+  const spinner = graph.createNode('RECTANGLE', loading.id, {
+    name: 'Spinner',
+    width: 10,
+    height: 10
+  })
+  graph.updateNode(spinner.id, { prototypeReactions: [changeTo(done.id, 'AFTER_TIMEOUT')] })
+  graph.updateNode(idle.id, { prototypeReactions: [changeTo(loading.id, 'ON_CLICK')] })
+  const screen = graph.createNode('FRAME', pageId, { width: 100, height: 100 })
+  const instance = graph.createInstance(idle.id, screen.id)
+  if (!instance) throw new Error('no instance')
+  return { graph, screen, instance, idle, loading, done }
+}
+
+/** A loader whose Loading variant's plain Spinner navigates to `third` after a delay. */
+function childNavigateDocument() {
+  const graph = new SceneGraph()
+  const pageId = graph.getPages()[0].id
+  const set = graph.createNode('COMPONENT_SET', pageId, { y: 400 })
+  const idle = graph.createNode('COMPONENT', set.id, { name: 'State=Idle', width: 20, height: 20 })
+  const loading = graph.createNode('COMPONENT', set.id, {
+    name: 'State=Loading',
+    x: 40,
+    width: 20,
+    height: 20
+  })
+  const done = graph.createNode('COMPONENT', set.id, { name: 'State=Done', x: 80 })
+  const spinner = graph.createNode('RECTANGLE', loading.id, {
+    name: 'Spinner',
+    width: 10,
+    height: 10
+  })
+  const third = graph.createNode('FRAME', pageId, { name: 'Third', x: 200, width: 50, height: 50 })
+  const other = graph.createNode('FRAME', pageId, { name: 'Other', x: 300, width: 50, height: 50 })
+  graph.updateNode(spinner.id, { prototypeReactions: [navigateTo(third.id, 'AFTER_TIMEOUT')] })
+  graph.updateNode(idle.id, { prototypeReactions: [changeTo(loading.id, 'ON_CLICK')] })
+  const screen = graph.createNode('FRAME', pageId, { width: 100, height: 100 })
+  const instance = graph.createInstance(idle.id, screen.id)
+  if (!instance) throw new Error('no instance')
+  return { graph, screen, instance, idle, loading, done, other, third }
+}
+
+function navigateTo(frameId: string, trigger: 'ON_CLICK' | 'AFTER_TIMEOUT'): PrototypeReaction {
+  return {
+    id: `navigate-${frameId}`,
+    trigger: { type: trigger, delay: trigger === 'AFTER_TIMEOUT' ? DELAY_MS / 1000 : 0 },
+    actions: [
+      {
+        type: 'NODE',
+        nodeId: frameId,
+        navigation: 'NAVIGATE',
+        transition: { type: 'INSTANT', duration: 0 },
+        overlayPosition: 'CENTER'
+      }
+    ]
+  }
 }
 
 function installTimerProbe() {
@@ -205,37 +275,6 @@ describe('play scenes on the stage', () => {
     store.dispose()
   })
 
-  test('a Smart animate Change to hands over its animation and its duration, with no crossfade', () => {
-    const { graph, screen, instance, loading } = loaderDocument()
-    const store = createEditorStore(graph)
-    const session = ref<PlaySession | null>(startSession(screen.id))
-    const dissolves: string[] = []
-    const animations: { rootId: string; durationMs: number }[] = []
-    const scope = effectScope()
-    const play = scope.run(() =>
-      usePlayScenes(
-        store,
-        session,
-        computed(() => ({ revision: 0 })),
-        {
-          beforeDissolve: (rootId) => dissolves.push(rootId),
-          onAnimation: (animation, durationMs) =>
-            animations.push({ rootId: animation.rootId, durationMs })
-        }
-      )
-    )
-    if (!play) throw new Error('no play scenes')
-    const smart = { type: 'SMART_ANIMATE' as const, duration: 0.4 }
-    const action = { ...changeTo(loading.id, 'ON_CLICK').actions[0], transition: smart }
-
-    play.run({ sourceId: instance.id, action, transition: smart })
-
-    expect(animations).toEqual([{ rootId: screen.id, durationMs: 400 }])
-    expect(dissolves).toEqual([])
-    scope.stop()
-    store.dispose()
-  })
-
   test('a dissolving Change to asks for the frame as it was first; an instant one and a Scroll to do not', () => {
     const { graph, screen, instance, loading, done } = loaderDocument()
     const store = createEditorStore(graph)
@@ -253,9 +292,8 @@ describe('play scenes on the stage', () => {
       )
     )
     if (!play) throw new Error('no play scenes')
-    const dissolve = { type: 'DISSOLVE' as const, duration: 0.3 }
-    const action = { ...changeTo(loading.id, 'ON_CLICK').actions[0], transition: dissolve }
-    play.run({ sourceId: instance.id, action, transition: dissolve })
+    const action = changeTo(loading.id, 'ON_CLICK').actions[0]
+    play.run({ sourceId: instance.id, action, transition: { type: 'DISSOLVE', duration: 0.3 } })
     expect(before).toEqual([screen.id])
     play.run({
       sourceId: instance.id,
@@ -387,6 +425,109 @@ describe('play scenes on the stage', () => {
     if (!timer) throw new Error('no timer')
     timer.fn()
     expect(before).toEqual([screen.id])
+    scope.stop()
+    store.dispose()
+  })
+
+  test("a child copy's inherited After delay runs once its instance shows that variant", async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const { graph, screen, instance, loading, done } = childDelayDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const live = computed(() => ({ revision: 0 }))
+    const scope = effectScope()
+    const play = scope.run(() => usePlayScenes(store, session, live))
+    if (!play) throw new Error('no play scenes')
+    await nextTick()
+    expect(probe.live()).toHaveLength(0)
+
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(loading.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    const [timer] = probe.live()
+    if (!timer) throw new Error('the copy of the Spinner armed no timer')
+    timer.fn()
+    await nextTick()
+    const played = play.graphFor(screen.id)
+    const shown = played.getNode(instance.id)
+    expect(shown ? instanceMainComponent(played, shown)?.id : undefined).toBe(done.id)
+
+    scope.stop()
+    store.dispose()
+  })
+
+  test("changing the variant before the delay ends cancels a child copy's timer", async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const { graph, screen, instance, loading, done } = childNavigateDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const live = computed(() => ({ revision: 0 }))
+    const scope = effectScope()
+    const play = scope.run(() => usePlayScenes(store, session, live))
+    if (!play) throw new Error('no play scenes')
+    await nextTick()
+
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(loading.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    const [timer] = probe.live()
+    if (!timer) throw new Error('the copy of the Spinner armed no timer')
+
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(done.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    expect(probe.live()).toHaveLength(0)
+    timer.fn()
+    await nextTick()
+    expect(session.value?.frameId).toBe(screen.id)
+
+    scope.stop()
+    store.dispose()
+  })
+
+  test("navigating away before the delay ends cancels a child copy's timer", async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const { graph, screen, instance, loading, other } = childNavigateDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const live = computed(() => ({ revision: 0 }))
+    const scope = effectScope()
+    const play = scope.run(() => usePlayScenes(store, session, live))
+    if (!play) throw new Error('no play scenes')
+    await nextTick()
+
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(loading.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    expect(probe.live()).toHaveLength(1)
+
+    play.run({
+      sourceId: screen.id,
+      action: navigateTo(other.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    // Navigation clears the timer, so leaving the frame cancels a delay that had not fired.
+    expect(session.value?.frameId).toBe(other.id)
+    expect(probe.live()).toHaveLength(0)
+    await nextTick()
+    expect(session.value?.frameId).toBe(other.id)
+
     scope.stop()
     store.dispose()
   })

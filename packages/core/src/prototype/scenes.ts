@@ -1,11 +1,17 @@
-import type { PrototypeAction, PrototypeTransition, SceneGraph } from '@pairdraw/scene-graph'
+import type {
+  PrototypeAction,
+  PrototypeReaction,
+  PrototypeTransition,
+  SceneGraph,
+  SceneNode
+} from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { extractPageContext, findPageId } from '#core/io/subgraph'
 
 import type { PlayRevert } from './pointer'
-import { effectiveReactions } from './reactions'
+import { componentLayerResolver, reactionsWithInherited } from './reactions'
 import {
   changeTarget,
   createPlayScene,
@@ -25,11 +31,13 @@ import {
 export const PLAY_SCENE_LIMIT = 4
 
 /**
- * An After delay reaction of an instance a frame shows: the instance, the variant it shows, whose
- * reaction it is, the reaction, its action, and the delay in milliseconds.
+ * An After delay reaction the layers a frame shows add: the layer it runs from, which is an
+ * instance or a copy inside one, the main component or layer it stands for, whose reaction it is,
+ * the reaction, its action, and the delay in milliseconds.
  */
 export interface PlayTimeout {
   sourceId: string
+  /** The main component an instance shows, or the main layer a copy stands for. */
   variantId: string
   reactionId: string
   action: PrototypeAction
@@ -79,7 +87,10 @@ export interface PlayScenes {
    * instance that shows another variant by now, or an overlay or frame no longer shown.
    */
   revert(session: PlaySession, revert: PlayRevert): PlayStep
-  /** The After delay reactions of the instances `rootId` shows, by the variants they show now. */
+  /**
+   * The After delay reactions of the instances `rootId` shows and of the copies inside them, by
+   * the variants and main layers they stand for now.
+   */
   instanceTimeouts(rootId: string): PlayTimeout[]
   /**
    * Drops the copies of frames that hold any of these document layers, after an edit to them:
@@ -193,23 +204,31 @@ export function createPlayScenes(
     instanceTimeouts(rootId) {
       const graph = graphFor(rootId)
       const timeouts: PlayTimeout[] = []
+      const sourceOf = componentLayerResolver(graph)
+      const collect = (node: SceneNode, variantId: string, inherited: PrototypeReaction[]) => {
+        for (const reaction of reactionsWithInherited(node, inherited)) {
+          const action = reaction.trigger.type === 'AFTER_TIMEOUT' && primaryAction(reaction)
+          if (!action) continue
+          timeouts.push({
+            sourceId: node.id,
+            variantId,
+            reactionId: reaction.id,
+            action,
+            delayMs: reaction.trigger.delay * 1000
+          })
+        }
+      }
       const visit = (id: string) => {
         for (const child of graph.getChildren(id)) {
-          const variantId = child.type === 'INSTANCE' && instanceMainComponent(graph, child)?.id
-          if (variantId) {
-            for (const reaction of effectiveReactions(graph, child)) {
-              const action = reaction.trigger.type === 'AFTER_TIMEOUT' && primaryAction(reaction)
-              if (action) {
-                const delayMs = reaction.trigger.delay * 1000
-                timeouts.push({
-                  sourceId: child.id,
-                  variantId,
-                  reactionId: reaction.id,
-                  action,
-                  delayMs
-                })
-              }
-            }
+          if (child.type === 'INSTANCE') {
+            const main = instanceMainComponent(graph, child)
+            if (main) collect(child, main.id, main.prototypeReactions)
+          } else {
+            // A plain copy inherits its main layer's After delay; the resolver reads each
+            // instance's copy map once, so arming costs one search per instance, not per copy.
+            const source = sourceOf(child)
+            if (source && source.id !== child.id)
+              collect(child, source.id, source.prototypeReactions)
           }
           visit(child.id)
         }

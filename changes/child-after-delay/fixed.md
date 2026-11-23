@@ -1,0 +1,1 @@
+- A prototype's After delay on a layer inside a component now runs on its copies inside instances during play, as in Figma.

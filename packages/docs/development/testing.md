@@ -93,9 +93,11 @@ Visual changes require inspection and committed coverage. Update only a justifie
 
 ### When a run disagrees with the code
 
-Two environment faults look exactly like a code regression, and both have cost real debugging time.
+Three environment faults look exactly like a code regression, and all three have cost real debugging time.
 
 Browser suites resolve `@pairdraw/*` through each package's built `dist`, which Vite then pre-bundles. Rebuilding a package does not invalidate that cache, so a Playwright run can execute code from before your change — including throwing on a field you just added. If a browser run contradicts the source you are reading, delete `node_modules/.vite` and run again before believing it.
+
+The `pairdraw-webkit` project needs a WebKit build that Playwright does not fetch with Chromium: a fresh checkout fails every webkit spec with `browserType.launch: Executable doesn't exist at …/ms-playwright/webkit-<build>/pw_run.sh`. Run `bunx playwright install webkit` once per machine; a failure that lists a path under `ms-playwright` is that missing build, not the app. WebKit also boots the CanvasKit app far slower than Chromium, which is why that project carries its own timeout rather than the app default.
 
 Heavy tests, the ones that parse the large fixtures or a populated `gold-preview.fig` more than once, run only with `BUN_HEAVY_TESTS=true`. The unit test runner sets it and gives each heavy file its own Bun process, because one such graph takes gigabytes and a process keeps every graph a test module holds until it exits: a bare `bun test` over `packages/core/tests/io/formats/fig` with heavy tests enabled has reached 37 GB. A bare `bun test` and `test:unit:quick` therefore skip them; `bun run test:unit` runs them, and `bun run test:unit:heavy` or `bun tools/dev/unit-tests/src/run.ts <group> --heavy-only` runs the heavy files alone.
 

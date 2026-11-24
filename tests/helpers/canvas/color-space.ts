@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 import type * as BlendScenes from '#tests/helpers/canvas/blend/scene'
 import type * as MaskScenes from '#tests/helpers/canvas/masks/scene'
@@ -25,11 +25,22 @@ export function wideGamutBanner(page: Page) {
   return page.getByRole('status').filter({ hasText: 'Display-P3' })
 }
 
-/** Keep the wide-gamut notice from resizing the canvas in rendering-fidelity tests. */
+/**
+ * Keep the wide-gamut notice from resizing the canvas in rendering-fidelity tests. A P3 document on
+ * an engine without a float drawing buffer always gets the notice, so wait for it: a best-effort
+ * click leaves the banner's row in place and the snapshot 40 px short.
+ */
 export async function dismissWideGamutBanner(page: Page) {
   const banner = wideGamutBanner(page)
-  await banner.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => undefined)
-  if (await banner.isVisible()) await banner.locator('[data-slot="banner-dismiss"]').click()
+  const canvas = page.getByTestId('scene-canvas-element')
+  const canvasHeight = () => canvas.evaluate((element: HTMLCanvasElement) => element.clientHeight)
+  await banner.waitFor({ state: 'visible', timeout: 30_000 })
+  const before = await canvasHeight()
+  await banner.locator('[data-slot="banner-dismiss"]').click()
+  await banner.waitFor({ state: 'hidden' })
+  // The notice's row goes back to the canvas. A size read that only compares the canvas with
+  // itself can pass on the old height and leave the snapshot that row short.
+  await expect.poll(canvasHeight, { timeout: 30_000 }).toBeGreaterThan(before)
 }
 
 /**

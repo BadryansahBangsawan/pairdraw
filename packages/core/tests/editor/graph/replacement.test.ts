@@ -47,3 +47,30 @@ test('graph replacement drops the old history, so undo never edits the next docu
   expect(editor.undo.redo()).toBeNull()
   expect(editor.graph.getNode('shared:1')?.name).toBe('Next document layer')
 })
+
+/** A graph with one undoable step, held only by its WeakRef once this returns. */
+function replacedGraphWithHistory() {
+  const editor = createEditor()
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const layer = graph.createNode('RECTANGLE', page.id, { id: 'left:1', width: 10, height: 10 })
+  editor.replaceGraph(graph)
+  editor.updateNodeWithUndo(layer.id, { name: 'Renamed' }, 'Rename')
+  return { editor, replaced: new WeakRef(graph) }
+}
+
+test('the history a replaced graph leaves behind does not keep that graph alive', async () => {
+  const { editor, replaced } = replacedGraphWithHistory()
+  editor.replaceGraph(new SceneGraph())
+
+  // A WeakRef's target survives the rest of the current task, and a full-suite run can leave a
+  // stale stack slot for longer, so give GC several event-loop turns. A real strong reference
+  // keeps the graph alive through every one of them.
+  for (let attempt = 0; attempt < 10 && replaced.deref() !== undefined; attempt++) {
+    const { promise, resolve } = Promise.withResolvers<boolean>()
+    setImmediate(() => resolve(true))
+    await promise
+    Bun.gc(true)
+  }
+  expect(replaced.deref()).toBeUndefined()
+})

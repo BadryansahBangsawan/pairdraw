@@ -1,4 +1,6 @@
+import { useDocumentVisibility } from '@vueuse/core'
 import { TimeoutError } from 'es-toolkit/error'
+import { watch, type Ref } from 'vue'
 
 import type { EditorPreparationEventEmitter } from '@/app/editor/preparation/events'
 import type {
@@ -11,6 +13,9 @@ import type {
 import type { AppEditorState } from '@/app/editor/session/types'
 
 const PRESENTATION_TIMEOUT_MS = 10_000
+
+/** Whether the browser shows the page, for every editor; a hidden tab draws no frames. */
+const documentVisibility = useDocumentVisibility()
 
 interface PresentationWaiter {
   sceneVersion: number
@@ -26,6 +31,8 @@ interface PresentationWaiter {
 
 export interface EditorPreparationControllerOptions {
   presentationTimeoutMs?: number
+  /** Whether the browser shows the page; the document's own by default. */
+  visibility?: Readonly<Ref<DocumentVisibilityState>>
 }
 
 export interface EditorPreparationController {
@@ -59,6 +66,16 @@ export function createEditorPreparationController(
   let canvases = 0
   let canvasFailure: Error | null = null
   const presentationWaiters = new Map<number, PresentationWaiter>()
+  // A hidden tab draws no frames, so presents nothing: the limit runs only while it is shown.
+  const visibility = options.visibility ?? documentVisibility
+  const timing = () => canvases > 0 && visibility.value !== 'hidden'
+  const stopVisibility = watch(visibility, () => {
+    for (const [id, waiter] of presentationWaiters) {
+      // A scene no canvas shows still stops waiting after its limit, whatever the tab shows.
+      if (canvases === 0 || timing()) startTimer(id, waiter)
+      else pauseTimer(waiter)
+    }
+  })
 
   function settle(id: number, outcome: Error | null) {
     const waiter = presentationWaiters.get(id)
@@ -185,14 +202,18 @@ export function createEditorPreparationController(
           remainingMs: presentationTimeoutMs
         }
         presentationWaiters.set(id, waiter)
-        if (canvases === 0 && canvasFailure) settle(id, canvasFailure)
+        // A failed canvas fails the wait only when no other canvas can present the scene; a
+        // scene nothing draws stops waiting quietly after the limit.
+        if (canvases > 0) {
+          if (timing()) startTimer(id, waiter)
+        } else if (canvasFailure) settle(id, canvasFailure)
         else startTimer(id, waiter)
       })
     },
     attachCanvas() {
       canvases += 1
       canvasFailure = null
-      for (const [id, waiter] of presentationWaiters) startTimer(id, waiter)
+      if (timing()) for (const [id, waiter] of presentationWaiters) startTimer(id, waiter)
       let attached = true
       return () => {
         if (!attached) return
@@ -212,6 +233,7 @@ export function createEditorPreparationController(
       for (const id of presentationWaiters.keys()) settle(id, error)
     },
     dispose() {
+      stopVisibility()
       activeCancel?.('tab-closed')
       activeAbort?.abort()
       activeAbort = null

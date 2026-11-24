@@ -3,9 +3,9 @@ import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
 import { fontManager } from '@pairdraw/core/text'
 import { browserHTMLToDesignDocument, resolveFontFamilyStack } from '@pairdraw/dom-css/browser'
 import { DEFAULT_FONT_FAMILY } from '@pairdraw/scene-graph/constants'
+import { nextFrame } from '@pairdraw/vue/shared/frame'
 
 import { describeDiagnosticError, recordDocumentFailure } from '@/app/diagnostics'
-import { yieldToUI } from '@/app/document/io/browser'
 import { applyImportedDocument } from '@/app/document/io/imported-document'
 import type { EditorPreparationController } from '@/app/editor/preparation/controller'
 import type { EditorPreparationHandle } from '@/app/editor/preparation/types'
@@ -25,7 +25,7 @@ type OpenDOMFileOptions = {
     handle?: FileSystemFileHandle,
     path?: string
   ) => void
-  fitCurrentPageToViewport: () => Promise<void>
+  fitCurrentPageToViewport: (signal?: AbortSignal) => Promise<void>
   preparationController: EditorPreparationController
 }
 
@@ -71,7 +71,7 @@ export function createDOMOpenActions({
     options: DOMTextImportOptions,
     load: ReturnType<EditorPreparationController['begin']>
   ) {
-    await yieldToUI()
+    await nextFrame()
     const pageName = options.documentName ?? 'DOM Import'
     load.update({ phase: 'decoding', detail: pageName })
     const styled = await browserHTMLToDesignDocument(html, {
@@ -83,10 +83,12 @@ export function createDOMOpenActions({
       pageName,
       resolveFontFamily: resolveImportedFontFamily
     })
-    await yieldToUI()
+    await nextFrame()
     await applyImportedDocument(editor, graph, load)
     state.documentName = pageName
-    await fitCurrentPageToViewport()
+    // A later open supersedes this one while it waits for a hidden tab to be shown.
+    await fitCurrentPageToViewport(load.signal)
+    load.signal.throwIfAborted()
     editor.requestRender()
     return pageName
   }

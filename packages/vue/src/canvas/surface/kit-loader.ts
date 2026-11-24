@@ -4,6 +4,8 @@ import type { Ref } from 'vue'
 
 import { getCanvasKit } from '@pairdraw/core/canvaskit'
 
+import { nextFrame } from '#vue/shared/frame'
+
 type CanvasKitLoaderOptions = {
   canvasRef: Ref<HTMLCanvasElement | null>
   lifecycle: { destroyed: boolean }
@@ -46,9 +48,7 @@ export function useCanvasKitLoader({
     setCanvasKit(await loadCanvasKit())
     if (!stillCurrent()) return
 
-    await new Promise((resolve) => {
-      requestAnimationFrame(resolve)
-    })
+    await nextFrame()
     if (!stillCurrent()) return
     if (!createSurface(canvas)) throw new Error('WebGL is unavailable, so the canvas cannot draw')
     await loadFonts()

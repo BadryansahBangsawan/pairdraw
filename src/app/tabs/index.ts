@@ -4,6 +4,7 @@ import { shallowRef, computed, triggerRef } from 'vue'
 import { createDocumentGraph } from '@pairdraw/core'
 import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
 import type { DocumentKind, SceneGraph } from '@pairdraw/scene-graph'
+import { nextFrame } from '@pairdraw/vue/shared/frame'
 
 import { setPairdrawStore } from '@/app/browser/bridge'
 import { describeDiagnosticError, recordStorageFailure } from '@/app/diagnostics'
@@ -314,12 +315,6 @@ function removeTab(closingTab: Tab): void {
   }
 }
 
-function yieldToUI(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => resolve())
-  })
-}
-
 function isDOMImportFile(file: File): boolean {
   return /\.(html?|xhtml)$/i.test(file.name)
 }
@@ -389,7 +384,7 @@ async function showImportedGraph(
   await store.switchPage(pageId, { preparation: load, awaitPresentation: false })
   load?.signal.throwIfAborted()
   load?.update({ phase: 'preparing-render', detail: store.state.documentName })
-  await store.fitCurrentPageToViewport()
+  await store.fitCurrentPageToViewport(load?.signal)
 }
 
 function findStorageTab(target: StorageDocumentBinding): Tab | undefined {
@@ -580,7 +575,7 @@ export async function openFileInNewTab(
       return store
     }
 
-    await yieldToUI()
+    await nextFrame()
     load.update({ phase: 'reading', detail: file.name })
     const isFig = isFigArchiveName(file.name)
     let imported: SceneGraph

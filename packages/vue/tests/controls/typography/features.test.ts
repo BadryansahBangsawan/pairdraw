@@ -35,11 +35,17 @@ function setup(family = 'Inter') {
   return { editor, text, features }
 }
 
-test('the panel offers the features the selected font actually has', () => {
+test('the common switches come first, then the features the selected font has', () => {
   const { features } = setup()
   const tags = features.available.value.map((feature) => feature.tag)
+  // Figma's common switches stay offered for any font, Inter's missing LIGA included.
+  expect(tags.slice(0, 3)).toEqual(['LIGA', 'CALT', 'KERN'])
+  expect(features.available.value.filter((feature) => feature.standard).map((f) => f.tag)).toEqual([
+    'LIGA',
+    'CALT',
+    'KERN'
+  ])
   // Inter's GSUB: contextual alternates, tabular figures, stylistic sets, slashed zero.
-  expect(tags).toContain('CALT')
   expect(tags).toContain('TNUM')
   expect(tags).toContain('SS01')
   expect(tags).toContain('ZERO')
@@ -47,9 +53,19 @@ test('the panel offers the features the selected font actually has', () => {
   expect(tags).not.toContain('SMCP')
 })
 
-test('a font that is not loaded offers no features yet', () => {
-  const { features } = setup('Never Loaded Family')
-  expect(features.available.value).toEqual([])
+test('a font that is still loading offers the common switches, then its own features', async () => {
+  const { features } = setup('Late Family')
+  expect(features.available.value.map((feature) => feature.tag)).toEqual(['LIGA', 'CALT', 'KERN'])
+  const data = await fontManager.fetchBundledFont('/InterVariable.ttf')
+  if (!data) throw new Error('bundled Inter missing')
+  await fontManager.markLoaded('Late Family', 'Regular', data)
+  // A face arriving by any path, the renderer included, re-reads the list.
+  expect(features.available.value.map((feature) => feature.tag)).toContain('TNUM')
+  expect(features.available.value.map((feature) => feature.tag).slice(0, 3)).toEqual([
+    'LIGA',
+    'CALT',
+    'KERN'
+  ])
 })
 
 test('a feature reads its state, defaulting on when the text has not set it', () => {

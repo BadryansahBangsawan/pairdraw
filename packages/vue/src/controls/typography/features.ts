@@ -10,7 +10,12 @@ import { MIXED, type MixedValue } from '#vue/controls/node-props/use'
 /** One OpenType feature the selected text's font has, as the panel's switch list offers it. */
 export interface TypographyFeature {
   tag: string
+  /** One of the switches Figma always offers, whether or not the font lists the tag. */
+  standard: boolean
 }
+
+/** The common switches Figma always shows for text; the font's own features follow them. */
+export const STANDARD_FEATURES = ['LIGA', 'CALT', 'KERN'] as const
 
 /** The features a font has, in a stable order: the common controls first, then the font's own. */
 const COMMON_ORDER = [
@@ -72,6 +77,12 @@ export function createTypographyFeatures(editor: Editor, nodes: ComputedRef<Scen
       request(families.value)
     })
   )
+  // Faces may also arrive by the renderer, a paste or a script: the list follows any of them.
+  onScopeDispose(
+    fontManager.onFaceLoaded((family) => {
+      if (families.value.includes(family)) arrived.value++
+    })
+  )
 
   const available = computed<TypographyFeature[]>(() => {
     void arrived.value
@@ -80,13 +91,26 @@ export function createTypographyFeatures(editor: Editor, nodes: ComputedRef<Scen
     let shared: string[] | null = null
     for (const family of families.value) {
       const tags = fontManager.familyFeatures(family)
-      // A family whose font is not loaded yet offers nothing; the list returns when it arrives.
-      if (tags === undefined || tags === null) return []
+      // Until a family's font is loaded its features are unknown: the common switches stay, and
+      // the font's own join them once it arrives.
+      if (tags === undefined || tags === null) {
+        return STANDARD_FEATURES.map((tag) => ({ tag, standard: true }))
+      }
       shared = shared === null ? tags : shared.filter((tag) => tags.includes(tag))
     }
-    return (shared ?? [])
-      .map((tag) => ({ tag }))
-      .sort((a, b) => featureOrder(a.tag) - featureOrder(b.tag) || a.tag.localeCompare(b.tag))
+    // The common switches stay offered beside the font's own, as Figma keeps them for any font.
+    const tags = uniq([...STANDARD_FEATURES, ...(shared ?? [])])
+    return tags
+      .map((tag) => ({
+        tag,
+        standard: (STANDARD_FEATURES as readonly string[]).includes(tag)
+      }))
+      .sort(
+        (a, b) =>
+          Number(b.standard) - Number(a.standard) ||
+          featureOrder(a.tag) - featureOrder(b.tag) ||
+          a.tag.localeCompare(b.tag)
+      )
   })
 
   /** Whether a feature is on for every selected text, MIXED when they differ; unset reads on. */

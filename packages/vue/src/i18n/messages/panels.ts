@@ -248,6 +248,7 @@ export const panelMessageDefaults = {
   paragraphIndent: 'Paragraph indent',
   hangingLists: 'Hanging lists',
   openTypeFeatures: 'Font features',
+  moreFontFeatures: 'More font features',
   standardLigatures: 'Standard ligatures',
   contextualAlternates: 'Contextual alternates',
   kerning: 'Kerning',

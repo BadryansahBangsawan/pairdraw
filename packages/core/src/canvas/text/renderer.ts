@@ -1,6 +1,6 @@
 import type { CanvasKit, TypefaceFontProvider } from 'canvaskit-wasm'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { ColorProfile, SceneNode } from '@pairdraw/scene-graph'
 
 import type { FontResolutionSettled } from '#core/text/resolver'
 
@@ -19,6 +19,7 @@ export interface FontReadinessRenderer {
 
 export interface TextRenderer extends FontReadinessRenderer {
   ck: CanvasKit
+  documentColorSpace?: ColorProfile
   fontProvider: TypefaceFontProvider | null
   fontsLoaded: boolean
 }

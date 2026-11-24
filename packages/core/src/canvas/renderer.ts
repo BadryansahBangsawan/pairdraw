@@ -1,8 +1,13 @@
 import { isEqual } from 'es-toolkit'
 import { toUint8Array } from 'js-base64'
 
-import type { SceneNode, SceneGraph, Fill, Stroke } from '@pairdraw/scene-graph'
-import type { RenderColorSpace, ResolvedRenderColor } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, SceneNode, SceneGraph, Fill, Stroke } from '@pairdraw/scene-graph'
+import {
+  normalizeColor,
+  toExtendedSRGB,
+  type RenderColorSpace,
+  type ResolvedRenderColor
+} from '@pairdraw/scene-graph/color'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
@@ -35,6 +40,7 @@ import { LabelParagraphCache } from './labels/paragraph-cache'
 import { labelHitOptions } from './labels/style'
 import { NodePathCaches } from './paths/cache'
 import * as RenderColors from './renderer/colors'
+import { releaseDocumentSurface, type DocumentSurface } from './renderer/document-surface'
 import * as RendererFonts from './renderer/fonts'
 import { destroyRenderer, releaseLiveImages } from './renderer/lifecycle'
 import { installRendererDomainMethods, type RendererDomainMethods } from './renderer/methods'
@@ -226,8 +232,15 @@ export class SkiaRenderer {
   /** What an empty connector label shows while it is typed into; null draws nothing. */
   connectorLabelPlaceholder: string | null = null
   tracksSceneSettlement = true
-  /** Colour space this renderer's surface presents; colours convert into it when painting. */
+  /** Colour space this renderer's surface presents; colours convert into it when panting chrome. */
   presentationColorSpace: RenderColorSpace = 'srgb'
+  /**
+   * The color profile of the document being drawn: surfaces it is drawn on hold its colors in it,
+   * and its blend modes work in it.
+   */
+  documentColorSpace: ColorProfile = 'srgb'
+  /** A surface in the document's profile the size of the screen's, while the two differ. */
+  documentSurface: DocumentSurface | null = null
   tiledScenePending = false
   tiledSceneCovered = false
   lastSceneViewport: { panX: number; panY: number; zoom: number } | null = null
@@ -514,6 +527,7 @@ export class SkiaRenderer {
   }
 
   replaceSurface(surface: Surface): void {
+    releaseDocumentSurface(this)
     this.tiledScene.destroy()
     // Live textures belong to the old surface's context, so they go before it does.
     releaseLiveImages(this)
@@ -753,7 +767,7 @@ export class SkiaRenderer {
   }
 
   resolveFillColor(fill: Fill, fillIndex: number, node: SceneNode, graph: SceneGraph): Color {
-    return RenderColors.resolveFillColor(fill, fillIndex, node, graph, this.presentationColorSpace)
+    return RenderColors.resolveFillColor(fill, fillIndex, node, graph)
   }
 
   resolveStrokeColorInfo(
@@ -777,13 +791,21 @@ export class SkiaRenderer {
     node: SceneNode,
     graph: SceneGraph
   ): Color {
-    return RenderColors.resolveStrokeColor(
-      stroke,
-      strokeIndex,
-      node,
-      graph,
-      this.presentationColorSpace
-    )
+    return RenderColors.resolveStrokeColor(stroke, strokeIndex, node, graph)
+  }
+
+  /**
+   * A color stored in the document, such as an effect's, as Skia is given it: in extended sRGB,
+   * which Skia converts into the document's space of the surfaces the document is drawn on.
+   */
+  renderColor(color: Color): Color {
+    return toExtendedSRGB(normalizeColor(color), this.documentColorSpace)
+  }
+
+  /** Draws on surfaces in `space` from now on. */
+  useDocumentColorSpace(space: ColorProfile): void {
+    if (this.documentColorSpace === space) return
+    this.documentColorSpace = space
   }
 
   screenToCanvas(sx: number, sy: number): Vector {

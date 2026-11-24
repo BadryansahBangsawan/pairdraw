@@ -1,5 +1,6 @@
 export * from './contrast'
 export * from './management'
+export * from './profile'
 export { normalizeColor } from './normalize'
 export * from './okhcl'
 export { colorSchema } from './schema'

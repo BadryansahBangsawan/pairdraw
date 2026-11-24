@@ -95,7 +95,7 @@ export function noiseFilter(filter: FilterBuilder, effect: NoiseEffect, input: s
     filter.push('feComposite', { in: band, in2: input, operator: 'in', result: clipped })
     const flood = filter.result('noiseFlood')
     filter.push('feFlood', {
-      'flood-color': floodColor(color, filter.colorSpace),
+      'flood-color': floodColor(color, filter.colorSpace, filter.documentColorSpace),
       'flood-opacity': round(color.a),
       result: flood
     })

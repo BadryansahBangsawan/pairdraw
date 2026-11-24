@@ -42,6 +42,7 @@ export const vectorElement = (
   const idPrefix = `${idPart(node.id)}-`
   const icon = readIcon(node)
   const drawn = renderNodeSVGElement(graph, node, {
+    documentColorSpace: graph.documentColorSpace,
     idPrefix,
     colorSpace: graph.documentColorSpace,
     tint: icon ? readIconTint : undefined,

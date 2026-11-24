@@ -7,6 +7,7 @@ import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { UndoManager } from '@pairdraw/scene-graph/undo'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
+import { documentImageInfo, skColorSpace } from '#core/canvas/renderer/colors'
 import { getPageColor } from '#core/figma-api/page-backgrounds'
 
 /** Which paint of the selection a sampled colour replaces. Alt samples into the stroke. */
@@ -14,7 +15,12 @@ export type EyedropperTarget = 'fill' | 'stroke'
 
 type SampleRenderer = Pick<
   SkiaRenderer,
-  'worldViewport' | 'viewportImageRendering' | 'presentationColorSpace' | 'renderNode'
+  | 'worldViewport'
+  | 'viewportImageRendering'
+  | 'presentationColorSpace'
+  | 'documentColorSpace'
+  | 'surface'
+  | 'renderNode'
 >
 
 /** A square of the document's pixels: RGBA rows, `size` pixels a side, the centre one sampled. */
@@ -47,11 +53,13 @@ export function sampleScenePixels(
   if (!Number.isInteger(size) || size < 1 || size % 2 === 0 || !(scale > 0)) return null
   const page = graph.getNode(pageId)
   if (!page) return null
-  const surface = ck.MakeSurface(size, size)
-  if (!surface) return null
+  const surface = renderer.surface.makeSurface(
+    documentImageInfo(ck, graph.documentColorSpace, size, size)
+  )
   const previousViewport = renderer.worldViewport
   const previousImageRendering = renderer.viewportImageRendering
   const previousColorSpace = renderer.presentationColorSpace
+  const previousDocumentColorSpace = renderer.documentColorSpace
   try {
     const canvas = surface.getCanvas()
     const background = getPageColor(page)
@@ -65,6 +73,7 @@ export function sampleScenePixels(
     renderer.worldViewport = { x: x - reach, y: y - reach, w: reach * 2, h: reach * 2 }
     renderer.viewportImageRendering = false
     renderer.presentationColorSpace = graph.documentColorSpace
+    renderer.documentColorSpace = graph.documentColorSpace
     for (const childId of page.childIds) renderer.renderNode(canvas, graph, childId, {})
     surface.flush()
     const data = canvas.readPixels(0, 0, {
@@ -72,7 +81,7 @@ export function sampleScenePixels(
       height: size,
       alphaType: ck.AlphaType.Unpremul,
       colorType: ck.ColorType.RGBA_8888,
-      colorSpace: ck.ColorSpace.SRGB
+      colorSpace: skColorSpace(ck, renderer.documentColorSpace)
     })
     if (!(data instanceof Uint8Array) || data.length < size * size * 4) return null
     return { size, data }
@@ -80,6 +89,7 @@ export function sampleScenePixels(
     renderer.worldViewport = previousViewport
     renderer.viewportImageRendering = previousImageRendering
     renderer.presentationColorSpace = previousColorSpace
+    renderer.documentColorSpace = previousDocumentColorSpace
     surface.dispose()
   }
 }

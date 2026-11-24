@@ -50,6 +50,7 @@ function preparePage(
 ): PreparedPage | null {
   const svg = renderNodesToSVG(graph, spec.pageId, spec.nodeIds, {
     xmlDeclaration: false,
+    documentColorSpace: graph.documentColorSpace,
     ...svgOptions
   })
   if (!svg) return null

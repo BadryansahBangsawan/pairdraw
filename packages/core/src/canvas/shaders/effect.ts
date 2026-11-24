@@ -11,6 +11,7 @@ import type { SceneGraph, SceneNode, ShaderEffect } from '@pairdraw/scene-graph'
 
 import { setPaintBlendMode } from '#core/canvas/blend'
 import type { SkiaRenderer } from '#core/canvas/renderer'
+import { skColorSpace } from '#core/canvas/renderer/colors'
 
 import { boundUniformValues } from './bindings'
 import { compileShader, packShaderUniforms, type CompiledShader, type ShaderFrame } from './compile'
@@ -119,7 +120,7 @@ export function drawShaderEffectLayer(
       height,
       colorType: r.ck.ColorType.RGBA_8888,
       alphaType: r.ck.AlphaType.Premul,
-      colorSpace: r.ck.ColorSpace.SRGB
+      colorSpace: skColorSpace(r.ck, r.documentColorSpace)
     })
     const offscreen = surface.getCanvas()
     offscreen.clear(r.ck.TRANSPARENT)

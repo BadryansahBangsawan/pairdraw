@@ -1,3 +1,11 @@
+import type {
+  ColorProfile,
+  Fill,
+  SceneGraph,
+  SceneNode,
+  Stroke,
+  VectorNetwork
+} from '@pairdraw/scene-graph'
 import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
 
 import { normalizeDashPattern } from '#core/canvas/strokes'
@@ -29,7 +37,6 @@ import {
 
 export { geometryBlobToSVGPath, nodeOutlinePath, type OutlineNode } from './paths'
 
-import type { SceneGraph, SceneNode, Fill, Stroke, VectorNetwork } from '@pairdraw/scene-graph'
 import { looseSegments, regionSVGPaths } from '@pairdraw/scene-graph/vector-network'
 
 import type { BooleanPathResolver } from '#core/io/formats/boolean-path'
@@ -373,8 +380,9 @@ function buildSVGStrokeAttrs(
     // viewer multiplies it by stroke-opacity; the canvas paints stroke.opacity alone.
     stroke:
       stroke.type === 'SOLID'
-        ? formatSolidColor(stroke.color, 1, ctx.colorSpace)
-        : (resolveFill(stroke, node, ctx) ?? formatSolidColor(stroke.color, 1, ctx.colorSpace)),
+        ? formatSolidColor(stroke.color, 1, ctx.colorSpace, ctx.documentColorSpace)
+        : (resolveFill(stroke, node, ctx) ??
+          formatSolidColor(stroke.color, 1, ctx.colorSpace, ctx.documentColorSpace)),
     'stroke-width': round(stroke.weight)
   }
   if (stroke.opacity < 1) attrs['stroke-opacity'] = round(stroke.opacity)
@@ -770,6 +778,8 @@ export interface SVGExportOptions {
   xmlDeclaration?: boolean
   /** Target export color space (default: srgb) */
   colorSpace?: 'srgb' | 'display-p3'
+  /** The document's color profile; colors stored in it convert into `colorSpace`. */
+  documentColorSpace?: ColorProfile
   /**
    * Line breaks of text nodes as the editor laid them out, wraps included. Without them, only
    * explicit newlines start a new baseline, which renderers that do not wrap SVG text keep.
@@ -805,6 +815,7 @@ export function renderNodesToSVG(
     defIdCounter: 0,
     graph,
     colorSpace: options.colorSpace ?? 'srgb',
+    documentColorSpace: options.documentColorSpace ?? graph.documentColorSpace,
     textLayout: options.textLayout,
     fontAlias: options.fontAlias,
     booleanPath: options.booleanPath
@@ -863,11 +874,13 @@ export function renderNodeSVGElement(
   {
     idPrefix,
     colorSpace = 'srgb',
+    documentColorSpace,
     tint,
     booleanPath
   }: Pick<SVGExportContext, 'tint' | 'booleanPath'> & {
     idPrefix: string
     colorSpace?: RenderColorSpace
+    documentColorSpace?: ColorProfile
   }
 ): SVGNode | null {
   const ctx: SVGExportContext = {
@@ -875,6 +888,7 @@ export function renderNodeSVGElement(
     defIdCounter: 0,
     graph,
     colorSpace,
+    documentColorSpace: documentColorSpace ?? graph.documentColorSpace,
     idPrefix,
     tint,
     booleanPath

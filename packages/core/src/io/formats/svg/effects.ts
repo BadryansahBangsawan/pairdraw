@@ -61,7 +61,7 @@ export function createFilterDef(
         dx: round(effect.offset.x),
         dy: round(effect.offset.y),
         stdDeviation: round(effect.radius / 2),
-        'flood-color': floodColor(effect.color, ctx.colorSpace),
+        'flood-color': floodColor(effect.color, ctx.colorSpace, ctx.documentColorSpace),
         'flood-opacity': round(effect.color.a),
         result: dropped
       })
@@ -87,7 +87,7 @@ export function createFilterDef(
       })
       filter.push('feComposite', { in: shape, in2: offset, operator: 'out', result: inverted })
       filter.push('feFlood', {
-        'flood-color': floodColor(effect.color, ctx.colorSpace),
+        'flood-color': floodColor(effect.color, ctx.colorSpace, ctx.documentColorSpace),
         'flood-opacity': round(effect.color.a),
         result: shadow
       })

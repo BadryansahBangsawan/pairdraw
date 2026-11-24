@@ -1,47 +1,87 @@
-import type { Fill, SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import type { CanvasKit, ColorSpace, ColorType, ImageInfo } from 'canvaskit-wasm'
+
+import type { ColorProfile, Fill, SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import {
-  resolveNodeFillColor,
-  resolveNodeStrokeColor,
-  resolveRGBAForPreview,
-  type RenderColorSpace,
-  type ResolvedRenderColor,
+  colorToProfileCSS,
   normalizeColor,
-  getFillOkHCL,
-  getStrokeOkHCL
+  resolveRGBAForPreview,
+  toExtendedSRGB,
+  type RenderColorSpace,
+  type ResolvedRenderColor
 } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { paintColorApplied } from '@pairdraw/scene-graph/variables'
 
+/** Skia's color space for a document's. */
+export function skColorSpace(ck: CanvasKit, space: ColorProfile): ColorSpace {
+  return space === 'display-p3' ? ck.ColorSpace.DISPLAY_P3 : ck.ColorSpace.SRGB
+}
+
 /**
- * A bound paint draws the color it stores once the graph has applied or recorded one for it, as
- * Figma draws its cache; OkHCL data kept from before it was bound no longer describes it. A
- * binding with no applied color, as a layer just imported or built with its bindings has, draws
- * its variable's color for the layer until a write or refresh records one.
+ * A premultiplied surface `width` by `height` in `profile`, as a document is drawn on: its colors
+ * and blend modes work in its own profile there, as on the screen and in Figma's export.
  */
-function boundDrawnColor(
+export function documentImageInfo(
+  ck: CanvasKit,
+  profile: ColorProfile,
+  width: number,
+  height: number,
+  colorType: ColorType = ck.ColorType.RGBA_8888
+): ImageInfo {
+  return {
+    width,
+    height,
+    colorType,
+    alphaType: ck.AlphaType.Premul,
+    colorSpace: skColorSpace(ck, profile)
+  }
+}
+
+/**
+ * A stored color, such as a paint's or a gradient stop's, as Skia is given it: its components, in
+ * the document's profile, as extended sRGB, which Skia converts into the document's space of the
+ * surfaces it draws on. The stored color is what draws, as in Figma; an OkHCL value kept for
+ * editing only describes it.
+ */
+export function drawnColor(color: Color, graph: SceneGraph): Color {
+  return toExtendedSRGB(normalizeColor(color), graph.documentColorSpace)
+}
+
+/**
+ * The color a paint draws: the color it stores, or before a write or refresh records one, the
+ * variable color a binding resolves to for the layer. OkHCL data kept from before the paint was
+ * bound no longer describes it.
+ */
+function storedColor(
   node: SceneNode,
   list: 'fills' | 'strokes',
   index: number,
   graph: SceneGraph,
-  presentation: RenderColorSpace
-): ResolvedRenderColor | undefined {
+  fallback: Color
+): Color {
   const field = `${list}/${index}/color`
   const variableId = node.boundVariables[field]
-  if (!variableId) return undefined
-  if (paintColorApplied(node, field)) return undefined
-  const resolved = graph.resolveColorVariableForNode(node.id, variableId)
-  if (!resolved) return undefined
-  return {
-    ...resolveRGBAForPreview(resolved, {
-      documentColorSpace: graph.documentColorSpace,
-      colorSpace: presentation
-    }),
-    cssColor: ''
+  if (variableId && !paintColorApplied(node, field)) {
+    const resolved = graph.resolveColorVariableForNode(node.id, variableId)
+    if (resolved) return resolved
   }
+  return normalizeColor(fallback)
 }
 
-function isBound(node: SceneNode, list: 'fills' | 'strokes', index: number): boolean {
-  return `${list}/${index}/color` in node.boundVariables
+function colorInfo(
+  color: Color,
+  graph: SceneGraph,
+  presentation: RenderColorSpace
+): ResolvedRenderColor {
+  const preview = resolveRGBAForPreview(color, {
+    documentColorSpace: graph.documentColorSpace,
+    colorSpace: presentation
+  })
+  return {
+    ...preview,
+    color: drawnColor(color, graph),
+    cssColor: colorToProfileCSS(color, graph.documentColorSpace, presentation)
+  }
 }
 
 export function resolveFillColorInfo(
@@ -51,25 +91,16 @@ export function resolveFillColorInfo(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): ResolvedRenderColor {
-  const options = { documentColorSpace: graph.documentColorSpace, colorSpace: presentation }
-  const drawn = boundDrawnColor(node, 'fills', fillIndex, graph, presentation)
-  if (drawn) return drawn
-  if (isBound(node, 'fills', fillIndex)) return resolveRGBAForPreview(fill.color, options)
-  return resolveNodeFillColor(fill, fillIndex, node, options)
+  return colorInfo(storedColor(node, 'fills', fillIndex, graph, fill.color), graph, presentation)
 }
 
 export function resolveFillColor(
   fill: Fill,
   fillIndex: number,
   node: SceneNode,
-  graph: SceneGraph,
-  presentation: RenderColorSpace
+  graph: SceneGraph
 ): Color {
-  const drawn = boundDrawnColor(node, 'fills', fillIndex, graph, presentation)
-  if (drawn) return drawn.color
-  if (isBound(node, 'fills', fillIndex) || !getFillOkHCL(node, fillIndex))
-    return normalizeColor(fill.color)
-  return resolveFillColorInfo(fill, fillIndex, node, graph, presentation).color
+  return drawnColor(storedColor(node, 'fills', fillIndex, graph, fill.color), graph)
 }
 
 export function resolveStrokeColorInfo(
@@ -79,23 +110,18 @@ export function resolveStrokeColorInfo(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): ResolvedRenderColor {
-  const options = { documentColorSpace: graph.documentColorSpace, colorSpace: presentation }
-  const drawn = boundDrawnColor(node, 'strokes', strokeIndex, graph, presentation)
-  if (drawn) return drawn
-  if (isBound(node, 'strokes', strokeIndex)) return resolveRGBAForPreview(stroke.color, options)
-  return resolveNodeStrokeColor(stroke, strokeIndex, node, options)
+  return colorInfo(
+    storedColor(node, 'strokes', strokeIndex, graph, stroke.color),
+    graph,
+    presentation
+  )
 }
 
 export function resolveStrokeColor(
   stroke: Stroke,
   strokeIndex: number,
   node: SceneNode,
-  graph: SceneGraph,
-  presentation: RenderColorSpace
+  graph: SceneGraph
 ): Color {
-  const drawn = boundDrawnColor(node, 'strokes', strokeIndex, graph, presentation)
-  if (drawn) return drawn.color
-  if (isBound(node, 'strokes', strokeIndex) || !getStrokeOkHCL(node, strokeIndex))
-    return normalizeColor(stroke.color)
-  return resolveStrokeColorInfo(stroke, strokeIndex, node, graph, presentation).color
+  return drawnColor(storedColor(node, 'strokes', strokeIndex, graph, stroke.color), graph)
 }

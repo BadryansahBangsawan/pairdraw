@@ -1,4 +1,4 @@
-import type { Canvas } from 'canvaskit-wasm'
+import type { Canvas, Surface } from 'canvaskit-wasm'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
@@ -12,6 +12,7 @@ import type { EditorState } from '#core/editor/types'
 import { resolveEditorProfile } from '#core/editor/views/profile'
 import { emitNavigationTrace } from '#core/profiler'
 
+import { documentSurfaceFor, presentDocumentSurface } from './document-surface'
 import { drawChromePass, drawLabelPass, drawOverlayPass } from './overlay-pass'
 import { renderSceneBacking, updateSceneBackingPreviewState } from './retained-backing'
 import { hasTransientPreviews, renderPageWithPreviews } from './transient-previews'
@@ -264,6 +265,17 @@ function drawAboveScene(
   canvas.restore()
 }
 
+/** The canvas the scene draws on this frame, and the surface it presents through when it differs. */
+function sceneSurfaceFor(
+  r: SkiaRenderer,
+  layer: RenderLayer
+): { canvas: Canvas; documentSurface: Surface | null; screen: Canvas } {
+  const screen = r.surface.getCanvas()
+  if (layer === 'overlays') return { canvas: screen, documentSurface: null, screen }
+  const documentSurface = documentSurfaceFor(r)
+  return { canvas: documentSurface?.getCanvas() ?? screen, documentSurface, screen }
+}
+
 export function render(
   r: SkiaRenderer,
   graph: SceneGraph,
@@ -290,7 +302,8 @@ export function render(
 
   graph.clearAbsPosCache()
 
-  const canvas = r.surface.getCanvas()
+  r.useDocumentColorSpace(graph.documentColorSpace)
+  const { canvas, documentSurface, screen } = sceneSurfaceFor(r, layer)
   if (layer === 'overlays') {
     canvas.clear(r.ck.Color4f(0, 0, 0, 0))
   } else {
@@ -373,7 +386,12 @@ export function render(
     canvas.restore()
   }
 
-  if (layer !== 'scene') drawAboveScene(r, canvas, graph, selectedIds, overlays, sceneVersion)
+  if (documentSurface) {
+    documentSurface.flush()
+    presentDocumentSurface(screen, documentSurface)
+  }
+
+  if (layer !== 'scene') drawAboveScene(r, screen, graph, selectedIds, overlays, sceneVersion)
 
   p.beginPhase('render:flush')
   const { duration: flushDuration } = measure(() => r.surface.flush())

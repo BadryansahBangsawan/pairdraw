@@ -9,8 +9,8 @@ import type {
   TextHeightBehavior
 } from 'canvaskit-wasm'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
-import { resolveRGBAForPreview } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, SceneNode } from '@pairdraw/scene-graph'
+import { normalizeColor, toExtendedSRGB } from '@pairdraw/scene-graph/color'
 import { faceStyleKey, type NamedFace } from '@pairdraw/scene-graph/font-style'
 import { rangeFontStyle } from '@pairdraw/scene-graph/shared-styles'
 import { lineHeightPixels, textLengthPixels } from '@pairdraw/scene-graph/text'
@@ -152,12 +152,22 @@ function drawnFontStyle(
 export function styleRunColor(
   ck: CanvasKit,
   style: SceneNode['styleRuns'][number]['style'],
-  baseColor: Float32Array
+  baseColor: Float32Array,
+  space: ColorProfile
 ): Float32Array {
   const visibleFill = style.fills?.find((fill) => fill.visible && fill.type === 'SOLID')
   if (!visibleFill) return baseColor
-  const color = resolveRGBAForPreview(visibleFill.color).color
+  const color = toExtendedSRGB(normalizeColor(visibleFill.color), space)
   return ck.Color4f(color.r, color.g, color.b, color.a * visibleFill.opacity)
+}
+
+/**
+ * A text style's color. CanvasKit keeps `color` in 8-bit sRGB, which clips a wide-gamut color, and
+ * draws `foregroundColor` with float components, so both carry it; a pushed foreground paint, as a
+ * gradient fill draws with, still takes their place.
+ */
+function textColor(color: Float32Array) {
+  return { color, foregroundColor: color }
 }
 
 function styleRunLanguage(
@@ -197,7 +207,7 @@ function pushStyleRun(
   const runKey = faceStyleKey(runFace)
 
   const textStyle = new ck.TextStyle({
-    color: styleRunColor(ck, style, baseColor),
+    ...textColor(styleRunColor(ck, style, baseColor, r.documentColorSpace ?? 'srgb')),
     fontFamilies: fontFamilies(runFamily, runFace),
     fontSize: runFontSize,
     locale: styleRunLanguage(style, node),
@@ -310,7 +320,7 @@ export function buildSkParagraph(
   const nodeKey = faceStyleKey(node)
 
   const baseTextStyle = {
-    color: baseColor,
+    ...textColor(baseColor),
     fontFamilies: fontFamilies(node.fontFamily || DEFAULT_FONT_FAMILY, node),
     fontSize: baseFontSize,
     locale: node.textLanguage ?? undefined,

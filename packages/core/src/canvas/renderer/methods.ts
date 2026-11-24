@@ -195,6 +195,7 @@ const rendererMethods = {
     parentAbsY?: number,
     hasTransformedAncestor?: boolean
   ): void {
+    this.useDocumentColorSpace(graph.documentColorSpace)
     SceneRender.renderNode(
       this,
       canvas,

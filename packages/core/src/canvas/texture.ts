@@ -4,6 +4,7 @@ import type { SceneNode, TextureEffect } from '@pairdraw/scene-graph'
 
 import { cellValue } from './noise/tile'
 import type { SkiaRenderer } from './renderer'
+import { skColorSpace } from './renderer/colors'
 
 /** Cells on each side of a texture's displacement tile; it repeats beyond them. */
 const TEXTURE_TILE_CELLS = 256
@@ -67,7 +68,7 @@ export function textureDisplacementTile(
       height: TEXTURE_TILE_CELLS,
       alphaType: r.ck.AlphaType.Unpremul,
       colorType: r.ck.ColorType.RGBA_8888,
-      colorSpace: r.ck.ColorSpace.SRGB
+      colorSpace: skColorSpace(r.ck, r.documentColorSpace)
     },
     pixels,
     TEXTURE_TILE_CELLS * 4

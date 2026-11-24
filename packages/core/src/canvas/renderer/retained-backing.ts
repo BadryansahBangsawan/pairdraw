@@ -9,6 +9,7 @@ import {
 } from '@pairdraw/scene-graph/geometry'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
+import { skColorSpace } from '#core/canvas/renderer/colors'
 import { recordWorldPicture } from '#core/canvas/renderer/picture'
 import { clearSubtreePictureCache } from '#core/canvas/renderer/state'
 import { worldNodeVisualBounds } from '#core/canvas/renderer/visual-bounds'
@@ -173,7 +174,7 @@ function createSceneBackingSurface(r: SkiaRenderer, width: number, height: numbe
     height: Math.ceil(height * r.dpr),
     colorType: r.ck.ColorType.RGBA_8888,
     alphaType: r.ck.AlphaType.Premul,
-    colorSpace: r.ck.ColorSpace.SRGB
+    colorSpace: skColorSpace(r.ck, r.documentColorSpace)
   }
   try {
     return r.surface.makeSurface(info)

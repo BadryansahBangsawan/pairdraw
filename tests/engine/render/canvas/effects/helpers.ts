@@ -4,6 +4,7 @@ import type { InputRect, Paint } from 'canvaskit-wasm'
 
 import { SceneGraph, type Fill, type SceneNode } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { renderEffects } from '#core/canvas/shadows'
@@ -193,6 +194,7 @@ export function createMockRenderer(overrides: Partial<SkiaRenderer> = {}): SkiaR
     drawNodeStroke: mock(() => undefined),
     drawStrokeWithAlign: mock(() => undefined),
     resolveStrokeColor: mock(() => ({ r: 0, g: 0, b: 0, a: 1 })),
+    renderColor: mock((color: Color) => color),
     nodePictureCache: {
       get: mock(() => null),
       set: mock(() => undefined)

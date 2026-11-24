@@ -1,4 +1,4 @@
-import type { CharacterStyleOverride, SceneNode } from '@pairdraw/scene-graph'
+import type { CharacterStyleOverride, ColorProfile, SceneNode } from '@pairdraw/scene-graph'
 import { parseFontStyle } from '@pairdraw/scene-graph/font-style'
 import { textLengthPixels } from '@pairdraw/scene-graph/text'
 import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
@@ -26,6 +26,7 @@ import { textFontFace } from '#core/text/requirements/collect'
 function styleOverrideToTspanAttrs(
   style: CharacterStyleOverride,
   colorSpace: 'srgb' | 'display-p3',
+  documentSpace: ColorProfile,
   parentFillOpacity: number | undefined,
   node: Pick<SceneNode, 'fontSize' | 'letterSpacing'>
 ): Record<string, string | number | undefined> {
@@ -54,9 +55,9 @@ function styleOverrideToTspanAttrs(
       // Paragraphs and saved glyphs draw a run at color.a * opacity. Shapes paint opacity alone.
       const alpha = round(visibleFill.color.a * visibleFill.opacity)
       if (colorSpace === 'display-p3') {
-        attrs.fill = formatColor({ ...visibleFill.color, a: 1 }, alpha, colorSpace)
+        attrs.fill = formatColor({ ...visibleFill.color, a: 1 }, alpha, colorSpace, documentSpace)
       } else {
-        attrs.fill = formatColor(visibleFill.color, 1, colorSpace)
+        attrs.fill = formatColor(visibleFill.color, 1, colorSpace, documentSpace)
         if (alpha < 1) attrs['fill-opacity'] = alpha
       }
       // `fill-opacity` inherits, so an opaque run has to cover a translucent parent.
@@ -105,12 +106,13 @@ function spanFontAttrs(
  */
 function textStrokeAttrs(
   node: SceneNode,
-  colorSpace: 'srgb' | 'display-p3'
+  colorSpace: 'srgb' | 'display-p3',
+  documentSpace: ColorProfile = 'srgb'
 ): Record<string, string | number | undefined> {
   const stroke = node.strokes.find((candidate) => candidate.visible)
   if (!stroke) return {}
   const attrs: Record<string, string | number | undefined> = {
-    stroke: formatSolidColor(stroke.color, 1, colorSpace),
+    stroke: formatSolidColor(stroke.color, 1, colorSpace, documentSpace),
     'stroke-width': round(stroke.weight * (stroke.align === 'OUTSIDE' ? 2 : 1))
   }
   if (stroke.opacity < 1) attrs['stroke-opacity'] = round(stroke.opacity)
@@ -202,7 +204,7 @@ export function renderTextNode(
   ctx: SVGExportContext,
   fillOpacity?: number
 ): SVGNode {
-  const { colorSpace, textLayout, fontAlias } = ctx
+  const { colorSpace, documentColorSpace: documentSpace, textLayout, fontAlias } = ctx
   const direction = resolveNodeTextDirection(node)
   const lines = textLayout ? textLayout(node) : null
   const laidOut = lines && lines.length > 0 ? lines : null
@@ -224,11 +226,11 @@ export function renderTextNode(
     'text-anchor': laidOut ? undefined : textAnchorForNode(node, direction),
     'text-decoration': textDecoration,
     'letter-spacing': letterSpacing ? round(letterSpacing) : undefined,
-    ...textStrokeAttrs(node, colorSpace),
+    ...textStrokeAttrs(node, colorSpace, documentSpace),
     ...(fontAlias ? aliasedFontAttrs(fontRequest(node), fontAlias) : {})
   }
   const spanAttrs = (style: CharacterStyleOverride, fallback?: SVGFallbackFace) => ({
-    ...styleOverrideToTspanAttrs(style, colorSpace, fillOpacity, node),
+    ...styleOverrideToTspanAttrs(style, colorSpace, documentSpace, fillOpacity, node),
     ...spanFontAttrs(node, style, fallback, fontAlias)
   })
 

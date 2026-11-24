@@ -1,0 +1,1 @@
+- A Display P3 document draws, blends, and exports in its own color profile: on a P3 display its colors look as designed, PNG exports keep the P3 profile, SVG and PDF exports write its colors as they show, text fills keep their wide gamut, and sRGB documents draw exactly as before.

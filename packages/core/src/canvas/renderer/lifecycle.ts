@@ -2,6 +2,7 @@ import { releaseImageAdjustments } from '#core/canvas/images/adjustments'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { clearSubtreePictureCache } from '#core/canvas/renderer/state'
 
+import { releaseDocumentSurface } from './document-surface'
 import { settleFontWaiters } from './font-waiters'
 
 function clearRetainedSceneState(r: SkiaRenderer): void {
@@ -99,5 +100,6 @@ export function destroyRenderer(r: SkiaRenderer): void {
   clearRetainedSceneState(r)
   r._flashPaint?.delete()
   r.profiler.destroy()
+  releaseDocumentSurface(r)
   r.surface.dispose()
 }

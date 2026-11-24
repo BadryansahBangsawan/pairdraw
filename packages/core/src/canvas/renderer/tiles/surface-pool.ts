@@ -1,6 +1,7 @@
 import type { Surface } from 'canvaskit-wasm'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
+import { documentImageInfo } from '#core/canvas/renderer/colors'
 
 import { TILE_DEVICE_SIZE } from './geometry'
 
@@ -10,13 +11,14 @@ export class TileSurfacePool {
   acquire(renderer: SkiaRenderer): Surface | null {
     return (
       this.available.pop() ??
-      renderer.surface.makeSurface({
-        width: TILE_DEVICE_SIZE,
-        height: TILE_DEVICE_SIZE,
-        colorType: renderer.ck.ColorType.RGBA_8888,
-        alphaType: renderer.ck.AlphaType.Premul,
-        colorSpace: renderer.ck.ColorSpace.SRGB
-      })
+      renderer.surface.makeSurface(
+        documentImageInfo(
+          renderer.ck,
+          renderer.documentColorSpace,
+          TILE_DEVICE_SIZE,
+          TILE_DEVICE_SIZE
+        )
+      )
     )
   }
 

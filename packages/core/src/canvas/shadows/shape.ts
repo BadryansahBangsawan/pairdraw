@@ -128,7 +128,8 @@ function drawMaskShadow(
   blendMode: BlendMode | undefined,
   draw: () => void
 ): void {
-  r.auxFill.setColor(r.color4f(effect.color.r, effect.color.g, effect.color.b, effect.color.a))
+  const color = r.renderColor(effect.color)
+  r.auxFill.setColor(r.color4f(color.r, color.g, color.b, color.a))
   r.auxFill.setMaskFilter(r.getCachedMaskBlur(blurSigma(effect.radius)))
   r.auxFill.setImageFilter(null)
   setPaintBlendMode(r, r.auxFill, blendMode)
@@ -241,7 +242,8 @@ export function drawShapeInnerShadow(
   isolated = false
 ): void {
   const sp = spread
-  r.auxFill.setColor(r.ck.Color4f(effect.color.r, effect.color.g, effect.color.b, effect.color.a))
+  const color = r.renderColor(effect.color)
+  r.auxFill.setColor(r.ck.Color4f(color.r, color.g, color.b, color.a))
   r.auxFill.setImageFilter(r.getCachedDecalBlur(blurSigma(effect.radius)))
 
   canvas.save()

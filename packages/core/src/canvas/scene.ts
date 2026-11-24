@@ -20,6 +20,7 @@ import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { textLinesReach, textVerticalOffset } from '@pairdraw/scene-graph/text'
 
+import { skColorSpace } from '#core/canvas/renderer/colors'
 import { createSceneGeometry, nodeOrientationMatrix, projectedNode } from '#core/geometry'
 import { liftedChildIds, scrollShiftX, scrollShiftY } from '#core/prototype/scroll'
 import { shownText } from '#core/text/case'
@@ -709,7 +710,7 @@ export function renderShape(
       height: Math.ceil(height * scale),
       colorType: r.ck.ColorType.RGBA_8888,
       alphaType: r.ck.AlphaType.Premul,
-      colorSpace: r.ck.ColorSpace.SRGB
+      colorSpace: skColorSpace(r.ck, r.documentColorSpace)
     })
     const rasterCanvas = surface.getCanvas()
     try {
@@ -1202,7 +1203,7 @@ function drawPaintedText(r: SkiaRenderer, canvas: Canvas, node: SceneNode): bool
     },
     (paragraph, prepared) => {
       const y = textVerticalOffset(node, paragraph.getHeight())
-      drawTextLayout(r.ck, canvas, node, prepared, y, r.fillPaint)
+      drawTextLayout(r.ck, canvas, node, prepared, y, r.fillPaint, r.documentColorSpace)
       return true
     }
   )
@@ -1299,7 +1300,7 @@ export function renderText(r: SkiaRenderer, canvas: Canvas, node: SceneNode, fil
       { halfLeading: true },
       (paragraph, prepared) => {
         const paragraphY = textVerticalOffset(node, paragraph.getHeight())
-        drawTextLayout(r.ck, canvas, node, prepared, paragraphY, r.fillPaint)
+        drawTextLayout(r.ck, canvas, node, prepared, paragraphY, r.fillPaint, r.documentColorSpace)
       }
     )
   } else if (r.textFont) {

@@ -1,9 +1,16 @@
 import { fromUint8Array } from 'js-base64'
 
-import type { Fill, FontVariation, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type {
+  ColorProfile,
+  Fill,
+  FontVariation,
+  SceneGraph,
+  SceneNode
+} from '@pairdraw/scene-graph'
 import {
   colorToHex,
-  colorToDisplayCSS,
+  colorToProfileCSS,
+  convertColor,
   getDefaultRenderColorSpace,
   type RenderColorSpace
 } from '@pairdraw/scene-graph/color'
@@ -41,7 +48,10 @@ export interface SVGExportContext {
   defs: SVGNode[]
   defIdCounter: number
   graph: SceneGraph
+  /** The space the export writes colors in. */
   colorSpace: RenderColorSpace
+  /** The document's profile: the space its stored color components are in. */
+  documentColorSpace: ColorProfile
   /** Starts every def id, so SVGs inlined on one page cannot reference each other's defs. */
   idPrefix?: string
   /** Paints drawn in `currentColor`, such as an icon's tinted paths, so CSS `color` sets them. */
@@ -60,12 +70,13 @@ export function nextDefId(ctx: SVGExportContext, prefix: string): string {
 export function formatColor(
   color: Color,
   opacity = 1,
-  colorSpace: RenderColorSpace = getDefaultRenderColorSpace()
+  colorSpace: RenderColorSpace = getDefaultRenderColorSpace(),
+  documentSpace: ColorProfile = 'srgb'
 ): string {
-  const alphaColor = { ...color, a: color.a * opacity }
-  if (colorSpace === 'display-p3') {
-    return colorToDisplayCSS(alphaColor, { colorSpace })
-  }
+  const painted = { ...color, a: color.a * opacity }
+  // Stored components sit in the document's profile; write the color in the profile it is shown in.
+  if (colorSpace === 'display-p3') return colorToProfileCSS(painted, documentSpace, 'display-p3')
+  const alphaColor = convertColor(painted, documentSpace, 'srgb')
   // Hex has no alpha. Stops and shadows already emit theirs; solid fills use `solidFillOpacity`.
   return colorToHex(alphaColor)
 }
@@ -78,12 +89,13 @@ export function formatColor(
 export function formatSolidColor(
   color: Color,
   opacity: number,
-  colorSpace: RenderColorSpace
+  colorSpace: RenderColorSpace,
+  documentSpace: ColorProfile = 'srgb'
 ): string {
   if (colorSpace === 'display-p3') {
-    return formatColor({ ...color, a: 1 }, round(opacity), colorSpace)
+    return formatColor({ ...color, a: 1 }, round(opacity), colorSpace, documentSpace)
   }
-  return formatColor(color, 1, colorSpace)
+  return formatColor(color, 1, colorSpace, documentSpace)
 }
 
 /**
@@ -113,7 +125,7 @@ function createGradientDef(
   const stopNodes = stops.map((s) =>
     svg('stop', {
       offset: `${round(s.position * 100)}%`,
-      'stop-color': formatColor(s.color, 1, ctx.colorSpace),
+      'stop-color': formatColor(s.color, 1, ctx.colorSpace, ctx.documentColorSpace),
       'stop-opacity': s.color.a < 1 ? round(s.color.a) : undefined
     })
   )
@@ -219,18 +231,18 @@ export function resolveFill(fill: Fill, node: SceneNode, ctx: SVGExportContext):
   if (!fill.visible) return null
 
   if (fill.type === 'SOLID') {
-    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
+    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace, ctx.documentColorSpace)
   }
 
   // SVG has no mesh element: a mesh exports its own color, as `.fig` records carry it.
   if (fill.type === 'MESH') {
-    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
+    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace, ctx.documentColorSpace)
   }
 
   // The canvas draws a pattern, noise or custom paint as its own colour when the format has no
   // element for it, so the export must not drop the layer.
   if (fill.type === 'PATTERN' || fill.type === 'NOISE' || fill.type === 'CUSTOM') {
-    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
+    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace, ctx.documentColorSpace)
   }
 
   if (fill.type.startsWith('GRADIENT')) {

@@ -1,7 +1,13 @@
 import type { Canvas, CanvasKit, Paint } from 'canvaskit-wasm'
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { DerivedTextGlyph, Fill, SceneNode, TextDecorationStyle } from '@pairdraw/scene-graph'
+import type {
+  ColorProfile,
+  DerivedTextGlyph,
+  Fill,
+  SceneNode,
+  TextDecorationStyle
+} from '@pairdraw/scene-graph'
 import { resolveRGBAForPreview } from '@pairdraw/scene-graph/color'
 import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
 
@@ -351,7 +357,8 @@ function drawKeycapFrames(
   node: SceneNode,
   layout: TextLayout,
   y: number,
-  paint: Paint
+  paint: Paint,
+  space: ColorProfile
 ): void {
   const text = shownText(node)
   if (!text.includes(COMBINING_KEYCAP)) return
@@ -372,7 +379,9 @@ function drawKeycapFrames(
       const run = node.styleRuns.find(
         (item) => source >= item.start && source < item.start + item.length
       )
-      runPaint.setColor(run ? styleRunColor(ck, run.style, paint.getColor()) : paint.getColor())
+      runPaint.setColor(
+        run ? styleRunColor(ck, run.style, paint.getColor(), space) : paint.getColor()
+      )
       drawKeycapFrame(ck, canvas, glyph.x, glyph.y, glyph.fontSize, runPaint)
     }
   } finally {
@@ -386,11 +395,12 @@ export function drawTextLayout(
   node: SceneNode,
   prepared: PreparedText,
   y: number,
-  textPaint: Paint
+  textPaint: Paint,
+  space: ColorProfile = 'srgb'
 ): void {
   const layout = prepared.paragraph
   layout.draw(canvas, 0, y)
-  drawKeycapFrames(ck, canvas, node, layout, y, textPaint)
+  drawKeycapFrames(ck, canvas, node, layout, y, textPaint, space)
   if (!hasDecoration(node)) return
   if (prepared.decorations?.y !== y) {
     const glyphs = laidOutGlyphs(node, layout, shownText(node), y)

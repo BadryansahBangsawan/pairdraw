@@ -1,6 +1,7 @@
 import type { Image } from 'canvaskit-wasm'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
+import { skColorSpace } from '#core/canvas/renderer/colors'
 
 /**
  * Cells on each side of a noise tile, which repeats beyond them: wide enough that the repeat lies
@@ -41,7 +42,7 @@ function cached(r: SkiaRenderer, key: string, build: () => Uint8Array): Image | 
       height: NOISE_TILE_CELLS,
       alphaType: r.ck.AlphaType.Unpremul,
       colorType: r.ck.ColorType.RGBA_8888,
-      colorSpace: r.ck.ColorSpace.SRGB
+      colorSpace: skColorSpace(r.ck, r.documentColorSpace)
     },
     build(),
     NOISE_TILE_CELLS * 4

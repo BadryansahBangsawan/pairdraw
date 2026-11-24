@@ -8,6 +8,7 @@ import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
 import { resolvedVariableModes } from '@pairdraw/scene-graph/variables'
 
 import type { SkiaRenderer } from '#core/canvas'
+import { skColorSpace } from '#core/canvas/renderer/colors'
 import { getPageColor } from '#core/figma-api/page-backgrounds'
 import { extractExportGraph, findPageId } from '#core/io/subgraph'
 
@@ -148,6 +149,8 @@ function renderToSurface(
   setup: (canvas: Canvas) => void,
   trimTransparent = false
 ): Uint8Array<ArrayBuffer> | null {
+  renderer.useDocumentColorSpace(renderGraph.documentColorSpace)
+  const documentSpace = skColorSpace(ck, renderGraph.documentColorSpace)
   const renderScale = exportRenderScale(width, height)
   const renderWidth = width * renderScale
   const renderHeight = height * renderScale
@@ -156,7 +159,7 @@ function renderToSurface(
     {
       alphaType: ck.AlphaType.Premul,
       colorType: ck.ColorType.RGBA_8888,
-      colorSpace: ck.ColorSpace.SRGB,
+      colorSpace: documentSpace,
       width: renderWidth,
       height: renderHeight
     },
@@ -198,7 +201,7 @@ function renderToSurface(
       {
         alphaType: ck.AlphaType.Premul,
         colorType: ck.ColorType.RGBA_8888,
-        colorSpace: ck.ColorSpace.SRGB,
+        colorSpace: documentSpace,
         width,
         height
       },

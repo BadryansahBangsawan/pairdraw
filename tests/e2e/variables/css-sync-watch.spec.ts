@@ -1,11 +1,17 @@
 import type { Locator } from '@playwright/test'
 
-import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 
 // The linked-stylesheet watch: when the option is on, an external change to the file pulls its
 // custom properties into the document; when off, the same change is left alone.
 
-const editor = useEditorSetup()
+// A fresh page per test: a dialog left open by one test makes the next one's launcher unreachable,
+// and the linked stylesheet, variables, watch option, and recovery copy of the last document all
+// live in the app's state or storage.
+const editor = useFreshEditor()
+
+// A fresh context re-fetches the app, so its boot alone can outlast the 15s project budget.
+test.describe.configure({ timeout: 45_000 })
 
 const STYLESHEET = ['/* App theme */', ':root {', '  --brand: #ff5b2e;', '}', ''].join('\n')
 

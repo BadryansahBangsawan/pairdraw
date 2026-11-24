@@ -46,14 +46,12 @@ function defaultChoice(entry: TokenDrift): RowChoice {
 }
 
 const choices = ref(new Map<string, RowChoice>())
-// Choices start over as the dialog opens, never as it closes.
+// Choices start over as the dialog opens, never as it closes. The sides picked are kept as overrides
+// only: a row's default follows the drift as it is now, which can arrive after the dialog opens.
 watch(
   open,
   (isOpen) => {
-    if (isOpen)
-      choices.value = new Map(
-        drift.filter(driftNeedsChoice).map((entry) => [tokenDriftKey(entry), defaultChoice(entry)])
-      )
+    if (isOpen) choices.value = new Map()
   },
   { immediate: true }
 )

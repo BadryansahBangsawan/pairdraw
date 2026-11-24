@@ -1,6 +1,12 @@
-import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 
-const editor = useEditorSetup()
+// A fresh page per test: a dialog left open by one test makes the next one's launcher unreachable,
+// and the linked stylesheet, variables, watch option, and recovery copy of the last document all
+// live in the app's state or storage.
+const editor = useFreshEditor()
+
+// A fresh context re-fetches the app, so its boot alone can outlast the 15s project budget.
+test.describe.configure({ timeout: 45_000 })
 
 const STYLESHEET = [
   '/* App theme */',

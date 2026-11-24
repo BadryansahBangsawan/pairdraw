@@ -1,3 +1,5 @@
+import { underlyingGraph } from '#core/figma-api/graph-ref'
+
 /**
  * What the `script` tool needs from the host: the sandbox and the node that carries its program
  * live in the app, so the app registers the runner for the documents it shows. A headless host
@@ -21,12 +23,13 @@ const hosts = new WeakMap<object, ScriptToolHost>()
 
 /** Lets the `script` tool run for the documents of `owner`, a document's graph. */
 export function registerScriptToolHost(owner: object, host: ScriptToolHost): () => void {
-  hosts.set(owner, host)
+  const target = underlyingGraph(owner)
+  hosts.set(target, host)
   return () => {
-    if (hosts.get(owner) === host) hosts.delete(owner)
+    if (hosts.get(target) === host) hosts.delete(target)
   }
 }
 
 export function getScriptToolHost(owner: object): ScriptToolHost | undefined {
-  return hosts.get(owner)
+  return hosts.get(underlyingGraph(owner))
 }

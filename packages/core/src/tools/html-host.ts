@@ -1,5 +1,6 @@
 import type { TailwindStylesheetLoader } from '@pairdraw/dom-css/export'
 
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import type { HTMLStyler } from '#core/io/formats/html/layers'
 
 /**
@@ -20,12 +21,13 @@ const hosts = new WeakMap<object, HTMLToolHost>()
 
 /** Lets the HTML tools run for the documents of `owner`, a document's graph. */
 export function registerHTMLToolHost(owner: object, host: HTMLToolHost): () => void {
-  hosts.set(owner, host)
+  const target = underlyingGraph(owner)
+  hosts.set(target, host)
   return () => {
-    if (hosts.get(owner) === host) hosts.delete(owner)
+    if (hosts.get(target) === host) hosts.delete(target)
   }
 }
 
 export function getHTMLToolHost(owner: object): HTMLToolHost | undefined {
-  return hosts.get(owner)
+  return hosts.get(underlyingGraph(owner))
 }

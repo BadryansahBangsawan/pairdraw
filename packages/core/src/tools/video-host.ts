@@ -1,3 +1,4 @@
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import type { VideoHostEncoder } from '#core/io/formats/video'
 
 const encoders = new WeakMap<object, VideoHostEncoder>()
@@ -7,12 +8,13 @@ const encoders = new WeakMap<object, VideoHostEncoder>()
  * WebCodecs cannot encode in that host, as the CLI does with ffmpeg. The app needs none.
  */
 export function registerVideoEncoder(owner: object, encoder: VideoHostEncoder): () => void {
-  encoders.set(owner, encoder)
+  const target = underlyingGraph(owner)
+  encoders.set(target, encoder)
   return () => {
-    if (encoders.get(owner) === encoder) encoders.delete(owner)
+    if (encoders.get(target) === encoder) encoders.delete(target)
   }
 }
 
 export function getVideoEncoder(owner: object): VideoHostEncoder | undefined {
-  return encoders.get(owner)
+  return encoders.get(underlyingGraph(owner))
 }

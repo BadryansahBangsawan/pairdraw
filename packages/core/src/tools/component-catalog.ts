@@ -1,3 +1,4 @@
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import type { LibraryAssetDescriptor, LibrarySummary } from '#core/library'
 
 export type ComponentCatalogSource = 'document' | 'libraries' | 'all'
@@ -34,12 +35,13 @@ export interface ComponentCatalog {
 const catalogs = new WeakMap<object, ComponentCatalog>()
 
 export function registerComponentCatalog(owner: object, catalog: ComponentCatalog): () => void {
-  catalogs.set(owner, catalog)
+  const target = underlyingGraph(owner)
+  catalogs.set(target, catalog)
   return () => {
-    if (catalogs.get(owner) === catalog) catalogs.delete(owner)
+    if (catalogs.get(target) === catalog) catalogs.delete(target)
   }
 }
 
 export function getComponentCatalog(owner: object): ComponentCatalog | undefined {
-  return catalogs.get(owner)
+  return catalogs.get(underlyingGraph(owner))
 }

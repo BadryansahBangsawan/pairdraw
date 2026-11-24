@@ -1,3 +1,4 @@
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import type { ImageVectorizeRequest } from '#core/tools/vector/vectorize'
 
 /** The shape of a generated image; each maps to a size the image services accept. */
@@ -35,14 +36,15 @@ const services = new WeakMap<object, ImageAIService>()
  * `registerImageVectorizer` does for `vectorize_image`.
  */
 export function registerImageAIService(owner: object, service: ImageAIService): () => void {
-  services.set(owner, service)
+  const target = underlyingGraph(owner)
+  services.set(target, service)
   return () => {
-    if (services.get(owner) === service) services.delete(owner)
+    if (services.get(target) === service) services.delete(target)
   }
 }
 
 export function getImageAIService(owner: object): ImageAIService | undefined {
-  return services.get(owner)
+  return services.get(underlyingGraph(owner))
 }
 
 /** What a tool answers where no host set the services up, such as the CLI or a headless server. */

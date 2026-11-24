@@ -1,5 +1,6 @@
 import * as v from 'valibot'
 
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import { defineTool, nodeIdInputSchema, nodeNotFound, toolFailure } from '#core/tools/schema'
 import {
   createVectorFrameBeside,
@@ -25,14 +26,15 @@ const vectorizers = new WeakMap<object, ImageVectorizer>()
 
 /** Lets `vectorize_image` run for the documents of `owner`, a document's graph. */
 export function registerImageVectorizer(owner: object, vectorizer: ImageVectorizer): () => void {
-  vectorizers.set(owner, vectorizer)
+  const target = underlyingGraph(owner)
+  vectorizers.set(target, vectorizer)
   return () => {
-    if (vectorizers.get(owner) === vectorizer) vectorizers.delete(owner)
+    if (vectorizers.get(target) === vectorizer) vectorizers.delete(target)
   }
 }
 
 export function getImageVectorizer(owner: object): ImageVectorizer | undefined {
-  return vectorizers.get(owner)
+  return vectorizers.get(underlyingGraph(owner))
 }
 
 export const vectorizeImage = defineTool({

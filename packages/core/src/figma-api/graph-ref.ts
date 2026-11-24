@@ -1,6 +1,6 @@
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
-const rawByProxy = new WeakMap<SceneGraph, SceneGraph>()
+const rawByProxy = new WeakMap<object, SceneGraph>()
 
 /** Remembers the raw graph behind a read-freshening proxy, so pending work keyed by the raw graph is found. */
 export function registerFreshGraph(proxy: SceneGraph, graph: SceneGraph): void {
@@ -8,6 +8,6 @@ export function registerFreshGraph(proxy: SceneGraph, graph: SceneGraph): void {
 }
 
 /** The graph pending layout and instance sync are recorded on. */
-export function underlyingGraph(graph: SceneGraph): SceneGraph {
-  return rawByProxy.get(graph) ?? graph
+export function underlyingGraph<T extends object>(graph: T): T {
+  return (rawByProxy.get(graph) as T | undefined) ?? graph
 }

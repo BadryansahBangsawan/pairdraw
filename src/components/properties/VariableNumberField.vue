@@ -16,6 +16,7 @@ import { BindableValueRoot } from '@pairdraw/vue/primitives/BindableValue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import VariableBindingPicker from '@/components/properties/binding/VariableBindingPicker.vue'
 import { BindingPill, useBindingFieldUI } from '@/components/ui/binding'
+import DeletedVariableMark from '@/components/ui/binding/DeletedVariableMark.vue'
 
 const {
   modelValue,
@@ -129,6 +130,10 @@ defineOptions({ inheritAttrs: false })
       <template #suffix>
         <!-- A field's own control, such as Hug or a mode menu, sits beside its value; the variable
              button ends every field, so it lines up down the panel. -->
+        <DeletedVariableMark
+          v-if="binding.variable?.deleted"
+          :label="panels.variableDeleted({ name: binding.variable.name })"
+        />
         <slot name="after-variable" />
         <span class="flex items-center pr-1">
           <VariableBindingPicker

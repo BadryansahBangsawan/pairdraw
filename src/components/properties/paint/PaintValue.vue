@@ -7,13 +7,16 @@ import { inputValue } from '@pairdraw/vue/shared/dom-events'
 
 import { BindingPill } from '@/components/ui/binding'
 
-const { color, resolvedColor, variableName, unavailableLabel, label } = defineProps<{
-  color: Color
-  resolvedColor?: Color
-  unavailableLabel?: string
-  variableName?: string
-  label: string
-}>()
+const { color, resolvedColor, variableName, unavailableLabel, label, deleted, deletedLabel } =
+  defineProps<{
+    color: Color
+    resolvedColor?: Color
+    unavailableLabel?: string
+    variableName?: string
+    label: string
+    deleted?: boolean
+    deletedLabel?: string
+  }>()
 const emit = defineEmits<{ update: [color: Color] }>()
 
 const displayColor = computed(() => resolvedColor ?? color)
@@ -31,6 +34,8 @@ const tooltip = computed(() => (variableName ? `${variableName} · #${model.hex.
     :label="variableName ?? unavailableLabel ?? label"
     :unresolved="!!unavailableLabel"
     :tooltip="unavailableLabel ?? tooltip"
+    :deleted="deleted"
+    :deleted-label="deletedLabel"
   />
   <input
     v-else

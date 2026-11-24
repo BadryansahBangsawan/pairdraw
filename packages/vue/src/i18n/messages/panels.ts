@@ -225,6 +225,7 @@ export const panelMessageDefaults = {
   fontSize: 'Font size',
   lineHeightMode: 'Line height mode',
   unresolvedVariable: 'Variable value unavailable',
+  variableDeleted: params('{name} was deleted in the source file'),
   lineHeight: 'Line height',
   letterSpacing: 'Letter spacing',
   textAlignment: 'Text alignment',

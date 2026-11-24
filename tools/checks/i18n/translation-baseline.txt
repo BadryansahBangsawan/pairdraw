@@ -659,3 +659,11 @@ es:panels.prototypeOverflowVertical
 es:panels.prototypeOverflowHorizontal
 fr:panels.prototypeOverflowVertical
 fr:panels.prototypeOverflowHorizontal
+de:panels.variableDeleted
+es:panels.variableDeleted
+fr:panels.variableDeleted
+it:panels.variableDeleted
+ja:panels.variableDeleted
+pl:panels.variableDeleted
+ru:panels.variableDeleted
+zh-cn:panels.variableDeleted

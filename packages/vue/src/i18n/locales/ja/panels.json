@@ -283,6 +283,7 @@
   "exportRenderingPreview": "プレビューをレンダリング中…",
   "createVariable": "変数を作成",
   "createColorVariable": "{value} からカラー変数を作成",
+  "variableDeleted": "{name} was deleted in the source file",
   "variableName": "変数名",
   "create": "作成",
   "createNumberVariable": "{value} から数値変数を作成",

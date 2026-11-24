@@ -8,6 +8,8 @@ export interface BindingPillProps {
   label: string
   tooltip?: string
   unresolved?: boolean
+  deleted?: boolean
+  deletedLabel?: string
   disabled?: boolean
   derived?: boolean
   class?: HTMLAttributes['class']
@@ -18,6 +20,7 @@ export interface BindingPillProps {
 <script setup lang="ts">
 import { computed, normalizeClass } from 'vue'
 
+import DeletedVariableMark from '@/components/ui/binding/DeletedVariableMark.vue'
 import { useBindingFieldUI } from '@/components/ui/binding/ui'
 import Tip from '@/components/ui/overlay/Tip.vue'
 
@@ -25,6 +28,8 @@ const {
   label,
   tooltip,
   unresolved = false,
+  deleted = false,
+  deletedLabel,
   disabled = false,
   derived = false,
   class: className,
@@ -53,6 +58,7 @@ defineOptions({ inheritAttrs: false })
       data-slot="pill"
     >
       <span :class="styles.pillLabel">{{ label }}</span>
+      <DeletedVariableMark v-if="deleted && deletedLabel" :label="deletedLabel" />
     </span>
   </Tip>
 </template>

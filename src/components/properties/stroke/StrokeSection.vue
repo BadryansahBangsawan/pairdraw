@@ -198,6 +198,12 @@ function onToggleSides(nodes: readonly SceneNode[]) {
                 :color="stroke.color"
                 :resolved-color="binding.resolvedValue"
                 :variable-name="binding.variable?.name ?? binding.bindingId"
+                :deleted="binding.variable?.deleted === true"
+                :deleted-label="
+                  binding.variable?.deleted
+                    ? panels.variableDeleted({ name: binding.variable.name })
+                    : undefined
+                "
                 :unavailable-label="
                   binding.state === 'unresolved' ? panels.unresolvedVariable : undefined
                 "

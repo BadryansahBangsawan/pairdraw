@@ -254,6 +254,7 @@
   "exportRenderingPreview": "正在渲染预览…",
   "createVariable": "创建变量",
   "createColorVariable": "从 {value} 创建颜色变量",
+  "variableDeleted": "{name} was deleted in the source file",
   "variableName": "变量名称",
   "create": "创建",
   "createNumberVariable": "从 {value} 创建数字变量",

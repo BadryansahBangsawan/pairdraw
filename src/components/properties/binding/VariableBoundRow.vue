@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import type { Variable } from '@pairdraw/scene-graph'
 import { variableText } from '@pairdraw/scene-graph/variables'
 import { useEditor } from '@pairdraw/vue'
 import type { BindingProvider } from '@pairdraw/vue/controls/binding-provider'
@@ -32,6 +33,13 @@ const targets = computed(() => [{ nodeId, path: config.path }])
 function valueText(variableId: string) {
   return variableText(editor.graph.resolveVariableForNode(nodeId, variableId))
 }
+
+/** A deleted variable stays bound and resolvable, so the row says why it is no longer listed. */
+function deletedNotice(variable: Variable | undefined) {
+  return variable?.deleted === true
+    ? panels.value.variableDeleted({ name: variable.name })
+    : undefined
+}
 </script>
 
 <template>
@@ -42,6 +50,8 @@ function valueText(variableId: string) {
       :name="binding.variable?.name ?? binding.bindingId ?? panels.unresolvedVariable"
       :value="binding.variable ? valueText(binding.variable.id) : undefined"
       :tone="binding.state === 'unresolved' ? 'unresolved' : 'variable'"
+      :deleted="binding.variable?.deleted === true"
+      :deleted-label="deletedNotice(binding.variable)"
     >
       <template #icon>
         <component

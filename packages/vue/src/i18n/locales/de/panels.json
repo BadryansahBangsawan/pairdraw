@@ -254,6 +254,7 @@
   "exportRenderingPreview": "Vorschau wird gerendert…",
   "createVariable": "Variable erstellen",
   "createColorVariable": "Farbvariable aus {value} erstellen",
+  "variableDeleted": "{name} was deleted in the source file",
   "variableName": "Variablenname",
   "create": "Erstellen",
   "createNumberVariable": "Zahlenvariable aus {value} erstellen",

@@ -254,6 +254,7 @@
   "exportRenderingPreview": "Rendering anteprima…",
   "createVariable": "Crea variabile",
   "createColorVariable": "Crea variabile colore da {value}",
+  "variableDeleted": "{name} was deleted in the source file",
   "variableName": "Nome variabile",
   "create": "Crea",
   "createNumberVariable": "Crea variabile numerica da {value}",

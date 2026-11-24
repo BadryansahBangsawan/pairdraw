@@ -41,7 +41,7 @@ export function createImageStore(
 }
 
 /** pen.dev's affine `[a, b, c, d, tx, ty]`, inverted, as the scene graph's matrix. */
-function invertAffine([a, b, c, d, tx, ty]: readonly number[]): Matrix | null {
+export function invertAffine([a, b, c, d, tx, ty]: readonly number[]): Matrix | null {
   const det = a * d - b * c
   if (Math.abs(det) < 1e-12) return null
   return {

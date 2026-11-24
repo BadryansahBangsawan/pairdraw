@@ -1,0 +1,1 @@
+- Saving a Pencil.dev (`.pen`) file embeds image fills and reports the content the format cannot hold — noise and texture effects, image adjustment filters, scroll overflow, OpenType features, and extra pages — instead of throwing or dropping it silently.

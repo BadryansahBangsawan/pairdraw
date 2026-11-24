@@ -1,3 +1,5 @@
+import { fromUint8Array } from 'js-base64'
+
 import type {
   BlendMode,
   Fill,
@@ -17,6 +19,7 @@ import { colorToHex, colorToHex8 } from '@pairdraw/scene-graph/color'
 import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { stickySublayers } from '@pairdraw/scene-graph/generated'
 import { applyGradientTransform, invertGradientTransform } from '@pairdraw/scene-graph/gradient'
+import { imageMimeType } from '@pairdraw/scene-graph/images'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-sources'
@@ -26,6 +29,7 @@ import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 import type {
   PenDocument,
   PenEffect,
+  PenImagePaint,
   PenNode,
   PenNumber,
   PenPaint,
@@ -60,7 +64,23 @@ type PenWriteState = {
   collections: ReadonlyMap<string, VariableCollection>
   /** Nodes the document will contain, so an instance refs only a component that is written. */
   writtenIds: ReadonlySet<string>
+  /** What the file cannot hold, reported once writing leaves it out. */
+  warnings: string[]
+  drops: {
+    images: number
+    effects: number
+    filters: number
+    scroll: number
+    fontFeatures: number
+  }
 }
+
+/** What a caller learns about content a written `.pen` file cannot hold. */
+export interface PenWriteOptions {
+  /** Collects one sentence per kind of content left out, in place of silently losing it. */
+  warnings?: string[]
+}
+
 /** Snaps matrix values that are within floating-point noise of an integer. */
 function snapCoordinate(value: number): number {
   return Math.abs(value - Math.round(value)) < 1e-9 ? Math.round(value) : value
@@ -174,8 +194,50 @@ function gradientPaint(fill: Fill): PenPaint {
   }
 }
 
-function imagePaint(fill: Fill): PenPaint {
-  return { type: 'image', ...paintBase(fill), url: fill.imageHash }
+/**
+ * An image fill as a pen.dev paint whose image travels with the file: Pencil.dev opens a data URL
+ * and the scene graph keeps the bytes, so the fill is written whole instead of pointing at a hash
+ * no reader can resolve. A paint whose bytes are gone is left out and reported, never written as a
+ * dead URL.
+ */
+function imagePaint(state: PenWriteState, fill: Fill): PenPaint | null {
+  const bytes = fill.imageHash ? state.graph.images.get(fill.imageHash) : undefined
+  if (!bytes) {
+    state.drops.images++
+    return null
+  }
+  if (fill.filters) state.drops.filters++
+  const paint: PenImagePaint = {
+    type: 'image',
+    ...paintBase(fill),
+    url: `data:${imageMimeType(bytes)};base64,${fromUint8Array(bytes)}`
+  }
+  if (fill.imageScaleMode === 'FIT') paint.mode = 'contain'
+  if (fill.imageScaleMode === 'CROP') {
+    paint.mode = 'stretch'
+    const transform = fill.imageTransform && cropTransform(fill.imageTransform)
+    if (transform) paint.transform = transform
+  }
+  return paint
+}
+
+/**
+ * A crop's image-space window as pen.dev's affine, which maps the crop back onto the image so a
+ * reader inverts it into the same window. The tuple is `[a, b, c, d, tx, ty]`: columns first.
+ */
+function cropTransform(
+  crop: GradientTransform
+): [number, number, number, number, number, number] | null {
+  const det = crop.m00 * crop.m11 - crop.m01 * crop.m10
+  if (Math.abs(det) < 1e-12) return null
+  return [
+    crop.m11 / det,
+    -crop.m10 / det,
+    -crop.m01 / det,
+    crop.m00 / det,
+    (crop.m01 * crop.m12 - crop.m11 * crop.m02) / det,
+    (crop.m10 * crop.m02 - crop.m00 * crop.m12) / det
+  ]
 }
 
 function penPaint(
@@ -184,13 +246,13 @@ function penPaint(
   field: 'fills' | 'strokes',
   fill: Fill,
   index: number
-): PenPaint {
+): PenPaint | null {
   if (fill.type === 'SOLID') {
     const binding = variableReference(state, node.boundVariables[`${field}/${index}/color`])
     return { type: 'color', color: binding ?? colorValue(fill.color), ...paintBase(fill) }
   }
   if (fill.type.startsWith('GRADIENT_')) return gradientPaint(fill)
-  if (fill.type === 'IMAGE') return imagePaint(fill)
+  if (fill.type === 'IMAGE') return imagePaint(state, fill)
   return { type: fill.type.toLowerCase(), ...paintBase(fill) }
 }
 
@@ -201,7 +263,10 @@ function paintsOf(
   paints: readonly Fill[]
 ): PenPaints | undefined {
   if (paints.length === 0) return undefined
-  const result = paints.map((paint, index) => penPaint(state, node, field, paint, index))
+  const result = paints
+    .map((paint, index) => penPaint(state, node, field, paint, index))
+    .filter((paint): paint is PenPaint => paint !== null)
+  if (result.length === 0) return undefined
   return result.length === 1 ? result[0] : result
 }
 
@@ -554,8 +619,13 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
     result.width = 'fit_content'
   if (node.type === 'STICKY') result.content = stickySublayers(state.graph, node)?.body.text ?? ''
   penPluginFields(node, result)
-  // Shader effects have no pen.dev form yet; dropping them keeps the file loadable.
-  const effects = node.effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+  // Shader, noise, and texture effects have no pen.dev form; dropping them keeps the file loadable.
+  const effects = node.effects.filter((effect): effect is ShadowEffect => {
+    if (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW') return true
+    if (effect.type === 'LAYER_BLUR' || effect.type === 'BACKGROUND_BLUR') return true
+    if (effect.type === 'NOISE' || effect.type === 'TEXTURE') state.drops.effects++
+    return false
+  })
   if (effects.length > 0)
     result.effect = effects.length === 1 ? effectOf(effects[0]) : effects.map(effectOf)
   if (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') result.reusable = true
@@ -567,6 +637,8 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
   return false
 }
 function writeNode(state: PenWriteState, node: SceneNode): PenNode {
+  if (node.overflowDirection !== 'NONE') state.drops.scroll++
+  if ((node.fontFeatures?.length ?? 0) > 0) state.drops.fontFeatures++
   const result: PenNode = { id: node.id, type: nodeType(node) }
   basicNodeFields(state, node, result)
   if (semanticNodeFields(state, node, result)) return result
@@ -612,20 +684,31 @@ function sortKeys(value: unknown): unknown {
   return value
 }
 
-export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
+export function penDocumentFromGraph(
+  graph: SceneGraph,
+  options: PenWriteOptions = {}
+): PenDocument {
   // A deleted variable has no state `.pen` can hold, so layers bound to it write its value.
   const variables = new Map<string, Variable>()
   for (const variable of graph.getLiveVariables()) variables.set(variable.id, variable)
   const collections = new Map<string, VariableCollection>()
   for (const collection of graph.getLiveCollections()) collections.set(collection.id, collection)
-  const state: PenWriteState = { graph, variables, collections, writtenIds: writtenNodeIds(graph) }
-  const children = graph.getPages().flatMap((page) =>
+  const state: PenWriteState = {
+    graph,
+    variables,
+    collections,
+    writtenIds: writtenNodeIds(graph),
+    warnings: options.warnings ?? [],
+    drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
+  }
+  const pages = graph.getPages()
+  const children = pages.flatMap((page) =>
     graph
       .getChildren(page.id)
       .filter((node) => !node.internalOnly)
       .map((node) => writeNode(state, node))
   )
-  const document: PenDocument = { version: PEN_VERSION, name: graph.getPages()[0]?.name, children }
+  const document: PenDocument = { version: PEN_VERSION, name: pages[0]?.name, children }
   const variablesValue = variablesOf(state)
   if (variablesValue) document.variables = variablesValue
   const themes = themesOf(state)
@@ -657,14 +740,50 @@ export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
     return refreshed
   })
   if (tokenSources.length > 0) document.tokenSources = tokenSources
+  if (pages.length > 1) {
+    const name = document.name ?? 'Page 1'
+    state.warnings.push(
+      `Pencil.dev files hold one page; ${pages.length} pages were merged into “${name}”.`
+    )
+  }
+  reportDrops(state)
   return document
+}
+
+/** Adds one sentence for each kind of content the written file had to leave out. */
+function reportDrops(state: PenWriteState): void {
+  const { images, effects, filters, scroll, fontFeatures } = state.drops
+  if (images > 0)
+    state.warnings.push(
+      `Image fills with missing image data were left out (${images}); Pencil.dev files cannot hold a paint without its image.`
+    )
+  if (effects > 0)
+    state.warnings.push(
+      `Noise and texture effects were left out (${effects}); Pencil.dev files have no form for them.`
+    )
+  if (filters > 0)
+    state.warnings.push(
+      `Image adjustment filters were left out (${filters}); Pencil.dev files have no form for them.`
+    )
+  if (scroll > 0)
+    state.warnings.push(
+      `Scroll overflow was left out (${scroll}); Pencil.dev files have no form for it.`
+    )
+  if (fontFeatures > 0)
+    state.warnings.push(
+      `OpenType font features were left out (${fontFeatures}); Pencil.dev files have no form for them.`
+    )
 }
 
 export function stringifyPenDocument(document: PenDocument): string {
   return `${JSON.stringify(sortKeys(document), null, 2)}\n`
 }
 
-export function writePenDocument(source: PenDocument | SceneGraph): string {
-  const document = source instanceof SceneGraphValue ? penDocumentFromGraph(source) : source
+export function writePenDocument(
+  source: PenDocument | SceneGraph,
+  options: PenWriteOptions = {}
+): string {
+  const document =
+    source instanceof SceneGraphValue ? penDocumentFromGraph(source, options) : source
   return stringifyPenDocument(document)
 }

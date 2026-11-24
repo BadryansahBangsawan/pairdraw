@@ -208,12 +208,15 @@ export const penFormat: IOFormatAdapter<'pen'> = {
       : { graph, sourceFormat: 'pen' }
   },
   async writeDocument(graph) {
+    const warnings: string[] = []
+    const data = writePenDocument(graph, { warnings })
     return {
       format: 'pen',
       mimeType: 'application/json',
       extension: 'pen',
-      data: writePenDocument(graph),
-      encoding: 'utf8'
+      data,
+      encoding: 'utf8',
+      ...(warnings.length > 0 ? { warnings } : {})
     }
   }
 }

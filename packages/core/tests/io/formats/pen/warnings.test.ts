@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { IORegistry, penFormat } from '@pairdraw/core/io'
+import { parsePenDocument } from '@pairdraw/pen'
 
 const io = new IORegistry([penFormat])
 
@@ -91,5 +92,30 @@ describe('penFormat warnings', () => {
 
     const warning = warnings?.find((item) => item.kind === 'unknown-variable')
     expect(warning?.kind === 'unknown-variable' ? warning.names : []).toHaveLength(10)
+  })
+})
+
+describe('penFormat save warnings', () => {
+  test('warns instead of throwing when an effect has no Pencil.dev form', async () => {
+    const { graph } = await read({
+      children: [{ id: 'grain', type: 'rectangle', width: 40, height: 40 }]
+    })
+    graph.updateNode('grain', {
+      effects: [
+        {
+          type: 'NOISE',
+          color: { r: 0, g: 0, b: 0, a: 1 },
+          visible: true,
+          noise: { noiseType: 'MULTITONE', density: 0.5, noiseSize: { x: 1, y: 1 } }
+        }
+      ]
+    })
+
+    const saved = await io.writeDocument('pen', graph)
+
+    expect(saved.warnings).toEqual([
+      'Noise and texture effects were left out (1); Pencil.dev files have no form for them.'
+    ])
+    expect(parsePenDocument(String(saved.data)).children[0]?.effect).toBeUndefined()
   })
 })

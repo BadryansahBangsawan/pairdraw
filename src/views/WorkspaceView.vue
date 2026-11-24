@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
-import { useEventListener } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -30,6 +29,7 @@ import { useDocumentDrop } from '@/app/shell/document-drop'
 import { useKeyboard } from '@/app/shell/keyboard/use'
 import { useEditorMenu } from '@/app/shell/menu/use'
 import { toast } from '@/app/shell/ui'
+import { useEditorWheelGuard } from '@/app/shell/wheel/use'
 import {
   activeTab,
   createHomeTab,
@@ -168,14 +168,7 @@ exposeAutomationTestRequests()
 const stopEmbed = embed ? startEmbed(embed) : undefined
 syncTabAddress(router, route)
 
-useEventListener(
-  document,
-  'wheel',
-  (event: WheelEvent) => {
-    if (event.ctrlKey || event.metaKey) event.preventDefault()
-  },
-  { passive: false }
-)
+useEditorWheelGuard()
 
 const fileAssociationCleanup = ref<(() => void) | null>(null)
 const roomLinksCleanup = ref<(() => void) | null>(null)

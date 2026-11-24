@@ -465,9 +465,9 @@ function penVariable(
 }
 
 function variablesOf(state: PenWriteState): Record<string, PenVariable> | undefined {
-  if (state.graph.variables.size === 0) return undefined
+  if (state.variables.size === 0) return undefined
   return Object.fromEntries(
-    [...state.graph.variables.values()]
+    [...state.variables.values()]
       .sort((left, right) => left.name.localeCompare(right.name))
       .map((variable) => [
         variable.name,
@@ -477,9 +477,9 @@ function variablesOf(state: PenWriteState): Record<string, PenVariable> | undefi
 }
 
 function themesOf(state: PenWriteState): PenDocument['themes'] {
-  if (state.graph.variableCollections.size === 0) return undefined
+  if (state.collections.size === 0) return undefined
   return Object.fromEntries(
-    [...state.graph.variableCollections.values()]
+    [...state.collections.values()]
       .sort((left, right) => left.name.localeCompare(right.name))
       .map((collection) => [collection.name, collection.modes.map((mode) => mode.name)])
   )
@@ -487,7 +487,7 @@ function themesOf(state: PenWriteState): PenDocument['themes'] {
 
 /** The selector each mode applies in, by collection and mode name; none when no mode names one. */
 function modeConditionsOf(state: PenWriteState): PenDocument['modeConditions'] {
-  const entries = [...state.graph.variableCollections.values()].flatMap((collection) => {
+  const entries = [...state.collections.values()].flatMap((collection) => {
     const modes = collection.modes.flatMap((mode) =>
       mode.condition ? [[mode.name, mode.condition] as const] : []
     )
@@ -613,11 +613,11 @@ function sortKeys(value: unknown): unknown {
 }
 
 export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
+  // A deleted variable has no state `.pen` can hold, so layers bound to it write its value.
   const variables = new Map<string, Variable>()
-  for (const variable of graph.variables.values()) variables.set(variable.id, variable)
+  for (const variable of graph.getLiveVariables()) variables.set(variable.id, variable)
   const collections = new Map<string, VariableCollection>()
-  for (const collection of graph.variableCollections.values())
-    collections.set(collection.id, collection)
+  for (const collection of graph.getLiveCollections()) collections.set(collection.id, collection)
   const state: PenWriteState = { graph, variables, collections, writtenIds: writtenNodeIds(graph) }
   const children = graph.getPages().flatMap((page) =>
     graph

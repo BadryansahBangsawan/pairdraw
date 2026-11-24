@@ -11,9 +11,9 @@ function counted(count: number, one: string, many: string): string {
  * unbound. The writer names that loss instead of writing a file that looks complete.
  */
 export function drawioDroppedWarnings(graph: SceneGraph): string[] {
-  const variables = graph.variables.size
+  const variables = graph.getLiveVariables().length
   if (variables === 0) return []
-  const names = [...graph.variableCollections.values()].map((collection) => collection.name)
+  const names = graph.getLiveCollections().map((collection) => collection.name)
   const dropped = `draw.io has no variables: ${counted(variables, 'variable', 'variables')} in ${counted(names.length, 'collection', 'collections')} (${names.join(', ')}) not written`
   const bound = [...graph.nodes.values()].filter(
     (node) => Object.keys(node.boundVariables).length > 0

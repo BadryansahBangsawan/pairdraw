@@ -42,7 +42,7 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 const fillCtx = useFillControls()
 const store = useEditorStore()
 /** Every variable a shader input may follow, in the order the binding picker lists them. */
-const shaderVariables = useSceneComputed(() => [...store.graph.variables.values()])
+const shaderVariables = useSceneComputed(() => store.graph.getLiveVariables())
 const okhcl = useOkHCL()
 const gradients = useGradientEditing()
 

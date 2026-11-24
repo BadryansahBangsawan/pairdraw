@@ -3,7 +3,7 @@ import {
   figFontEntries,
   figFontsManifest,
   type FigArchiveRecordInfo,
-  type FigRecordPatch,
+  type FigRecordPatch
 } from '@pairdraw/fig'
 import {
   nameImagesForFigma,

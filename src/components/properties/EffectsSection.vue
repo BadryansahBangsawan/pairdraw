@@ -29,7 +29,7 @@ const { panels } = useI18n()
 const blendModeGroups = useBlendModeGroups()
 const store = useEditorStore()
 /** The variables a shader effect's inputs may follow. */
-const shaderVariables = useSceneComputed(() => [...store.graph.variables.values()])
+const shaderVariables = useSceneComputed(() => store.graph.getLiveVariables())
 const {
   visible: stylesVisible,
   hasStyle,

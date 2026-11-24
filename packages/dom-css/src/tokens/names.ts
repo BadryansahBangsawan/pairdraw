@@ -9,9 +9,9 @@ export function collectionVariables(
   source: Pick<SceneGraph, 'variables' | 'variableCollections'>
 ): Variable[] {
   return compact(
-    [...source.variableCollections.values()].flatMap((collection) =>
-      collection.variableIds.map((id) => source.variables.get(id))
-    )
+    [...source.variableCollections.values()]
+      .filter((collection) => !collection.deleted)
+      .flatMap((collection) => collection.variableIds.map((id) => source.variables.get(id)))
   )
 }
 

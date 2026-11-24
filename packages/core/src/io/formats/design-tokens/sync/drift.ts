@@ -579,9 +579,11 @@ export function tokenSnapshot(
 /** Every collection's modes by id and name, to find them again when a format reassigns ids. */
 function modeNames(graph: SceneGraph): Record<string, Record<string, string>> {
   return Object.fromEntries(
-    [...graph.variableCollections.values()].map((collection) => [
-      collection.name,
-      Object.fromEntries(collection.modes.map((mode) => [mode.modeId, mode.name]))
-    ])
+    graph
+      .getLiveCollections()
+      .map((collection) => [
+        collection.name,
+        Object.fromEntries(collection.modes.map((mode) => [mode.modeId, mode.name]))
+      ])
   )
 }

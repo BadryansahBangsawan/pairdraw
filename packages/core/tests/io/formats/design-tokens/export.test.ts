@@ -78,6 +78,23 @@ describe('design token export', () => {
     ])
   })
 
+  test('leaves a deleted variable and collection out of every file', () => {
+    const graph = designSystem()
+    const accent = [...graph.variables.values()].find((item) => item.name === 'Accent')
+    if (!accent) throw new Error('Missing fixture')
+    graph.addVariable({ ...accent, deleted: true })
+    const removed = graph.createCollection('Removed')
+    const orphan = graph.createVariable('Orphan', 'COLOR', removed.id, { r: 0, g: 1, b: 0, a: 1 })
+    graph.addCollection({ ...removed, deleted: true })
+    graph.addVariable({ ...orphan, deleted: true })
+
+    const exported = exportDesignTokens(graph)
+    expect(exported.files.map((entry) => entry.path)).not.toContain('Removed/Mode 1.tokens.json')
+    expect(file(graph, 'Theme/Light.tokens.json')).not.toHaveProperty('Accent')
+    expect(JSON.stringify(file(graph, RESOLVER_FILE))).not.toContain('Removed')
+    expect(JSON.stringify(exported.files)).not.toContain('Orphan')
+  })
+
   test('writes values the way Figma imports them', () => {
     const light = file(designSystem(), 'Theme/Light.tokens.json')
 

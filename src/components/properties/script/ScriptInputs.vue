@@ -64,7 +64,7 @@ function variablesFor(declaration: ScriptInputDeclaration): VariablePickerItem[]
   const type = VARIABLE_TYPES[declaration.kind]
   if (!type) return []
   const items: VariablePickerItem[] = []
-  for (const variable of store.graph.variables.values()) {
+  for (const variable of store.graph.getLiveVariables()) {
     if (variable.type !== type) continue
     items.push({
       id: variable.id,

@@ -106,9 +106,9 @@ class CSSTokenReader {
   group(name: string): Group {
     const found = this.groups.get(name)
     if (found) return found
-    const existing = [...this.graph.variableCollections.values()].find(
-      (collection) => collection.name === name && !isLibraryCollection(collection)
-    )
+    const existing = this.graph
+      .getLiveCollections()
+      .find((collection) => collection.name === name && !isLibraryCollection(collection))
     const defaultName =
       existing?.modes.find((mode) => mode.modeId === existing.defaultModeId)?.name ?? 'Default'
     const group: Group = {

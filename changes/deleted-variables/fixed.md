@@ -1,2 +1,3 @@
-- A variable or collection deleted in Figma leaves its collection's variable list and stays deleted through a save, while layers bound to it still resolve it.
+- A variable or collection deleted in Figma leaves every variable list and token export, while layers bound to it still resolve it and `.fig` saves keep it deleted.
+- Writing a `.pen` file leaves out deleted variables and collections and stores the value a deleted binding resolved to.
 - A `.fig` file whose variables include a type Pairdraw does not model, such as a paint variable, now opens, and a save copies those records back as the file held them.

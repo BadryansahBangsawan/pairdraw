@@ -50,6 +50,16 @@ describe('variable mode choices', () => {
     expect(variableModeChoices(editor, [node(page)]).map((c) => c.collectionId)).toEqual([theme.id])
   })
 
+  test('offer a deleted collection only where its variables are still bound', () => {
+    const { editor, graph, theme, page, outer, plain, node } = setup()
+    graph.addCollection({ ...theme, deleted: true })
+    const offered = (id: string) =>
+      variableModeChoices(editor, [node(id)]).map((choice) => choice.collectionId)
+    expect(offered(outer.id)).toEqual([theme.id])
+    expect(offered(page)).toEqual([theme.id])
+    expect(offered(plain.id)).toEqual([])
+  })
+
   test('show Auto with the inherited mode, the set mode, or MIXED', () => {
     const { editor, theme, light, dark, outer, inner, node } = setup()
     const [auto] = variableModeChoices(editor, [node(inner.id)])

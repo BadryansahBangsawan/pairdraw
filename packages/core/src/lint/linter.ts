@@ -334,7 +334,7 @@ function describeVariables(graph: SceneGraph): LintVariables {
   const counts = { COLOR: 0, FLOAT: 0, STRING: 0, BOOLEAN: 0 }
   const colorsByHex = new Map<string, { id: string; name: string }>()
   const numbersByField = new Map<TokenNumberField, Map<number, { id: string; name: string }[]>>()
-  for (const variable of graph.variables.values()) {
+  for (const variable of graph.getLiveVariables()) {
     counts[variable.type]++
     if (variable.type === 'FLOAT') {
       const namespace = variableNamespace(variable)

@@ -47,7 +47,7 @@ export function knownTokens(graph: SceneGraph): KnownTokens {
     byCSSName.set(name, { variable, collection, library: isLibraryCollection(collection) })
   }
   const byCondition = new Map<string, KnownMode>()
-  for (const collection of graph.variableCollections.values()) {
+  for (const collection of graph.getLiveCollections()) {
     if (isLibraryCollection(collection)) continue
     for (const mode of collection.modes) {
       if (mode.modeId === collection.defaultModeId) continue

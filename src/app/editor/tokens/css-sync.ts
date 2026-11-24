@@ -287,7 +287,7 @@ export function tokenDriftKey(drift: TokenDrift): string {
 function trackingKey(store: EditorStore, link: TokenCSSLink, recorded: TokenSource | undefined) {
   const { graph } = store
   let modes = 0
-  for (const collection of graph.variableCollections.values()) modes += collection.modes.length
+  for (const collection of graph.getLiveCollections()) modes += collection.modes.length
   return [
     graph.rootId,
     link.id,

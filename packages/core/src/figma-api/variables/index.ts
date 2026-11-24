@@ -65,7 +65,8 @@ export class FigmaVariablesAPI {
 
   getLocalVariables(type?: FigmaVariableResolvedType): FigmaVariable[] {
     const wanted = type === undefined ? undefined : assertType('getLocalVariables', type)
-    return [...this.#graph.variables.values()]
+    return this.#graph
+      .getLiveVariables()
       .filter((variable) => wanted === undefined || variable.type === wanted)
       .map((variable) => new FigmaVariable(this.#graph, variable.id))
   }
@@ -75,9 +76,9 @@ export class FigmaVariablesAPI {
   }
 
   getLocalVariableCollections(): FigmaVariableCollection[] {
-    return [...this.#graph.variableCollections.keys()].map(
-      (id) => new FigmaVariableCollection(this.#graph, id)
-    )
+    return this.#graph
+      .getLiveCollections()
+      .map((collection) => new FigmaVariableCollection(this.#graph, collection.id))
   }
 
   async getLocalVariableCollectionsAsync(): Promise<FigmaVariableCollection[]> {

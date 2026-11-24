@@ -183,7 +183,12 @@ function renderOwnLayerElement(
   const parentLayout = graph.getNode(parentId)?.layoutMode ?? 'NONE'
   const layer = omitBy(
     {
-      ...propsToOverrides(readElementProps(element.layer, props), false, parentLayout),
+      ...propsToOverrides(
+        readElementProps(element.layer, props),
+        false,
+        parentLayout,
+        graph.documentColorSpace
+      ),
       ...(modes && { variableModes: modes })
     },
     (value) => value === undefined
@@ -426,7 +431,7 @@ async function renderInstanceNode(
     throw new Error(`<Instance> component not found: ${label}`)
   }
   const overrides: Partial<SceneNode> = {
-    ...propsToOverrides(props, false, parentLayout),
+    ...propsToOverrides(props, false, parentLayout, graph.documentColorSpace),
     ...layerMetadata(modes, bound.references)
   }
   // Instances inherit their container layout, but explicitly authored dimensions
@@ -561,7 +566,7 @@ export function elementOverrides(
   const layer = { parentId, modes }
   const { props, bindings } = preparePropsForRender(graph, bound.props, isText, layer)
   const overrides = {
-    ...propsToOverrides(props, isText, parentLayout),
+    ...propsToOverrides(props, isText, parentLayout, graph.documentColorSpace),
     ...shapeOverrides(nodeType, props),
     ...layerMetadata(modes, bound.references)
   }
@@ -569,7 +574,12 @@ export function elementOverrides(
   if (isText) {
     // A span's variables give their values; characters keep no bindings of their own.
     const spanOverrides = (spanProps: Record<string, unknown>) =>
-      propsToOverrides(preparePropsForRender(graph, spanProps, true, layer).props, true, 'NONE')
+      propsToOverrides(
+        preparePropsForRender(graph, spanProps, true, layer).props,
+        true,
+        'NONE',
+        graph.documentColorSpace
+      )
     Object.assign(overrides, textContentFields(tree, props, overrides, spanOverrides))
     // As Figma does, a text layer follows its characters until a name is given, and keeps a given
     // name through later edits.

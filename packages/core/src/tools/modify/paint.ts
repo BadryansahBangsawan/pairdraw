@@ -45,11 +45,11 @@ export const setFill = defineTool({
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
 
-    const c = parseToolColor(color)
+    const c = parseToolColor(color, figma.graph.documentColorSpace)
     if ('error' in c) return c
 
     if (gradient && color_end) {
-      const cEnd = parseToolColor(color_end)
+      const cEnd = parseToolColor(color_end, figma.graph.documentColorSpace)
       if ('error' in cEnd) return cEnd
       // Edge middles of the layer's unit square that each direction runs between.
       const ends: Record<string, [Vector, Vector]> = {
@@ -111,7 +111,7 @@ export const setStroke = defineTool({
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
 
-    const c = parseToolColor(color)
+    const c = parseToolColor(color, figma.graph.documentColorSpace)
     if ('error' in c) return c
     node.strokes = [{ type: 'SOLID', color: c }]
     node.strokeWeight = weight

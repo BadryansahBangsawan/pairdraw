@@ -323,3 +323,16 @@ describe('vectorizableImageFill', () => {
     expect(vectorizableImageFill(page)).toBeNull()
   })
 })
+
+describe('svgToVectorPaths colors', () => {
+  test('reads a color that names its space into the given profile', () => {
+    const svg = `<svg viewBox="0 0 10 10"><path d="M0 0 H10 V10 H0 Z" fill="color(display-p3 1 0 0)"/></svg>`
+    const p3 = expectDefined(
+      svgToVectorPaths(svg, { width: 10, height: 10 }, { profile: 'display-p3' }),
+      'vectorized SVG'
+    )
+    expect(p3.paths[0]?.fills[0]?.color).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+    const srgb = expectDefined(svgToVectorPaths(svg, { width: 10, height: 10 }), 'vectorized SVG')
+    expect(srgb.paths[0]?.fills[0]?.color.r).toBeLessThan(1)
+  })
+})

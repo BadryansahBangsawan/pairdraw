@@ -162,7 +162,7 @@ function worstContrast(text: Color, surfaces: Color[]): number {
  * it read as text on every one of them; returned as it is when it already does.
  */
 function readableOnPanels(color: Color, theme: AccentTheme): Color {
-  const panels = ACCENT_PANEL_COLORS[theme].map(parseColor)
+  const panels = ACCENT_PANEL_COLORS[theme].map((value) => parseColor(value))
   if (worstContrast(color, panels) >= ACCENT_TEXT_CONTRAST) return color
   const { l, c, h } = rgbaToOkHCL(color)
   const direction = theme === 'dark' ? 1 : -1

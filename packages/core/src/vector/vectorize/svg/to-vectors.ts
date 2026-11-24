@@ -7,7 +7,13 @@
  */
 import svgpath from 'svgpath'
 
-import type { Fill, Stroke, VectorNetwork, WindingRule } from '@pairdraw/scene-graph'
+import type {
+  DocumentColorSpace,
+  Fill,
+  Stroke,
+  VectorNetwork,
+  WindingRule
+} from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import { computeBounds } from '@pairdraw/scene-graph/geometry'
 import type { Mat3 } from '@pairdraw/scene-graph/matrix'
@@ -49,20 +55,35 @@ function unionPathBounds(paths: VectorizedPath[]): Rect {
   return computeBounds(rects)
 }
 
-function resolveFill(path: IconPathInfo, defaultColor: string): Fill[] {
+function resolveFill(
+  path: IconPathInfo,
+  defaultColor: string,
+  profile: DocumentColorSpace
+): Fill[] {
   if (path.fill && path.fill !== 'none') {
-    const color = path.fill === 'currentColor' ? parseColor(defaultColor) : parseColor(path.fill)
+    const color =
+      path.fill === 'currentColor'
+        ? parseColor(defaultColor, profile)
+        : parseColor(path.fill, profile)
     return [{ type: 'SOLID', color, opacity: path.fillOpacity, visible: true }]
   }
   if (path.fill === null && !path.stroke) {
-    return [{ type: 'SOLID', color: parseColor(defaultColor), opacity: 1, visible: true }]
+    return [{ type: 'SOLID', color: parseColor(defaultColor, profile), opacity: 1, visible: true }]
   }
   return []
 }
 
-function resolveStrokes(path: IconPathInfo, defaultColor: string, strokeScale = 1): Stroke[] {
+function resolveStrokes(
+  path: IconPathInfo,
+  defaultColor: string,
+  strokeScale = 1,
+  profile: DocumentColorSpace = 'srgb'
+): Stroke[] {
   if (!path.stroke || path.stroke === 'none') return []
-  const color = path.stroke === 'currentColor' ? parseColor(defaultColor) : parseColor(path.stroke)
+  const color =
+    path.stroke === 'currentColor'
+      ? parseColor(defaultColor, profile)
+      : parseColor(path.stroke, profile)
   const stroke = createPathStroke(
     color,
     path.strokeWidth * strokeScale,
@@ -114,7 +135,12 @@ export interface SVGVectorizeResult {
 export function svgToVectorPaths(
   svgText: string,
   bounds: Size,
-  options?: { defaultColor?: string; preserveAspectRatio?: boolean }
+  options?: {
+    defaultColor?: string
+    preserveAspectRatio?: boolean
+    /** The profile a color that names its own space is read into. */
+    profile?: DocumentColorSpace
+  }
 ): SVGVectorizeResult | null {
   const { paths, texts } = extractSVGContent(svgText)
   if (paths.length === 0 && texts.length === 0) return null
@@ -123,7 +149,8 @@ export function svgToVectorPaths(
   if (space.width <= 0 || space.height <= 0) return null
 
   const defaultColor = options?.defaultColor ?? '#000000'
-  const gradients = parseSVGGradients(svgText)
+  const profile = options?.profile ?? 'srgb'
+  const gradients = parseSVGGradients(svgText, profile)
   const viewport = resolveSVGViewportMapping(
     svgText,
     space,
@@ -139,8 +166,8 @@ export function svgToVectorPaths(
     const transform = path.transform ?? null
     const pathData = applySVGTransformToPath(path.d, transform)
     const scaledD = mapSVGPathToViewport(pathData, viewport)
-    const solidFills = resolveFill(path, defaultColor)
-    const strokes = resolveStrokes(path, defaultColor, strokeScale)
+    const solidFills = resolveFill(path, defaultColor, profile)
+    const strokes = resolveStrokes(path, defaultColor, strokeScale, profile)
     // A stroke would also trace the closing edge of an open subpath in the fill region.
     const network = parseSVGPath(scaledD, fillRule, {
       includeOpenRegions: solidFills.length > 0 && strokes.length === 0
@@ -171,7 +198,10 @@ export function svgToVectorPaths(
     texts: texts.map((text) => ({
       pieces: text.pieces.map((piece) => ({
         ...piece,
-        runs: piece.runs.map((run) => ({ ...run, fills: resolveTextFill(run, defaultColor) }))
+        runs: piece.runs.map((run) => ({
+          ...run,
+          fills: resolveTextFill(run, defaultColor, profile)
+        }))
       })),
       matrix: transformMatrix(text.transform, viewport),
       clips: text.clipPaths && vectorizeClips(text.clipPaths, viewport, null, clipCache),
@@ -253,10 +283,14 @@ function transformMatrix(transform: string | null, viewport: SVGViewportMapping)
   ]
 }
 
-function resolveTextFill(run: SVGTextRun, defaultColor: string): Fill[] {
+function resolveTextFill(
+  run: SVGTextRun,
+  defaultColor: string,
+  profile: DocumentColorSpace
+): Fill[] {
   const color =
     run.fill === null || run.fill === 'currentColor'
-      ? parseColor(defaultColor)
-      : parseColor(run.fill)
+      ? parseColor(defaultColor, profile)
+      : parseColor(run.fill, profile)
   return [{ type: 'SOLID', color, opacity: run.fillOpacity, visible: true }]
 }

@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, SceneNode } from '@pairdraw/scene-graph'
 import { colorSchema } from '@pairdraw/scene-graph/color'
 import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import { parseCSSShadows } from '@pairdraw/scene-graph/css'
@@ -102,14 +102,18 @@ function forNormalize(effect: ParsedEffect): NormalizableEffect {
 }
 
 /** `effects` takes structured effects; `shadow` appends its shadows and `blur` a layer blur. */
-export function applyEffectOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
+export function applyEffectOverrides(
+  props: Record<string, unknown>,
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace = 'srgb'
+): void {
   if (Array.isArray(props.effects) && props.effects.length > 0) {
     const effects = parseScriptInput('effects', effectsSchema, props.effects).map(forNormalize)
     o.effects = normalizeEffects(effects)
   }
 
   // A CSS shadow list, as `box-shadow` takes it.
-  const shadows = typeof props.shadow === 'string' ? parseCSSShadows(props.shadow) : []
+  const shadows = typeof props.shadow === 'string' ? parseCSSShadows(props.shadow, profile) : []
   if (shadows.length > 0) o.effects = [...(o.effects ?? []), ...shadows]
 
   if (typeof props.blur === 'number') {

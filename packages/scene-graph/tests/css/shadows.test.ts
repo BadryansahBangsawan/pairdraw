@@ -27,6 +27,12 @@ describe('parseCSSShadows', () => {
     expect(parseCSSShadows(value)).toEqual([shadow({ color: RED })])
   })
 
+  test('reads a shadow color in the given profile', () => {
+    expect(parseCSSShadows('0 4px 8px color(display-p3 1 0 0)', 'display-p3')).toEqual([
+      shadow({ color: RED })
+    ])
+  })
+
   test('reads spread, rem lengths, and a translucent color', () => {
     expect(parseCSSShadows('0 0.25rem 8px 2px rgba(0, 0, 0, 0.5)')).toEqual([
       shadow({ spread: 2, color: { r: 0, g: 0, b: 0, a: 0.5 } })

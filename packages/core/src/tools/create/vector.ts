@@ -75,9 +75,9 @@ export const createVector = defineTool({
       parsedPath = parsed
     }
     // Both colours are read before the node exists, so a bad one creates nothing.
-    const fill = parseOptionalToolColor(args.fill)
+    const fill = parseOptionalToolColor(args.fill, figma.graph.documentColorSpace)
     if ('error' in fill) return fill
-    const stroke = parseOptionalToolColor(args.stroke)
+    const stroke = parseOptionalToolColor(args.stroke, figma.graph.documentColorSpace)
     if ('error' in stroke) return stroke
     const parent = args.parent_id ? figma.getNodeById(args.parent_id) : null
     if (parent) prepareSlotInsertion(figma.graph, parent.id, 'create_vector')

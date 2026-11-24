@@ -1,7 +1,8 @@
 import valueParser, { type Node } from 'postcss-value-parser'
 
-import { parseDisplayableColor } from '../color'
+import { tryParseColor } from '../color'
 import type { Color } from '../primitives'
+import type { DocumentColorSpace } from '../types'
 
 /** Pixels in a rem, as browsers use by default. */
 const ROOT_FONT_SIZE = 16
@@ -27,11 +28,17 @@ export function parseCSSNumber(value: string | undefined): number | null {
   }
 }
 
-/** A CSS color that paints something; null for an invalid or fully transparent one. */
-export function parseCSSColor(value: string | undefined): Color | null {
+/**
+ * A CSS color that paints something, as components in `profile`; null for an invalid or fully
+ * transparent one. A stylesheet's own declarations are read in sRGB, as CSS authors them; a caller
+ * reading markup into a document passes the document's profile.
+ */
+export function parseCSSColor(
+  value: string | undefined,
+  profile: DocumentColorSpace = 'srgb'
+): Color | null {
   if (!value) return null
-  // CSS clamps `rgb()` channels and maps wide-gamut colors into sRGB, as a stored color must be.
-  const color = parseDisplayableColor(value.trim())
+  const color = tryParseColor(value.trim(), profile)
   return color && color.a > 0 ? color : null
 }
 

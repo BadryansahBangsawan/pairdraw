@@ -1,7 +1,7 @@
 import { designJSXProp } from '#design-jsx/definitions'
 import { STROKE_ALIGN, STROKE_CAP, STROKE_JOIN } from '#design-jsx/enums'
 
-import type { SceneNode, Stroke } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -35,8 +35,8 @@ function dashValue(value: unknown): number[] | undefined {
   return dash.length > 0 ? dash : undefined
 }
 
-function toStroke(value: StrokeValue): Stroke {
-  const color = typeof value.color === 'string' ? parseColor(value.color) : value.color
+function toStroke(value: StrokeValue, profile: DocumentColorSpace): Stroke {
+  const color = typeof value.color === 'string' ? parseColor(value.color, profile) : value.color
   const stroke: Stroke = {
     type: 'SOLID',
     color,
@@ -80,7 +80,11 @@ function applyStrokeWeights(value: unknown, o: Partial<SceneNode>): void {
 }
 
 /** `strokes` takes structured strokes; `stroke` and its sibling props describe a single one. */
-export function applyStrokeOverrides(props: LayerProps, o: Partial<SceneNode>): void {
+export function applyStrokeOverrides(
+  props: LayerProps,
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace = 'srgb'
+): void {
   applyStrokeWeights(props.strokeWeights, o)
   // Node-level cap and join, which strokes without their own use.
   const nodeCap = STROKE_CAP.parse(props.strokeCap)
@@ -91,7 +95,7 @@ export function applyStrokeOverrides(props: LayerProps, o: Partial<SceneNode>): 
   const nodeDash = dashValue(props.dashPattern)
   if (nodeDash) o.dashPattern = nodeDash
   const strokes = strokeValues(props).map((value) =>
-    toStroke({ ...value, dash: value.dash ?? nodeDash })
+    toStroke({ ...value, dash: value.dash ?? nodeDash }, profile)
   )
   if (strokes.length > 0) o.strokes = strokes
 }

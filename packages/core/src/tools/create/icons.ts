@@ -130,7 +130,7 @@ export const insertIcon = defineTool({
     if (names.length === 0) return { error: 'Provide "names" (array) or "name" (string)' }
 
     const size = args.size ?? 24
-    const parsedColor = parseToolColor(args.color ?? '#000000')
+    const parsedColor = parseToolColor(args.color ?? '#000000', figma.graph.documentColorSpace)
     if ('error' in parsedColor) return parsedColor
     const options = iconOptions(args)
 

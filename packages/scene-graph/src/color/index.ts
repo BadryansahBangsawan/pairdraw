@@ -8,22 +8,34 @@ import { parse, formatHex, formatHex8, formatRgb, converter, differenceEuclidean
 
 import { BLACK } from '../constants'
 import type { Color } from '../primitives'
+import type { DocumentColorSpace } from '../types'
+import { fitIntoProfile, SRGB_SYNTAX_MODES } from './management'
 import { normalizeColor } from './normalize'
 
 const toRGB = converter('rgb')
 
-/** A CSS color, or null when `input` is not one. */
-export function tryParseColor(input: string): Color | null {
+/**
+ * A CSS color as components in `profile`, or null when `input` is not one. Hex and the other sRGB
+ * syntaxes give their numbers as they are, as Figma takes typed or imported hex as the document's
+ * own numbers in either profile. A color that names its space, such as `color(display-p3 …)` or
+ * `oklch()`, is converted into `profile`, and brought inside it by reducing chroma when the profile
+ * cannot show it.
+ */
+export function tryParseColor(input: string, profile: DocumentColorSpace = 'srgb'): Color | null {
   const parsed = parse(input)
   if (!parsed) return null
-  const rgb = toRGB(parsed)
+  // A component written past the float range, such as `1e999`, is no color.
+  if (Object.values(parsed).some((value) => typeof value === 'number' && !Number.isFinite(value)))
+    return null
+  const a = parsed.alpha ?? 1
   // culori leaves a `none` channel out, which normalizing reads as zero.
-  return normalizeColor({ r: rgb.r, g: rgb.g, b: rgb.b, a: parsed.alpha })
+  if (SRGB_SYNTAX_MODES.has(parsed.mode)) return normalizeColor({ ...toRGB(parsed), a })
+  return fitIntoProfile(parsed, profile).color
 }
 
-/** A CSS color, or black when `input` is not one. */
-export function parseColor(input: string): Color {
-  return tryParseColor(input) ?? { ...BLACK }
+/** A CSS color as components in `profile`, or black when `input` is not one. */
+export function parseColor(input: string, profile: DocumentColorSpace = 'srgb'): Color {
+  return tryParseColor(input, profile) ?? { ...BLACK }
 }
 
 export function colorToHex(color: Color): string {
@@ -64,8 +76,9 @@ export function rgba255ToColor(r: number, g: number, b: number, a = 1): Color {
   return { r: r / 255, g: g / 255, b: b / 255, a }
 }
 
-export function colorToFill(color: string | Color) {
-  const rgba = typeof color === 'string' ? parseColor(color) : color
+/** A solid paint of `color`, a CSS color read into `profile` or components already in it. */
+export function colorToFill(color: string | Color, profile: DocumentColorSpace = 'srgb') {
+  const rgba = typeof color === 'string' ? parseColor(color, profile) : color
   return {
     type: 'SOLID' as const,
     color: { r: rgba.r, g: rgba.g, b: rgba.b, a: rgba.a },

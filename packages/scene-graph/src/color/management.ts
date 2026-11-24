@@ -1,4 +1,13 @@
-import { clampGamut, converter, formatCss, formatRgb, inGamut, parse, toGamut } from 'culori'
+import {
+  clampGamut,
+  converter,
+  formatCss,
+  formatRgb,
+  inGamut,
+  parse,
+  toGamut,
+  type Color as CuloriColor
+} from 'culori'
 
 import type { Color } from '../primitives'
 import type { DocumentColorSpace, Fill, SceneNode, Stroke } from '../types'
@@ -149,6 +158,50 @@ export function resolveOkHCLForPreview(
     clipped
   }
 }
+
+/**
+ * `color`, any culori color, as components in `profile`, past 0 and 1 if need be.
+ */
+function exactlyInProfile(color: CuloriColor, profile: DocumentColorSpace): Color {
+  const converted = profile === 'display-p3' ? toP3(color) : toRGB(color)
+  return { r: converted.r, g: converted.g, b: converted.b, a: converted.alpha ?? 1 }
+}
+
+function isInsideProfile(color: Color, profile: DocumentColorSpace): boolean {
+  if (profile === 'display-p3')
+    return isDisplayableP3({ mode: 'p3', r: color.r, g: color.g, b: color.b, alpha: color.a })
+  return isDisplayableRGB({ mode: 'rgb', r: color.r, g: color.g, b: color.b, alpha: color.a })
+}
+
+/**
+ * `color`, any culori color, as components in `profile`, brought inside it the way CSS maps
+ * out-of-gamut colors — by reducing chroma in OKLCH so lightness and hue hold — and whether it had
+ * to be. A color inside already keeps its components, as mapping it would shift them by float
+ * noise. A missing (`none`) component reads as zero.
+ */
+export function fitIntoProfile(
+  color: CuloriColor,
+  profile: DocumentColorSpace
+): { color: Color; clipped: boolean } {
+  const exact = normalizeColor(exactlyInProfile(color, profile))
+  const clipped = !isInsideProfile(exact, profile)
+  const inside = clipped
+    ? normalizeColor(
+        exactlyInProfile(
+          profile === 'display-p3' ? toDisplayableP3(color) : toDisplayableRGB(color),
+          profile
+        )
+      )
+    : exact
+  const clamp = (channel: number) => Math.min(1, Math.max(0, channel))
+  return {
+    color: { r: clamp(inside.r), g: clamp(inside.g), b: clamp(inside.b), a: color.alpha ?? 1 },
+    clipped
+  }
+}
+
+/** Syntaxes CSS reads as sRGB numbers: hex, `rgb()`, `hsl()`, `hwb()`, names, `color(srgb …)`. */
+export const SRGB_SYNTAX_MODES = new Set(['rgb', 'hsl', 'hwb'])
 
 /**
  * A CSS color in any space, mapped into sRGB the way CSS maps out-of-gamut colors: by reducing

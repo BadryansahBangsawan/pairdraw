@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { VariableType } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, VariableType } from '@pairdraw/scene-graph'
 import { tryParseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -14,8 +14,12 @@ function figmaValue(value: ToolValue): FigmaVariableValue {
 
 type ToolValue = Color | number | string | boolean
 
-function parseVariableValue(type: VariableType, value: string): ToolValue | null {
-  if (type === 'COLOR') return tryParseColor(value)
+function parseVariableValue(
+  type: VariableType,
+  value: string,
+  profile: DocumentColorSpace
+): ToolValue | null {
+  if (type === 'COLOR') return tryParseColor(value, profile)
   if (type === 'FLOAT') return Number(value)
   if (type === 'BOOLEAN') return value === 'true'
   return value
@@ -40,7 +44,10 @@ export const createVariable = defineTool({
   execute: (figma, args) => {
     const type = args.type
     // The value is checked first, so a value the variable cannot hold creates nothing.
-    const value = args.value === undefined ? undefined : parseVariableValue(type, args.value)
+    const value =
+      args.value === undefined
+        ? undefined
+        : parseVariableValue(type, args.value, figma.graph.documentColorSpace)
     if (value === null) return { error: `"${args.value}" is not a ${type} value` }
     if (typeof value === 'number' && !Number.isFinite(value))
       return { error: `"${args.value}" is not a number` }
@@ -66,7 +73,11 @@ export const setVariable = defineTool({
   execute: (figma, args) => {
     const variable = figma.variables.getVariableById(args.id)
     if (!variable) return { error: `Variable "${args.id}" not found` }
-    const parsedValue = parseVariableValue(variable.resolvedType, args.value)
+    const parsedValue = parseVariableValue(
+      variable.resolvedType,
+      args.value,
+      figma.graph.documentColorSpace
+    )
     if (parsedValue === null)
       return { error: `"${args.value}" is not a ${variable.resolvedType} value` }
     variable.setValueForMode(args.mode, figmaValue(parsedValue))

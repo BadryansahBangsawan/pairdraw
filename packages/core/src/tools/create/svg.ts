@@ -37,7 +37,10 @@ export const importSVG = defineTool({
   execute: async (figma, args) => {
     if (!args.svg || typeof args.svg !== 'string') return { error: 'svg parameter is required' }
 
-    const data = prepareSVGImport(args.svg, { defaultColor: args.color })
+    const data = prepareSVGImport(args.svg, {
+      defaultColor: args.color,
+      profile: figma.graph.documentColorSpace
+    })
     // Text is measured and placed as it is created, so its fonts load first.
     await Promise.all(
       (data ? svgImportFonts(data) : []).map(({ family, style }) =>

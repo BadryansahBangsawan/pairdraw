@@ -1,6 +1,6 @@
 import { groupBy } from 'es-toolkit/array'
 
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { WHITE } from '@pairdraw/scene-graph/constants'
 import { fitEnclosingGroups } from '@pairdraw/scene-graph/group-bounds'
 import type { Size } from '@pairdraw/scene-graph/primitives'
@@ -31,6 +31,8 @@ export type SVGImportData = SVGVectorizeResult &
 export interface SVGImportOptions {
   name?: string
   defaultColor?: string
+  /** The profile a color that names its own space is read into. */
+  profile?: DocumentColorSpace
   x?: number
   y?: number
   /** Keep the frame of an SVG that draws nothing, as `figma.createNodeFromSvg` does. */
@@ -40,7 +42,7 @@ export interface SVGImportOptions {
 /** The layers SVG markup draws, or null when it does not parse as SVG. */
 export function prepareSVGImport(
   source: string,
-  options: Pick<SVGImportOptions, 'defaultColor'> = {}
+  options: Pick<SVGImportOptions, 'defaultColor' | 'profile'> = {}
 ): SVGImportData | null {
   if (!parseSVGDocument(source)) return null
   const sized = parseSVGSize(source, { width: 0, height: 0 }).width > 0
@@ -50,7 +52,8 @@ export function prepareSVGImport(
     { width, height },
     {
       defaultColor: options.defaultColor,
-      preserveAspectRatio: true
+      preserveAspectRatio: true,
+      profile: options.profile
     }
   ) ?? { paths: [], texts: [], contentBounds: { x: 0, y: 0, width: 0, height: 0 } }
   return { width, height, name: svgRootId(source), sized, ...vectorized }

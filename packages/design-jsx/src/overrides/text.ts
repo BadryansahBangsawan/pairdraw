@@ -1,7 +1,7 @@
 import { uniqBy } from 'es-toolkit'
 import * as v from 'valibot'
 
-import type { Fill, SceneNode, TextLength } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill, SceneNode, TextLength } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { percentLength, pixelLength } from '@pairdraw/scene-graph/text'
 
@@ -75,7 +75,8 @@ function autoLength(value: number | typeof AUTO): number | null {
  */
 export function applyTextDetailOverrides(
   props: Record<string, unknown>,
-  o: Partial<SceneNode>
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace
 ): void {
   const parsed = parseScriptInput('Invalid <Text> props', textPropsSchema, props)
   const color = parsed.textDecorationColor
@@ -85,7 +86,7 @@ export function applyTextDetailOverrides(
     o.textDecorationFills =
       typeof color === 'string' && color.toLowerCase() === CURRENT_COLOR.toLowerCase()
         ? []
-        : [fillFromValue(color)]
+        : [fillFromValue(color, profile)]
   }
   if (parsed.textDecorationThickness !== undefined)
     o.textDecorationThickness = autoLength(parsed.textDecorationThickness)

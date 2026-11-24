@@ -1,7 +1,13 @@
 import { isEqual, isPlainObject } from 'es-toolkit/predicate'
 import * as v from 'valibot'
 
-import type { Effect, SceneGraph, SceneNode, TextLength } from '@pairdraw/scene-graph'
+import type {
+  DocumentColorSpace,
+  Effect,
+  SceneGraph,
+  SceneNode,
+  TextLength
+} from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { getSharedStyles } from '@pairdraw/scene-graph/shared-styles'
 import { percentLength, pixelLength, textLengthSchema } from '@pairdraw/scene-graph/text'
@@ -178,15 +184,24 @@ function recordedTarget(
 }
 
 /** One shadow of a shadow token, or the shadows a referenced shadow token holds. */
-function shadowEffects(raw: unknown, resolve: Resolve, depth = 0): Effect[] | null {
+function shadowEffects(
+  raw: unknown,
+  resolve: Resolve,
+  profile: DocumentColorSpace,
+  depth = 0
+): Effect[] | null {
   const path = referencePath(raw)
   if (path) {
     const resolved = depth < 16 ? resolve(path) : undefined
-    return resolved?.kind === 'token' ? shadowList(resolved.token.value, resolve, depth + 1) : null
+    return resolved?.kind === 'token'
+      ? shadowList(resolved.token.value, resolve, profile, depth + 1)
+      : null
   }
   if (!isPlainObject(raw)) return null
   const color = fieldValue<Color>(raw.color, resolve, (value) =>
-    isPlainObject(value) && typeof value.r === 'number' ? (value as Color) : decodeColor(value)
+    isPlainObject(value) && typeof value.r === 'number'
+      ? (value as Color)
+      : decodeColor(value, profile)
   )
   const length = (key: string) => fieldValue(raw[key], resolve, pixels) ?? 0
   if (!color) return null
@@ -203,11 +218,16 @@ function shadowEffects(raw: unknown, resolve: Resolve, depth = 0): Effect[] | nu
   ]
 }
 
-function shadowList(value: unknown, resolve: Resolve, depth = 0): Effect[] | null {
+function shadowList(
+  value: unknown,
+  resolve: Resolve,
+  profile: DocumentColorSpace,
+  depth = 0
+): Effect[] | null {
   const entries = Array.isArray(value) ? value : [value]
   const effects: Effect[] = []
   for (const entry of entries) {
-    const shadows = shadowEffects(entry, resolve, depth)
+    const shadows = shadowEffects(entry, resolve, profile, depth)
     if (!shadows) return null
     effects.push(...shadows)
   }
@@ -229,12 +249,16 @@ function replaceShadows(exact: readonly Effect[], shadows: readonly Effect[]): E
 }
 
 /** A shadow token as effects, preferring the exact effects Pairdraw wrote. */
-function effectFields(token: ReadToken, resolve: Resolve): Partial<SceneNode> | null {
+function effectFields(
+  token: ReadToken,
+  resolve: Resolve,
+  profile: DocumentColorSpace
+): Partial<SceneNode> | null {
   const own = v.safeParse(ownEffectsSchema, token.extensions[PAIRDRAW_EXTENSION])
   // Extension effects that do not read fall back to the token's own shadows.
   const exact = own.success ? tryParseFigmaEffects(own.output.effects) : null
   if (exact && isEqual(token.value, shadowTokenValue(exact))) return { effects: exact }
-  const shadows = shadowList(token.value, resolve)
+  const shadows = shadowList(token.value, resolve, profile)
   if (!shadows) return null
   return { effects: exact ? replaceShadows(exact, shadows) : shadows }
 }
@@ -256,7 +280,10 @@ export function planStyles(
       skipped.push({ name: token.name, collection: undefined, reason: 'unsupported-type' })
       continue
     }
-    const fields = kind === 'TEXT' ? textFields(token, resolve) : effectFields(token, resolve)
+    const fields =
+      kind === 'TEXT'
+        ? textFields(token, resolve)
+        : effectFields(token, resolve, graph.documentColorSpace)
     if (!fields) {
       skipped.push({ name: token.name, collection: undefined, reason: 'invalid-value' })
       continue

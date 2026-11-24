@@ -1,4 +1,4 @@
-import type { Fill, SceneNode, ArcData, NodeType } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill, SceneNode, ArcData, NodeType } from '@pairdraw/scene-graph'
 import { colorToFill, tryParseColor } from '@pairdraw/scene-graph/color'
 import { parseCSSGridTracks, parseCSSNumber } from '@pairdraw/scene-graph/css'
 import {
@@ -95,14 +95,18 @@ export function applySizeOverrides(
  * Sets the layer's fills, moving each shader paint's preset into the layer's plugin data,
  * where a shader paint keeps it.
  */
-function setFills(values: (string | Color | Fill)[], o: Partial<SceneNode>): void {
+function setFills(
+  values: (string | Color | Fill)[],
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace
+): void {
   const shaders: ShaderPaint[] = []
   // A colour string no parser reads would otherwise become black, opposite to leaving it out.
   const usable = values.filter(
-    (value) => typeof value !== 'string' || tryParseColor(value) !== null
+    (value) => typeof value !== 'string' || tryParseColor(value, profile) !== null
   )
   const fills = usable.map((value) => {
-    const fill = fillFromValue(value)
+    const fill = fillFromValue(value, profile)
     if (!isShaderFill(fill)) return fill
     const { shader, ...paint } = fill
     if (paint.imageHash) shaders.push(shader)
@@ -114,19 +118,23 @@ function setFills(values: (string | Color | Fill)[], o: Partial<SceneNode>): voi
     o.pluginData = withShaderPaints({ pluginData: o.pluginData ?? [] }, fills, shaders)
 }
 
-function applyFillOverride(props: Record<string, unknown>, o: Partial<SceneNode>): void {
+function applyFillOverride(
+  props: Record<string, unknown>,
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace
+): void {
   // `fills={[]}` paints nothing, which a text, painted black by default, has to say.
   if (Array.isArray(props.fills) && props.fills.length === 0) {
     o.fills = []
     return
   }
   if (Array.isArray(props.fills)) {
-    setFills(props.fills.filter(isFillValue), o)
+    setFills(props.fills.filter(isFillValue), o, profile)
     return
   }
 
   const bg = designJSXProp(props, 'bg')
-  if (isFillValue(bg)) setFills([bg], o)
+  if (isFillValue(bg)) setFills([bg], o, profile)
 }
 
 function applyCornerOverrides(props: LayerProps, o: Partial<SceneNode>): void {
@@ -149,9 +157,13 @@ function applyCornerOverrides(props: LayerProps, o: Partial<SceneNode>): void {
   if (props.cornerSmoothing !== undefined) o.cornerSmoothing = props.cornerSmoothing
 }
 
-function applyVisualOverrides(props: LayerProps, o: Partial<SceneNode>): void {
-  applyFillOverride(props, o)
-  applyStrokeOverrides(props, o)
+function applyVisualOverrides(
+  props: LayerProps,
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace
+): void {
+  applyFillOverride(props, o, profile)
+  applyStrokeOverrides(props, o, profile)
   applyCornerOverrides(props, o)
 
   if (props.opacity !== undefined) o.opacity = props.opacity
@@ -337,7 +349,11 @@ function applyLayoutOverrides(
   if (props.grow !== undefined) o.layoutGrow = props.grow as number
 }
 
-function applyTextStyleOverrides(props: LayerProps, o: Partial<SceneNode>): void {
+function applyTextStyleOverrides(
+  props: LayerProps,
+  o: Partial<SceneNode>,
+  profile: DocumentColorSpace
+): void {
   const fontSize = designJSXProp(props, 'size')
   if (typeof fontSize === 'number') o.fontSize = fontSize
 
@@ -354,7 +370,7 @@ function applyTextStyleOverrides(props: LayerProps, o: Partial<SceneNode>): void
   }
 
   if (typeof props.color === 'string' || isColor(props.color)) {
-    o.fills = [colorToFill(props.color)]
+    o.fills = [colorToFill(props.color, profile)]
   }
 
   // A value it cannot read is left out, so the text keeps its own.
@@ -364,7 +380,7 @@ function applyTextStyleOverrides(props: LayerProps, o: Partial<SceneNode>): void
   if (letterSpacing) o.letterSpacing = letterSpacing
   const textDecoration = TEXT_DECORATION.parse(props.textDecoration)
   if (textDecoration) o.textDecoration = textDecoration
-  applyTextDetailOverrides(props, o)
+  applyTextDetailOverrides(props, o, profile)
   const textCase = TEXT_CASE.parse(props.textCase)
   if (textCase) o.textCase = textCase
   if (props.maxLines !== undefined) {
@@ -417,9 +433,10 @@ function applyTextAutoResize(
 function applyTextOverrides(
   props: LayerProps,
   o: Partial<SceneNode>,
-  parentLayout: SceneNode['layoutMode']
+  parentLayout: SceneNode['layoutMode'],
+  profile: DocumentColorSpace
 ): void {
-  applyTextStyleOverrides(props, o)
+  applyTextStyleOverrides(props, o, profile)
   // Without `dir` the node keeps the style's own direction, which is auto by default; writing an
   // undefined override would erase it and stop Arabic text from being detected as RTL.
   const direction = parseDirection(props.dir)
@@ -474,7 +491,8 @@ export function shapeOverrides(
 export function propsToOverrides(
   props: Record<string, unknown>,
   isText: boolean,
-  parentLayout: SceneNode['layoutMode']
+  parentLayout: SceneNode['layoutMode'],
+  profile: DocumentColorSpace = 'srgb'
 ): Partial<SceneNode> {
   // Layer props are read once, after `style` gives the ones the props leave unset.
   const layer = readLayerProps(normalizeStyleProps(props))
@@ -483,10 +501,10 @@ export function propsToOverrides(
   if (layer.name) o.name = layer.name
 
   const { w, h } = applySizeOverrides(layer, o, parentLayout)
-  applyVisualOverrides(layer, o)
+  applyVisualOverrides(layer, o, profile)
   applyLayoutOverrides(layer, o, w, h, isText, parentLayout)
-  if (isText) applyTextOverrides(layer, o, parentLayout)
-  applyEffectOverrides(layer, o)
+  if (isText) applyTextOverrides(layer, o, parentLayout, profile)
+  applyEffectOverrides(layer, o, profile)
   applyStateOverrides(layer, o)
 
   return o

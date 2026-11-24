@@ -221,6 +221,30 @@ describe('planning an import', () => {
     expect(byName.brand.values[0]).toMatchObject({ kind: 'literal' })
   })
 
+  test('a P3 color keeps its numbers in a P3 document and is mapped in an sRGB one', () => {
+    const input = files({
+      'Tokens/Default.tokens.json': {
+        brand: { $type: 'color', $value: 'color(display-p3 1 0 0)' }
+      }
+    })
+    const valueIn = (space: 'srgb' | 'display-p3') => {
+      const graph = new SceneGraph()
+      graph.documentColorSpace = space
+      const bundle = readDesignTokens(input)
+      const result = planTokenImport(graph, bundle, defaultTokenImportOptions(graph, bundle))
+      return result.collections[0].variables[0].values[0]
+    }
+    expect(valueIn('display-p3')).toMatchObject({ kind: 'literal', value: { r: 1, g: 0, b: 0 } })
+    const srgb = valueIn('srgb') as { kind: string; value: { r: number; g: number; b: number } }
+    expect(srgb.kind).toBe('literal')
+    const { r, g, b } = srgb.value
+    expect(r).toBeLessThan(1)
+    for (const channel of [r, g, b]) {
+      expect(channel).toBeGreaterThanOrEqual(0)
+      expect(channel).toBeLessThanOrEqual(1)
+    }
+  })
+
   test('an untyped alias takes the type of what it points at', () => {
     const { plan: result } = plan(
       files({

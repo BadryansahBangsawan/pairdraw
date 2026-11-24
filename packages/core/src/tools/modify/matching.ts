@@ -1,7 +1,7 @@
 import { mapValues, pick } from 'es-toolkit'
 import * as v from 'valibot'
 
-import type { Fill, NodeType, SceneNode } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill, NodeType, SceneNode } from '@pairdraw/scene-graph'
 import { copyStroke } from '@pairdraw/scene-graph/copy'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -84,8 +84,8 @@ function channels(color: Color): string {
 }
 
 /** A colour as a tool reads it, so a bad value fails with the message other tools give. */
-function colorOf(value: string): Color {
-  const parsed = parseToolColor(value)
+function colorOf(value: string, profile: DocumentColorSpace): Color {
+  const parsed = parseToolColor(value, profile)
   if ('error' in parsed) throw new Error(parsed.error)
   return parsed
 }
@@ -96,9 +96,9 @@ interface ColorSwap {
 }
 
 /** The swap a colour pair makes; throws on a value that is not a colour. */
-function colorSwap(pair: ColorPair): ColorSwap {
-  const from = colorOf(pair.from)
-  const to = colorOf(pair.to)
+function colorSwap(pair: ColorPair, profile: DocumentColorSpace): ColorSwap {
+  const from = colorOf(pair.from, profile)
+  const to = colorOf(pair.to, profile)
   const key = channels(from)
   const percent = (value: number) => Math.round(value * 100)
   return {
@@ -206,8 +206,11 @@ function textEdits(node: SceneNode, replacements: Replacements): TextEdit[] {
 
 const REPLACEMENT_KINDS = Object.keys(replacementInputs) as ReplacementKind[]
 
-function colorSwaps(pairs: readonly ColorPair[] | undefined): ColorSwap[] {
-  return (pairs ?? []).map(colorSwap)
+function colorSwaps(
+  pairs: readonly ColorPair[] | undefined,
+  profile: DocumentColorSpace
+): ColorSwap[] {
+  return (pairs ?? []).map((pair) => colorSwap(pair, profile))
 }
 
 export const replaceMatchingProperties = defineTool({
@@ -253,9 +256,9 @@ export const replaceMatchingProperties = defineTool({
     const readOnly: string[] = []
     try {
       const swaps = {
-        fill: colorSwaps(args.fill_color),
-        text: colorSwaps(args.text_color),
-        stroke: colorSwaps(args.stroke_color)
+        fill: colorSwaps(args.fill_color, figma.graph.documentColorSpace),
+        text: colorSwaps(args.text_color, figma.graph.documentColorSpace),
+        stroke: colorSwaps(args.stroke_color, figma.graph.documentColorSpace)
       }
       for (const node of nodes) {
         const paint = paintAndGeometryChanges(node, args, swaps)

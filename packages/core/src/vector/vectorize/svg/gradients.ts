@@ -9,7 +9,7 @@
  * normalize into each node's bounding box and build the transform in Figma's convention
  * (see geometry/gradient).
  */
-import type { Fill, GradientStop } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill, GradientStop } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import {
   ellipticalGradientTransform,
@@ -59,12 +59,12 @@ function coord(value: string | null, fallback: number): number {
   return Number.isFinite(n) ? n : fallback
 }
 
-function readStops(gradient: SVGElementLike): RawStop[] {
+function readStops(gradient: SVGElementLike, profile: DocumentColorSpace): RawStop[] {
   const stops: RawStop[] = []
   const stopEls = Array.from(gradient.getElementsByTagName('stop'))
   for (const [i, stop] of stopEls.entries()) {
     const offset = coord(stop.getAttribute('offset'), i === 0 ? 0 : 1)
-    const color = parseColor(stop.getAttribute('stop-color') ?? '#000000')
+    const color = parseColor(stop.getAttribute('stop-color') ?? '#000000', profile)
     const opacity = stop.getAttribute('stop-opacity')
     if (opacity != null) {
       const a = Number.parseFloat(opacity)
@@ -80,7 +80,10 @@ function readStops(gradient: SVGElementLike): RawStop[] {
  * (no hand-rolled markup parsing). Returns an empty map on parse failure so a
  * malformed SVG simply falls back to solid fills.
  */
-export function parseSVGGradients(svg: string): Map<string, ParsedGradient> {
+export function parseSVGGradients(
+  svg: string,
+  profile: DocumentColorSpace = 'srgb'
+): Map<string, ParsedGradient> {
   const map = new Map<string, ParsedGradient>()
   const doc: SVGQueryable | null = parseSVGDocument(svg)
   if (!doc) return map
@@ -100,7 +103,7 @@ export function parseSVGGradients(svg: string): Map<string, ParsedGradient> {
         kind,
         units,
         transform: el.getAttribute('gradientTransform'),
-        stops: readStops(el),
+        stops: readStops(el, profile),
         x1: coord(el.getAttribute('x1'), 0),
         y1: coord(el.getAttribute('y1'), 0),
         x2: coord(el.getAttribute('x2'), units === 'objectBoundingBox' ? 1 : 0),

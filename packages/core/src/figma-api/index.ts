@@ -405,7 +405,10 @@ export class FigmaAPI implements NodeProxyHost {
   /** The layers Figma makes from SVG markup, on the current page at its origin. */
   // eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Figma Plugin API name.
   createNodeFromSvg(svg: string): FigmaFrameNode {
-    const node = createSVGNodes(this.graph, this._currentPageId, svg, { keepEmpty: true })
+    const node = createSVGNodes(this.graph, this._currentPageId, svg, {
+      keepEmpty: true,
+      profile: this.graph.documentColorSpace
+    })
     if (!node) throw new Error('in createNodeFromSvg: Failed to convert SVG file')
     return this.wrapNode(node.id) as FigmaFrameNode
   }

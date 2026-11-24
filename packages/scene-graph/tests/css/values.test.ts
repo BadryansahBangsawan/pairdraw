@@ -22,8 +22,19 @@ describe('parseCSSNumber', () => {
 })
 
 describe('parseCSSColor', () => {
-  test('keeps out-of-range and wide-gamut colors inside sRGB', () => {
-    for (const value of ['rgb(300 0 0)', 'oklch(0.5 0.1 200)', 'color(display-p3 0 1 0)']) {
+  test('reads a color that names its space into the given profile', () => {
+    expect(parseCSSColor('color(display-p3 1 0 0)', 'display-p3')).toEqual({
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1
+    })
+    const srgb = parseCSSColor('color(display-p3 1 0 0)')
+    expect(srgb?.r).toBeLessThan(1)
+  })
+
+  test('maps a wide-gamut color into sRGB', () => {
+    for (const value of ['oklch(0.5 0.1 200)', 'color(display-p3 0 1 0)']) {
       const color = parseCSSColor(value)
       if (!color) throw new Error(`${value} did not parse`)
       for (const channel of [color.r, color.g, color.b]) {
@@ -31,7 +42,8 @@ describe('parseCSSColor', () => {
         expect(channel).toBeLessThanOrEqual(1)
       }
     }
-    expect(parseCSSColor('rgb(300 0 0)')).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+    // An sRGB syntax keeps its numbers, as Figma takes typed colors in either document profile.
+    expect(parseCSSColor('rgb(300 0 0)')).toEqual({ r: 300 / 255, g: 0, b: 0, a: 1 })
   })
 
   test('reads a color', () => {

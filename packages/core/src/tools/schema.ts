@@ -7,7 +7,7 @@
 
 import * as v from 'valibot'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, SceneNode } from '@pairdraw/scene-graph'
 import { tryParseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -328,9 +328,12 @@ export function nodeSummary(node: FigmaNodeProxy): { id: string; name: string; t
  * used to paint black and report success. Read through `tryParseColor`, since a published schema
  * cannot express what the parser accepts.
  */
-export function parseToolColor(value: string): Color | { error: string } {
+export function parseToolColor(
+  value: string,
+  profile: DocumentColorSpace = 'srgb'
+): Color | { error: string } {
   return (
-    tryParseColor(value) ?? {
+    tryParseColor(value, profile) ?? {
       error: `"${value}" is not a color; use a hex value, a color name, or a color function`
     }
   )
@@ -341,10 +344,11 @@ export function parseToolColor(value: string): Color | { error: string } {
  * same refusal `parseToolColor` gives, so each tool does not repeat that check.
  */
 export function parseOptionalToolColor(
-  value: string | undefined
+  value: string | undefined,
+  profile: DocumentColorSpace = 'srgb'
 ): { color: Color | undefined } | { error: string } {
   if (value === undefined) return { color: undefined }
-  const parsed = parseToolColor(value)
+  const parsed = parseToolColor(value, profile)
   if ('error' in parsed) return parsed
   return { color: parsed }
 }

@@ -1,5 +1,6 @@
 import * as v from 'valibot'
 
+import type { DocumentColorSpace } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api'
@@ -223,15 +224,18 @@ function badVariationTag(variations: FigmaVariationSettings | undefined): { erro
 }
 
 /** What a range edit sets, or why it cannot run: nothing named, a bad colour, or a bad link. */
-function rangeEdit(args: {
-  family?: string
-  size?: number
-  style?: string
-  variations?: unknown
-  font_features?: Record<string, boolean>
-  color?: string
-  hyperlink?: string | null
-}): RangeEdit | { error: string } {
+function rangeEdit(
+  args: {
+    family?: string
+    size?: number
+    style?: string
+    variations?: unknown
+    font_features?: Record<string, boolean>
+    color?: string
+    hyperlink?: string | null
+  },
+  profile: DocumentColorSpace
+): RangeEdit | { error: string } {
   if (
     !args.family &&
     !args.size &&
@@ -248,7 +252,7 @@ function rangeEdit(args: {
   }
   const hyperlink = requestedHyperlink(args.hyperlink)
   if (hyperlink && 'error' in hyperlink) return hyperlink
-  const color = parseOptionalToolColor(args.color)
+  const color = parseOptionalToolColor(args.color, profile)
   if ('error' in color) return color
   return { hyperlink: hyperlink ?? null, color: color.color }
 }
@@ -287,7 +291,7 @@ export const setFontRange = defineTool({
     if (badTag) return badTag
     const badFeature = badFeatureEntry(args.font_features)
     if (badFeature) return badFeature
-    const edit = rangeEdit(args)
+    const edit = rangeEdit(args, figma.graph.documentColorSpace)
     if ('error' in edit) return edit
     const { hyperlink, color } = edit
     // The range methods reject an empty range or one past the text, before changing anything.

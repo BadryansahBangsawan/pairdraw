@@ -34,7 +34,7 @@ export const setEffects = defineTool({
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
-    const parsedColor = parseOptionalToolColor(args.color)
+    const parsedColor = parseOptionalToolColor(args.color, figma.graph.documentColorSpace)
     if ('error' in parsedColor) return parsedColor
     const shadowColor = parsedColor.color ?? { ...DEFAULT_SHADOW_COLOR }
 

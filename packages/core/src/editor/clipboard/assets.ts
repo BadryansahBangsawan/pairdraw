@@ -74,7 +74,9 @@ export function createClipboardAssetActions(
 
   async function prepareAsset(file: File): Promise<PreparedAsset | null> {
     if (isSVGFile(file)) {
-      const data = prepareSVGImport(await file.text())
+      const data = prepareSVGImport(await file.text(), {
+        profile: ctx.graph.documentColorSpace
+      })
       return data
         ? {
             kind: 'svg',
@@ -181,7 +183,9 @@ export function createClipboardAssetActions(
 
   /** Paste SVG markup as layers, as Figma does; false when the text is not SVG. */
   async function pasteSVG(markup: string, cx: number, cy: number): Promise<boolean> {
-    const data = isSVGMarkup(markup) ? prepareSVGImport(markup) : null
+    const data = isSVGMarkup(markup)
+      ? prepareSVGImport(markup, { profile: ctx.graph.documentColorSpace })
+      : null
     if (!data) return false
     const asset: PreparedAsset = { kind: 'svg', data, width: data.width, height: data.height }
     await loadSVGFonts([asset])

@@ -5,7 +5,12 @@ import { parseFigBuffer } from '@pairdraw/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph, type PrototypeOverlayPositionType } from '@pairdraw/scene-graph'
 
-import { uint8ArrayToArrayBuffer } from '#tests/helpers/fig/fixtures'
+function uint8ArrayToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength
+  ) as ArrayBuffer
+}
 
 const PLACEMENTS: readonly PrototypeOverlayPositionType[] = [
   'CENTER',

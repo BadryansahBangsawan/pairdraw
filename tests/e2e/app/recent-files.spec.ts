@@ -1,5 +1,11 @@
 import { expect, test } from '#tests/e2e/fixtures'
 
+import { waitForAppBoot } from '#tests/helpers/boot'
+
+// Each test here boots the app itself, and a cold dev server gets thirty seconds for the first
+// load (`waitForAppBoot`); a test needs room for that boot plus its own work.
+test.beforeEach(() => test.setTimeout(90_000))
+
 test.describe('a populated recent files list', () => {
   test.use({
     storageState: async ({ baseURL }, use) => {
@@ -37,6 +43,7 @@ test.describe('a populated recent files list', () => {
     page
   }) => {
     await page.goto('/?recent-files')
+    await waitForAppBoot(page)
     await page.getByTestId('recent-files-home').waitFor()
     // Each entry also has a menu button, so count the entries rather than buttons named after them.
     const documents = page
@@ -53,6 +60,8 @@ test.describe('a populated recent files list', () => {
     await expect(documents).toHaveCount(12)
 
     await page.reload()
+
+    await waitForAppBoot(page)
     await expect(documents).toHaveCount(12)
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
     await expect(limit).toHaveText('25')
@@ -65,6 +74,7 @@ test.describe('on a phone', () => {
 
   test('keeps the New tab layout usable', async ({ page }) => {
     await page.goto('/?recent-files')
+    await waitForAppBoot(page)
 
     const search = page.getByLabel('Search files…')
     await expect(search).toBeVisible()
@@ -84,6 +94,7 @@ test('a narrow window with a mouse keeps mouse-sized controls and focuses the se
 }) => {
   await page.setViewportSize({ width: 600, height: 800 })
   await page.goto('/?recent-files')
+  await waitForAppBoot(page)
 
   await expect(page.getByLabel('Search files…')).toBeFocused()
   // Medium buttons, 32 px tall; touch screens get the 36 px large ones.
@@ -92,6 +103,7 @@ test('a narrow window with a mouse keeps mouse-sized controls and focuses the se
 
 test('opens to the recent-files home and starts a new document', async ({ page }) => {
   await page.goto('/?recent-files')
+  await waitForAppBoot(page)
 
   // Home is pinned first and never closes; a design opens in a tab of its own beside it.
   const home = page.getByRole('tab', { name: 'Home' })

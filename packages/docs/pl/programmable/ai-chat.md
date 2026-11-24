@@ -90,7 +90,7 @@ W ustawieniach Czatu obok przeglądu modeli wybierz, czy rozumowanie ma być **D
 | **Anthropic**          | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Klucz API z [console.anthropic.com](https://console.anthropic.com)                                         |
 | **OpenAI**             | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                   | Klucz API z [platform.openai.com](https://platform.openai.com)                                             |
 | **ChatGPT**            | Modele, które Twój plan ChatGPT oferuje w Codex, pobierane na bieżąco  | Aplikacja na komputer: **Zaloguj się przez ChatGPT**. Odpowiedzi wliczają się do limitów użycia planu.     |
-| **Google AI**          | Gemini 3.8 Flash, Gemini 4 Argon                                       | Klucz API z [aistudio.google.dev](https://aistudio.google.dev)                                             |
+| **Google AI**          | Gemini 3.8 Flash, Gemini 4 Argon                                       | Klucz API z [aistudio.google.com](https://aistudio.google.com)                                             |
 | **DeepSeek**           | DeepSeek Flash, DeepSeek V4 Pro                                        | Klucz API z [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
 | **Z.ai**               | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Klucz API z [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                             |
 | **MiniMax**            | MiniMax-M3.1-Flash, MiniMax-M3                                         | Klucz API z [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |

@@ -23,16 +23,18 @@ async function boundDeletedVariable(page: Page) {
       const old = graph.createVariable('Old accent', 'COLOR', colors.id, red)
       const flag = graph.createVariable('Old flag', 'BOOLEAN', colors.id, true)
       const gap = graph.createVariable('Old gap', 'FLOAT', colors.id, 8)
+      const label = graph.createVariable('Old label', 'STRING', colors.id, 'Hello')
       const removeAsDeleted = (id: string) => {
         const record = graph.variables.get(id)
         if (!record) throw new Error('Missing variable')
         graph.removeVariable(id)
         graph.addVariable({ ...record, deleted: true })
       }
-      for (const variable of [old, flag, gap]) removeAsDeleted(variable.id)
+      for (const variable of [old, flag, gap, label]) removeAsDeleted(variable.id)
 
       const deletedNode = store.createShape('RECTANGLE', 40, 40, 120, 90)
       const liveNode = store.createShape('RECTANGLE', 200, 40, 120, 90)
+      const textNode = store.createShape('TEXT', 40, 200, 160, 60)
       store.updateNode(deletedNode, {
         name: 'Deleted bound',
         fills: [{ type: 'SOLID', color: blue, opacity: 1, visible: true }],
@@ -45,21 +47,23 @@ async function boundDeletedVariable(page: Page) {
         name: 'Live bound',
         fills: [{ type: 'SOLID', color: blue, opacity: 1, visible: true }]
       })
+      store.updateNode(textNode, { name: 'Deleted label', text: 'Bound label' })
       graph.bindVariable(deletedNode, 'fills/0/color', old.id)
       graph.bindVariable(deletedNode, 'strokes/0/color', old.id)
       graph.bindVariable(liveNode, 'fills/0/color', live.id)
       graph.bindVariable(liveNode, 'visible', flag.id)
       graph.bindVariable(liveNode, 'opacity', gap.id)
+      graph.bindVariable(textNode, 'text', label.id)
       store.select([deletedNode])
       store.requestRender()
-      return { deletedNode, liveNode, liveId: live.id, oldId: old.id }
+      return { deletedNode, liveNode, textNode, liveId: live.id, oldId: old.id }
     },
     { red: RED, blue: BLUE }
   )
 }
 
 for (const theme of ['light', 'dark'] as const) {
-  test(`a fill bound to a deleted variable is marked in the ${theme} theme`, async ({ page }) => {
+  test(`bindings to deleted variables are marked in the ${theme} theme`, async ({ page }) => {
     await page.goto('/?test')
     const canvas = new CanvasHelper(page)
     await canvas.waitForInit()
@@ -91,6 +95,13 @@ for (const theme of ['light', 'dark'] as const) {
     await expect(appearance.getByLabel('Old flag was deleted in the source file')).toBeVisible()
     await expect(appearance.getByLabel('Old gap was deleted in the source file')).toBeVisible()
     await expect(page.getByLabel(/was deleted in the source file/)).toHaveCount(2)
+
+    await page.evaluate((id) => window.pairdraw?.getStore?.().select([id]), scene.textNode)
+    await canvas.waitForRender()
+    const content = page.getByRole('group', { name: 'Content', exact: true })
+    await expect(content).toContainText('Old label')
+    await expect(content.getByLabel('Old label was deleted in the source file')).toBeVisible()
+    await expect(page.getByLabel(/was deleted in the source file/)).toHaveCount(1)
     canvas.assertNoErrors()
   })
 }

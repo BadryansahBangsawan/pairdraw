@@ -3,6 +3,7 @@ import { numberedName } from '@pairdraw/scene-graph/naming'
 
 import type { EditorContext } from '#core/editor/types'
 
+import { matchClipboardComponents } from './component-matches'
 import {
   addsRenamed,
   matchClipboardCollections,
@@ -18,6 +19,13 @@ import { importClipboardVariables, remapClipboardVariableBindings } from './vari
 export interface ClipboardDependencyImport {
   nodes: ClipboardSnapshot['nodes']
   componentDependencies: ClipboardSnapshot['componentDependencies']
+  /**
+   * By a dependency's id here, the component or set already in this document it becomes, when the
+   * same snapshot was pasted before. A reuse keeps the local main, as in Figma.
+   */
+  componentMatches: Map<string, string>
+  /** The copying document's root id, for a foreign paste that creates dependencies here. */
+  clipboardOrigin?: string
   styleSnapshots: SceneNode[]
   /**
    * Whether the layers bind variables of this document now, whose values may differ from the
@@ -77,6 +85,7 @@ export function importClipboardDependencies(
     return {
       nodes,
       componentDependencies: componentDependencies.filter((node) => !ctx.graph.getNode(node.id)),
+      componentMatches: new Map(),
       styleSnapshots: [],
       resolveBindings: false
     }
@@ -87,7 +96,13 @@ export function importClipboardDependencies(
       for (const child of node.children ?? []) detach(child)
     }
     for (const node of [...nodes, ...componentDependencies]) detach(node)
-    return { nodes, componentDependencies, styleSnapshots: [], resolveBindings: false }
+    return {
+      nodes,
+      componentDependencies,
+      componentMatches: new Map(),
+      styleSnapshots: [],
+      resolveBindings: false
+    }
   }
   const styleIds = new Map<string, string>()
   /** This document's styles the layers use in place of copied ones, by id. */
@@ -154,6 +169,12 @@ export function importClipboardDependencies(
   return {
     nodes,
     componentDependencies,
+    componentMatches: matchClipboardComponents(
+      ctx.graph,
+      snapshot.sourceRootId,
+      componentDependencies
+    ),
+    clipboardOrigin: snapshot.sourceRootId,
     styleSnapshots,
     resolveBindings: snapshot.variableDependencies.variables.length > 0,
     applyVariables: variables.apply,

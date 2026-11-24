@@ -79,6 +79,11 @@ const exportSettingsSchema: v.GenericSchema<unknown, ExportSetting[]> = v.array(
   )
 )
 
+const clipboardOriginSchema = v.object({
+  documentId: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64)),
+  nodeId: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64))
+})
+
 const librarySourceSchema: v.GenericSchema<unknown, LibraryAssetSource> = v.pipe(
   v.object({
     identity: v.object({ libraryId: v.string(), assetKey: v.string(), revisionId: v.string() }),
@@ -231,6 +236,11 @@ export const PAIRDRAW_PLUGIN_DATA = {
   textPathBox: jsonPluginDataField('textPathBox', 'format', textPathBoxSchema),
   /** The library asset a node was inserted from. */
   librarySource: jsonPluginDataField('librarySource', 'bookkeeping', librarySourceSchema),
+  /**
+   * Where a layer of a pasted component came from: the copying document's root id and the node's id
+   * there. A later paste of the same snapshot into that document reuses the component it made.
+   */
+  clipboardOrigin: jsonPluginDataField('clipboardOrigin', 'bookkeeping', clipboardOriginSchema),
   /**
    * The document root's id, on the DOCUMENT node, whose own GUID is always Figma's `0:0`; the
    * root keeps it across a save as every layer keeps its GUID.

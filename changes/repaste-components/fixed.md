@@ -1,0 +1,1 @@
+- Pasting the same component from another document again now reuses the component the first paste created, instead of adding a duplicate, and the same holds for component sets.

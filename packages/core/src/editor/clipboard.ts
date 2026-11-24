@@ -5,6 +5,7 @@ import { CommittedGraphEventError, type SceneNode } from '@pairdraw/scene-graph'
 import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import { getAxisAlignedBoundsInParent, getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { cycleSafeParent, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
+import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 import { keepPastedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
@@ -57,6 +58,10 @@ type PasteOptions = {
 type PasteNodesOptions = PasteOptions & {
   /** Resolve the pasted layers' variable bindings where they land, before history records them. */
   resolveBindings?: boolean
+  /** Components this document already has for the snapshot's dependencies, by dependency id. */
+  componentMatches?: Map<string, string>
+  /** The copying document's root id, recorded on each dependency a paste creates here. */
+  clipboardOrigin?: string
 }
 
 /**
@@ -209,7 +214,12 @@ export function createClipboardActions(ctx: EditorContext) {
         snapshot.sourceRootId === ctx.graph.rootId ? snapshot.appliedBoundPaints : new Map(),
         dependencies.componentDependencies,
         cursorPos,
-        { ...options, resolveBindings: dependencies.resolveBindings }
+        {
+          ...options,
+          resolveBindings: dependencies.resolveBindings,
+          componentMatches: dependencies.componentMatches,
+          clipboardOrigin: dependencies.clipboardOrigin
+        }
       )
     })
     await fontActions.loadFontsForNodes(created)
@@ -340,16 +350,46 @@ export function createClipboardActions(ctx: EditorContext) {
     const instanceTargets = instanceReplacementTargets(options)
     for (const [hash, bytes] of images) ctx.graph.images.set(hash, bytes)
 
+    const matches = options.componentMatches ?? new Map<string, string>()
     const created: string[] = []
     const copiedIds = new Map<string, string>()
-    const createNodeTree = (source: SceneNode & { children?: SceneNode[] }, parentId: string) => {
-      const { id: _id, childIds: _childIds, children = [], parentId: _parentId, ...rest } = source
+    const pastedIds = new Set<string>()
+    // A dependency this document already has keeps its local main; only the roots it creates are
+    // this paste's to undo.
+    const seedMatches = () => {
+      for (const [sourceId, existingId] of matches)
+        if (ctx.graph.getNode(existingId)) copiedIds.set(sourceId, existingId)
+    }
+    seedMatches()
+    const createNodeTree = (
+      source: SceneNode & { children?: SceneNode[] },
+      parentId: string,
+      originDocumentId?: string
+    ) => {
+      const existing = copiedIds.get(source.id)
+      if (existing && ctx.graph.getNode(existing)) return existing
+      const {
+        id: _id,
+        childIds: _childIds,
+        children = [],
+        parentId: _parentId,
+        pluginData,
+        ...rest
+      } = source
+      const record = originDocumentId
+        ? withPluginData(pluginData, PAIRDRAW_PLUGIN_DATA.clipboardOrigin, {
+            documentId: originDocumentId,
+            nodeId: source.id
+          })
+        : pluginData
       const node = ctx.graph.createNode(source.type, parentId, {
         ...structuredClone(rest),
+        pluginData: structuredClone(record),
         childIds: []
       })
       copiedIds.set(source.id, node.id)
-      for (const child of children) createNodeTree(child, node.id)
+      pastedIds.add(node.id)
+      for (const child of children) createNodeTree(child, node.id, originDocumentId)
       return node.id
     }
 
@@ -365,25 +405,37 @@ export function createClipboardActions(ctx: EditorContext) {
       pastedComponentIds(ctx.graph, [...nodes, ...dependencies])
     )
     if (!prepareSlotEdits(ctx, [pasteTarget])) return created
-    const dependencyRootIds: string[] = []
-    for (const dependency of dependencies)
-      dependencyRootIds.push(createNodeTree(dependency, ctx.state.currentPageId))
-    for (const node of nodes) created.push(createNodeTree(node, pasteTarget))
-    for (const id of copiedIds.values()) {
-      const node = ctx.graph.getNode(id)
-      if (!node) continue
-      const componentId = node.componentId ? copiedIds.get(node.componentId) : undefined
-      const instanceOverrides = {
-        self: node.instanceOverrides.self,
-        descendants: new Map(
-          [...node.instanceOverrides.descendants].map(([target, fields]) => [
-            copiedIds.get(target) ?? target,
-            fields
-          ])
-        )
+    const pasteDependencies = () => {
+      const roots: string[] = []
+      for (const dependency of dependencies) {
+        if (copiedIds.has(dependency.id)) continue
+        roots.push(createNodeTree(dependency, ctx.state.currentPageId, options.clipboardOrigin))
       }
-      ctx.graph.updateNode(id, { componentId: componentId ?? node.componentId, instanceOverrides })
+      return roots
     }
+    const dependencyRootIds = pasteDependencies()
+    for (const node of nodes) created.push(createNodeTree(node, pasteTarget))
+    const remapPasted = () => {
+      for (const id of pastedIds) {
+        const node = ctx.graph.getNode(id)
+        if (!node) continue
+        const componentId = node.componentId ? copiedIds.get(node.componentId) : undefined
+        const instanceOverrides = {
+          self: node.instanceOverrides.self,
+          descendants: new Map(
+            [...node.instanceOverrides.descendants].map(([target, fields]) => [
+              copiedIds.get(target) ?? target,
+              fields
+            ])
+          )
+        }
+        ctx.graph.updateNode(id, {
+          componentId: componentId ?? node.componentId,
+          instanceOverrides
+        })
+      }
+    }
+    remapPasted()
     keepPastedBoundPaints(ctx.graph, copiedIds, applied)
     // Variables of this document can give the layers other values than the copied ones.
     if (options.resolveBindings) {

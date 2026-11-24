@@ -1,7 +1,7 @@
 import type { SceneGraph } from '#scene-graph/graph'
 import type { VariableLiteral, VariableValue } from '#scene-graph/types'
 
-import { resolveVariableInModes } from '../resolution'
+import { createVariableResolver } from '../resolver'
 import { parseFormulaSyntax, type FormulaReference } from './parse'
 import { printFormula, type PrintFormulaOptions } from './print'
 import type { FormulaValueType } from './signatures'
@@ -120,14 +120,11 @@ export function parseVariableFormula(
   const value: VariableValue = isFormulaOperation(node)
     ? { expression: 'FORMULA', type: variable.type, value: node }
     : node
-  const resolved = resolveVariableInModes(
-    graph,
-    variableId,
-    (collectionId) =>
-      collectionId === variable.collectionId ? modeId : graph.getActiveModeId(collectionId),
-    new Set(),
-    new Map(),
-    new Map([[variableId, value]])
-  )
+  const resolver = createVariableResolver(graph, { overrides: new Map([[variableId, value]]) })
+  const resolved = resolver
+    .forModes((collectionId) =>
+      collectionId === variable.collectionId ? modeId : resolver.activeMode(collectionId)
+    )
+    .resolve(variableId)
   return { value, resolved }
 }

@@ -23,6 +23,7 @@ import {
   copyAppliedBoundPaints,
   keepCopyBoundPaints
 } from '../variables/paints'
+import { createVariableResolver, type VariableResolver } from '../variables/resolver'
 import { scaleVariableBindingUnits } from '../variables/units'
 import { applyEnclosingAssignments, assignedFieldValues, propertyDrivenFields } from './assignments'
 import { keepOwnContentSize, remeasureChangedText, type SyncedPlacement } from './content-size'
@@ -220,13 +221,14 @@ export function updateSyncedProps(
   /** A field the copy keeps as its own, which the sync leaves as it is. */
   kept: (field: string) => boolean = () => false
 ): void {
-  resolveBoundNumbersInPlace(graph, target, updates, kept)
+  const resolver = createVariableResolver(graph)
+  resolveBoundNumbersInPlace(graph, target, updates, kept, resolver)
   if (updates.fills || updates.strokes || updates.boundVariables) {
     applySyncedModes(graph, target, updates)
-    keepCopyBoundPaints(graph, target, updates)
+    keepCopyBoundPaints(graph, target, updates, resolver)
   }
   // After the copy's own bound paints, which can bring its strokes into the write.
-  applySyncedStrokeLines(graph, target, updates, kept)
+  applySyncedStrokeLines(graph, target, updates, kept, resolver)
   const changed = Object.fromEntries(
     Object.entries(updates).filter(
       ([key, value]) => !isEqual(target[key as keyof SceneNode], value)
@@ -246,7 +248,8 @@ function resolveBoundNumbersInPlace(
   graph: SceneGraph,
   target: SceneNode,
   updates: Partial<SceneNode>,
-  kept: (field: string) => boolean
+  kept: (field: string) => boolean,
+  resolver: VariableResolver
 ): void {
   const bound = updates.boundVariables ?? target.boundVariables
   // The fields the sync writes, and the ones it binds anew, which keep an equal value only in
@@ -259,7 +262,7 @@ function resolveBoundNumbersInPlace(
   )
   if (synced.length === 0) return
   applySyncedModes(graph, target, updates)
-  const resolved = resolvedNumericBindings(graph, { ...target, ...updates })
+  const resolved = resolvedNumericBindings(graph, { ...target, ...updates }, 'active', resolver)
   Object.assign(updates, pick(resolved, synced as (keyof SceneNode)[]))
 }
 
@@ -278,7 +281,8 @@ export function applySyncedStrokeLines(
   graph: SceneGraph,
   target: SceneNode,
   updates: Partial<SceneNode>,
-  kept: (field: string) => boolean
+  kept: (field: string) => boolean,
+  resolver: VariableResolver = createVariableResolver(graph)
 ): void {
   const strokes = updates.strokes
   const first = strokes?.at(0)
@@ -289,7 +293,7 @@ export function applySyncedStrokeLines(
   const weightScale =
     (updates.variableBindingScales ?? target.variableBindingScales).strokeWeight ?? 1
   const resolvedWeight = boundWeight
-    ? graph.resolveNumberVariableForNode(target.id, boundWeight, 'active')
+    ? resolver.forNode(target.id, 'active').number(boundWeight)
     : undefined
   const lines: StrokeLines = {}
   let set = false

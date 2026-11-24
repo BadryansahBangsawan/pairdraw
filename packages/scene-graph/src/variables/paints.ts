@@ -6,7 +6,7 @@ import { hasInstanceOverride } from '../instances/overrides'
 import type { Color } from '../primitives'
 import type { Fill, SceneNode, Stroke } from '../types'
 import { paintBindingTarget, type PaintBindingList } from './fields'
-import { collectionsResolving, getNodeExplicitVariableModeId } from './resolution'
+import { createVariableResolver, type VariableResolver } from './resolver'
 import { subtreeNodes } from './subtree'
 
 /**
@@ -85,11 +85,13 @@ function sameColor(a: Color, b: Color): boolean {
 function explicitModes(
   graph: SceneGraph,
   node: SceneNode,
-  variableId: string
+  variableId: string,
+  resolver?: VariableResolver
 ): Record<string, string | null> {
   const modes: Record<string, string | null> = {}
-  for (const collectionId of collectionsResolving(graph, [variableId]))
-    modes[collectionId] = getNodeExplicitVariableModeId(graph, node.id, collectionId)
+  const shared = resolver ?? createVariableResolver(graph)
+  for (const collectionId of shared.dependencies([variableId]))
+    modes[collectionId] = shared.explicitModeFor(node.id, collectionId)
   return modes
 }
 
@@ -223,14 +225,20 @@ function writePaints(graph: SceneGraph, node: SceneNode, changes: PaintLists): v
  * Writes into each bound paint the color its variable gives the layer now, where that differs
  * from the color last applied, or wherever `forced` says, and records what each binding gives.
  */
-function refresh(graph: SceneGraph, node: SceneNode, forced: (field: string) => boolean): void {
+function refresh(
+  graph: SceneGraph,
+  node: SceneNode,
+  forced: (field: string) => boolean,
+  resolver?: VariableResolver
+): void {
   let fills: Fill[] | undefined
   let strokes: Stroke[] | undefined
+  const reader = (resolver ?? createVariableResolver(graph)).forNode(node.id)
   for (const bound of boundPaints(node)) {
-    const color = graph.resolveColorVariableForNode(node.id, bound.variableId)
+    const color = reader.color(bound.variableId)
     const paint = node[bound.list].at(bound.index)
     if (!color || !paint) continue
-    const modes = explicitModes(graph, node, bound.variableId)
+    const modes = explicitModes(graph, node, bound.variableId, resolver)
     const stale = staleApplied(node, bound, paint, color, modes)
     recordApplied(node, bound, color, modes)
     if ((!forced(bound.field) && !stale) || showsColor(paint, color)) continue
@@ -256,13 +264,22 @@ const ALL_FORCED = (): boolean => true
  * opacity, once that color differs from the one last applied, discarding edits made since, as
  * Figma refreshes them when a variable's value or a layer's mode changes.
  */
-export function refreshBoundPaints(graph: SceneGraph, node: SceneNode): void {
-  if (hasBoundPaints(node)) refresh(graph, node, NONE_FORCED)
+export function refreshBoundPaints(
+  graph: SceneGraph,
+  node: SceneNode,
+  resolver?: VariableResolver
+): void {
+  if (hasBoundPaints(node)) refresh(graph, node, NONE_FORCED, resolver)
 }
 
 /** Gives one bound paint its variable's color for the layer, as binding it does in Figma. */
-export function applyBoundPaintColor(graph: SceneGraph, node: SceneNode, field: string): void {
-  if (paintBindingTarget(field)) refresh(graph, node, (bound) => bound === field)
+export function applyBoundPaintColor(
+  graph: SceneGraph,
+  node: SceneNode,
+  field: string,
+  resolver?: VariableResolver
+): void {
+  if (paintBindingTarget(field)) refresh(graph, node, (bound) => bound === field, resolver)
 }
 
 /**
@@ -270,14 +287,24 @@ export function applyBoundPaintColor(graph: SceneGraph, node: SceneNode, field: 
  * or a layer an instance sync adds is a copy, which shows its variables in its own context rather
  * than whatever its component's paints hold.
  */
-export function applyBoundPaintColorsIn(graph: SceneGraph, rootId: string): void {
+export function applyBoundPaintColorsIn(
+  graph: SceneGraph,
+  rootId: string,
+  resolver?: VariableResolver
+): void {
+  const shared = resolver ?? createVariableResolver(graph)
   for (const node of subtreeNodes(graph, [rootId]))
-    if (hasBoundPaints(node)) refresh(graph, node, ALL_FORCED)
+    if (hasBoundPaints(node)) refresh(graph, node, ALL_FORCED, shared)
 }
 
 /** Refreshes the bound paints in this subtree whose variables now give their layers another color. */
-export function refreshBoundPaintsIn(graph: SceneGraph, rootId: string): void {
-  for (const node of subtreeNodes(graph, [rootId])) refreshBoundPaints(graph, node)
+export function refreshBoundPaintsIn(
+  graph: SceneGraph,
+  rootId: string,
+  resolver?: VariableResolver
+): void {
+  const shared = resolver ?? createVariableResolver(graph)
+  for (const node of subtreeNodes(graph, [rootId])) refreshBoundPaints(graph, node, shared)
 }
 
 /**
@@ -287,12 +314,15 @@ export function refreshBoundPaintsIn(graph: SceneGraph, rootId: string): void {
 export function recordWrittenBoundPaints(
   graph: SceneGraph,
   node: SceneNode,
-  written: PaintLists
+  written: PaintLists,
+  resolver?: VariableResolver
 ): void {
+  const reader = (resolver ?? createVariableResolver(graph)).forNode(node.id)
   for (const bound of boundPaints(node)) {
     if (!written[bound.list]) continue
-    const color = graph.resolveColorVariableForNode(node.id, bound.variableId)
-    if (color) recordApplied(node, bound, color, explicitModes(graph, node, bound.variableId))
+    const color = reader.color(bound.variableId)
+    if (color)
+      recordApplied(node, bound, color, explicitModes(graph, node, bound.variableId, resolver))
   }
 }
 
@@ -304,12 +334,14 @@ export function recordWrittenBoundPaints(
  */
 export function shownPaintBindings(
   graph: SceneGraph,
-  node: SceneNode
+  node: SceneNode,
+  resolver?: VariableResolver
 ): Pick<Partial<SceneNode>, 'fills' | 'strokes'> {
   const changes: Pick<Partial<SceneNode>, 'fills' | 'strokes'> = {}
+  const reader = (resolver ?? createVariableResolver(graph)).forNode(node.id)
   for (const bound of boundPaints(node)) {
     if (paintColorApplied(node, bound.field)) continue
-    const color = graph.resolveColorVariableForNode(node.id, bound.variableId)
+    const color = reader.color(bound.variableId)
     const paint = node[bound.list].at(bound.index)
     if (!color || !paint || showsColor(paint, color)) continue
     if (bound.list === 'fills') {
@@ -332,18 +364,18 @@ export function shownPaintBindings(
 export function refreshMovedBoundPaints(
   graph: SceneGraph,
   nodeId: string,
-  previousParentId: string | null | undefined
+  previousParentId: string | null | undefined,
+  resolver?: VariableResolver
 ): void {
   if (graph.isApplyingImportedState || graph.variableCollections.size === 0) return
   const parentId = graph.nodes.get(nodeId)?.parentId
   if (!parentId) return
   const previous = previousParentId && graph.nodes.has(previousParentId) ? previousParentId : null
+  const shared = resolver ?? createVariableResolver(graph)
   const changed = new Set(
     [...graph.variableCollections.keys()].filter(
       (id) =>
-        !previous ||
-        getNodeExplicitVariableModeId(graph, previous, id) !==
-          getNodeExplicitVariableModeId(graph, parentId, id)
+        !previous || shared.explicitModeFor(previous, id) !== shared.explicitModeFor(parentId, id)
     )
   )
   if (changed.size === 0) return
@@ -351,14 +383,14 @@ export function refreshMovedBoundPaints(
   const reachesChanged = (variableId: string) => {
     let found = reaches.get(variableId)
     if (found === undefined) {
-      found = [...collectionsResolving(graph, [variableId])].some((id) => changed.has(id))
+      found = [...shared.dependencies([variableId])].some((id) => changed.has(id))
       reaches.set(variableId, found)
     }
     return found
   }
   for (const node of subtreeNodes(graph, [nodeId])) {
     if (boundPaints(node).some((bound) => reachesChanged(bound.variableId)))
-      refresh(graph, node, NONE_FORCED)
+      refresh(graph, node, NONE_FORCED, shared)
   }
 }
 
@@ -383,9 +415,12 @@ function reboundPaint(
 export function keepCopyBoundPaints(
   graph: SceneGraph,
   target: SceneNode,
-  updates: Partial<SceneNode>
+  updates: Partial<SceneNode>,
+  resolver?: VariableResolver
 ): void {
   const bindings = updates.boundVariables ?? target.boundVariables
+  const shared = resolver ?? createVariableResolver(graph)
+  const reader = shared.forNode(target.id)
   for (const list of PAINT_LISTS) {
     // A paint the component binds anew keeps its own paint otherwise, but takes the new color.
     if (!updates[list] && reboundPaint(target, bindings, list))
@@ -403,9 +438,9 @@ export function keepCopyBoundPaints(
         paint.color = { ...own.color }
         paint.opacity = own.opacity
       }
-      const color = graph.resolveColorVariableForNode(target.id, variableId)
+      const color = reader.color(variableId)
       if (!color) return
-      const modes = explicitModes(graph, target, variableId)
+      const modes = explicitModes(graph, target, variableId, shared)
       if (!keeps || staleApplied(target, bound, own, color, modes)) applyColor(paint, color)
       recordApplied(target, bound, color, modes)
     })

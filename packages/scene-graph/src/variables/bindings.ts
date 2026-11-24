@@ -9,7 +9,7 @@ import { pixelLength } from '../text/lengths'
 import type { SceneNode, StyleRun, TextLength } from '../types'
 import { NUMERIC_FIELDS, isNumericVariableBindingField } from './fields'
 import { refreshBoundPaints } from './paints'
-import { collectionsResolving } from './resolution'
+import { createVariableResolver, type VariableResolver } from './resolver'
 import { subtreeNodes } from './subtree'
 import { variableFontFamily, variableText, variableTruthy } from './text'
 import { runBindingScale } from './units'
@@ -62,6 +62,11 @@ export function boundNumberValue(field: string, value: number): number | TextLen
   return TEXT_LENGTH_FIELDS.has(field) ? pixelLength(value) : value
 }
 
+/** One resolver per field lookup, unless a caller reconciling many nodes shares its own. */
+function resolverFor(graph: SceneGraph, resolver?: VariableResolver): VariableResolver {
+  return resolver ?? createVariableResolver(graph)
+}
+
 /**
  * The values a node's numeric bindings resolve to in its mode, in scene units, for the fields
  * whose stored value differs. A width or height an instance overrides keeps its own value.
@@ -69,14 +74,16 @@ export function boundNumberValue(field: string, value: number): number | TextLen
 export function resolvedNumericBindings(
   graph: SceneGraph,
   node: SceneNode,
-  fallback: VariableModeFallback = 'active'
+  fallback: VariableModeFallback = 'active',
+  resolver?: VariableResolver
 ): Partial<SceneNode> {
   const updates: Partial<SceneNode> = {}
+  const reader = resolverFor(graph, resolver).forNode(node.id, fallback)
   for (const [field, variableId] of Object.entries(node.boundVariables)) {
     if (!NUMERIC_FIELDS.has(field)) continue
     if ((field === 'width' || field === 'height') && overriddenInInstance(graph, node.id, field))
       continue
-    const value = graph.resolveNumberVariableForNode(node.id, variableId, fallback)
+    const value = reader.number(variableId)
     if (value === undefined || !Number.isFinite(value)) continue
     const scale = node.variableBindingScales[field] ?? 1
     const effective = value * scale
@@ -100,13 +107,15 @@ export function resolvedNumericBindings(
 export function resolvedValueBindings(
   graph: SceneGraph,
   node: SceneNode,
-  fallback: VariableModeFallback = 'active'
+  fallback: VariableModeFallback = 'active',
+  resolver?: VariableResolver
 ): Partial<SceneNode> {
   const updates: Partial<SceneNode> = {}
+  const reader = resolverFor(graph, resolver).forNode(node.id, fallback)
   const resolve = (field: 'text' | 'fontFamily' | 'visible') => {
     const variableId = node.boundVariables[field]
     if (!variableId || overriddenInInstance(graph, node.id, field)) return undefined
-    return graph.resolveVariableForNode(node.id, variableId, fallback)
+    return reader.value(variableId)
   }
   const text = node.type === 'TEXT' ? variableText(resolve('text')) : undefined
   if (text !== undefined && text !== node.text) updates.text = text
@@ -126,14 +135,15 @@ export function resolvedValueBindings(
 export function resolvedIconBinding(
   graph: SceneGraph,
   node: SceneNode,
-  fallback: VariableModeFallback = 'active'
+  fallback: VariableModeFallback = 'active',
+  resolver?: VariableResolver
 ): string | undefined {
   if (node.type !== 'FRAME') return undefined
   const icon = readIcon(node)
   if (!icon) return undefined
   const variableId = node.boundVariables['iconName']
   if (!variableId || overriddenInInstance(graph, node.id, 'iconName')) return undefined
-  const resolved = graph.resolveVariableForNode(node.id, variableId, fallback)
+  const resolved = resolverFor(graph, resolver).forNode(node.id, fallback).value(variableId)
   if (typeof resolved !== 'string') return undefined
   const name = resolved.trim()
   if (name === '' || name === icon.name || !ICON_NAME.test(name)) return undefined
@@ -151,8 +161,10 @@ const NUMERIC_RUN_FIELDS = ['fontSize', 'fontWeight', 'letterSpacing', 'lineHeig
 export function resolvedRunBindings(
   graph: SceneGraph,
   node: SceneNode,
-  fallback: VariableModeFallback = 'active'
+  fallback: VariableModeFallback = 'active',
+  resolver?: VariableResolver
 ): Pick<Partial<SceneNode>, 'styleRuns'> {
+  const reader = resolverFor(graph, resolver).forNode(node.id, fallback)
   const styleRuns = node.styleRuns.map((run): StyleRun => {
     const bound = run.style.boundVariables
     if (!bound) return run
@@ -160,7 +172,7 @@ export function resolvedRunBindings(
     for (const field of NUMERIC_RUN_FIELDS) {
       const variableId = bound[field]
       if (!variableId) continue
-      const value = graph.resolveNumberVariableForNode(node.id, variableId, fallback)
+      const value = reader.number(variableId)
       if (value === undefined || !Number.isFinite(value)) continue
       const effective = value * runBindingScale(node, style, field)
       if (!Number.isFinite(effective)) continue
@@ -169,9 +181,7 @@ export function resolvedRunBindings(
       style = { ...style, [field]: next }
     }
     const familyId = bound.fontFamily
-    const family = familyId
-      ? variableFontFamily(graph.resolveVariableForNode(node.id, familyId, fallback))
-      : undefined
+    const family = familyId ? variableFontFamily(reader.value(familyId)) : undefined
     if (family !== undefined && family !== style.fontFamily)
       style = { ...style, fontFamily: family }
     return style === run.style ? run : { ...run, style }
@@ -218,8 +228,14 @@ export function variablesResolvingThrough(graph: SceneGraph, ids: Iterable<strin
  * The collections whose variables the layers in these subtrees resolve: those they bind, and
  * those the bound variables alias, so a mode set on the subtrees can change what they show.
  */
-export function collectionsBoundIn(graph: SceneGraph, roots: Iterable<string>): Set<string> {
-  return collectionsResolving(graph, subtreeNodes(graph, roots).flatMap(boundVariableIds))
+export function collectionsBoundIn(
+  graph: SceneGraph,
+  roots: Iterable<string>,
+  resolver?: VariableResolver
+): Set<string> {
+  return resolverFor(graph, resolver).dependencies(
+    subtreeNodes(graph, roots).flatMap(boundVariableIds)
+  )
 }
 
 /**
@@ -249,12 +265,13 @@ function scopedNodes(graph: SceneGraph, scope: BindingScope | undefined): Iterab
 export function reconcileVariableBindings(graph: SceneGraph, scope?: BindingScope): string[] {
   const changed: string[] = []
   const nodes = [...scopedNodes(graph, scope)]
-  for (const node of nodes) refreshBoundPaints(graph, node)
+  const resolver = createVariableResolver(graph)
+  for (const node of nodes) refreshBoundPaints(graph, node, resolver)
   for (const node of nodes) {
     const updates = {
-      ...resolvedNumericBindings(graph, node),
-      ...resolvedValueBindings(graph, node),
-      ...resolvedRunBindings(graph, node)
+      ...resolvedNumericBindings(graph, node, 'active', resolver),
+      ...resolvedValueBindings(graph, node, 'active', resolver),
+      ...resolvedRunBindings(graph, node, 'active', resolver)
     }
     if (Object.keys(updates).length === 0) continue
     graph.updateNode(node.id, updates)

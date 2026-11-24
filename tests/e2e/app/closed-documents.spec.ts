@@ -7,19 +7,37 @@ import { testPath } from '#tests/helpers/paths'
 
 const FIXTURE = 'gold-preview.fig'
 
+// A tab that opens scrolls its bar into view smoothly; a click waits for its target to stand
+// still, and under load the animation never settles. These tests assert what a close does, not
+// how the bar animates, so they run with motion reduced, as the tab bar's own overflow spec does.
+test.use({ contextOptions: { reducedMotion: 'reduce' } })
+
 async function openFixtureInNewTab(page: Page) {
-  await page.evaluate(async (fixture) => {
+  const openedTabId = await page.evaluate(async (fixture) => {
     const tabsURL = '/src/app/tabs/index.ts'
     const tabs: typeof AppTabs = await import(tabsURL)
     const response = await fetch(`/__fixtures/${fixture}`)
-    await tabs.openFileInNewTab(new File([await response.arrayBuffer()], fixture))
+    const store = await tabs.openFileInNewTab(new File([await response.arrayBuffer()], fixture))
+    return tabs.getTabForStore(store)?.id ?? ''
   }, FIXTURE)
+  // This test closes tabs to see their documents released, so the document must be fully presented
+  // first: a close during the first frame would release what has not mounted yet. The canvas's own
+  // waits allow thirty seconds for that frame on a cold or busy server.
   await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const store = window.pairdraw?.getStore?.()
-        return Boolean(store && store.graph.nodes.size > 100 && !store.state.preparation)
-      })
+    .poll(
+      () =>
+        page.evaluate(async (tabId) => {
+          const tabsURL = '/src/app/tabs/index.ts'
+          const tabs: typeof AppTabs = await import(tabsURL)
+          const tab = tabs.getTabsSnapshot().find((entry) => entry.id === tabId)
+          return Boolean(
+            tab &&
+              tabs.getActiveTabId() === tabId &&
+              tab.store.graph.nodes.size > 100 &&
+              !tab.store.state.preparation
+          )
+        }, openedTabId),
+      { timeout: 30_000 }
     )
     .toBe(true)
 }
@@ -38,7 +56,9 @@ function activeTabRenderers(page: Page) {
 // closing tab's canvas also registered its renderers with the tab that became active, which
 // kept every closed canvas and its whole UI tree alive in the remaining document.
 test('documents closed in tabs are released', async ({ page }) => {
-  test.setTimeout(90_000)
+  // Four opens, each allowed the canvas's thirty seconds to present, and a garbage-collection
+  // check at the end.
+  test.setTimeout(180_000)
   await page.route(`**/__fixtures/${FIXTURE}`, (route) =>
     route.fulfill({ path: testPath('fixtures', FIXTURE) })
   )
@@ -64,6 +84,8 @@ test('documents closed in tabs are released', async ({ page }) => {
     })
   }
 
+  // A graph still referenced is a leak whether collected in one second or thirty: the bound only
+  // limits how long a forced collection may take on a busy server.
   await expect
     .poll(
       async () => {
@@ -75,7 +97,7 @@ test('documents closed in tabs are released', async ({ page }) => {
             ).length
         )
       },
-      { timeout: 15_000 }
+      { timeout: 30_000 }
     )
     .toBe(0)
   // The remaining tab's canvas remounts when it becomes active again.

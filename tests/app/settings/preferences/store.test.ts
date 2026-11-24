@@ -7,6 +7,7 @@ import {
   DEFAULT_APP_PREFERENCES,
   parseAppPreferences,
   updateAISetupState,
+  updateAnimationPreference,
   updateCanvasRenderingMode,
   updateNavigationPreferences,
   updateRenderingPreferences,
@@ -213,4 +214,17 @@ describe('parseAppPreferences', () => {
       showResolved: true
     })
   })
+})
+
+test('changing the animation preference leaves preferences cloneable', () => {
+  const saved = structuredClone(toRaw(appPreferences.value))
+  try {
+    updateAnimationPreference('off')
+    updateRenderingPreferences({ ultralight: true })
+    expect(() => structuredClone(toRaw(appPreferences.value))).not.toThrow()
+    expect(appPreferences.value.appearance.animations).toBe('off')
+    expect(appPreferences.value.rendering.ultralight).toBe(true)
+  } finally {
+    appPreferences.value = saved
+  }
 })

@@ -355,9 +355,10 @@ export const appPreferences = useLocalStorage<AppPreferences>(
 )
 
 export function updateAnimationPreference(animations: AnimationPreference): void {
+  const preferences = toRaw(appPreferences.value)
   appPreferences.value = {
-    ...appPreferences.value,
-    appearance: { ...appPreferences.value.appearance, animations }
+    ...preferences,
+    appearance: { ...toRaw(preferences.appearance), animations }
   }
 }
 
@@ -402,9 +403,10 @@ export function updateCanvasRenderingMode(canvasMode: CanvasRenderingMode): void
 }
 
 export function updateRenderingPreferences(changes: Partial<AppPreferences['rendering']>): void {
+  const preferences = toRaw(appPreferences.value)
   appPreferences.value = {
-    ...appPreferences.value,
-    rendering: { ...appPreferences.value.rendering, ...changes }
+    ...preferences,
+    rendering: { ...toRaw(preferences.rendering), ...changes }
   }
 }
 

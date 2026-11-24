@@ -1,0 +1,1 @@
+- A documentation page with no translation sends its other-language links to the English page instead of a missing one, and the published site serves a robots.txt naming its sitemap.

@@ -16,6 +16,7 @@ import { appSourceConfig } from '@pairdraw/vite-config/app-source'
 import { landingPreloads } from './landing-head.ts'
 import { docsLocales } from './locales.ts'
 import { rootThemeConfig } from './root-theme.ts'
+import { pageTree, writeSiteFiles } from './site-files.ts'
 import {
   LOCALE_PREFIXES,
   SITE_URL,
@@ -77,6 +78,16 @@ export default defineConfig({
     }
   },
   transformHead: landingPreloads,
+
+  // The language switcher links every locale from every page, so a page without a translation
+  // gets a 302 to its English text; robots.txt exists only for the published site.
+  buildEnd(siteConfig) {
+    const pages = pageTree(docsRoot, LOCALE_PREFIXES)
+    const written = writeSiteFiles(siteConfig.outDir, pages, LOCALE_PREFIXES, SITE_URL)
+    console.log(
+      `Language fallbacks: ${written.fallbacks}; robots.txt: ${written.robots ? 'written' : 'none'}`
+    )
+  },
 
   markdown: {
     codeTransformers: [

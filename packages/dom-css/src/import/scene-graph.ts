@@ -4,25 +4,21 @@ import { isValid, toUint8Array } from 'js-base64'
 import {
   SceneGraph,
   type Effect,
-  type Fill,
   type ImageScaleMode,
   type SceneNode,
   type Stroke
 } from '@pairdraw/scene-graph'
 import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
-import {
-  parseCSSAlignSelf,
-  parseCSSBackgroundImages,
-  parseCSSNumber,
-  parseCSSShadows
-} from '@pairdraw/scene-graph/css'
+import { parseCSSAlignSelf, parseCSSNumber, parseCSSShadows } from '@pairdraw/scene-graph/css'
 import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { blurRadiusForSigma } from '@pairdraw/scene-graph/geometry'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
 import type { DesignDocument, DesignElement, DesignNode, DesignStyleDeclaration } from '../types'
-import { colorToFillFromCSS, colorToStrokeFromCSS, mergedStyle, pickStyle } from './css-values'
+import type { BackgroundLayerPaint } from './background-pictures'
+import { backgroundPaint } from './background-pictures'
+import { colorToStrokeFromCSS, mergedStyle, pickStyle } from './css-values'
 import {
   applyContainerLayout,
   applyFlowSizing,
@@ -33,6 +29,8 @@ import {
   type ParentFlow
 } from './flow'
 import { resolveFontFamilyStack } from './fonts'
+import type { PaintedChild } from './stacking'
+import { applyStacking } from './stacking'
 import {
   blockRichText,
   characterStyleFromCSS,
@@ -126,45 +124,35 @@ function firstCSSNumber(style: DesignStyleDeclaration, ...properties: string[]):
   return null
 }
 
-function fillsFromStyle(style: DesignStyleDeclaration, property: string): Fill[] {
-  return colorToFillFromCSS(pickStyle(style, property))
-}
-
 /**
- * The `background-image` layers as fills, bottom-first as Pairdraw paints them: CSS paints the
- * first layer on top, so the list reverses. A `url()` layer becomes an image fill when its
- * bytes are inline; a remote address is skipped, as an unfetchable background paints nothing.
+ * Puts one background layer behind the children, at the area a picture shows or over the whole
+ * box. Layers are added bottom-first, so each new one paints above the last.
  */
-function backgroundFills(
+function addBackgroundLayer(
   graph: SceneGraph,
-  node: SceneNode,
-  style: DesignStyleDeclaration
-): Fill[] {
-  const layers = parseCSSBackgroundImages(
-    pickStyle(style, 'background-image'),
-    node.width,
-    node.height
-  )
-  const fills: Fill[] = []
-  for (const layer of layers) {
-    if (layer.kind === 'gradient') {
-      fills.push(layer.fill)
-      continue
-    }
-    const bytes = bytesFromDataURL(layer.url)
-    if (!bytes) continue
-    const imageHash = computeImageHash(bytes)
-    graph.images.set(imageHash, bytes)
-    fills.push({
-      type: 'IMAGE',
-      imageHash,
-      imageScaleMode: 'FILL',
-      color: { ...TRANSPARENT },
-      opacity: 1,
-      visible: true
-    })
-  }
-  return fills.reverse()
+  parent: SceneNode,
+  layer: BackgroundLayerPaint
+): void {
+  // A layer that covers the box follows its corners; one at a picture's own area does not.
+  const corners =
+    layer.area === undefined
+      ? {
+          cornerRadius: parent.cornerRadius,
+          topLeftRadius: parent.topLeftRadius,
+          topRightRadius: parent.topRightRadius,
+          bottomRightRadius: parent.bottomRightRadius,
+          bottomLeftRadius: parent.bottomLeftRadius,
+          independentCorners: parent.independentCorners
+        }
+      : {}
+  const background = graph.createNode('RECTANGLE', parent.id, {
+    name: layer.picture ? 'background image' : 'background',
+    ...(layer.area ?? { x: 0, y: 0, width: parent.width, height: parent.height }),
+    fills: [layer.fill],
+    ...corners,
+    layoutPositioning: parent.layoutMode === 'NONE' ? 'AUTO' : 'ABSOLUTE'
+  })
+  graph.insertChildAt(background.id, parent.id, parent.childIds.length)
 }
 
 function aspectRatioFromCSS(value: string | undefined): number | null {
@@ -400,9 +388,9 @@ function applyElementStyle(
   applyPositioning(node, style)
   applyPadding(node, style)
 
-  const fills = fillsFromStyle(style, 'background-color')
-  const background = backgroundFills(graph, node, style)
-  if (fills.length > 0 || background.length > 0) node.fills = [...fills, ...background]
+  const background = backgroundPaint(graph, style, node)
+  if (background.fills.length > 0) node.fills = background.fills
+  for (const layer of background.layers) addBackgroundLayer(graph, node, layer)
   applyImageFill(graph, node, element, style)
 
   const strokes = colorToStrokeFromCSS(
@@ -647,6 +635,23 @@ function containerFlow(element: DesignElement, display: string) {
   return { flow, richText, lines }
 }
 
+/** Builds a container's children and orders them the way CSS paints them. */
+function paintChildren(
+  graph: SceneGraph,
+  node: SceneNode,
+  element: DesignElement,
+  style: DesignStyleDeclaration,
+  flow: ParentFlow
+): void {
+  const children = flow === 'flex' ? element.children.toSorted(byFlexOrder) : element.children
+  const painted: PaintedChild[] = []
+  for (const child of children) {
+    const layer = createDesignNode(graph, node.id, child, flow, inheritedTextStyle(element, style))
+    if (layer) painted.push({ layer, style: child.type === 'element' ? mergedStyle(child) : {} })
+  }
+  applyStacking(graph, node, style, painted)
+}
+
 function createElementNode(
   graph: SceneGraph,
   parentId: string,
@@ -691,10 +696,7 @@ function createElementNode(
     createRichTextNode(graph, node.id, element, textStyle, textDisplay, flow ?? 'none')
     return node
   }
-  const children = flow === 'flex' ? element.children.toSorted(byFlexOrder) : element.children
-  for (const child of children) {
-    createDesignNode(graph, node.id, child, flow ?? 'none', inheritedTextStyle(element, style))
-  }
+  paintChildren(graph, node, element, style, flow ?? 'none')
 
   return node
 }

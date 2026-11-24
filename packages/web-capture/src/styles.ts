@@ -9,7 +9,9 @@ export const CAPTURED_STYLE_PROPERTIES = [
   'align-self',
   'aspect-ratio',
   'background-color',
+  'background-clip',
   'background-image',
+  'background-origin',
   'background-position',
   'background-repeat',
   'background-size',
@@ -43,6 +45,7 @@ export const CAPTURED_STYLE_PROPERTIES = [
   'font-weight',
   'gap',
   'height',
+  'isolation',
   'justify-content',
   'left',
   'letter-spacing',
@@ -77,7 +80,8 @@ export const CAPTURED_STYLE_PROPERTIES = [
   'text-underline-offset',
   'top',
   'white-space',
-  'width'
+  'width',
+  'z-index'
 ] as const
 
 export type CapturedStyleProperty = (typeof CAPTURED_STYLE_PROPERTIES)[number]
@@ -100,8 +104,10 @@ const IMPLIED_VALUES: Partial<Record<CapturedStyleProperty, readonly string[]>> 
   'align-items': ['normal'],
   'align-self': ['auto'],
   'aspect-ratio': ['auto'],
+  'background-clip': ['border-box'],
   'background-color': ['rgba(0, 0, 0, 0)', 'transparent'],
   'background-image': ['none'],
+  'background-origin': ['padding-box'],
   'background-position': ['0% 0%'],
   'background-repeat': ['repeat'],
   'background-size': ['auto'],
@@ -110,6 +116,8 @@ const IMPLIED_VALUES: Partial<Record<CapturedStyleProperty, readonly string[]>> 
   'flex-direction': ['row'],
   'flex-wrap': ['nowrap'],
   gap: ['normal'],
+  isolation: ['auto'],
+  'z-index': ['auto'],
   height: ['auto'],
   'justify-content': ['normal'],
   'max-height': ['none'],

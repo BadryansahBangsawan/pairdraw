@@ -16,7 +16,9 @@ const DEFAULT_COMPUTED_PROPERTIES = [
   'align-items',
   'aspect-ratio',
   'background-color',
+  'background-clip',
   'background-image',
+  'background-origin',
   'border-bottom-color',
   'border-bottom-style',
   'border-bottom-left-radius',
@@ -56,6 +58,7 @@ const DEFAULT_COMPUTED_PROPERTIES = [
   'max-height',
   'max-width',
   'min-height',
+  'isolation',
   'min-width',
   'object-fit',
   'opacity',
@@ -73,7 +76,8 @@ const DEFAULT_COMPUTED_PROPERTIES = [
   'text-transform',
   'top',
   'white-space',
-  'width'
+  'width',
+  'z-index'
 ] as const
 
 function resolveBrowserDocument(documentOverride: Document | undefined): Document {

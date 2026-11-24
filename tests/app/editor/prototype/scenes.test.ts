@@ -292,8 +292,9 @@ describe('play scenes on the stage', () => {
       )
     )
     if (!play) throw new Error('no play scenes')
-    const action = changeTo(loading.id, 'ON_CLICK').actions[0]
-    play.run({ sourceId: instance.id, action, transition: { type: 'DISSOLVE', duration: 0.3 } })
+    const dissolve = { type: 'DISSOLVE' as const, duration: 0.3 }
+    const action = { ...changeTo(loading.id, 'ON_CLICK').actions[0], transition: dissolve }
+    play.run({ sourceId: instance.id, action, transition: dissolve })
     expect(before).toEqual([screen.id])
     play.run({
       sourceId: instance.id,

@@ -6,10 +6,7 @@ import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph, type PrototypeOverlayPositionType } from '@pairdraw/scene-graph'
 
 function uint8ArrayToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength
-  ) as ArrayBuffer
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
 }
 
 const PLACEMENTS: readonly PrototypeOverlayPositionType[] = [

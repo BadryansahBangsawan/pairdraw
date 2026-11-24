@@ -4,7 +4,6 @@ import {
   figFontsManifest,
   type FigArchiveRecordInfo,
   type FigRecordPatch,
-  type FigUnreadVariable
 } from '@pairdraw/fig'
 import {
   nameImagesForFigma,
@@ -29,10 +28,7 @@ import {
   type FigExportSetup,
   type KiwiNodeChange
 } from '#core/io/formats/fig/export/setup'
-import {
-  appendVariableNodeChanges,
-  sequentialPositions
-} from '#core/io/formats/fig/export/variables'
+import { appendVariableNodeChanges } from '#core/io/formats/fig/export/variables'
 import { figArchive, type FigArchiveAccess } from '#core/kiwi/fig/session/archive/access'
 import { archiveChanges, type ArchiveChangeSummary } from '#core/kiwi/fig/session/archive/changes'
 import {
@@ -302,11 +298,7 @@ function writeRecords(setup: FigExportSetup, plan: RecordPlan): KiwiNodeChange[]
   return slotContentRecords.length > 0 ? null : written
 }
 
-function variableRecords(
-  setup: FigExportSetup,
-  archiveInternalCanvas: boolean,
-  unread: readonly FigUnreadVariable[]
-): KiwiNodeChange[] {
+function variableRecords(setup: FigExportSetup, archiveInternalCanvas: boolean): KiwiNodeChange[] {
   const internal = setup.canvasEntries.find((entry) => entry.page.internalOnly)
   if (!internal) return []
   const records: KiwiNodeChange[] = archiveInternalCanvas ? [] : [internal.canvasNc]
@@ -315,9 +307,7 @@ function variableRecords(
     records,
     internal.canvasGuid,
     setup.varIdToGuid,
-    setup.modeIdToGuid,
-    sequentialPositions(),
-    unread
+    setup.modeIdToGuid
   )
   return records
 }
@@ -344,7 +334,7 @@ function baselineWriter(info: FigArchiveRecordInfo): RecordWriter {
     if (!written) return null
     const internalPage = graph.getPages(true).find((page) => page.internalOnly)
     // The baseline holds the document's own records; an unread one is not in the graph.
-    return [documentRecord(setup, info), ...written, ...variableRecords(setup, !!internalPage, [])]
+    return [documentRecord(setup, info), ...written, ...variableRecords(setup, !!internalPage)]
   }
 }
 
@@ -375,11 +365,8 @@ async function buildPatch(
     const internalPage = graph.getPages(true).find((page) => page.internalOnly)
     const internal = setup.canvasEntries.find((entry) => entry.page.internalOnly)
     const canvasWritten = records.some((record) => record === internal?.canvasNc)
-    for (const record of variableRecords(
-      setup,
-      !!internalPage || canvasWritten,
-      info.unreadVariables
-    ))
+    // Unread records stay in the archive's bytes, so the patch never encodes them.
+    for (const record of variableRecords(setup, !!internalPage || canvasWritten))
       records.push(record)
   }
   const narrowed = await narrowToChangedFields(

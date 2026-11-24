@@ -1,110 +1,77 @@
 import { expect, test } from 'bun:test'
 
-import type { FigUnreadVariable } from '@pairdraw/fig'
-import type { GUID } from '@pairdraw/kiwi/fig'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { stringToGuid } from '@pairdraw/kiwi/fig/guid'
-import { SceneGraph } from '@pairdraw/scene-graph'
-import { guid } from '#core-tests/helpers/fig/guid'
+import { SceneGraph, type Variable } from '@pairdraw/scene-graph'
 
-import { appendVariableNodeChanges } from '#core/io/formats/fig/export/variables'
+import { figArchive, registerFigArchive } from '#core/kiwi/fig/session/archive/access'
 
-/** A PAINT variable as Figma writes it; the pinned schema has no PAINT type or paint values. */
-function paintVariable(localID: number, extra: Partial<NodeChange> = {}): NodeChange {
-  const value = { paintValue: { type: 'SOLID' } }
+const RED = { r: 1, g: 0, b: 0, a: 1 }
+const BLUE = { r: 0, g: 0, b: 1, a: 1 }
+
+/** A record the pinned schema has no type for, shaped as the archive decodes one. */
+function unreadPaintRecord(legacy: Variable): NodeChange {
   return {
-    guid: guid(localID),
+    guid: stringToGuid(legacy.id),
     type: 'VARIABLE',
-    name: `Paint ${localID}`,
-    isSoftDeleted: true,
-    parentIndex: { guid: guid(1), position: 'saved' },
-    ...extra,
-    ...({
-      variableResolvedType: 'PAINT',
-      variableDataValues: {
-        entries: [{ modeID: guid(10), variableData: { value } }]
-      }
-    } as Partial<NodeChange>)
+    name: legacy.name,
+    ...({ variableResolvedType: 'PAINT' } as Partial<NodeChange>)
   }
 }
 
-/** The records a save writes for one collection and its variable, then `unread`. */
-function written(
-  unread: (collectionId: string) => FigUnreadVariable[],
-  ids = (_collectionId: string): Map<string, GUID> => new Map()
-) {
-  const graph = new SceneGraph()
-  const collection = graph.createCollection('Color Scheme')
-  graph.createVariable('Accent', 'COLOR', collection.id)
-  const changes: NodeChange[] = []
-  let position = 0
-  appendVariableNodeChanges(
-    graph,
-    changes,
-    guid(2),
-    ids(collection.id),
-    new Map(),
-    () => `${position++}`,
-    unread(collection.id)
-  )
-  return changes
+/** A document read from its own file, whose second variable the reader left unread. */
+async function documentWithUnreadVariable() {
+  await initCodec()
+  const source = new SceneGraph()
+  const colors = source.createCollection('Colors')
+  source.createVariable('Accent', 'COLOR', colors.id, RED)
+  source.createVariable('Legacy', 'COLOR', colors.id, BLUE)
+  const bytes = await exportFigFile(source)
+
+  const graph = await parseFigFile(bytes.buffer as ArrayBuffer)
+  const archive = figArchive(graph)
+  if (!archive) throw new Error('The read registered no archive')
+  const info = await archive.info()
+  const legacy = [...graph.variables.values()].find((variable) => variable.name === 'Legacy')
+  if (!legacy) throw new Error('Missing Legacy')
+  const collectionId = legacy.collectionId
+  graph.removeVariable(legacy.id)
+  // An image the archive's name does not hash to makes the save a whole write instead of a patch.
+  graph.images.set('not-a-sha1', new Uint8Array([1, 2, 3]))
+  // The pinned schema has no type for this record, so the reader leaves it out; a save must keep
+  // its bytes rather than encode it again.
+  registerFigArchive(graph, {
+    original: () => archive.original(),
+    info: async () => ({
+      ...info,
+      imageHashes: ['not-a-sha1'],
+      unreadVariables: [{ record: unreadPaintRecord(legacy), collectionId }]
+    }),
+    componentPages: (ids) => archive.componentPages(ids),
+    recordPages: (ids) => archive.recordPages(ids),
+    patch: async () => {
+      throw new Error('A patch cannot carry this record')
+    },
+    close: () => undefined
+  })
+  return { graph, legacy }
 }
 
-test('a save writes unread variables back after the rest, unless their collection is gone', () => {
-  const records: NodeChange[] = []
-  const changes = written((collectionId) => {
-    records.push(paintVariable(5, { variableSetID: { guid: stringToGuid(collectionId) } }))
-    return [
-      { record: records[0], collectionId },
-      {
-        record: paintVariable(6, { variableSetID: { guid: guid(9) } }),
-        collectionId: '1:9'
-      }
-    ]
-  })
-  expect(changes.map((change) => change.name)).toEqual(['Color Scheme', 'Accent', 'Paint 5'])
-  expect(changes[2]).toEqual({
-    ...records[0],
-    parentIndex: { guid: guid(2), position: '2' }
-  })
+test('a whole save copies a record the schema cannot encode instead of failing', async () => {
+  const { graph, legacy } = await documentWithUnreadVariable()
+  const saved = await exportFigFile(graph)
+  const reopened = await parseFigFile(Uint8Array.from(saved).buffer as ArrayBuffer)
+  expect(reopened.variables.get(legacy.id)?.name).toBe('Legacy')
+  expect(reopened.variables.get(legacy.id)?.collectionId).toBe(legacy.collectionId)
+  expect([...reopened.variables.values()].find((item) => item.name === 'Accent')).toBeDefined()
 })
 
-test('an unread variable that names its collection as its parent keeps naming it', () => {
-  const changes = written((collectionId) => [
-    {
-      record: paintVariable(5, {
-        parentIndex: { guid: stringToGuid(collectionId), position: '0' }
-      }),
-      collectionId
-    }
-  ])
-  expect(changes[2]?.variableSetID).toEqual({ guid: changes[0]?.guid })
-  expect(changes[2]?.parentIndex?.guid).toEqual(guid(2))
-})
-
-test('an unread variable names its collection under the GUID the save gives it', () => {
-  const changes = written(
-    (collectionId) => [
-      {
-        record: paintVariable(5, {
-          parentIndex: { guid: stringToGuid(collectionId), position: '0' }
-        }),
-        collectionId
-      }
-    ],
-    (collectionId) => new Map([[collectionId, guid(40)]])
-  )
-  expect(changes[0]?.guid).toEqual(guid(40))
-  expect(changes[2]?.variableSetID).toEqual({ guid: guid(40) })
-})
-
-test('an unread variable whose collection the file never held is written as it was', () => {
-  const record = paintVariable(5, {
-    variableSetID: { assetRef: { key: 'lib', version: '1' } }
-  })
-  const changes = written(() => [{ record }])
-  expect(changes[2]).toEqual({
-    ...record,
-    parentIndex: { guid: guid(2), position: '2' }
-  })
+test('a second whole save keeps the copied record too', async () => {
+  const { graph, legacy } = await documentWithUnreadVariable()
+  await exportFigFile(graph)
+  const second = await exportFigFile(graph)
+  const reopened = await parseFigFile(Uint8Array.from(second).buffer as ArrayBuffer)
+  expect(reopened.variables.get(legacy.id)?.name).toBe('Legacy')
 })

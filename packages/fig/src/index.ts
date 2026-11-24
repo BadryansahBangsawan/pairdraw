@@ -38,10 +38,12 @@ export {
   type FontFileExtension
 } from './fonts'
 export {
+  appendFigRecordBytes,
   figArchiveComponentUsePages,
   figArchiveRecordInfo,
   figArchiveRecordPages,
   figComponentUsePages,
+  figRecordBytes,
   figRecordPages,
   patchFigArchive,
   patchFigRecords,

@@ -339,6 +339,60 @@ export function patchFigRecords(
   return mergeRecords(archive.map(entryOf), patch, (record) => record).map((entry) => entry.value)
 }
 
+/**
+ * The encoded bytes of the archive's records named by `ids`, in the archive's own schema. A
+ * record whose type the schema does not model cannot be encoded again, so a save copies these.
+ */
+export function figRecordBytes(
+  schemaDeflated: Uint8Array,
+  dataRaw: Uint8Array,
+  ids: readonly string[]
+): Uint8Array[] {
+  if (ids.length === 0) return []
+  const wanted = new Set(ids)
+  return scanMessage(archiveCodec(schemaDeflated), dataRaw).records.flatMap((record) =>
+    record.id !== undefined && wanted.has(record.id) ? [record.value] : []
+  )
+}
+
+/** `message` with these record bytes appended to its `nodeChanges`, framed as the archive does. */
+export function appendFigRecordBytes(
+  schemaDeflated: Uint8Array,
+  message: Uint8Array,
+  chunks: readonly Uint8Array[]
+): Uint8Array {
+  if (chunks.length === 0) return message
+  const { schema } = archiveCodec(schemaDeflated)
+  const fields = schema.definition('Message').byId
+  const bb = new ByteBuffer(message)
+  for (;;) {
+    const key = bb.readVarUint()
+    const field = fields[key]
+    if (!field) throw new Error('Attempted to parse invalid message')
+    if (field.name === 'nodeChanges' && field.isArray) {
+      const countStart = bb.offset
+      const count = bb.readVarUint()
+      const countBytes = bb.offset - countStart
+      const definition = field.definition
+      if (!definition) throw new Error('Kiwi nodeChanges holds no messages')
+      const element = { ...field, isArray: false }
+      for (let index = 0; index < count; index++) schema.skip(element, bb)
+      const recordsEnd = bb.offset
+      // One block carries every record: a second one would replace the first on decode.
+      return concat([
+        message.subarray(0, countStart),
+        varUint(count + chunks.length),
+        message.subarray(countStart + countBytes, recordsEnd),
+        ...chunks,
+        message.subarray(recordsEnd)
+      ])
+    }
+    if (key === 0) break
+    schema.skip(field, bb)
+  }
+  throw new Error('The archive message has no records')
+}
+
 type RecordHead = Omit<RecordEntry<Uint8Array>, 'value'> & SharedRecordHead
 type EncodedPart =
   | { kind: 'bytes'; bytes: Uint8Array }

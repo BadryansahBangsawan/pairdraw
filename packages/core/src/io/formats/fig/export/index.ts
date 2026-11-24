@@ -1,4 +1,10 @@
-import { compressFigDataSync, renameFigArchive } from '@pairdraw/fig'
+import {
+  appendFigRecordBytes,
+  compressFigDataSync,
+  figRecordBytes,
+  readFigArchiveParts,
+  renameFigArchive
+} from '@pairdraw/fig'
 import {
   nameImagesForFigma,
   placeSlotContent,
@@ -8,6 +14,7 @@ import {
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { loadFigDataCompressor, type FigFileKind } from '@pairdraw/kiwi/fig/container'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import { fractionalPosition } from '@pairdraw/scene-graph/order-keys'
 import type { GUID } from '@pairdraw/scene-graph/primitives'
@@ -89,15 +96,14 @@ function appendInternalResources(context: InternalResourceContext): void {
       )
     )
   }
-  if (graph.variableCollections.size > 0 || context.unreadVariables.length > 0) {
+  if (graph.variableCollections.size > 0) {
     appendVariableNodeChanges(
       graph,
       nodeChanges,
       internalCanvasGuid,
       context.varIdToGuid,
       context.modeIdToGuid,
-      sequentialPositions(written + sharedStyleNodes.length),
-      context.unreadVariables
+      sequentialPositions(written + sharedStyleNodes.length)
     )
   }
 }
@@ -197,7 +203,27 @@ async function writeFigFile(
   }
 
   const imageNames = nameImagesForFigma(nodeChanges, graph.images)
-  const kiwiData = compiled.encodeMessage(msg)
+  let kiwiData = compiled.encodeMessage(msg)
+  // A record of a type the pinned schema does not model cannot be encoded again, so its bytes
+  // come from the archive as the file saved them.
+  const unread = archived?.unreadVariables ?? []
+  if (unread.length > 0) {
+    const original = await figArchive(sourceGraph)?.original()
+    if (original) {
+      const parts = readFigArchiveParts(
+        original.buffer.slice(
+          original.byteOffset,
+          original.byteOffset + original.byteLength
+        ) as ArrayBuffer
+      )
+      const ids = unread.flatMap(({ record }) => (record.guid ? [guidToString(record.guid)] : []))
+      kiwiData = appendFigRecordBytes(
+        parts.schemaDeflated,
+        kiwiData,
+        figRecordBytes(parts.schemaDeflated, parts.dataRaw, ids)
+      )
+    }
+  }
   const extras = await figFileExtras(graph, imageNames, options)
 
   const version = graph.figKiwiVersion ?? undefined

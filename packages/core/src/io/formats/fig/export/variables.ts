@@ -1,6 +1,5 @@
 import * as v from 'valibot'
 
-import type { FigUnreadVariable } from '@pairdraw/fig'
 import {
   collectionPluginDataNodeChange,
   figmaFormulaFunction,
@@ -249,8 +248,7 @@ export function appendVariableNodeChanges(
   parent: GUID,
   ids: Map<string, GUID>,
   modes: Map<string, GUID>,
-  nextPosition: () => string = sequentialPositions(),
-  unread: readonly FigUnreadVariable[] = []
+  nextPosition: () => string = sequentialPositions()
 ): void {
   const modeKey = (modeId: string) => guidToString(modes.get(modeId) ?? stringToGuid(modeId))
   for (const collection of graph.variableCollections.values()) {
@@ -307,14 +305,5 @@ export function appendVariableNodeChanges(
         ...(variable.deleted ? { isSoftDeleted: true } : {})
       })
     }
-  }
-  for (const { record, collectionId } of unread) {
-    // One the file already left without a collection stays as it was.
-    if (collectionId && !graph.variableCollections.has(collectionId)) continue
-    const written = structuredClone(record)
-    // A record named its collection as its parent, which the internal canvas now is.
-    if (!written.variableSetID && collectionId)
-      written.variableSetID = { guid: ids.get(collectionId) ?? stringToGuid(collectionId) }
-    changes.push({ ...written, parentIndex: { guid: parent, position: nextPosition() } })
   }
 }

@@ -638,7 +638,7 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
 }
 function writeNode(state: PenWriteState, node: SceneNode): PenNode {
   if (node.overflowDirection !== 'NONE') state.drops.scroll++
-  if ((node.fontFeatures?.length ?? 0) > 0) state.drops.fontFeatures++
+  if (node.fontFeatures.length > 0) state.drops.fontFeatures++
   const result: PenNode = { id: node.id, type: nodeType(node) }
   basicNodeFields(state, node, result)
   if (semanticNodeFields(state, node, result)) return result

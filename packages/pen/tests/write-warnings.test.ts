@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { parsePenDocument, parsePenFile, writePenDocument } from '@pairdraw/pen'
+import { parsePenDocument, parsePenFile, writePenDocument, type PenNode } from '@pairdraw/pen'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 
 import { parseDocument } from './helpers/document'
@@ -31,21 +31,21 @@ function imageGraph() {
   return { graph, hash }
 }
 
+/** The URL of the single image paint a written node holds. */
+function paintURL(node: PenNode | undefined): string | undefined {
+  const fill = node?.fill
+  const paint = Array.isArray(fill) ? fill[0] : fill
+  if (typeof paint !== 'object' || paint === null || !('url' in paint)) return undefined
+  return typeof paint.url === 'string' ? paint.url : undefined
+}
+
 describe('writing a .pen file', () => {
   test('embeds image fills and keeps where the crop draws', () => {
     const { graph, hash } = imageGraph()
     const warnings: string[] = []
 
     const saved = writePenDocument(graph, { warnings })
-    const document = parsePenDocument(saved)
-    const fillValue = document.children[0]?.fill
-    const paint = Array.isArray(fillValue) ? fillValue[0] : fillValue
-    expect(typeof paint).toBe('object')
-    expect(typeof paint === 'object' && paint !== null ? paint.type : undefined).toBe('image')
-    const url =
-      typeof paint === 'object' && paint !== null && 'url' in paint && typeof paint.url === 'string'
-        ? paint.url
-        : undefined
+    const url = paintURL(parsePenDocument(saved).children[0])
     expect(url?.startsWith('data:image/png;base64,')).toBe(true)
 
     const reopened = parsePenFile(saved, {

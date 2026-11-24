@@ -1,6 +1,11 @@
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { guidToString } from '@pairdraw/kiwi/fig/guid'
-import { generateId, SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
+import {
+  generateId,
+  SceneGraph,
+  type PrototypeOverlayPositionType,
+  type SceneNode
+} from '@pairdraw/scene-graph'
 import { compareOrderKeys } from '@pairdraw/scene-graph/order-keys'
 import { PAIRDRAW_PLUGIN_DATA } from '@pairdraw/scene-graph/plugin-data'
 import { remapStyleRunReferences } from '@pairdraw/scene-graph/text'
@@ -26,6 +31,7 @@ import { nodeChangeToProps } from '../node-change'
 import { gridPositionFromAnchors } from '../node-change/convert'
 import { generatedFrameCodec } from '../node-change/generated/codecs'
 import { readNodeChangePluginData } from '../node-change/plugin-data'
+import { overlayPositionFromFigma } from '../node-change/prototype'
 import { figArchiveRecordInfo, type FigArchiveRecordInfo } from '../record-patch'
 import { applyDocumentLayoutBindings } from './bindings/layout'
 import { applyDocumentPaintBindings } from './bindings/paint'
@@ -525,6 +531,18 @@ function materializeReaderInto(
   /** A record's layer keeps the record's GUID, unless a layer has it already: a repeated record. */
   const recordId = ({ sourceId }: InstanceOccurrence): string | undefined =>
     graph.isEntityIdTaken(sourceId) ? undefined : sourceId
+  /**
+   * Where each overlay target sits, read from the destination records the pages hold. Figma keeps
+   * an overlay's placement on the frame it opens, not on the action that opens it.
+   */
+  const overlayPlacements = new Map<string, PrototypeOverlayPositionType>()
+  const collectOverlayPlacements = (occurrence: InstanceOccurrence): void => {
+    const record = occurrence.properties
+    const placement = overlayPositionFromFigma(record.overlayPositionType)
+    if (record.guid && placement) overlayPlacements.set(guidToString(record.guid), placement)
+    for (const child of occurrence.children) collectOverlayPlacements(child)
+  }
+  for (const page of pages) collectOverlayPlacements(page)
   /** Generated frames whose records name other layers, linked once the pass has made them. */
   const linked: Array<{ node: SceneNode; record: NodeChange }> = []
   const createShells = (
@@ -539,7 +557,9 @@ function materializeReaderInto(
         createShells(child, existingId, occurrence.properties)
       return
     }
-    const { nodeType, ...props } = nodeChangeToProps(occurrence.properties, blobs)
+    const { nodeType, ...props } = nodeChangeToProps(occurrence.properties, blobs, 'source', (id) =>
+      overlayPlacements.get(id)
+    )
     if (nodeType === 'DOCUMENT' || nodeType === 'VARIABLE')
       throw new Error(`Unsupported scene type ${nodeType}`)
     const gridPosition = parentRecord

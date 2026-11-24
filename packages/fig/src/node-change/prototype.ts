@@ -197,27 +197,55 @@ function transitionOf(action: FigmaAction): PrototypeTransition {
   return easing ? { ...transition, easing } : transition
 }
 
-function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | null {
+const OVERLAY_POSITIONS: readonly PrototypeOverlayPositionType[] = [
+  'CENTER',
+  'TOP_LEFT',
+  'TOP_CENTER',
+  'TOP_RIGHT',
+  'BOTTOM_LEFT',
+  'BOTTOM_CENTER',
+  'BOTTOM_RIGHT'
+]
+
+/** The placement a destination record's `overlayPositionType` names; unknown or absent is CENTER. */
+export function overlayPositionFromFigma(value: unknown): PrototypeOverlayPositionType | undefined {
+  return OVERLAY_POSITIONS.find((position) => position === value)
+}
+
+/** Where the frame a reaction opens as an overlay sits, by the destination record's node id. */
+export type OverlayPlacementOf = (nodeId: string) => PrototypeOverlayPositionType | undefined
+
+function reactionFromFigma(
+  interaction: FigmaInteraction,
+  placementOf?: OverlayPlacementOf
+): PrototypeReaction | null {
   if (!isModeledInteraction(interaction)) return null
   const id = interaction.id ? guidToString(interaction.id) : null
   if (!id) return null
   const trigger = triggerFromFigma(interaction.event ?? {})
-  const actions = (interaction.actions ?? []).flatMap<PrototypeAction>((action) => {
+  const actions: PrototypeAction[] = []
+  for (const action of interaction.actions ?? []) {
     const connection = action.connectionType ?? 'INTERNAL_NODE'
-    if (connection === 'BACK') return [{ type: 'BACK' }]
-    if (connection === 'CLOSE') return [{ type: 'CLOSE' }]
-    return [
-      {
-        type: 'NODE',
-        nodeId: action.transitionNodeID ? guidToString(action.transitionNodeID) : null,
-        navigation: NAVIGATION_FROM_FIGMA[action.navigationType ?? 'NAVIGATE'] ?? 'NAVIGATE',
-        transition: transitionOf(action),
-        // Figma records an overlay's placement on the destination frame, not on the action; the
-        // write below puts it back there.
-        overlayPosition: 'CENTER'
-      }
-    ]
-  })
+    if (connection === 'BACK') {
+      actions.push({ type: 'BACK' })
+      continue
+    }
+    if (connection === 'CLOSE') {
+      actions.push({ type: 'CLOSE' })
+      continue
+    }
+    const nodeId = action.transitionNodeID ? guidToString(action.transitionNodeID) : null
+    const placement = nodeId ? placementOf?.(nodeId) : undefined
+    actions.push({
+      type: 'NODE',
+      nodeId,
+      navigation: NAVIGATION_FROM_FIGMA[action.navigationType ?? 'NAVIGATE'] ?? 'NAVIGATE',
+      transition: transitionOf(action),
+      // Figma records an overlay's placement on the destination frame, not on the action; the
+      // write below puts it back there.
+      overlayPosition: placement ?? 'CENTER'
+    })
+  }
   return { id, trigger, actions }
 }
 
@@ -243,11 +271,14 @@ export function scrollBehaviorToFigma(behavior: ScrollBehavior): string {
  * The reactions a `.fig` record carries. Interactions this model cannot edit (hover, drag,
  * variables) stay in the record's raw payload and keep round-tripping verbatim.
  */
-export function extractPrototypeReactions(nc: NodeChange): PrototypeReaction[] {
+export function extractPrototypeReactions(
+  nc: NodeChange,
+  placementOf?: OverlayPlacementOf
+): PrototypeReaction[] {
   const parsed = v.safeParse(interactionsSchema, nc.prototypeInteractions)
   if (!parsed.success) return []
   return parsed.output.flatMap((interaction) => {
-    const reaction = reactionFromFigma(interaction)
+    const reaction = reactionFromFigma(interaction, placementOf)
     return reaction ? [reaction] : []
   })
 }

@@ -34,7 +34,12 @@ import {
   extractPluginRelaunchData,
   readNodeChangePluginData
 } from './plugin-data'
-import { extractPrototypeReactions, overflowFromFigma, scrollBehaviorFromFigma } from './prototype'
+import {
+  extractPrototypeReactions,
+  overflowFromFigma,
+  scrollBehaviorFromFigma,
+  type OverlayPlacementOf
+} from './prototype'
 import { extractNodeStatus } from './status'
 import { styleRefId } from './style/refs'
 import { importStyleRuns } from './style/runs'
@@ -854,7 +859,8 @@ function resolveNodeType(nc: NodeChange): NodeType | 'DOCUMENT' | 'VARIABLE' {
 export function nodeChangeToProps(
   nc: NodeChange,
   blobs: Uint8Array[],
-  metadata: 'source' | 'occurrence' = 'source'
+  metadata: 'source' | 'occurrence' = 'source',
+  placementOf?: OverlayPlacementOf
 ): Partial<SceneNode> & { nodeType: NodeType | 'DOCUMENT' | 'VARIABLE' } {
   const nodeType = resolveNodeType(nc)
 
@@ -915,7 +921,7 @@ export function nodeChangeToProps(
     maskIsOutline: nc.maskIsOutline ?? false,
     expanded: true,
     autoRename: (nc.autoRename ?? true) as boolean,
-    prototypeReactions: extractPrototypeReactions(nc),
+    prototypeReactions: extractPrototypeReactions(nc, placementOf),
     boundVariables: extractBoundVariables(nc),
     variableAssignmentScales: numericVariableAssignmentScales(),
     variableBindingScales: sourceVariableBindingScales(nc),

@@ -39,6 +39,7 @@ import { applyBoundPaintColor } from './paints'
 import { pinnedRunBindingScales } from './units'
 
 export * from './resolution'
+export * from './resolver'
 
 /**
  * Variables a list shows: every one but those deleted, on their own or with their collection,

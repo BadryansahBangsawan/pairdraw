@@ -1,8 +1,8 @@
-import { expect, test } from 'bun:test'
+import { expect, jest, test } from 'bun:test'
 
 import { createEditor } from '@pairdraw/core'
 import { exportFigFile, parseFigFile, populateFigPage } from '@pairdraw/core/io/formats/fig'
-import { fontManager } from '@pairdraw/core/text'
+import { FontManager, fontManager } from '@pairdraw/core/text'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -330,5 +330,42 @@ test('a page with a CSS generic font family prepares without asking a web provid
   } finally {
     fontManager.setWebFontFetch(null)
     fontManager.setOnlineFontProviders({})
+  }
+})
+
+test('a web font that never answers falls back instead of blocking page preparation', async () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  if (!page) throw new Error('Expected default page')
+  // No catalog holds this family and its name is no CSS generic, so preparation asks a provider.
+  graph.createNode('TEXT', page.id, { text: 'offline', fontFamily: 'Never Answers' })
+
+  // A fresh manager keeps the hung fetch from poisoning the shared one.
+  const manager = new FontManager()
+  manager.setOnlineFontProviders({ google: true })
+  manager.setWebFontFetch(
+    () =>
+      new Promise<Response>(() => {
+        // Never answers: only the fetch bound can settle page preparation.
+      })
+  )
+  jest.useFakeTimers()
+  try {
+    const editor = createEditor({
+      graph,
+      skipInitialGraphSetup: true,
+      loadFont: (family, style, characters, signal) =>
+        manager.loadFont(family, style, characters, signal)
+    })
+    const preparing = editor.preparePage(page.id)
+    // The fetch never answers, so only the bound can let preparation finish.
+    for (let tick = 0; tick < 30; tick++) {
+      await Promise.resolve()
+      jest.advanceTimersByTime(1_000)
+    }
+    expect(await preparing).not.toBeNull()
+    editor.dispose()
+  } finally {
+    jest.useRealTimers()
   }
 })

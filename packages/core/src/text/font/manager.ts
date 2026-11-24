@@ -57,6 +57,33 @@ import type { WebFontFetch, WebFontProviderId } from '#core/text/web-font/resolv
 
 export type { BundledFontLocator } from '#core/text/font/bundled'
 
+/**
+ * How long a web-font fetch may run before the page falls back to an installed or bundled face.
+ * A provider that never answers must not block page preparation.
+ */
+const WEB_FONT_FETCH_TIMEOUT_MS = 10_000
+
+/**
+ * `load`, bounded by `ms` and cancelled as soon as `signal` aborts, so a provider that never
+ * answers cannot block page preparation. The timer clears when the load settles.
+ */
+async function fetchWithin<T>(
+  load: (signal: AbortSignal) => Promise<T>,
+  signal: AbortSignal | undefined,
+  ms: number
+): Promise<T> {
+  const bounded = new AbortController()
+  const forward = () => bounded.abort(signal?.reason)
+  signal?.addEventListener('abort', forward, { once: true })
+  const timer = setTimeout(() => bounded.abort(new Error('Web font fetch timed out')), ms)
+  try {
+    return await load(bounded.signal)
+  } finally {
+    clearTimeout(timer)
+    signal?.removeEventListener('abort', forward)
+  }
+}
+
 export class FontManager {
   private loadedFamilies = new Map<string, ArrayBuffer>()
   /** The families `loadedFamilies` has a face of, so asking needs no scan of its keys. */
@@ -443,7 +470,12 @@ export class FontManager {
       )
       const normalized = normalizeFontFamily(family)
       const families = normalized === family ? [family] : [family, normalized]
-      const resolved = await this.webFonts.fetchFont(families, style, requestedCharacters, signal)
+      const resolved = await fetchWithin(
+        (boundedSignal) =>
+          this.webFonts.fetchFont(families, style, requestedCharacters, boundedSignal),
+        signal,
+        WEB_FONT_FETCH_TIMEOUT_MS
+      )
       if (!resolved || resolved.buffers.length === 0) return null
       const primary = resolved.buffers[0]
       // Providers serve faces by weight; a named face comes only from a variable file that has it.

@@ -102,7 +102,10 @@ export function createDefaultNode(
   type: NodeType,
   overrides: Partial<SceneNode> = {}
 ): SceneNode {
-  const node = {
+  // A literal ending in a spread is built one field at a time, and V8 keeps an object given this
+  // many fields that way in dictionary mode, about 3 KB more per layer; a spread copy of a
+  // finished literal keeps fast fields, in JavaScriptCore as well.
+  const defaults = {
     id: generateId(),
     type,
     name: type.charAt(0) + type.slice(1).toLowerCase(),
@@ -265,9 +268,9 @@ export function createDefaultNode(
     derivedTextHeight: null,
     textPathData: null,
     textPathBox: null,
-    booleanOperation: undefined,
-    ...overrides
+    booleanOperation: undefined
   } satisfies CompleteNodeFields
+  const node: SceneNode = { ...defaults, ...overrides }
   node.effects = normalizeEffects(node.effects)
   shareEmptyNodeValues(node, Object.keys(overrides))
   return node

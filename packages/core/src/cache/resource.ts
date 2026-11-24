@@ -35,7 +35,7 @@ export class ResourceCache<K, V> {
   private newest = -1
   private totalWeight = 0
   private readonly maxEntries: number
-  private readonly maxWeight: number
+  private maxWeight: number
 
   constructor(private readonly options: ResourceCacheOptions<K, V>) {
     this.maxEntries = options.maxEntries ?? Infinity
@@ -57,6 +57,29 @@ export class ResourceCache<K, V> {
   }
   get weight(): number {
     return this.totalWeight
+  }
+
+  /** The weight budget a `setMaxWeight` call set, or the option the cache was built with. */
+  get maxBytes(): number {
+    return this.maxWeight
+  }
+
+  /**
+   * Resizes the weight budget, evicting least recently used entries to fit. A cache bounded only
+   * by entries keeps its weight budget unset.
+   */
+  setMaxWeight(maxWeight: number): void {
+    if (
+      !(maxWeight === Infinity || (Number.isSafeInteger(maxWeight) && maxWeight >= 0)) ||
+      (this.maxEntries === Infinity && maxWeight === Infinity)
+    )
+      throw new RangeError('ResourceCache requires a finite non-negative weight budget')
+    this.maxWeight = Math.min(maxWeight, Number.MAX_SAFE_INTEGER)
+    const removed: Removal<K, V>[] = []
+    while (this.totalWeight > this.maxWeight) {
+      removed.push({ slot: this.remove(this.oldest), reason: 'evict' })
+    }
+    this.dispose(removed)
   }
 
   has(key: K): boolean {

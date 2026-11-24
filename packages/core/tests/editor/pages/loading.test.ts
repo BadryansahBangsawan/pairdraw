@@ -1,11 +1,14 @@
 import { expect, jest, test } from 'bun:test'
 
 import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
 import { exportFigFile, parseFigFile, populateFigPage } from '@pairdraw/core/io/formats/fig'
 import { FontManager, fontManager } from '@pairdraw/core/text'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
+import { expectDefined } from '#core-tests/helpers/assert'
 import type { PageSwitchProgress } from '#core/editor/pages'
 
 test('core page preparation only reports progress and never owns app suspension', async () => {
@@ -375,4 +378,30 @@ test('a web font that never answers falls back instead of blocking page preparat
   } finally {
     jest.useRealTimers()
   }
+})
+
+test('a page shown before the editor had a canvas is laid out once its first canvas arrives', async () => {
+  const editor = createEditor()
+  const pageId = editor.state.currentPageId
+  const row = editor.graph.createNode('FRAME', pageId, {
+    layoutMode: 'HORIZONTAL',
+    itemSpacing: 10,
+    primaryAxisSizing: 'HUG',
+    counterAxisSizing: 'HUG'
+  })
+  editor.graph.createNode('RECTANGLE', row.id, { width: 40, height: 40 })
+  const second = editor.graph.createNode('RECTANGLE', row.id, { width: 40, height: 40 })
+  // Without a canvas, preparing a page it already holds leaves its layout to the canvas.
+  await editor.switchPage(pageId)
+  expect(editor.graph.getNode(second.id)?.x).toBe(0)
+
+  const ck = await getCanvasKit()
+  const surface = expectDefined(ck.MakeSurface(64, 64), 'canvas surface')
+  const renderer = new SkiaRenderer(ck, surface)
+  editor.setCanvasKit(ck, renderer)
+
+  expect(editor.graph.getNode(second.id)?.x).toBe(50)
+  editor.removeCanvasRenderer(renderer)
+  renderer.destroy()
+  editor.dispose()
 })

@@ -9,7 +9,12 @@ import {
   RenderChunkPictureCache
 } from '#core/canvas/renderer/chunks'
 
-import { TileImageCache } from './cache'
+import {
+  TileImageCache,
+  viewportTileBytes,
+  viewportTileCacheBudget,
+  type TileMemory
+} from './cache'
 import { TILE_DEVICE_SIZE, tileLevel, tileWorldBounds, type TileWorldBounds } from './geometry'
 import { planTiles } from './planner'
 import { deleteRenderedTile, renderTile, tileChunks } from './render'
@@ -54,6 +59,25 @@ export class TiledSceneController {
     maximumJobsPerFrame: MAXIMUM_TILE_JOBS_PER_FRAME
   })
   private readonly measuredCosts = new Map<string, number>()
+  private memory: TileMemory = {}
+  /** The tile bytes of the last frame's viewport, which a change of memory resizes the cache to. */
+  private viewportBytes = 0
+
+  /**
+   * Tells the cache what the host knows of the memory its tiles share. A hidden canvas draws no
+   * frames, so the budget changes at once rather than at the next frame.
+   */
+  setMemory(memory: TileMemory): void {
+    this.memory = memory
+    if (this.viewportBytes > 0) {
+      this.tileCache.setBudget(viewportTileCacheBudget(this.viewportBytes, memory))
+    }
+  }
+
+  /** The tile cache's current byte budget. */
+  tileCacheBytes(): number {
+    return this.tileCache.budget()
+  }
 
   invalidateNode(nodeId: string, graph?: SceneGraph): void {
     const chunks = this.index?.getChunksDependingOnNode(nodeId) ?? []
@@ -97,6 +121,11 @@ export class TiledSceneController {
     if (!index || !renderer.pageId) return this.emptyResult()
 
     const level = tileLevel(renderer.zoom * renderer.dpr)
+    this.viewportBytes = viewportTileBytes(
+      renderer.viewportWidth * renderer.dpr,
+      renderer.viewportHeight * renderer.dpr
+    )
+    this.tileCache.setBudget(viewportTileCacheBudget(this.viewportBytes, this.memory))
     const viewport = {
       minX: -renderer.panX / renderer.zoom,
       minY: -renderer.panY / renderer.zoom,

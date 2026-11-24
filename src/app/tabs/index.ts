@@ -13,6 +13,7 @@ import { confirmAllDocuments } from '@/app/document/close/all'
 import { confirmDocumentClose } from '@/app/document/close/controller'
 import { requestDocumentClose } from '@/app/document/close/prompt'
 import { documentAssetReader } from '@/app/document/io/assets'
+import { readFigDocument } from '@/app/document/io/fig'
 import { applyImportedDocument } from '@/app/document/io/imported-document'
 import { documentImportOpener, reportReadWarnings } from '@/app/document/io/imports'
 import { isFigArchiveName } from '@/app/document/io/names'
@@ -44,7 +45,7 @@ import {
   watchOpenedFigCover
 } from '@/app/tabs/open/cover'
 import { announceFileOpened } from '@/app/tabs/open/events'
-import { figFile, readFigForTab } from '@/app/tabs/open/fig'
+import { figFile } from '@/app/tabs/open/fig'
 import { findTabByFileIdentity, hasFileIdentity } from '@/app/tabs/open/identity'
 import { readStorageDocument } from '@/app/tabs/open/storage'
 
@@ -373,7 +374,9 @@ async function showImportedGraph(
   load?: DocumentLoadSession
 ): Promise<void> {
   load?.update({ phase: 'materializing', detail: store.state.documentName })
-  await applyImportedDocument(store, graph, load)
+  // The page this tab will show is prepared by switchPage below. Preparing the first page in a
+  // staging editor would load its fonts twice, and an inactive Cover page stays lazy until used.
+  await applyImportedDocument(store, graph, load, { prepare: false })
   load?.signal.throwIfAborted()
   await prepare?.()
   load?.signal.throwIfAborted()
@@ -417,7 +420,7 @@ async function showStorageDocument(
   const bytes = given ?? (await readStorageDocument(binding, document, load))
   const file = figFile(bytes, document.name)
   load.update({ phase: 'decoding', detail: document.name })
-  const imported = await readFigForTab(file, load.signal)
+  const imported = await readFigDocument(file, load.signal)
   await showImportedGraph(
     store,
     imported,
@@ -427,15 +430,15 @@ async function showStorageDocument(
 }
 
 /**
- * Reads a `.fig` file's bytes as a tab opens them, laid out and ready to show, for an editor of
- * its own such as an earlier version's preview.
+ * Reads a `.fig` file's bytes as a tab opens them, for an editor of its own such as an earlier
+ * version's preview. The page it shows prepares its own fonts and layout.
  */
 export function readFigBytes(
   bytes: Uint8Array,
   name: string,
   signal?: AbortSignal
 ): Promise<SceneGraph> {
-  return readFigForTab(figFile(bytes, name), signal)
+  return readFigDocument(figFile(bytes, name), signal)
 }
 
 /**
@@ -582,7 +585,7 @@ export async function openFileInNewTab(
     let sourceFormat: string
     if (isFig) {
       load.update({ phase: 'decoding', detail: file.name })
-      imported = await readFigForTab(file, load.signal)
+      imported = await readFigDocument(file, load.signal)
       sourceFormat = 'fig'
     } else {
       const result = await io.readDocument(
@@ -674,7 +677,7 @@ export async function openKeptDocument(kept: KeptDocument): Promise<EditorStore>
   let succeeded = false
   try {
     load.update({ phase: 'decoding', detail: kept.name })
-    const imported = await readFigForTab(figFile(kept.bytes, kept.name), load.signal)
+    const imported = await readFigDocument(figFile(kept.bytes, kept.name), load.signal)
     await showImportedGraph(
       store,
       imported,

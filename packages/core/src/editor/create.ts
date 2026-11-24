@@ -354,6 +354,7 @@ export function createEditor(options?: EditorOptions) {
   function setCanvasKit(ck: CanvasKit, renderer: SkiaRenderer) {
     _ck = ck
     _renderer = renderer
+    const first = _renderers.size === 0
     _renderers.add(renderer)
     _textEditor ??= new TextEditor(ck)
     uninstallTextMeasurer?.()
@@ -363,6 +364,9 @@ export function createEditor(options?: EditorOptions) {
             pendingTextLayout.measure(renderer, node, maxWidth)
           )
         : null
+    // A page shown before this editor had a canvas to measure its text, as one a tab opens while
+    // its canvas loads, is laid out now that one can.
+    if (first) pages.layOutStaleCurrentPage()
   }
 
   function releaseTextMeasurer() {
@@ -433,9 +437,9 @@ export function createEditor(options?: EditorOptions) {
     unsubscribeFromGraph()
   }
 
-  function releaseGraphResources() {
-    releaseFigPopulationWorker(_graph)
-    releaseOriginalFigArchive(_graph)
+  function releaseGraphResources(graph: SceneGraph = _graph) {
+    releaseFigPopulationWorker(graph)
+    releaseOriginalFigArchive(graph)
   }
 
   const editor = {

@@ -1,3 +1,4 @@
+import { useDocumentVisibility } from '@vueuse/core'
 import type { CanvasKit } from 'canvaskit-wasm'
 import { onScopeDispose, watch } from 'vue'
 import type { Ref } from 'vue'
@@ -23,6 +24,17 @@ import { useCanvasResizeObserver } from '#vue/canvas/surface/resize-observer'
 import { createShaderRasterizer } from '#vue/canvas/surface/shader/rasterizer'
 import type { UseCanvasOptions } from '#vue/canvas/surface/types'
 import { editorMessages } from '#vue/i18n/messages/editor'
+
+/**
+ * The device's memory in bytes where the browser reports it. Browsers round it and stop at 8 GB,
+ * which means at least that much, so a device at the cap is treated as unknown.
+ */
+function reportedDeviceMemory(): number | undefined {
+  // Chromium's Device Memory API; WebKit and Firefox leave it out.
+  const gigabytes: unknown = Reflect.get(navigator, 'deviceMemory')
+  if (typeof gigabytes !== 'number' || gigabytes >= 8) return undefined
+  return gigabytes * 1024 ** 3
+}
 
 type SurfaceManagerState = {
   renderer: SkiaRenderer | null
@@ -102,6 +114,17 @@ export function createCanvasSurfaceManager({
     if (showsStickyPlaceholder) renderer.stickyPlaceholder = stickyPlaceholder
   }
 
+  /**
+   * Tells the renderer's tiles what memory they share: a share of the device's where the browser
+   * reports it, and only what the canvas showed last while the page is hidden.
+   */
+  function applyTileMemory() {
+    state.renderer?.tiledScene.setMemory({
+      deviceBytes: reportedDeviceMemory(),
+      hidden: document.visibilityState === 'hidden'
+    })
+  }
+
   function clearSceneBackingRenderTimer() {
     if (sceneBackingRenderTimer === null) return
     clearTimeout(sceneBackingRenderTimer)
@@ -157,6 +180,7 @@ export function createCanvasSurfaceManager({
     state.renderer.presentationColorSpace = result.presentation ?? 'srgb'
     applyRenderOptions(state.renderer, options)
     showPlaceholders(state.renderer)
+    applyTileMemory()
     editor.setCanvasKit(ck, state.renderer)
     // The scene surface draws shader frames; an overlay surface has none to draw.
     if (options?.layer !== 'overlays' && !editor.hasShaderRasterizer())
@@ -281,6 +305,7 @@ export function createCanvasSurfaceManager({
     renderNow,
     destroy,
     markDirty: () => renderLoop.markDirty(),
+    applyTileMemory,
     getRenderer: () => state.renderer,
     getPresentation: () => state.presentation
   }
@@ -371,6 +396,9 @@ export function useCanvasSurfaceLifecycle({
     getCanvasKitValue,
     resizeCanvas: surface.resizeCanvas
   })
+
+  // A hidden page draws nothing, so its tiles shrink to what it showed last until it is back.
+  watch(useDocumentVisibility(), () => surface.applyTileMemory())
 
   onScopeDispose(() => {
     lifecycle.destroyed = true

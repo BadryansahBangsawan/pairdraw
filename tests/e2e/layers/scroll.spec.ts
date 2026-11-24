@@ -152,3 +152,96 @@ test('selecting a deep layer scrolls the layers sideways to its depth', async ({
   await expect.poll(() => scroller.evaluate((el) => Math.abs(el.scrollLeft))).toBe(0)
   canvas.assertNoErrors()
 })
+
+test('keyboard focus reveals a deep layer without selecting it', async ({ page }) => {
+  await page.goto('/?test')
+  const canvas = new CanvasHelper(page)
+  await canvas.waitForInit()
+  await openLayersPanel(page)
+  canvas.errors.length = 0
+  await canvas.clearCanvas()
+
+  const ids = await page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const pageId = store.state.currentPageId
+    for (let i = 0; i < 80; i++) {
+      store.graph.createNode('RECTANGLE', pageId, {
+        name: `Sibling ${i + 1}`,
+        width: 20,
+        height: 20
+      })
+    }
+    let parentId = pageId
+    for (let i = 0; i < 16; i++) {
+      parentId = store.graph.createNode('FRAME', parentId, {
+        name: `Nested frame ${i + 1}`,
+        width: 200,
+        height: 200
+      }).id
+    }
+    const leaf = store.graph.createNode('RECTANGLE', parentId, {
+      name: 'Deep layer with a long name',
+      width: 20,
+      height: 20
+    })
+    store.requestRender()
+    return { leaf: leaf.id }
+  })
+  await canvas.waitForRender()
+
+  // Selecting the leaf opens its ancestors; the focus path must work from a fresh scroll.
+  await page.evaluate((id) => window.pairdraw?.getStore?.()?.select([id]), ids.leaf)
+  const scroller = page.getByTestId('layers-scroll')
+  const leafRow = page.locator(`[data-node-id="${ids.leaf}"]`)
+  await expect(leafRow).toHaveCount(1)
+  await page.evaluate(() => window.pairdraw?.getStore?.()?.select([]))
+  const selectedBefore = await page.evaluate(() => {
+    const selected = window.pairdraw?.getStore?.()?.state.selectedIds
+    return selected ? [...selected].join(',') : ''
+  })
+  await scroller.evaluate((el) => {
+    el.scrollTop = 0
+    el.scrollLeft = 0
+  })
+
+  const rows = scroller.locator('[data-node-id]')
+  const index = await rows.evaluateAll(
+    (els, id) => els.findIndex((el) => el.getAttribute('data-node-id') === id),
+    ids.leaf
+  )
+  expect(index).toBeGreaterThan(0)
+
+  await rows.first().focus()
+  for (let i = 0; i < index; i++) await page.keyboard.press('ArrowDown')
+
+  // Roving focus lands on the row, moves the list to it, and never selects it.
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.activeElement?.closest('[data-node-id]')?.getAttribute('data-node-id')
+      )
+    )
+    .toBe(ids.leaf)
+  await expect.poll(() => scroller.evaluate((el) => Math.abs(el.scrollLeft))).toBeGreaterThan(0)
+  expect(
+    await page.evaluate(() => {
+      const selected = window.pairdraw?.getStore?.()?.state.selectedIds
+      return selected ? [...selected].join(',') : ''
+    })
+  ).toBe(selectedBefore)
+
+  // The focused layer's name is readable inside the panel's edges.
+  const bounds = await leafRow.evaluate((row) => {
+    const viewport = row.closest('[data-test-id="layers-scroll"]')
+    const label = row.querySelector('[data-slot="label"]')
+    if (!viewport || !label) throw new Error('Layer row parts missing')
+    const rect = (el: Element) => el.getBoundingClientRect()
+    return { viewport: rect(viewport), label: rect(label) }
+  })
+  expect(bounds.label.left).toBeGreaterThanOrEqual(bounds.viewport.left)
+  expect(bounds.label.top).toBeGreaterThanOrEqual(bounds.viewport.top)
+  expect(bounds.label.bottom).toBeLessThanOrEqual(bounds.viewport.bottom)
+
+  canvas.assertNoErrors()
+})

@@ -143,6 +143,16 @@ function scrollToNode(id: string) {
   })
 }
 
+/** Moves the list to a row without selecting it, for keyboard focus and Tab. */
+function reveal(id: string) {
+  const index = visibleRows.value.findIndex((row) => row.node.id === id)
+  if (index !== -1 && virtualizer) {
+    virtualizer.scrollToIndex(index, { align: 'auto' })
+    return
+  }
+  rowRefs.get(id)?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+}
+
 function onSelectionChanged(ids: string[]) {
   expandSelectionAncestors(ids)
   if (applyingSelection) return
@@ -222,6 +232,7 @@ function setVirtualizer(next: LayerTreeVirtualizer) {
 const actions = {
   select,
   toggleExpand,
+  reveal,
   setFocused: (value: boolean) => {
     focused.value = value
   },

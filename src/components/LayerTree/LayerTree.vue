@@ -48,6 +48,7 @@ const { panels } = useI18n()
 interface LayerTreeRootActions {
   select: (id: string, selection: boolean | LayerSelectionMode) => void
   toggleExpand: (id: string) => void
+  reveal: (id: string) => void
   setFocused: (focused: boolean) => void
   setVirtualizer: (virtualizer: LayerTreeVirtualizer) => void
 }
@@ -312,6 +313,7 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
                   "
                 >
                   <LayerTreeItem
+                    @focusin="scope.actions.reveal(toLayerNode(item.value).id)"
                     v-slot="{
                       node,
                       isSelected,

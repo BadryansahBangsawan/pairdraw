@@ -25,8 +25,16 @@ export function liveYogaNodeCount(): number {
   return liveYogaNodes
 }
 
+/** Yoga nodes created since the process started, which tests read to see a pass build what it places. */
+let yogaNodeCreations = 0
+
+export function yogaNodeCreationCount(): number {
+  return yogaNodeCreations
+}
+
 export function createYogaNode(): YogaNode {
   liveYogaNodes += 1
+  yogaNodeCreations += 1
   return Yoga.Node.create(yogaConfig)
 }
 

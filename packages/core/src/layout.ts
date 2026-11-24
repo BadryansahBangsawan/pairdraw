@@ -36,7 +36,7 @@ export {
 } from './layout/text-measurement'
 import type { LayoutSizing, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { connectorSublayers, layoutConnector } from '@pairdraw/scene-graph/connectors'
-import { layoutSizing } from '@pairdraw/scene-graph/layout'
+import { enforcedAspectRatio, layoutSizing } from '@pairdraw/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
 import {
@@ -376,6 +376,47 @@ function configureAutoLayoutChildSizing(
   else setMainAxisSizing(yogaChild, 'height', heightSizing, child.height, child.layoutGrow)
 }
 
+/**
+ * Whether the parent's pass places this child from the size it holds: neither its content nor the
+ * parent decides its size, so its own cells keep their places while the parent moves it.
+ */
+function placesFromSize(
+  child: SceneNode,
+  parent: SceneNode,
+  widthSizing: LayoutSizing,
+  heightSizing: LayoutSizing
+): boolean {
+  return (
+    widthSizing === 'FIXED' &&
+    heightSizing === 'FIXED' &&
+    child.layoutGrow === 0 &&
+    parent.counterAxisAlign !== 'BASELINE' &&
+    child.layoutAlignSelf !== 'BASELINE' &&
+    enforcedAspectRatio(child) === null &&
+    child.minWidth === null &&
+    child.maxWidth === null &&
+    child.minHeight === null &&
+    child.maxHeight === null
+  )
+}
+
+/**
+ * Refuses a chain deeper than Yoga can lay out, for the subtrees a pass places from their size and
+ * does not build: the same refusal, without the Yoga nodes.
+ */
+function assertLayoutDepth(graph: SceneGraph, frame: SceneNode, depth: number): void {
+  if (depth > MAX_LAYOUT_DEPTH) {
+    throw new RangeError(
+      `Layers nest more than ${MAX_LAYOUT_DEPTH} auto-layout frames deep, which the layout engine cannot lay out.`
+    )
+  }
+  for (const child of graph.getChildren(frame.id)) {
+    if (child.layoutMode === 'NONE' || !child.visible) continue
+    if (child.layoutPositioning === 'ABSOLUTE') continue
+    assertLayoutDepth(graph, child, depth + 1)
+  }
+}
+
 function configureChildAsAutoLayout(
   yogaChild: YogaNode,
   child: SceneNode,
@@ -407,6 +448,11 @@ function configureChildAsAutoLayout(
       yogaChild.setHeight(derived?.height ?? child.height)
     }
     applyMinMaxConstraints(yogaChild, child)
+    return
+  }
+
+  if (placesFromSize(child, parent, widthSizing, heightSizing)) {
+    assertLayoutDepth(graph, child, depth + 1)
     return
   }
 

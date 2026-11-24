@@ -13,6 +13,7 @@ export type FigReaderDiagnostic =
     }
   | { kind: 'component'; diagnostic: Parameters<Handler<'onMissingComponent'>>[0] }
   | { kind: 'slot-content'; diagnostic: Parameters<Handler<'onMissingSlotContent'>>[0] }
+  | { kind: 'variable-type'; diagnostic: Parameters<Handler<'onUnsupportedVariableType'>>[0] }
 
 /** Each sink's entries, so a record reported again is not listed twice. */
 const reported = new WeakMap<FigReaderDiagnostic[], Set<string>>()
@@ -50,6 +51,8 @@ export function readerSessionOptions(sink: FigReaderDiagnostic[]): DocumentAssem
     onUnsupportedVariableExpression: (diagnostic) =>
       report(sink, { kind: 'variable-expression', diagnostic }),
     onMissingComponent: (diagnostic) => report(sink, { kind: 'component', diagnostic }),
-    onMissingSlotContent: (diagnostic) => report(sink, { kind: 'slot-content', diagnostic })
+    onMissingSlotContent: (diagnostic) => report(sink, { kind: 'slot-content', diagnostic }),
+    onUnsupportedVariableType: (resource) =>
+      report(sink, { kind: 'variable-type', diagnostic: resource })
   }
 }

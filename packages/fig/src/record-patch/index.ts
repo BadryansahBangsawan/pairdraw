@@ -14,6 +14,8 @@ import {
 import { orderKeyBetween } from '@pairdraw/scene-graph/order-keys'
 
 import { readFigArchiveParts, writeFigArchive, type FigImageEntry } from '../archive'
+import { createResourceResolver } from '../document/resource-reference'
+import { isModeledVariableType, variableCollectionId } from '../document/variables'
 import { symbolDataOf, symbolOverridesOf } from '../instance-overrides/types'
 import { patchedRecord, type FigRecordFieldPatch } from './fields'
 import {
@@ -58,6 +60,18 @@ export interface FigArchiveRecordInfo {
   imageHashes: string[]
   /** The document record's GUID, as `session:local`. */
   documentId: string | null
+  /**
+   * Variable records the reader leaves out of the document, such as one of a type OpenPencil does
+   * not model; a save writes them back as they are.
+   */
+  unreadVariables: FigUnreadVariable[]
+}
+
+/** A variable record the reader left out, with the collection it names as the reader finds it. */
+export interface FigUnreadVariable {
+  record: NodeChange
+  /** Absent when the record names no collection the file holds. */
+  collectionId?: string
 }
 
 export interface FigPatchedArchiveInput {
@@ -112,6 +126,8 @@ function highestLocalId(records: readonly NodeChange[]): number {
 
 export function figArchiveRecordInfo(archive: {
   records: readonly NodeChange[]
+  /** The variable and collection records, whole; `records` may hold only their headers. */
+  resources: readonly NodeChange[]
   blobCount: number
   imageHashes: readonly string[]
 }): FigArchiveRecordInfo {
@@ -122,8 +138,21 @@ export function figArchiveRecordInfo(archive: {
     blobCount: archive.blobCount,
     nextLocalId: highestLocalId(archive.records) + 1,
     imageHashes: [...archive.imageHashes],
-    documentId: key(archive.records.find((record) => record.type === 'DOCUMENT')?.guid) ?? null
+    documentId: key(archive.records.find((record) => record.type === 'DOCUMENT')?.guid) ?? null,
+    unreadVariables: unreadVariables(archive.resources)
   }
+}
+
+function unreadVariables(resources: readonly NodeChange[]): FigUnreadVariable[] {
+  const resolve = createResourceResolver(resources)
+  return resources
+    .filter(
+      (record) => record.type === 'VARIABLE' && !isModeledVariableType(record.variableResolvedType)
+    )
+    .map((record) => {
+      const collectionId = variableCollectionId(record, resolve)
+      return collectionId ? { record, collectionId } : { record }
+    })
 }
 
 /**

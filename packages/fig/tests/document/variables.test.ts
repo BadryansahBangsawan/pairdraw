@@ -70,7 +70,7 @@ function collectionWithModes(modes: NonNullable<NodeChange['variableSetModes']>)
 
 function listedModes(changes: NodeChange[]) {
   const graph = new SceneGraph()
-  materializeVariableResources(graph, changes, () => undefined)
+  materializeVariableResources(graph, changes, { onUnsupported: () => undefined })
   const collection = graph.variableCollections.get('1:3')
   if (!collection) throw new Error('Missing collection')
   return {

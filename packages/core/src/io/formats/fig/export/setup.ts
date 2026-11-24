@@ -2,7 +2,12 @@ import type { CanvasKit } from 'canvaskit-wasm'
 import { deflateSync, inflateSync } from 'fflate'
 import { toUint8Array } from 'js-base64'
 
-import { figArchiveMetaJSON, figFontEntries, figFontsManifest } from '@pairdraw/fig'
+import {
+  figArchiveMetaJSON,
+  figFontEntries,
+  figFontsManifest,
+  type FigUnreadVariable
+} from '@pairdraw/fig'
 import {
   buildComponentPropIndex,
   exportCanvasGuides,
@@ -271,7 +276,7 @@ function buildCanvasEntries(
   nodeIdToGuid: Map<string, GUID>,
   assignedGuidValues: Set<string>,
   sourceOwners: ReadonlyMap<string, string>,
-  ownGuids = true
+  keepsUnreadRecords: boolean
 ): { canvasEntries: CanvasExportEntry[]; internalCanvasGuid: GUID | null } {
   const canvasEntries: CanvasExportEntry[] = []
   let internalCanvasGuid: GUID | null = null
@@ -283,7 +288,7 @@ function buildCanvasEntries(
     const canvasGuid = (() => {
       if (!page.source.id) {
         return (
-          (ownGuids ? ownGuid(page.id, sourceOwners, assignedGuidValues) : null) ?? {
+          ownGuid(page.id, sourceOwners, assignedGuidValues) ?? {
             sessionID: 0,
             localID: localIdCounter.value++
           }
@@ -318,10 +323,8 @@ function buildCanvasEntries(
 
   const hasSharedStyles = [...graph.nodes.values()].some((node) => node.sharedStyleType !== null)
   const hasSlotContent = [...graph.nodes.values()].some((node) => ownsSlotContent(graph, node))
-  if (
-    (graph.variableCollections.size > 0 || hasSharedStyles || hasSlotContent) &&
-    internalCanvasGuid === null
-  ) {
+  const hasVariables = graph.variableCollections.size > 0 || keepsUnreadRecords
+  if ((hasVariables || hasSharedStyles || hasSlotContent) && internalCanvasGuid === null) {
     internalCanvasGuid = { sessionID: 0, localID: localIdCounter.value++ }
     assignedGuidValues.add(`${internalCanvasGuid.sessionID}:${internalCanvasGuid.localID}`)
     canvasEntries.push({
@@ -382,6 +385,8 @@ export interface FigExportSetup {
   componentPropertyDefinitionsById: ReturnType<typeof buildComponentPropIndex>
   pluginDataOverrides: ReadonlyMap<string, PluginDataEntry[]>
   recordOwners?: ReadonlyMap<string, string>
+  /** Variable records the document never read, written back as the archive saved them. */
+  unreadVariables: readonly FigUnreadVariable[]
 }
 
 export interface FigExportSetupOptions {
@@ -399,6 +404,8 @@ export interface FigExportSetupOptions {
   recordOwners?: ReadonlyMap<string, string>
   /** Writing into an archive: the variables, collections and modes it holds keep their GUIDs. */
   archiveResourceIds?: ReadonlySet<string>
+  /** Records the document never read, which the write keeps, so nothing new takes their GUIDs. */
+  unreadVariables?: readonly FigUnreadVariable[]
 }
 
 /**
@@ -425,6 +432,9 @@ export async function prepareFigExport(
   // Reserve the document GUID to prevent imported nodes with source.id "0:0"
   // from reusing the document's own GUID slot.
   assignedGuidValues.add(`${docGuid.sessionID}:${docGuid.localID}`)
+  // No layer takes an unread record's GUID either: the save writes that record back.
+  for (const { record } of options.unreadVariables ?? [])
+    if (record.guid) assignedGuidValues.add(`${record.guid.sessionID}:${record.guid.localID}`)
   const varIdToGuid = new Map<string, GUID>()
   const modeIdToGuid = new Map<string, GUID>()
   const propertyIdToGuid = new Map<string, GUID>()
@@ -433,10 +443,10 @@ export async function prepareFigExport(
   const sourceOwners = layerSourceOwners(graph)
   const archiveRecordIds = new Set(options.archiveRecordIds)
   const propertyIds = collectComponentPropertyIds(graph)
-  // Before any canvas, variable or layer takes a counter GUID, so none collides.
+  // Before any canvas, variable or layer takes a counter GUID, so none collides with a reserved one.
   localIdCounter.value = Math.max(
     localIdCounter.value,
-    firstUnclaimedLocalId(graph, propertyIds),
+    firstUnclaimedLocalId(graph, [...propertyIds, ...assignedGuidValues]),
     options.nextLocalId ?? 0
   )
 
@@ -448,7 +458,7 @@ export async function prepareFigExport(
     nodeIdToGuid,
     assignedGuidValues,
     sourceOwners,
-    true
+    (options.unreadVariables?.length ?? 0) > 0
   )
   // Archive records keep their GUIDs: claim them before any copy that kept one can.
   for (const [guid, nodeId] of options.recordOwners ?? []) {
@@ -504,7 +514,8 @@ export async function prepareFigExport(
     blobIndexByHex: new Map(),
     componentPropertyDefinitionsById: buildComponentPropIndex(graph),
     pluginDataOverrides,
-    recordOwners: options.recordOwners
+    recordOwners: options.recordOwners,
+    unreadVariables: options.unreadVariables ?? []
   }
 }
 

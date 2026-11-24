@@ -61,6 +61,11 @@ export interface DocumentAssemblyOptions extends InterpretInstanceOptions {
   onUnsupportedResource?: (resource: NodeChange) => void
   /** Explicitly preserve expression-valued variables without evaluating them. */
   onUnsupportedVariableExpression?: (diagnostic: UnsupportedVariableExpressionDiagnostic) => void
+  /**
+   * A variable of a type OpenPencil does not model, such as PAINT: left out, and kept in the file
+   * by a save that has the archive. Without it, such a variable refuses the file.
+   */
+  onUnsupportedVariableType?: (resource: NodeChange) => void
   onUnresolvedBinding?: (diagnostic: BindingReferenceDiagnostic) => void
 }
 
@@ -235,6 +240,7 @@ export function createFigDocumentSession(
     archiveRecordInfo(): FigArchiveRecordInfo {
       recordInfo ??= figArchiveRecordInfo({
         records: archive.records,
+        resources: archive.reader.resources,
         blobCount: archive.blobs.length,
         imageHashes: archive.images.map(([hash]) => hash)
       })
@@ -359,12 +365,11 @@ function createAssemblyState(
   for (const [hash, bytes] of options.archiveImages ?? []) graph.images.set(hash, bytes)
   graph.applyImportedStateDuring(
     () =>
-      materializeVariableResources(
-        graph,
-        reader.resources,
-        options.onUnsupportedResource,
-        options.onUnsupportedVariableExpression
-      ),
+      materializeVariableResources(graph, reader.resources, {
+        onUnsupported: options.onUnsupportedResource,
+        onUnsupportedExpression: options.onUnsupportedVariableExpression,
+        onUnsupportedType: options.onUnsupportedVariableType
+      }),
     () => mintImportedId(state)
   )
   for (const page of graph.getPages()) graph.deleteNode(page.id)

@@ -3,7 +3,8 @@ import {
   figFontEntries,
   figFontsManifest,
   type FigArchiveRecordInfo,
-  type FigRecordPatch
+  type FigRecordPatch,
+  type FigUnreadVariable
 } from '@pairdraw/fig'
 import {
   nameImagesForFigma,
@@ -28,7 +29,10 @@ import {
   type FigExportSetup,
   type KiwiNodeChange
 } from '#core/io/formats/fig/export/setup'
-import { appendVariableNodeChanges } from '#core/io/formats/fig/export/variables'
+import {
+  appendVariableNodeChanges,
+  sequentialPositions
+} from '#core/io/formats/fig/export/variables'
 import { figArchive, type FigArchiveAccess } from '#core/kiwi/fig/session/archive/access'
 import { archiveChanges, type ArchiveChangeSummary } from '#core/kiwi/fig/session/archive/changes'
 import {
@@ -298,7 +302,11 @@ function writeRecords(setup: FigExportSetup, plan: RecordPlan): KiwiNodeChange[]
   return slotContentRecords.length > 0 ? null : written
 }
 
-function variableRecords(setup: FigExportSetup, archiveInternalCanvas: boolean): KiwiNodeChange[] {
+function variableRecords(
+  setup: FigExportSetup,
+  archiveInternalCanvas: boolean,
+  unread: readonly FigUnreadVariable[]
+): KiwiNodeChange[] {
   const internal = setup.canvasEntries.find((entry) => entry.page.internalOnly)
   if (!internal) return []
   const records: KiwiNodeChange[] = archiveInternalCanvas ? [] : [internal.canvasNc]
@@ -307,7 +315,9 @@ function variableRecords(setup: FigExportSetup, archiveInternalCanvas: boolean):
     records,
     internal.canvasGuid,
     setup.varIdToGuid,
-    setup.modeIdToGuid
+    setup.modeIdToGuid,
+    sequentialPositions(),
+    unread
   )
   return records
 }
@@ -333,7 +343,8 @@ function baselineWriter(info: FigArchiveRecordInfo): RecordWriter {
     const written = writeRecords(setup, plan)
     if (!written) return null
     const internalPage = graph.getPages(true).find((page) => page.internalOnly)
-    return [documentRecord(setup, info), ...written, ...variableRecords(setup, !!internalPage)]
+    // The baseline holds the document's own records; an unread one is not in the graph.
+    return [documentRecord(setup, info), ...written, ...variableRecords(setup, !!internalPage, [])]
   }
 }
 
@@ -352,7 +363,8 @@ async function buildPatch(
     blobs: Array.from({ length: info.blobCount }, () => new Uint8Array(0)),
     recordOwners: archived.byGuid,
     archiveRecordIds: info.recordIds,
-    archiveResourceIds: changes.resourceIds
+    archiveResourceIds: changes.resourceIds,
+    unreadVariables: info.unreadVariables
   })
   const records = writeRecords(setup, plan)
   if (!records) return null
@@ -363,7 +375,11 @@ async function buildPatch(
     const internalPage = graph.getPages(true).find((page) => page.internalOnly)
     const internal = setup.canvasEntries.find((entry) => entry.page.internalOnly)
     const canvasWritten = records.some((record) => record === internal?.canvasNc)
-    for (const record of variableRecords(setup, !!internalPage || canvasWritten))
+    for (const record of variableRecords(
+      setup,
+      !!internalPage || canvasWritten,
+      info.unreadVariables
+    ))
       records.push(record)
   }
   const narrowed = await narrowToChangedFields(

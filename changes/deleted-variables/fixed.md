@@ -1,1 +1,2 @@
 - Variables and collections deleted in Figma stay out of every variable list, while layers bound to them still resolve them and `.fig` saves keep them deleted.
+- A `.fig` file whose variables include a type Pairdraw does not model, such as a paint variable, now opens and keeps those records when saved, instead of refusing the file.

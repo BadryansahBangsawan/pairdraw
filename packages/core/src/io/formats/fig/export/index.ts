@@ -16,6 +16,7 @@ import { withFigExportRuntime } from '#core/canvas/text/shape'
 import { IS_BROWSER, IS_TAURI } from '#core/constants'
 import { figCompressionLevel } from '#core/io/formats/fig/compression'
 import { cloneSceneGraphForFigExport } from '#core/kiwi/fig/parse/transfer'
+import { figArchive } from '#core/kiwi/fig/session/archive/access'
 import {
   hasPendingReaderPages,
   populateFigInternalPages,
@@ -88,14 +89,15 @@ function appendInternalResources(context: InternalResourceContext): void {
       )
     )
   }
-  if (graph.variableCollections.size > 0) {
+  if (graph.variableCollections.size > 0 || context.unreadVariables.length > 0) {
     appendVariableNodeChanges(
       graph,
       nodeChanges,
       internalCanvasGuid,
       context.varIdToGuid,
       context.modeIdToGuid,
-      sequentialPositions(written + sharedStyleNodes.length)
+      sequentialPositions(written + sharedStyleNodes.length),
+      context.unreadVariables
     )
   }
 }
@@ -139,7 +141,12 @@ async function writeFigFile(
     graph = cloneSceneGraphForFigExport(sourceGraph)
     populateReaderExport(sourceGraph, graph)
   }
-  const setup = await prepareFigExport(graph, runtime)
+  // The archive's records the document never read go back as the file saved them; a source
+  // without an archive was never saved, so it has none.
+  const archived = await figArchive(sourceGraph)?.info()
+  const setup = await prepareFigExport(graph, runtime, {
+    unreadVariables: archived?.unreadVariables
+  })
   const { compiled, schemaDeflated } = exportSchema(graph)
   const { canvasEntries, internalCanvasGuid, localIdCounter, blobs } = setup
   const nodeChanges: KiwiNodeChange[] = [setup.documentNc]

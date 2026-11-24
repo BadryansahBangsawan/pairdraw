@@ -124,3 +124,19 @@ test('a keyboard resize survives a reload and hiding the panels', async () => {
   expect(Math.abs((await panelWidth()) - resized)).toBeLessThanOrEqual(1)
   editor.canvas.assertNoErrors()
 })
+
+test('hiding and showing the panels keeps the drawing where it is on screen', async () => {
+  const layer = { x: 120, y: 140 }
+  await editor.canvas.setView({ panX: 57, panY: -23, zoom: 1.75 })
+  await expect(editor.page.getByTestId('layers-panel')).toBeVisible()
+  const shown = await editor.canvas.screenPositionOf(layer)
+
+  await editor.page.keyboard.press('ControlOrMeta+\\')
+  await expect(editor.page.getByTestId('layers-panel')).not.toBeVisible()
+  await expect.poll(() => editor.canvas.screenPositionOf(layer)).toEqual(shown)
+
+  await editor.page.keyboard.press('ControlOrMeta+\\')
+  await expect(editor.page.getByTestId('layers-panel')).toBeVisible()
+  await expect.poll(() => editor.canvas.screenPositionOf(layer)).toEqual(shown)
+  editor.canvas.assertNoErrors()
+})

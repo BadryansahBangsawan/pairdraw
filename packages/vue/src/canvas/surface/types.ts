@@ -88,6 +88,12 @@ export interface UseCanvasOptions {
    */
   onViewportResize?: (width: number, height: number) => void
   /**
+   * Receives how far this canvas moved in the browser viewport when it was resized, as when a
+   * panel beside it hides. Pan the view by as much the other way to keep the drawing still on
+   * screen. Not called by default; on a page that scrolls, a move measured here includes scroll.
+   */
+  onViewportMove?: (dx: number, dy: number) => void
+  /**
    * Runs when the browser takes this canvas's WebGL context away. A browser may never give a lost
    * context back, and drawing into the lost one leaves the canvas blank, so the host replaces the
    * canvas element and the surface is made again on the new one.

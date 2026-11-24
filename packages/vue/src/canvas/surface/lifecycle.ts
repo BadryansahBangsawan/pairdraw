@@ -19,6 +19,7 @@ import {
 } from '#vue/canvas/surface/gl-surface'
 import { createImagePreviewDecoder } from '#vue/canvas/surface/image-preview'
 import { useCanvasKitLoader } from '#vue/canvas/surface/kit-loader'
+import { createCanvasOriginTracker } from '#vue/canvas/surface/origin'
 import { createCanvasRenderLoop } from '#vue/canvas/surface/render-loop'
 import { useCanvasResizeObserver } from '#vue/canvas/surface/resize-observer'
 import { createShaderRasterizer } from '#vue/canvas/surface/shader/rasterizer'
@@ -81,6 +82,7 @@ export function createCanvasSurfaceManager({
   isDestroyed: () => boolean
   shouldShowRulers: () => boolean
 }) {
+  const origin = createCanvasOriginTracker(options?.onViewportMove)
   const state: SurfaceManagerState = {
     renderer: null,
     glContext: null,
@@ -153,7 +155,7 @@ export function createCanvasSurfaceManager({
     state.renderer = null
     releaseGLContext()
 
-    sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio)
+    origin.place(sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio))
 
     const result = makeGLSurface(
       ck,
@@ -247,7 +249,7 @@ export function createCanvasSurfaceManager({
       return
     }
 
-    sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio)
+    origin.place(sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio))
 
     const result = makeGLSurface(
       ck,

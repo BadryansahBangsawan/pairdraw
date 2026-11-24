@@ -107,6 +107,37 @@ export class CanvasHelper {
   }
 
   /** The canvas with what floats over it, such as the toolbar, once its transitions have ended. */
+  async setView(view: { panX: number; panY: number; zoom: number }) {
+    await this.page.evaluate((next) => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) {
+        throw new Error('Pairdraw store not initialized')
+      }
+      Object.assign(store.state, next)
+      store.requestRepaint()
+    }, view)
+    await this.waitForRender()
+  }
+
+  async screenPositionOf(point: Vector): Promise<Vector> {
+    return this.page.evaluate((scenePoint) => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) {
+        throw new Error('Pairdraw store not initialized')
+      }
+      const canvas = document.querySelector('[data-test-id="scene-canvas-element"]')
+      if (!canvas) {
+        throw new Error('scene canvas not found')
+      }
+      const box = canvas.getBoundingClientRect()
+      const { panX, panY, zoom } = store.state
+      return {
+        x: Math.round(box.x + panX + scenePoint.x * zoom),
+        y: Math.round(box.y + panY + scenePoint.y * zoom)
+      }
+    }, point)
+  }
+
   async screenshotCanvas() {
     return this.canvas.screenshot({ animations: 'disabled' })
   }

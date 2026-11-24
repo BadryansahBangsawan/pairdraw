@@ -100,6 +100,19 @@ export function createCanvasPaneRegistry(state: EditorState) {
     pane.viewportHeight = height
   }
 
+  /**
+   * Moves what a pane shows by as many screen pixels, for when the layout moves its canvas. It is
+   * not navigation, so no viewport event fires and following carries on, as on a page switch.
+   */
+  function shiftPane(paneId: string, dx: number, dy: number): void {
+    const pane = getPane(paneId)
+    if (!pane) return
+    const view = paneId === activePaneId.value ? state : pane
+    view.panX += dx
+    view.panY += dy
+    state.renderVersion++
+  }
+
   function setSplitSizes(splitId: string, sizes: number[]): void {
     splitTree.value = updateSplitSizes(splitTree.value, splitId, sizes)
   }
@@ -116,6 +129,7 @@ export function createCanvasPaneRegistry(state: EditorState) {
     splitPane,
     closePane,
     resizePane,
+    shiftPane,
     setSplitSizes,
     maxVisiblePanes: MAX_VISIBLE_CANVAS_PANES
   }

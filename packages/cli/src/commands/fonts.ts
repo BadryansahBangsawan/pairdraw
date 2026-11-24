@@ -1,25 +1,25 @@
 import { defineCommand } from 'citty'
 
-import { fontManager, prepareGraphFonts, type DocumentFontStatus } from '@pairdraw/core/text'
+import { fontManager, resolveFontReadiness, type FontReadiness } from '@pairdraw/core/text'
 
 import { appTargetOptions } from '#cli/app/target'
 import { bold, entity, fmtList, kv, printError, printJSON } from '#cli/format'
 import { loadDocument, populateWholeDocument } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
 
-function statusLabel(status: DocumentFontStatus['faces'][number]['status']): string {
+function statusLabel(status: FontReadiness['faces'][number]['status']): string {
   return status
 }
 
 async function prepareFontStatus(
   graph: Awaited<ReturnType<typeof loadDocument>>,
   roots: string[]
-): Promise<DocumentFontStatus> {
+): Promise<FontReadiness> {
   const previousProviders = fontManager.enabledOnlineFontProviders()
   fontManager.setOnlineFontProviders({})
   fontManager.setWebFontFetch(null)
   try {
-    return await prepareGraphFonts(graph, roots)
+    return await resolveFontReadiness(graph, roots)
   } finally {
     fontManager.setOnlineFontProviders(
       Object.fromEntries(previousProviders.map((provider) => [provider, true]))
@@ -39,10 +39,10 @@ export default defineCommand({
     json: { type: 'boolean', description: 'Output as JSON' }
   },
   async run({ args }) {
-    let data: DocumentFontStatus
+    let data: FontReadiness
     try {
       if (!args.file) {
-        data = await loadRPCData<DocumentFontStatus>(args.file, 'font-status', undefined, args)
+        data = await loadRPCData<FontReadiness>(args.file, 'font-status', undefined, args)
       } else {
         const graph = await loadDocument(args.file)
         // Lazily imported pages hold text too, and its fonts belong in the report.

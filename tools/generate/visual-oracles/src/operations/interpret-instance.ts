@@ -8,7 +8,7 @@ import * as v from 'valibot'
 
 import { SkiaRenderer } from '@pairdraw/core/canvas'
 import { initCanvasKit, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
-import { prepareGraphFonts } from '@pairdraw/core/text'
+import { resolveFontReadiness } from '@pairdraw/core/text'
 import { parseFigBuffer } from '@pairdraw/fig'
 import {
   interpretInstance,
@@ -69,7 +69,7 @@ if (!surface) throw new Error('No Skia surface')
 const renderer = new SkiaRenderer(ck, surface)
 try {
   await renderer.loadFonts()
-  const fonts = await prepareGraphFonts(graph, [result.root.id])
+  const fonts = await resolveFontReadiness(graph, [result.root.id])
   if (!fonts.faithful) throw new Error(`Missing fonts: ${JSON.stringify(fonts)}`)
   const png = renderNodesToImage(ck, renderer, graph, page.id, [result.root.id], {
     scale,

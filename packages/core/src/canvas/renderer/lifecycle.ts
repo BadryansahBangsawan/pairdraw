@@ -1,7 +1,6 @@
 import { releaseImageAdjustments } from '#core/canvas/images/adjustments'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { clearSubtreePictureCache } from '#core/canvas/renderer/state'
-import { fontManager } from '#core/text/font/manager'
 
 import { settleFontWaiters } from './font-waiters'
 
@@ -67,11 +66,10 @@ export function destroyRenderer(r: SkiaRenderer): void {
   r.componentLabelFont?.delete()
   r.hudFont?.delete()
   r.fontMgr?.delete()
-  const fontProvider = r.fontProvider
+  r.fontLease?.release()
+  r.fontLease = null
   r.fontProvider = null
   r.fontsLoaded = false
-  // Only its own share: a renderer that never loaded fonts leaves the others' provider alone.
-  if (fontProvider) fontManager.releaseProvider(fontProvider)
   r.rulerBgPaint.delete()
   r.rulerTickPaint.delete()
   r.rulerTextPaint.delete()

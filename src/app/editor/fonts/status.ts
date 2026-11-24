@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 
 import { computeAllLayouts } from '@pairdraw/core/layout'
-import { documentFontStatus, fontManager, fontResolver } from '@pairdraw/core/text'
+import { readFontReadiness, fontManager, fontResolver } from '@pairdraw/core/text'
 import { useEditorEvent } from '@pairdraw/vue/editor/events'
 
 import { useEditorStore } from '@/app/editor/active-store'
@@ -27,7 +27,7 @@ export function useDocumentFontStatus() {
 
   const status = computed(() => {
     void revision.value
-    return documentFontStatus(editor.graph, editor.state.currentPageId)
+    return readFontReadiness(editor.graph, editor.state.currentPageId)
   })
 
   async function retry() {

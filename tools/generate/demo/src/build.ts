@@ -3,7 +3,7 @@ import { setPageBackgrounds } from '@pairdraw/core/figma-api'
 import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { computeAllLayouts, installTextMeasurer } from '@pairdraw/core/layout'
-import { fontManager, prepareGraphFonts } from '@pairdraw/core/text'
+import { fontManager, resolveFontReadiness } from '@pairdraw/core/text'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 
@@ -86,7 +86,7 @@ export function buildDemoGraph(renderer: SkiaRenderer): Promise<SceneGraph> {
       graph.getChildren(page.id).filter((node) => node.type === 'SECTION')
     )
 
-    await prepareGraphFonts(graph, [page.id])
+    await resolveFontReadiness(graph, [page.id])
     computeAllLayouts(graph, page.id)
     return graph
   })

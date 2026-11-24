@@ -379,7 +379,7 @@ tests/engine/text/fonts/fallbacks.test.ts
 tests/engine/text/fonts/lifecycle.test.ts
 tests/engine/text/fonts/loading.test.ts
 tests/engine/text/fonts/normalize-export.test.ts
-tests/engine/text/fonts/status.test.ts
+tests/engine/text/fonts/readiness.test.ts
 tests/engine/text/fonts/variations.test.ts
 tests/engine/text/fonts/web-fonts.test.ts
 tests/engine/text/harfbuzz/outlines.test.ts

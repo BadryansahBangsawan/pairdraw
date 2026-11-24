@@ -13,8 +13,8 @@ import { shownText } from '#core/text/case'
 import { EMOJI_METRICS_FAMILY } from '#core/text/emoji'
 import { ARABIC_CHARACTER } from '#core/text/fallbacks'
 import { fontManager } from '#core/text/font/manager'
-import type { DocumentFontStatus } from '#core/text/font/status'
-import { prepareGraphFonts } from '#core/text/prepare'
+import type { FontReadiness } from '#core/text/font/readiness'
+import { resolveFontReadiness } from '#core/text/prepare'
 import { collectGraphFontRequirements } from '#core/text/requirements/collect'
 
 import type { PDFFontFace } from './fonts'
@@ -28,9 +28,9 @@ import type { PDFPageSpec } from './plan'
 export async function preparePDFFonts(
   graph: SceneGraph,
   specs: readonly PDFPageSpec[]
-): Promise<DocumentFontStatus> {
+): Promise<FontReadiness> {
   const nodeIds = specs.flatMap((spec) => spec.nodeIds)
-  return prepareGraphFonts(graph, nodeIds, await pdfWrittenCharacters(graph, nodeIds))
+  return resolveFontReadiness(graph, nodeIds, await pdfWrittenCharacters(graph, nodeIds))
 }
 
 /**
@@ -71,7 +71,7 @@ export function readPDFPages(graph: SceneGraph, pageIds?: readonly string[]): vo
 export async function preparePagesForPDF(
   graph: SceneGraph,
   specs: readonly PDFPageSpec[]
-): Promise<DocumentFontStatus> {
+): Promise<FontReadiness> {
   const status = await preparePDFFonts(graph, specs)
   graph.applyDerivedLayoutDuring(() => {
     for (const spec of specs) computeAllLayouts(graph, spec.pageId)
@@ -80,7 +80,7 @@ export async function preparePagesForPDF(
 }
 
 /** The faces the pages' text uses, with the files the canvas draws them from. */
-export function pdfFontFaces(status: DocumentFontStatus): PDFFontFace[] {
+export function pdfFontFaces(status: FontReadiness): PDFFontFace[] {
   return status.faces.map((face) => {
     const data =
       face.status === 'available' ? fontManager.loadedData(face.family, face.style) : null

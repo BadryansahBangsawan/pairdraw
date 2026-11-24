@@ -9,7 +9,7 @@ import { withFigExportRuntime } from '#core/canvas/text/shape'
 import { NOTO_COLOR_EMOJI_FAMILY } from '#core/text/emoji'
 import { glyphAdvanceSync, glyphOutlineSourceSync } from '#core/text/font/glyphs'
 import { fontManager } from '#core/text/font/manager'
-import { prepareGraphFonts } from '#core/text/prepare'
+import { resolveFontReadiness } from '#core/text/prepare'
 
 function graphWithText(text: string) {
   const graph = new SceneGraph()
@@ -55,14 +55,14 @@ describe('emoji font preparation', () => {
   test('fetches nothing for symbols the text font has', async () => {
     recordNotoRequests()
     const { graph, nodeIds } = graphWithText('© ™ ↔ text')
-    await prepareGraphFonts(graph, nodeIds)
+    await resolveFontReadiness(graph, nodeIds)
     expect(requested).toEqual([])
   })
 
   test('fetches the emoji the text font lacks', async () => {
     recordNotoRequests()
     const { graph, nodeIds } = graphWithText('© 😀')
-    await prepareGraphFonts(graph, nodeIds)
+    await resolveFontReadiness(graph, nodeIds)
     expect(requested).toEqual(['😀'])
   })
 })
@@ -99,7 +99,7 @@ describe('fallback faces of a family found nowhere', () => {
         height: 20,
         textAutoResize: 'NONE'
       })
-      await prepareGraphFonts(graph, [node.id])
+      await resolveFontReadiness(graph, [node.id])
       expect(fontManager.isStyleLoaded(family, 'Italic')).toBe(false)
 
       const italic = expectDefined(glyphOutlineSourceSync('Inter', 'Regular Italic'))

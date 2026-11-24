@@ -6,7 +6,7 @@ import type { SkiaRenderer } from '#core/canvas/renderer'
 import { withPDFTextLayout } from '#core/io/formats/pdf/prepare'
 import { bakeAdjustedImages, hasAdjustedImagePaints } from '#core/io/formats/raster/adjusted-images'
 import { renderNodesToSVG, type SVGExportOptions } from '#core/io/formats/svg/export'
-import { prepareGraphFonts } from '#core/text/prepare'
+import { resolveFontReadiness } from '#core/text/prepare'
 
 /**
  * Layers as SVG with their text set as the canvas sets it: the fonts it draws with loaded, each
@@ -22,7 +22,7 @@ export async function renderNodesToLaidOutSVG(
   canvasKit?: CanvasKit,
   renderer?: SkiaRenderer
 ): Promise<string | null> {
-  await prepareGraphFonts(graph, nodeIds)
+  await resolveFontReadiness(graph, nodeIds)
   const baked = hasAdjustedImagePaints(graph, nodeIds)
     ? await bakeAdjustedImages(graph, nodeIds, canvasKit, renderer)
     : graph

@@ -24,6 +24,7 @@ import {
 } from '#core/constants'
 import type { EditorState } from '#core/editor/types'
 import { RenderProfiler } from '#core/profiler'
+import type { FontProviderLease } from '#core/text/font/provider'
 import type { FontResolutionSnapshot } from '#core/text/resolver'
 
 import { createImageCache } from './images/cache'
@@ -161,6 +162,8 @@ export class SkiaRenderer {
   hudFont: Font | null = null
   fontMgr: FontMgr | null = null
   fontProvider: TypefaceFontProvider | null = null
+  /** The renderer's share of the shared provider; released on dispose and before a reload. */
+  fontLease: FontProviderLease | null = null
   fontsLoaded = false
   /** Set once fonts are prepared for a one-shot export, so a pending face stops holding text back. */
   exportFontsSettled = false

@@ -16,7 +16,7 @@ import { collectGraphFontRequirements, collectNodeFontFaces } from '#core/text/r
 import { missingGraphFontScripts } from '#core/text/requirements/resolved'
 import { fontFaceDemand, fontResolver } from '#core/text/resolver'
 
-import { documentFontStatus, type DocumentFontStatus } from './font/status'
+import { readFontReadiness, type FontReadiness } from './font/readiness'
 
 /**
  * The characters of a text its layout falls back to the emoji metrics font for: ones that may be
@@ -59,14 +59,19 @@ async function settleUnavailableFonts(
   }
 }
 
-export async function prepareGraphFonts(
+/**
+ * The one readiness read a caller needs: loads every face the document under `nodeIds` asks for,
+ * then reports what it can draw with. {@link readFontReadiness} reports the loaded state without
+ * loading, for a caller that only mirrors it in the UI.
+ */
+export async function resolveFontReadiness(
   graph: SceneGraph,
   nodeIds: readonly string[],
   /** Characters a writer draws besides the text's own, which the fonts must map too. */
   extraCharacters = '',
   /** An output that draws once and cannot wait for a face to arrive; see `settleUnavailableFonts`. */
   { settleUnavailable = false }: { settleUnavailable?: boolean } = {}
-): Promise<DocumentFontStatus> {
+): Promise<FontReadiness> {
   const collected = collectGraphFontRequirements(graph, nodeIds)
   const requirements = extraCharacters
     ? {
@@ -118,5 +123,5 @@ export async function prepareGraphFonts(
     requirements.nodes.map(laidOutEmojiCharacters).join('')
   if (emoji && !canDrawPlatformEmoji())
     await fontManager.loadRemoteFont(NOTO_COLOR_EMOJI_FAMILY, 'Regular', emoji)
-  return documentFontStatus(graph, nodeIds)
+  return readFontReadiness(graph, nodeIds)
 }

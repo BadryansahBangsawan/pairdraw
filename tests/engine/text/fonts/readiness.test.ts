@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FontManager, documentFontStatus, UnsupportedFontFormatError } from '@pairdraw/core/text'
+import { FontManager, readFontReadiness, UnsupportedFontFormatError } from '@pairdraw/core/text'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 function pageId(graph: SceneGraph): string {
   return graph.getPages()[0].id
 }
 
-describe('documentFontStatus', () => {
+describe('readFontReadiness', () => {
   test('reports loaded faces and their source without false warnings', async () => {
     const graph = new SceneGraph()
     const manager = new FontManager()
@@ -19,7 +19,7 @@ describe('documentFontStatus', () => {
       fontWeight: 400
     })
 
-    expect(documentFontStatus(graph, pageId(graph), manager)).toEqual({
+    expect(readFontReadiness(graph, pageId(graph), manager)).toEqual({
       faithful: true,
       faces: [
         {
@@ -48,7 +48,7 @@ describe('documentFontStatus', () => {
       fontWeight: 400
     })
 
-    const status = documentFontStatus(graph, [node.id], manager)
+    const status = readFontReadiness(graph, [node.id], manager)
     expect(status.faces.map((face) => [face.family, face.style, face.status])).toEqual([
       ['Inter', 'Regular', 'available']
     ])
@@ -65,7 +65,7 @@ describe('documentFontStatus', () => {
       fontWeight: 400
     })
 
-    const status = documentFontStatus(graph, pageId(graph), manager)
+    const status = readFontReadiness(graph, pageId(graph), manager)
 
     expect(status.faithful).toBe(false)
     expect(status.issues).toEqual([
@@ -101,7 +101,7 @@ describe('documentFontStatus', () => {
       ]
     })
 
-    const status = documentFontStatus(graph, pageId(graph), manager)
+    const status = readFontReadiness(graph, pageId(graph), manager)
 
     expect(status.issues).toEqual([
       {
@@ -146,7 +146,7 @@ describe('documentFontStatus', () => {
     })
 
     expect(await manager.loadLocalFont('PingFang SC', 'Regular')).toBeNull()
-    expect(documentFontStatus(graph, pageId(graph), manager).issues).toEqual([
+    expect(readFontReadiness(graph, pageId(graph), manager).issues).toEqual([
       {
         family: 'PingFang SC',
         style: 'Regular',
@@ -166,7 +166,7 @@ describe('documentFontStatus', () => {
 
     host = 'drawable'
     expect(await manager.loadLocalFont('PingFang SC', 'Regular')).not.toBeNull()
-    expect(documentFontStatus(graph, pageId(graph), manager).faithful).toBe(true)
+    expect(readFontReadiness(graph, pageId(graph), manager).faithful).toBe(true)
   })
 
   test('names faces as their text does, and keeps two faces of one weight apart', () => {
@@ -184,7 +184,7 @@ describe('documentFontStatus', () => {
       ]
     })
 
-    const issues = documentFontStatus(graph, pageId(graph), new FontManager()).issues
+    const issues = readFontReadiness(graph, pageId(graph), new FontManager()).issues
     // Faces their weight cannot pick load by their own names.
     expect(issues.map(({ name, style }) => [name, style])).toEqual([
       ['Bold', 'Bold'],
@@ -204,7 +204,7 @@ describe('documentFontStatus', () => {
     const manager = new FontManager()
     await manager.markLoaded('Avenir', 'Book', new ArrayBuffer(8), 'local')
 
-    expect(documentFontStatus(graph, pageId(graph), manager)).toMatchObject({
+    expect(readFontReadiness(graph, pageId(graph), manager)).toMatchObject({
       faithful: true,
       faces: [{ family: 'Avenir', name: 'Book', style: 'Book', status: 'available' }]
     })

@@ -20,8 +20,8 @@ import { getCanvasKit } from '#core/canvaskit'
 import { shownText } from '#core/text/case'
 import { EMOJI_METRICS_FAMILY } from '#core/text/emoji'
 import type { OutlineCommand } from '#core/text/font/glyphs'
-import { fontManager } from '#core/text/font/manager'
 import { faceStyleName } from '#core/text/font/names'
+import { leaseFontProvider } from '#core/text/font/provider'
 import { nextGraphemeBoundary } from '#core/text/graphemes'
 
 /**
@@ -205,11 +205,11 @@ export async function withTextShaper<T>(
   canvasKit: CanvasKit,
   use: (shape: (node: SceneNode) => ShapedText | null) => Promise<T>
 ): Promise<T> {
-  const provider = fontManager.acquireProvider(canvasKit)
+  const lease = leaseFontProvider(canvasKit)
   try {
-    return await use((node) => shapeText(canvasKit, provider, node))
+    return await use((node) => shapeText(canvasKit, lease.provider, node))
   } finally {
-    fontManager.releaseProvider(provider)
+    lease.release()
   }
 }
 

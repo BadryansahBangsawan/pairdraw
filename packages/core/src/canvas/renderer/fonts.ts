@@ -23,7 +23,8 @@ import { withTextMeasurer } from '#core/layout/text-measurement'
 import { EMOJI_METRICS_FAMILY } from '#core/text/emoji'
 import { resetFontCollection } from '#core/text/font/collection'
 import { fontManager } from '#core/text/font/manager'
-import { prepareGraphFonts } from '#core/text/prepare'
+import { leaseFontProvider } from '#core/text/font/provider'
+import { resolveFontReadiness } from '#core/text/prepare'
 import {
   fontCoverageDemand,
   fontResolver,
@@ -137,8 +138,9 @@ export async function loadFonts(
     settleFontDemand(r, snapshot, nodeIds)
     onFallbackFontsLoaded?.()
   }
-  if (r.fontProvider) fontManager.releaseProvider(r.fontProvider)
-  r.fontProvider = fontManager.acquireProvider(r.ck)
+  r.fontLease?.release()
+  r.fontLease = leaseFontProvider(r.ck)
+  r.fontProvider = r.fontLease.provider
   syncFontGeneration(r)
 
   const [fontData, titleData] = await Promise.all([
@@ -187,7 +189,7 @@ export async function prepareForExport(
   nodeIds: string[]
 ): Promise<void> {
   const { computeAllLayouts } = await import('#core/layout')
-  await prepareGraphFonts(graph, nodeIds, '', { settleUnavailable: true })
+  await resolveFontReadiness(graph, nodeIds, '', { settleUnavailable: true })
   r.exportFontsSettled = true
   syncFontGeneration(r)
   withTextMeasurer(

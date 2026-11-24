@@ -19,7 +19,7 @@ import { headlessHTMLReader } from '@pairdraw/core/io/formats/html/import'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { computeAllLayouts, installTextMeasurer, sizeAutoResizingText } from '@pairdraw/core/layout'
 import { writeFileAtomic } from '@pairdraw/core/node/fs'
-import { prepareGraphFonts, type DocumentFontStatus } from '@pairdraw/core/text'
+import { resolveFontReadiness, type FontReadiness } from '@pairdraw/core/text'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   collectSceneMutation,
@@ -158,9 +158,9 @@ export function measureTextHeadlessly(): Promise<void> {
  * stand-in, and the edited layer comes out taller or wider than the app draws it. Returns which
  * of those fonts could not be loaded.
  */
-export async function measureDocumentText(graph: SceneGraph): Promise<DocumentFontStatus> {
+export async function measureDocumentText(graph: SceneGraph): Promise<FontReadiness> {
   await measureTextHeadlessly()
-  return prepareGraphFonts(
+  return resolveFontReadiness(
     graph,
     graph.getPages(true).map((page) => page.id)
   )
@@ -211,7 +211,7 @@ export function populateDocumentPage(graph: SceneGraph, pageId: string): boolean
 
 /** Loads a page not loaded yet with the fonts its text uses, as the editor prepares a page. */
 export async function loadDocumentPage(graph: SceneGraph, pageId: string): Promise<void> {
-  if (populateDocumentPage(graph, pageId)) await prepareGraphFonts(graph, [pageId])
+  if (populateDocumentPage(graph, pageId)) await resolveFontReadiness(graph, [pageId])
 }
 
 export function populateWholeDocument(graph: SceneGraph): boolean {
@@ -311,7 +311,7 @@ export async function editDocument<T>(graph: SceneGraph, edit: () => T | Promise
     const { result, impact } = await collectSceneMutation(graph, edit)
     const textIds = [...impact.changedNodeIds].filter((id) => graph.getNode(id)?.type === 'TEXT')
     if (textIds.length > 0) {
-      await prepareGraphFonts(graph, textIds)
+      await resolveFontReadiness(graph, textIds)
       for (const id of textIds) sizeAutoResizingText(graph, id)
     }
     syncEditedComponents(graph, [...authored.changedNodeIds, ...authored.previousParentIds])

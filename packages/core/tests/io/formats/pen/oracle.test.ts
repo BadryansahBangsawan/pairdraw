@@ -20,7 +20,7 @@ import {
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
 import { computeAllLayouts } from '@pairdraw/core/layout'
-import { fontManager, prepareGraphFonts, WEB_FONT_PROVIDER_IDS } from '@pairdraw/core/text'
+import { fontManager, resolveFontReadiness, WEB_FONT_PROVIDER_IDS } from '@pairdraw/core/text'
 import { parsePenDocument } from '@pairdraw/pen'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -119,7 +119,7 @@ const readProbes = once(async (): Promise<SceneGraph> => {
     { icons: recordedIcons() }
   )
   graph.applyDerivedLayoutDuring(() => computeAllLayouts(graph))
-  await prepareGraphFonts(
+  await resolveFontReadiness(
     graph,
     manifest.targets.map((target) => target.penNodeId)
   )

@@ -4,8 +4,8 @@ import type { BooleanOperation, MaskType, SceneGraph, SceneNode } from '@pairdra
 
 import { shapeDetailFields } from '#core/figma-api/shape-details'
 import { ELLIPSIS } from '#core/text/ellipsis'
-import type { DocumentFontStatus } from '#core/text/font/status'
-import { prepareGraphFonts } from '#core/text/prepare'
+import type { FontReadiness } from '#core/text/font/readiness'
+import { resolveFontReadiness } from '#core/text/prepare'
 import { queryByXPath } from '#core/xpath'
 
 import type { RPCCommand } from './types'
@@ -104,11 +104,11 @@ export const infoCommand: RPCCommand<void, InfoResult> = {
   }
 }
 
-export const fontStatusCommand: RPCCommand<void, DocumentFontStatus> = {
+export const fontStatusCommand: RPCCommand<void, FontReadiness> = {
   name: 'font-status',
   execute: async (graph) => {
     const pageIds = graph.getPages().map((page) => page.id)
-    return prepareGraphFonts(graph, pageIds.length > 0 ? pageIds : [graph.rootId])
+    return resolveFontReadiness(graph, pageIds.length > 0 ? pageIds : [graph.rootId])
   }
 }
 

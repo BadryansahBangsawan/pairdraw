@@ -1,4 +1,4 @@
-import { prepareGraphFonts, type DocumentFontStatus } from '@pairdraw/core/text'
+import { resolveFontReadiness, type FontReadiness } from '@pairdraw/core/text'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { fail, printError } from '#cli/format'
@@ -9,7 +9,7 @@ export const FONT_POLICIES = new Set(['allow', 'strict', 'warn'])
  * Reports the fonts a document could not load as `policy` asks: a warning, a failure before
  * anything is written (`strict`), or nothing (`allow`).
  */
-export function reportFontStatus(status: DocumentFontStatus, policy: string): void {
+export function reportFontStatus(status: FontReadiness, policy: string): void {
   if (policy === 'allow' || status.faithful) return
   const names = status.issues.map((face) => `${face.family} ${face.name}`).join(', ')
   const message = `Font substitution: ${names}`
@@ -27,7 +27,7 @@ export async function applyExportFontPolicy(
   policy: string
 ): Promise<void> {
   if (policy === 'allow' || !['PNG', 'JPG', 'WEBP', 'PDF'].includes(format)) return
-  reportFontStatus(await prepareGraphFonts(graph, roots), policy)
+  reportFontStatus(await resolveFontReadiness(graph, roots), policy)
 }
 
 export function exportFontRoots(

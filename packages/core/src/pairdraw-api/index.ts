@@ -17,7 +17,7 @@ import {
 import { exposeInstanceSwap } from '#core/figma-api/components'
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api/index'
 import { writeVariableValue } from '#core/figma-api/variables'
-import { documentFontStatus, type DocumentFontStatus } from '#core/text/font/status'
+import { readFontReadiness, type FontReadiness } from '#core/text/font/readiness'
 
 import {
   getBehaviour,
@@ -264,8 +264,8 @@ export class PairdrawAPI {
    * Whether the current page's fonts are faithfully available: requested faces, where each
    * loaded from, substitutions, why an installed face could not load, and the layers affected.
    */
-  getFontStatus(): DocumentFontStatus {
-    return documentFontStatus(this.figma.graph, this.figma.currentPageId)
+  getFontStatus(): FontReadiness {
+    return readFontReadiness(this.figma.graph, this.figma.currentPageId)
   }
 
   /** A fill's OkHCL color, which the color picker keeps beside its RGB, or null. */

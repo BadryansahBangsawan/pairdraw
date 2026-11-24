@@ -42,7 +42,7 @@ import {
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
 import { computeAllLayouts } from '@pairdraw/core/layout'
-import { fontManager, prepareGraphFonts } from '@pairdraw/core/text'
+import { fontManager, resolveFontReadiness } from '@pairdraw/core/text'
 import {
   isDocumentAssetPath,
   parsePenDocument,
@@ -194,7 +194,7 @@ const { graph } = await new IORegistry([penFormat]).readDocument(
 )
 graph.applyDerivedLayoutDuring(() => computeAllLayouts(graph))
 const pageId = graph.getPages()[0].id
-await prepareGraphFonts(
+await resolveFontReadiness(
   graph,
   frames.map((frame) => frame.id)
 )

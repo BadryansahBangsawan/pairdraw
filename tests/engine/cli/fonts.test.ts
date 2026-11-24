@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
-import type { DocumentFontStatus } from '@pairdraw/core/text'
+import type { FontReadiness } from '@pairdraw/core/text'
 
 import { runPairdrawCLI } from '#tests/helpers/cli'
 import { repoPath, requireBuiltWorkspacePackages } from '#tests/helpers/paths'
@@ -35,7 +35,7 @@ test('reports bundled fonts as available', async () => {
   const { stdout, stderr, exitCode } = await runPairdrawCLI(['fonts', GOLD, '--json'])
   expect(stderr).toBe('')
   expect(exitCode).toBe(0)
-  const data: DocumentFontStatus = JSON.parse(stdout)
+  const data: FontReadiness = JSON.parse(stdout)
   expect(data.faithful).toBe(true)
   expect(data.faces.every((face) => face.source === 'bundled')).toBe(true)
 })
@@ -46,7 +46,7 @@ heavy('fonts CLI', () => {
     const { stdout, stderr, exitCode } = await runPairdrawCLI(['fonts', fixture, '--json'])
     expect(stderr).toBe('')
     expect(exitCode).toBe(0)
-    const data: DocumentFontStatus = JSON.parse(stdout)
+    const data: FontReadiness = JSON.parse(stdout)
     expect(data.faithful).toBe(false)
     expect(data.issues).toEqual(data.faces)
     // The host has bundled Inter, so a missing family is drawn with it rather than left unresolved.

@@ -18,7 +18,7 @@ import { applyArrangement, type ArrangePlacement } from '#core/layout/arrange/ap
 import { arrangeBoxes, type ArrangeInput } from '#core/layout/arrange/boxes'
 import { connectorLabelSize } from '#core/layout/arrange/routes'
 import { shapeWithTextWidthFor } from '#core/layout/shape-with-text'
-import { prepareGraphFonts } from '#core/text/prepare'
+import { resolveFontReadiness } from '#core/text/prepare'
 
 import { figJamShape } from './shapes'
 import { declarationsFor, readStyle, type FlowStyle } from './styles'
@@ -247,7 +247,7 @@ export async function addFlowchart(
     created = added
     // Shapes grow to their labels, and connector labels take their size, before the layout reads
     // them, measured in the fonts they are drawn in.
-    await prepareGraphFonts(graph, added)
+    await resolveFontReadiness(graph, added)
     for (const node of chart.nodes) builder.fitWidth(node)
     layoutAuthoredNodes(graph, added)
     const enclosing = enclosingSubgraphs(chart)

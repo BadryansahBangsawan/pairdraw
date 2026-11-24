@@ -5,15 +5,15 @@ import { fontManager, type FontManager } from '#core/text/font/manager'
 import { collectNamedNodeFontFaces } from '#core/text/font/names'
 import type { FontLoadedSource, FontUnavailableReason } from '#core/text/font/sources'
 
-export type FontFaceStatus = 'available' | 'substituted' | 'unresolved'
+export type FontReadinessStatus = 'available' | 'substituted' | 'unresolved'
 
-export interface DocumentFontFaceStatus {
+export interface FontFaceReadiness {
   family: string
   /** The style the font manager loads the face as. */
   style: string
   /** The face's name, as its text names it ("Book", "Semi Bold"). */
   name: string
-  status: FontFaceStatus
+  status: FontReadinessStatus
   source: FontLoadedSource | null
   substituteFamily: string | null
   /** Why the requested face could not be loaded, when the host reported a reason. */
@@ -22,10 +22,10 @@ export interface DocumentFontFaceStatus {
   nodeNames: string[]
 }
 
-export interface DocumentFontStatus {
+export interface FontReadiness {
   faithful: boolean
-  faces: DocumentFontFaceStatus[]
-  issues: DocumentFontFaceStatus[]
+  faces: FontFaceReadiness[]
+  issues: FontFaceReadiness[]
 }
 
 interface MutableFontFaceUse {
@@ -72,7 +72,7 @@ function collectFaceUses(graph: SceneGraph, rootIds: readonly string[]): Mutable
   return [...uses.values()]
 }
 
-function faceStatus(use: MutableFontFaceUse, manager: FontManager): DocumentFontFaceStatus {
+function faceStatus(use: MutableFontFaceUse, manager: FontManager): FontFaceReadiness {
   const exactSource = manager.loadedFontSource(use.family, use.style)
   if (exactSource) {
     return {
@@ -116,11 +116,15 @@ function faceStatus(use: MutableFontFaceUse, manager: FontManager): DocumentFont
   }
 }
 
-export function documentFontStatus(
+/**
+ * What the fonts loaded now can draw: a face reads `unresolved` until something loads it, so a
+ * caller that needs the truth for a document asks {@link resolveFontReadiness} instead.
+ */
+export function readFontReadiness(
   graph: SceneGraph,
   rootIds: string | readonly string[],
   manager: FontManager = fontManager
-): DocumentFontStatus {
+): FontReadiness {
   const roots = typeof rootIds === 'string' ? [rootIds] : rootIds
   const faces = collectFaceUses(graph, roots)
     .map((use) => faceStatus(use, manager))

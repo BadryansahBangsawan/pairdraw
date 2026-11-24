@@ -499,6 +499,30 @@ describe('a Change to named by variant properties', () => {
     expect(graph.getNode(destination.nodeId)?.name).toBe('On')
   })
 
+  test('refuses properties that match more than one variant', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { name: 'Toggle' })
+    const small = graph.createNode('COMPONENT', set.id, {
+      name: 'State=On, Size=Small',
+      componentPropertyValues: { State: 'On', Size: 'Small' }
+    })
+    graph.createNode('COMPONENT', set.id, {
+      name: 'State=On, Size=Large',
+      componentPropertyValues: { State: 'On', Size: 'Large' }
+    })
+    const proxy = new FigmaAPI(graph).getNodeById(small.id)
+    if (!proxy) throw new Error('no variant')
+    expect(() => {
+      Reflect.set(proxy, 'reactions', [
+        {
+          trigger: { type: 'ON_CLICK' },
+          actions: [{ type: 'NODE', variantProperties: { State: 'On' }, navigation: 'CHANGE_TO' }]
+        }
+      ])
+    }).toThrow('matches 2 variants of Toggle')
+  })
+
   test('refuses properties no variant of the set has', () => {
     const { proxy, off } = toggle()
     expect(() => {

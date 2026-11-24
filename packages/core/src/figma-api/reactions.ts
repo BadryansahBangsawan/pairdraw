@@ -67,7 +67,8 @@ const variantPropertiesSchema = v.pipe(
   v.minEntries(1),
   v.description(
     "CHANGE_TO: the values of the variant to change to, in the layer's nearest component set, " +
-      'such as { State: "Hover" }. Resolved to the variant, so get_reactions reads it back as ' +
+      'such as { State: "Hover" }. Name every property of a set whose variants share values, as ' +
+      'a partial match is refused. Resolved to the variant, so get_reactions reads it back as ' +
       'a destinationId.'
   )
 )
@@ -281,18 +282,24 @@ function variantByProperties(
       `${at}: only a variant, an instance of one, or a layer inside one can Change to another variant`
     )
   }
-  for (const set of sets) {
-    for (const child of context.graph.getChildren(set.id)) {
-      if (child.type !== 'COMPONENT') continue
-      const values = { ...parseVariantName(child.name), ...child.componentPropertyValues }
-      if (Object.entries(properties).every(([name, value]) => values[name] === value)) {
-        return child.id
-      }
-    }
-  }
   const wanted = Object.entries(properties)
     .map(([name, value]) => `${name}=${value}`)
     .join(', ')
+  for (const set of sets) {
+    const matches = context.graph.getChildren(set.id).filter((child) => {
+      if (child.type !== 'COMPONENT') return false
+      const values = { ...parseVariantName(child.name), ...child.componentPropertyValues }
+      return Object.entries(properties).every(([name, value]) => values[name] === value)
+    })
+    if (matches.length === 1) return matches[0].id
+    // A set can hold variants a partial map matches equally: refuse rather than pick one.
+    if (matches.length > 1) {
+      const names = matches.map((match) => `"${match.name}"`).join(', ')
+      throw failure(
+        `${at}: ${wanted} matches ${matches.length} variants of ${set.name} (${names}); name every property of the variant`
+      )
+    }
+  }
   throw failure(`${at}: no variant of ${nearest.name} with ${wanted}`)
 }
 

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import { computed, effectScope, nextTick, ref } from 'vue'
 
 import { startSession, type PlaySession } from '@pairdraw/core/prototype'
-import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
+import { SceneGraph, type PrototypeNodeAction, type PrototypeReaction } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { usePlayScenes } from '@/app/editor/prototype/scenes'

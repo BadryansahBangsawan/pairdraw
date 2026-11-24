@@ -47,7 +47,10 @@ test('dragging a nested card uses repaint-only position previews', async ({ page
   })
   await canvas.waitForRender()
 
-  const counters = await measureInteraction(page, () => canvas.drag(110, 110, 210, 150, 20))
+  // From the card's body, past its 16px padding: a drag inside that band is the auto layout padding
+  // handle (`hitAutoLayoutHandle`), which relaid out children on every move rather than moving the
+  // card. `tests/e2e/editor/auto-layout/padding-editor.spec.ts` covers that gesture.
+  const counters = await measureInteraction(page, () => canvas.drag(320, 180, 360, 230, 20))
 
   expect(counters?.storeUpdateCount).toBeLessThanOrEqual(1)
   expect(counters?.graphUpdateCount).toBeLessThanOrEqual(25)

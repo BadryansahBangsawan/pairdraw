@@ -3,6 +3,10 @@ import { expect, test, type Page } from '@playwright/test'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { waitForDemo } from '#tests/helpers/demo'
 
+// A test here boots the app itself, and the canvas allows thirty seconds for that boot
+// (`CanvasHelper.waitForInit`); a test needs room for the boot plus the tour.
+test.beforeEach(() => test.setTimeout(90_000))
+
 async function openDemo(page: Page) {
   const canvas = new CanvasHelper(page)
   await page.goto('/demo?no-chrome&no-rulers')

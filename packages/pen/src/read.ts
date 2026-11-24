@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 import type { FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
+import { rekeyTokenSources, tokenSourcesPluginData } from '@pairdraw/scene-graph/token-sources'
 
 import { lineNetwork, pathNetwork } from './geometry'
 import { removeUnusedIconComponents } from './icons'
@@ -151,6 +152,11 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
 
   if (graph.getPages(true).length === 0) {
     graph.addPage('Page 1')
+  }
+  if (doc.tokenSources && doc.tokenSources.length > 0) {
+    graph.updateNode(graph.rootId, {
+      pluginData: tokenSourcesPluginData(graph, rekeyTokenSources(graph, doc.tokenSources))
+    })
   }
 
   return graph

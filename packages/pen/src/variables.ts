@@ -230,6 +230,23 @@ interface ThemeCollection {
   modeByTheme: Map<string, string>
 }
 
+/** The selector each mode applies in, which Pencil itself does not record. */
+function applyModeConditions(
+  graph: SceneGraph,
+  doc: PenDocument,
+  collections: readonly ThemeCollection[]
+) {
+  for (const created of collections) {
+    const collection = graph.variableCollections.get(created.id)
+    const conditions = collection && doc.modeConditions?.[collection.name]
+    if (!collection || !conditions) continue
+    for (const mode of collection.modes) {
+      const condition = conditions[mode.name]
+      if (condition) mode.condition = condition
+    }
+  }
+}
+
 function addThemeCollection(graph: SceneGraph, axes: Axis[]): ThemeCollection {
   const themes = combinations(axes)
   const modes: VariableCollectionMode[] = themes.map((theme) => ({
@@ -261,6 +278,7 @@ export function buildVarContext(
     axes,
     definitions.map(([, definition]) => definition)
   ).map((group) => addThemeCollection(graph, group))
+  applyModeConditions(graph, doc, collections)
   const collectionOfAxis = new Map(
     collections.flatMap((collection) => collection.axes.map(([axis]) => [axis, collection]))
   )
@@ -293,7 +311,8 @@ export function buildVarContext(
         ])
       ),
       description: '',
-      hiddenFromPublishing: false
+      hiddenFromPublishing: false,
+      ...(definition.codeSyntax ? { codeSyntax: definition.codeSyntax } : {})
     }
     graph.addVariable(variable)
     byName.set(name, variable)

@@ -1,6 +1,7 @@
 import { compact } from 'es-toolkit/array'
 import { isEmptyObject } from 'es-toolkit/predicate'
 
+import { parseCSSName } from '@pairdraw/dom-css/export'
 import type { SceneGraph, Variable, VariableValue } from '@pairdraw/scene-graph'
 import { colorToHex8 } from '@pairdraw/scene-graph/color'
 import type { TokenSource } from '@pairdraw/scene-graph/token-sources'
@@ -8,14 +9,16 @@ import type { TokenSource } from '@pairdraw/scene-graph/token-sources'
 import {
   defaultTokenImportOptions,
   planTokenImport,
+  type PlannedCollection,
   type PlannedValue,
+  type PlannedVariable,
   type TokenImportPlan
 } from '#core/io/formats/design-tokens/plan'
 import { plannedValue } from '#core/io/formats/design-tokens/plan/changes'
 import type { DesignTokenBundle } from '#core/io/formats/design-tokens/read'
 
 /** What linked code held at the last sync, and the token each variable then was. */
-export type TokenSyncBase = Pick<TokenSource, 'snapshot' | 'names'>
+export type TokenSyncBase = Pick<TokenSource, 'snapshot' | 'names' | 'modes'>
 
 /**
  * How a token differs between linked code and the canvas, against what the code held at the last
@@ -141,6 +144,16 @@ function positionKey(collection: number, variable: number, mode?: number): strin
 /** How a sync names a token across syncs: its collection and its name there. */
 function tokenKey(collection: string, variable: string): string {
   return `${collection}/${variable}`
+}
+
+/**
+ * The token a planned variable is in code. A token that states the code naming it, as a
+ * stylesheet's `var(--brand)` does, is named by that rather than by the variable's current name:
+ * a variable renamed on the canvas is still the code's `brand` on the next sync.
+ */
+function plannedTokenKey(collection: PlannedCollection, planned: PlannedVariable): string {
+  const codeName = parseCSSName(planned.codeSyntax?.WEB)
+  return tokenKey(collection.name, codeName ?? planned.name)
 }
 
 function syncPlan(graph: SceneGraph, bundle: DesignTokenBundle): TokenImportPlan {
@@ -486,7 +499,7 @@ function codeSnapshot(plans: readonly TokenImportPlan[], snapshot: Snapshot, nam
           modes[target.modeId] = codeSignature(plan, value, planned.expressions[m])
         })
         snapshot[planned.existingId] = modes
-        names[planned.existingId] = tokenKey(collection.name, planned.name)
+        names[planned.existingId] = plannedTokenKey(collection, planned)
       }
     }
   }
@@ -506,7 +519,7 @@ function keepDeleted(
   const declared = new Set(
     plans.flatMap((plan) =>
       plan.collections.flatMap((collection) =>
-        collection.variables.map((planned) => tokenKey(collection.name, planned.name))
+        collection.variables.map((planned) => plannedTokenKey(collection, planned))
       )
     )
   )
@@ -554,11 +567,21 @@ export function tokenSnapshot(
   previous: TokenSyncBase = { snapshot: {} },
   undecided: readonly TokenDrift[] = []
 ): Required<TokenSyncBase> {
-  const record = { snapshot: {} as Snapshot, names: {} as Names }
+  const record = { snapshot: {} as Snapshot, names: {} as Names, modes: modeNames(graph) }
   const plans = bundles.map((bundle) => syncPlan(graph, bundle))
   codeSnapshot(plans, record.snapshot, record.names)
   const waiting = new Set(compact(undecided.map((entry) => entry.variableId)))
   keepDeleted(graph, plans, previous, waiting, record)
   keepUndecided(previous, undecided, record)
   return record
+}
+
+/** Every collection's modes by id and name, to find them again when a format reassigns ids. */
+function modeNames(graph: SceneGraph): Record<string, Record<string, string>> {
+  return Object.fromEntries(
+    [...graph.variableCollections.values()].map((collection) => [
+      collection.name,
+      Object.fromEntries(collection.modes.map((mode) => [mode.modeId, mode.name]))
+    ])
+  )
 }

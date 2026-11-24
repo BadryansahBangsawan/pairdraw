@@ -65,3 +65,43 @@ describe('page name', () => {
     expect(reread.getPages()[0].name).toBe('Card')
   })
 })
+
+describe('token links', () => {
+  const link = {
+    id: 'link-app',
+    kind: 'css' as const,
+    name: 'app.css',
+    path: 'styles/app.css',
+    syncedAt: '2026-11-24T10:00:00.000Z',
+    snapshot: { collection: { brand: 'color:#ff0000' } },
+    names: { brand: 'Colors/brand' }
+  }
+
+  test('keeps the document’s token links through a write and a read', async () => {
+    const { readTokenSources, tokenSourcesPluginData } =
+      await import('@pairdraw/scene-graph/token-sources')
+    const graph = parseDocument([{ id: 'screen', type: 'frame', width: 100, height: 100 }])
+    graph.updateNode(graph.rootId, { pluginData: tokenSourcesPluginData(graph, [link]) })
+
+    const reopened = parsePenFile(writePenDocument(graph))
+
+    expect(readTokenSources(reopened)).toEqual([link])
+  })
+
+  test('drops a link it cannot read and keeps the rest', async () => {
+    const { readTokenSources } = await import('@pairdraw/scene-graph/token-sources')
+    const json = JSON.stringify({
+      version: '2.21',
+      children: [{ id: 'screen', type: 'frame' }],
+      tokenSources: [
+        link,
+        { id: 'broken' },
+        { id: 'another', kind: 'css', name: 'b.css', snapshot: {} }
+      ]
+    })
+
+    const reopened = parsePenFile(json)
+
+    expect(readTokenSources(reopened).map((source) => source.id)).toEqual(['link-app', 'another'])
+  })
+})

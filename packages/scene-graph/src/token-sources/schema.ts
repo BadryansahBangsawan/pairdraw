@@ -30,7 +30,19 @@ const tokenSourceSchema = v.object({
    * The token each variable was at the last sync, `Collection/name` by variable id, so a variable
    * deleted on the canvas is known when the code still has it.
    */
-  names: v.optional(v.record(v.string(), v.string()))
+  names: v.optional(v.record(v.string(), v.string())),
+  /**
+   * The names the document held when it was saved, `Collection/name` by variable id. A format that
+   * keys variables by name gives them new ids when it reads them back; this finds a renamed
+   * variable's new id while `names` keeps the token it was at the last sync.
+   */
+  currentNames: v.optional(v.record(v.string(), v.string())),
+  /**
+   * The mode names the document holds, by collection name and mode id. A format that keys variables
+   * and modes by name gives them new ids when it reads them back, and this maps the snapshot onto
+   * those.
+   */
+  modes: v.optional(v.record(v.string(), v.record(v.string(), v.string())))
 })
 
 export type TokenSource = v.InferOutput<typeof tokenSourceSchema>

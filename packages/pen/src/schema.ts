@@ -1,6 +1,8 @@
 import * as v from 'valibot'
 
+import { CODE_SYNTAX_PLATFORMS } from '@pairdraw/scene-graph'
 import { finiteNumberSchema } from '@pairdraw/scene-graph/primitives'
+import { tokenSourcesSchema } from '@pairdraw/scene-graph/token-sources'
 
 import { stripJSONComments } from './jsonc'
 
@@ -282,7 +284,13 @@ const variableSchema = v.looseObject({
         theme: v.optional(v.record(strSchema, strSchema))
       })
     )
-  ])
+  ]),
+  /**
+   * The code that names the token, as Figma's variables carry it. Pencil has no field for it, so
+   * it is an extension other Pencil clients ignore; without it a reopened document cannot match a
+   * renamed variable to the token its stylesheet declares.
+   */
+  codeSyntax: v.optional(v.record(v.picklist(CODE_SYNTAX_PLATFORMS), strSchema))
 })
 
 /** A font file the document bundles, which its text names by `name` as a family. */
@@ -294,8 +302,16 @@ const penDocumentSchema = v.looseObject({
   name: v.optional(strSchema),
   fonts: v.optional(v.array(fontSchema)),
   themes: v.optional(v.record(strSchema, v.array(strSchema))),
+  /**
+   * The selector each mode applies in, by collection and mode name: `.dark` for a Dark mode a
+   * stylesheet writes. Pencil has no field for it, so it is an extension other clients ignore;
+   * without it a reopened document reads the stylesheet's dark block as a new mode.
+   */
+  modeConditions: v.optional(v.record(strSchema, v.record(strSchema, strSchema))),
   imports: v.optional(v.record(strSchema, strSchema)),
   variables: v.optional(v.record(strSchema, variableSchema)),
+  /** The code the document's variables are linked to, as Core keeps it on the document node. */
+  tokenSources: v.optional(tokenSourcesSchema),
   children: v.array(nodeSchema)
 })
 

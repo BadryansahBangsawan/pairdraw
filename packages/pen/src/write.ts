@@ -19,6 +19,7 @@ import { stickySublayers } from '@pairdraw/scene-graph/generated'
 import { applyGradientTransform, invertGradientTransform } from '@pairdraw/scene-graph/gradient'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
+import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-sources'
 
 import { networkToSVGPath } from './geometry'
 import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
@@ -446,17 +447,20 @@ function penVariable(
   state: PenWriteState
 ): PenVariable {
   const modes = collection?.modes ?? []
+  const syntax = variable.codeSyntax ? { codeSyntax: variable.codeSyntax } : {}
   if (modes.length <= 1)
     return {
       type: variableType(variable.type),
-      value: variableScalar(variable.valuesByMode[modes[0]?.modeId ?? ''], state)
+      value: variableScalar(variable.valuesByMode[modes[0]?.modeId ?? ''], state),
+      ...syntax
     }
   return {
     type: variableType(variable.type),
     value: modes.map((mode, index) => ({
       value: variableScalar(variable.valuesByMode[mode.modeId], state),
       ...(index === 0 ? {} : { theme: { [collection?.name ?? 'Mode']: mode.name } })
-    }))
+    })),
+    ...syntax
   }
 }
 
@@ -479,6 +483,17 @@ function themesOf(state: PenWriteState): PenDocument['themes'] {
       .sort((left, right) => left.name.localeCompare(right.name))
       .map((collection) => [collection.name, collection.modes.map((mode) => mode.name)])
   )
+}
+
+/** The selector each mode applies in, by collection and mode name; none when no mode names one. */
+function modeConditionsOf(state: PenWriteState): PenDocument['modeConditions'] {
+  const entries = [...state.graph.variableCollections.values()].flatMap((collection) => {
+    const modes = collection.modes.flatMap((mode) =>
+      mode.condition ? [[mode.name, mode.condition] as const] : []
+    )
+    return modes.length > 0 ? [[collection.name, Object.fromEntries(modes)] as const] : []
+  })
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined
 }
 
 function basicNodeFields(state: PenWriteState, node: SceneNode, result: PenNode): void {
@@ -615,6 +630,33 @@ export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
   if (variablesValue) document.variables = variablesValue
   const themes = themesOf(state)
   if (themes) document.themes = themes
+  const conditions = modeConditionsOf(state)
+  if (conditions) document.modeConditions = conditions
+  const tokenSources = readTokenSources(graph).map((source) => {
+    // The reopen gives variables new ids; these are the names the file holds for them. `names`
+    // stays as the last sync recorded it, where the token each variable stands for lives.
+    const currentNames = Object.fromEntries(
+      Object.keys(source.names ?? {}).flatMap((id) => {
+        const variable = variables.get(id)
+        const collection = variable ? collections.get(variable.collectionId) : undefined
+        return variable && collection ? [[id, `${collection.name}/${variable.name}`]] : []
+      })
+    )
+    const modes = {
+      ...source.modes,
+      ...Object.fromEntries(
+        [...collections.values()].map((collection) => [
+          collection.name,
+          Object.fromEntries(collection.modes.map((mode) => [mode.modeId, mode.name]))
+        ])
+      )
+    }
+    const refreshed: TokenSource = { ...source }
+    if (Object.keys(currentNames).length > 0) refreshed.currentNames = currentNames
+    if (Object.keys(modes).length > 0) refreshed.modes = modes
+    return refreshed
+  })
+  if (tokenSources.length > 0) document.tokenSources = tokenSources
   return document
 }
 

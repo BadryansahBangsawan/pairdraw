@@ -4,7 +4,11 @@ import type { CanvasKit, TypefaceFontProvider } from 'canvaskit-wasm'
 import { uniq } from 'es-toolkit'
 
 import type { FontVariation, SceneGraph } from '@pairdraw/scene-graph'
-import { isGenericFontFamily } from '@pairdraw/scene-graph/css'
+import {
+  GENERIC_FONT_FAMILIES_BY_CLASS,
+  genericFontFamilyClass,
+  isGenericFontFamily
+} from '@pairdraw/scene-graph/css'
 import {
   faceLoadKey,
   namesWeight,
@@ -512,9 +516,9 @@ export class FontManager {
     signal?: AbortSignal
   ): Promise<ArrayBuffer | null> {
     signal?.throwIfAborted()
-    // A CSS generic keyword is never a bundled, installed, or served face: fetching it only
-    // wastes a doomed network round-trip that can block a page's fonts (and an open) offline.
-    if (isGenericFontFamily(family)) return null
+    // A CSS generic keyword is never a bundled, installed, or served face: it draws a face of the
+    // class it names, from the host or the bundle, rather than fetching a name no provider serves.
+    if (isGenericFontFamily(family)) return this.loadGenericFont(family, style)
     const loaded = this.loadedData(family, style)
     if (loaded) {
       this.registerFontInCanvasKit(family, loaded)
@@ -532,6 +536,22 @@ export class FontManager {
       (await this.loadCachedFont(family, style, characters)) ??
       (await this.loadRemoteFont(family, style, characters, signal))
     )
+  }
+
+  /**
+   * A CSS generic keyword draws a face of the class it names: the first concrete family the host
+   * has, else a bundled one. Its bytes register under the keyword, so the text keeps its name.
+   */
+  private async loadGenericFont(keyword: string, style: string): Promise<ArrayBuffer | null> {
+    const kind = genericFontFamilyClass(keyword)
+    if (!kind) return null
+    for (const candidate of GENERIC_FONT_FAMILIES_BY_CLASS[kind]) {
+      const installed = await this.loadInstalledFont(candidate, style)
+      if (installed) return this.registerAndCache(keyword, style, installed, 'local')
+      const bundled = await this.loadBundledFont(candidate, style)
+      if (bundled) return this.registerAndCache(keyword, style, bundled, 'bundled')
+    }
+    return null
   }
 
   /**

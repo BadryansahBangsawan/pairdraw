@@ -2,11 +2,11 @@ import { expect, test } from 'bun:test'
 import { join } from 'node:path'
 
 import { FIXTURES } from '#core-tests/helpers/paths'
-
 import type { CanvasKit, TypefaceFontProvider } from 'canvaskit-wasm'
 
-import { getCanvasKit } from '#core/canvaskit'
 import { FontManager, facesFromStyles } from '@pairdraw/core/text'
+
+import { getCanvasKit } from '#core/canvaskit'
 
 /** A font manager that asks no web provider, so a family's faces come from its catalog. */
 function offlineManager() {
@@ -25,6 +25,24 @@ function countingProvider() {
   } as TypefaceFontProvider
   return { provider, registrations }
 }
+
+test('a CSS generic keyword draws a face of its class, not the default family', async () => {
+  const manager = offlineManager()
+  const menlo = new Uint8Array(16).fill(3).buffer
+  manager.setHostFontLoader(async (family) => (family === 'Menlo' ? menlo : null))
+
+  const loaded = await manager.loadFont('ui-monospace')
+
+  expect(loaded).toBe(menlo)
+  expect(manager.loadedFontSource('ui-monospace', 'Regular')).toBe('local')
+})
+
+test('a CSS generic keyword with no host or bundled face keeps the default', async () => {
+  const manager = offlineManager()
+
+  expect(await manager.loadFont('ui-monospace')).toBeNull()
+  expect(manager.loadedFontSource('ui-monospace', 'Regular')).toBeNull()
+})
 
 test('the canvases of one CanvasKit share a provider, so each face is copied into it once', async () => {
   const manager = offlineManager()

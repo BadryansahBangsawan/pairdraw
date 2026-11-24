@@ -1,0 +1,1 @@
+- A CSS generic font family such as `ui-monospace` now draws with a face of its class when the host has one — a mono face for `ui-monospace` — and the bundled default otherwise, instead of always Inter.

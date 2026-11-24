@@ -1,5 +1,6 @@
 import valueParser from 'postcss-value-parser'
 
+import { DEFAULT_FONT_FAMILY } from '../constants'
 import { percentLength, pixelLength } from '../text/lengths'
 import type { TextLength } from '../types'
 import { parseCSSNumber } from './values'
@@ -91,6 +92,43 @@ export const GENERIC_FONT_FAMILIES: ReadonlySet<string> = new Set([
 /** Whether `family` is a CSS generic keyword rather than a face a provider or the host can load. */
 export function isGenericFontFamily(family: string): boolean {
   return GENERIC_FONT_FAMILIES.has(family.trim().toLowerCase())
+}
+
+/** The class a CSS generic keyword stands for, when a concrete face of it can draw the text. */
+export type GenericFontClass = 'sans-serif' | 'serif' | 'monospace'
+
+/** CSS generic keywords, by the concrete face class they stand for. */
+export const GENERIC_FONT_FAMILY_CLASS: Readonly<Record<string, GenericFontClass>> = {
+  'sans-serif': 'sans-serif',
+  'ui-sans-serif': 'sans-serif',
+  'system-ui': 'sans-serif',
+  '-apple-system': 'sans-serif',
+  blinkmacsystemfont: 'sans-serif',
+  serif: 'serif',
+  'ui-serif': 'serif',
+  monospace: 'monospace',
+  'ui-monospace': 'monospace'
+}
+
+/** Known system faces of each generic class, best first. The app bundles Inter for sans-serif. */
+export const GENERIC_FONT_FAMILIES_BY_CLASS = {
+  'sans-serif': [DEFAULT_FONT_FAMILY],
+  serif: ['Georgia', 'Times New Roman', 'Times', 'DejaVu Serif', 'Liberation Serif', 'Noto Serif'],
+  monospace: [
+    'Menlo',
+    'SF Mono',
+    'Consolas',
+    'Courier New',
+    'DejaVu Sans Mono',
+    'Liberation Mono',
+    'Noto Sans Mono',
+    'Ubuntu Mono'
+  ]
+} as const satisfies Record<GenericFontClass, readonly string[]>
+
+/** The concrete face class `family` stands for, or null when its name is no CSS generic keyword. */
+export function genericFontFamilyClass(family: string): GenericFontClass | null {
+  return GENERIC_FONT_FAMILY_CLASS[family.trim().toLowerCase()] ?? null
 }
 
 /** A CSS dimension's number and lowercase unit, or null. */

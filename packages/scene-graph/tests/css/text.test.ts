@@ -1,11 +1,40 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  GENERIC_FONT_FAMILIES_BY_CLASS,
+  genericFontFamilyClass,
   parseCSSFontFamily,
   parseCSSLetterSpacing,
-  parseCSSLineHeight
+  parseCSSLineHeight,
+  type GenericFontClass
 } from '@pairdraw/scene-graph/css'
 import { percentLength, pixelLength } from '@pairdraw/scene-graph/text'
+
+const GENERIC_CLASS_CASES: Array<[string, GenericFontClass]> = [
+  ['ui-monospace', 'monospace'],
+  ['  UI-MonoSpace ', 'monospace'],
+  ['SERIF', 'serif'],
+  ['System-UI', 'sans-serif']
+]
+
+describe('genericFontFamilyClass', () => {
+  test.each(GENERIC_CLASS_CASES)('%s maps to its class', (family, expected) => {
+    expect(genericFontFamilyClass(family)).toBe(expected)
+  })
+
+  test.each(['cursive', 'Inter', ''])("'%s' is not a mapped keyword", (family) => {
+    expect(genericFontFamilyClass(family)).toBeNull()
+  })
+
+  test('each class lists the common faces of macOS, Windows, and Linux', () => {
+    expect(GENERIC_FONT_FAMILIES_BY_CLASS.monospace).toEqual(
+      expect.arrayContaining(['Menlo', 'Consolas', 'DejaVu Sans Mono', 'Ubuntu Mono'])
+    )
+    expect(GENERIC_FONT_FAMILIES_BY_CLASS.serif).toEqual(
+      expect.arrayContaining(['Georgia', 'Times New Roman', 'DejaVu Serif', 'Noto Serif'])
+    )
+  })
+})
 
 describe('parseCSSFontFamily', () => {
   test.each([

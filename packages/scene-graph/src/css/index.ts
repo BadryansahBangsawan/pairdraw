@@ -13,6 +13,10 @@ export {
   parseCSSLetterSpacing,
   parseCSSLineHeight,
   GENERIC_FONT_FAMILIES,
-  isGenericFontFamily
+  GENERIC_FONT_FAMILY_CLASS,
+  GENERIC_FONT_FAMILIES_BY_CLASS,
+  genericFontFamilyClass,
+  isGenericFontFamily,
+  type GenericFontClass
 } from './text'
 export { parseCSSColor, parseCSSNumber, splitCSSValue } from './values'

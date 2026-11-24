@@ -1,1 +1,0 @@
-- The website's home page opens on a live canvas where an agent types the headline while a person comments, and its feature tabs show the editor's own tool call cards and alignment control.

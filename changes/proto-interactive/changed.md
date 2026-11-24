@@ -1,1 +1,0 @@
-- A click in play goes to the topmost layer under the pointer that has an interaction, over that layer's whole box, or that shows a paint there, so a button's background runs its interaction as its label does and a filled sheet over a button keeps the click from it; an unfilled frame laid over a screen lets the click through, and masks hide what lies outside them.

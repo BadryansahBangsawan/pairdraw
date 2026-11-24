@@ -1,1 +1,0 @@
-- Push an instance's text, fill, size, visibility, and nested overrides to its main component, clearing them from the instance in one undo step.

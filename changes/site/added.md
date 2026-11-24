@@ -1,1 +1,0 @@
-- Pairdraw's documentation and landing page are published at https://pairdraw.dev.

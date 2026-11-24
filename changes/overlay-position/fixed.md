@@ -1,1 +1,0 @@
-- An overlay opened from a Figma file plays at the corner placement the file records, instead of centered. A manual placement, and an overlay whose frame is on another page, still center when the file opens; the file keeps its own placement either way.

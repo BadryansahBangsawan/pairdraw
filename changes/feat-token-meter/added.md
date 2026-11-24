@@ -1,1 +1,0 @@
-- The AI chat shows the tokens each reply spent and a running total for the conversation, with an estimated cost when the model's price is known; Settings › AI turns the meter off.

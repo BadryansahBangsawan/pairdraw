@@ -1,1 +1,0 @@
-- A web-font fetch that never answers now times out and falls back to an installed or bundled face, so opening a page with an unknown font family no longer hangs or loses the page.

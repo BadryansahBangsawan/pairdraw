@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/emit",
-  "version": "0.19.2",
+  "version": "0.20.0",
   "description": "How Pairdraw exporters emit source: JavaScript, TypeScript, and JSX built as ESTree and printed with esrap.",
   "keywords": [
     "pairdraw",

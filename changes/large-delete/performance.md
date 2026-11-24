@@ -1,1 +1,0 @@
-- Deleting a frame of thousands of layers no longer stalls the editor: its undo step keeps light copies of the deleted layers instead of a deep copy of each.

@@ -1,1 +1,0 @@
-- A .pen or HTML import now tells the host about variables it does not define, missing image files, unknown node types, and empty HTML instead of losing content silently.

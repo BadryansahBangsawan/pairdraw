@@ -2,6 +2,99 @@
 
 ## Unreleased
 
+## 0.20.0 — 2026-11-24
+
+This release makes Pairdraw a place where you and an agent design together under the same rules: a design memory the agent must follow, variations it can cook up for you to pick from, prompts and reviews you shape yourself, and a token meter that shows what each reply costs. Prototypes grow up — interactive components with hover/press/delay triggers, Smart animate, scrolling frames with fixed and sticky layers, and video export to MP4/GIF/WebM — and the everyday canvas gets the tools Figma users reach for: an eyedropper, document colors, on-canvas auto layout handles, image adjustments, noise and texture effects, OpenType features, replace-fonts, and push-to-main. Figma grid auto layout and draw.io connector routes survive a round trip. Under the hood, a large `.fig` opens faster, prepares each page once, and keeps fewer copies of each layer.
+
+### Breaking changes
+
+- `ReadDocumentWarning` from `@pairdraw/core/io` is now a discriminated union with `unknown-variable`, `missing-image`, and `unknown-node` arms beside `unresolved-imports`; code that switches exhaustively on `kind` or reads `paths`/`reason` without narrowing must handle the new arms.
+- In `@pairdraw/scene-graph`, a layer's empty lists and records, such as `fills`, `effects`, `boundVariables`, `pluginData`, and the lists in `source`, are one frozen value every layer shares. Give the field a new value, for example through `updateNode`, instead of writing into it; writing into it now throws a `TypeError`.
+
+### Added
+
+- Added on-canvas auto layout handles: drag a frame's padding or gap to change it. Shift moves by the large nudge; Alt edits the opposite side on the dragged axis, and Alt+Shift all four sides. Instances edit their own values as an override.
+- A document keeps a design memory that agents follow: the colors, fonts, font sizes, spacing, and corner radii they may use (the document's variables and styles plus values you allow), decisions written down, and frames pinned as examples. Create it from the Design panel with nothing selected, or learn it from a selected frame.
+- An agent's edit that brings in a color or font outside the design memory is undone, and the agent is told the nearest allowed values; so is a variable or style it creates or changes with such a value, or a change to the memory itself. Off-scale sizes, spacing, and radii go through with a warning. Your own edits, including CLI commands, are never undone: the Lint panel lists values outside the memory with a fix and **Allow**, `pairdraw tool call` and `pairdraw eval` warn, and `pairdraw tool call --enforce-design-memory` refuses.
+- Agents read the design memory with `get_design_memory`, check values with `check_design_values`, and write decisions down with `record_design_decision`; `pairdraw design-memory` prints it, and `pairdraw.designMemory` reads it in scripts.
+- The color picker lists the solid colors used on the current page, most used first, so a color already in the document is one click away.
+- The Eyedropper tool (I) and the color picker's eyedropper button pick any color shown on the canvas, with a loupe of the pixels under the pointer; Alt samples into the stroke, and Escape leaves without changing the selection.
+- Long AI chats compact themselves into a summary before the context window fills, instead of failing at the limit: automatically before a message or between a reply's steps, on demand with `/compact` (text after it says what to keep), and with Compact and retry when a request was too long; the transcript keeps every message with a divider that opens the summary, and Settings → AI can turn automatic compaction off.
+- A model assigned to Fast tasks names each conversation after its first reply and, when it is an API model, writes compaction summaries in place of the Design model; "Same as Design" and no model leave both as they were.
+- Settings → Prompts holds your own instructions for the AI: the Design agent's, added after Pairdraw's or in their place (the design JSX reference always follows), and the templates for design reviews, chat titles, and compaction summaries, with variable help, a sample preview, and Reset; a template with errors falls back to the built-in one, and text left as Pairdraw's keeps receiving its updates.
+- `/review` asks the Review model to review the selection or page, with attached images as references and optional focus text; its findings join the conversation as a review card with Fix these, and each AI edit's change preview offers Review this change.
+- Noise effects carry their grain in the scene graph and are edited in the effects panel: a mono, duo, or multi noise, its size, density, colour, and opacity.
+- Texture effects roughen a layer, with a grain size, a radius, and clipping to the layer's shape.
+- Design JSX gains `noise()` and `texture()` helpers, and JSX export writes both effects as those calls.
+- SVG export draws a noise as Figma's turbulence chain and a texture as Figma's displacement chain.
+- The canvas draws noise with Figma's measured grain statistics over cached tiles, and a texture displaces a layer's edges by its radius.
+- The text panel offers the OpenType features the selected font actually has — ligatures, tabular and oldstyle figures, fractions, small caps, ordinals, slashed zero, and the font's stylistic sets and character variants — as switches beside the variable font axes, which now have sliders as well as numeric fields. Figma's common ligature, contextual-alternates, and kerning switches stay visible, and the font's remaining features fold behind **More font features**.
+- `set_text_properties` and `set_font_range` take `font_features`, a tag-to-boolean map, so scripts and agents can set OpenType features on a whole text or a range. Scripts can also use `pairdraw.setFontFeatures` and `pairdraw.setRangeFontFeatures`, and read a text's set features through `openTypeFeatures`, as Figma's plugin API does.
+- Added `check_responsive`, which lays out a copy of a frame at several widths, such as phone, tablet, and desktop, and returns one render per width with the text overflow, layers outside the frame, and overlapping siblings found there, without changing the document.
+- The AI chat shows the tokens each reply spent and a running total for the conversation, with an estimated cost when the model's price is known; Settings › AI turns the meter off.
+- Open Figma frames with grid auto layout, keeping their rows, columns, gaps, and child placement when the file is saved again.
+- Image fills and strokes draw their exposure, contrast, saturation, temperature, tint, highlights, and shadows adjustments on the canvas and in exports, matching Figma's output; the highlight response is within one level of Figma on saturated colours. The image fill picker sets them with sliders, and a whole drag is one undo step.
+- Prototypes play interactive components: Change to switches an instance to another variant of its set, set once on the main component's variant, with While hovering, While pressing, Mouse enter, Mouse leave, On click, and After delay triggers, and interactions set on a layer inside a component run on the instance's copy of that layer; the Prototype section lists the variants and shows how many interactions an instance takes from its main component, and play never changes the document.
+- Frames take Overflow scrolling in the Prototype section. In play the wheel or a drag scrolls a clipping frame inside a screen, a screen longer than the window that scrolls fits across and pans through the rest, and Scroll to brings a layer into view, easing with Dissolve.
+- Figma files keep their interactive components, hover and press triggers, Scroll to, and scrolling frames through a round trip and play them; a Mouse enter or Mouse leave delay set in Pairdraw is not written to `.fig` yet. Agents set them with `set_reactions` and the `overflow_direction` of `update_node` and `batch_update`.
+- File › Export Prototype as Video… records a prototype as an MP4, GIF, or WebM file: from a start frame, following its After delay interactions and their Dissolve transitions on a clock of its own, so the video is the same every time, at a chosen size, frame rate, and maximum length. MP4 and WebM need a browser that encodes them with WebCodecs, which the desktop app has.
+- The CLI (`pairdraw export -f mp4`, `gif`, or `webm`) and the MCP `export_video` tool record the same video, with optional scripted clicks; from a file without the app, MP4 and WebM are encoded with `ffmpeg` when it is installed, and GIF works everywhere.
+- Push an instance's text, fill, size, visibility, and nested overrides to its main component, clearing them from the instance in one undo step.
+- Added **Replace fonts**, reachable from the missing-fonts warning and the font-family menu; `list_fonts` gains `scope: "document"` to report every face across the document with its missing state and layer count, and `replace_fonts` swaps fonts over MCP and scripts in one undoable step.
+- Added **Position when scrolling** for layers in a scrolling frame: Scroll with parent, Fixed, or Sticky. Play keeps fixed layers in place and sticks sticky ones to the frame's top or left edge, above the content that scrolls under them, and `.fig` files read and write the setting.
+- Pairdraw's documentation and landing page are published at https://pairdraw.dev.
+- Prototype interactions can Smart animate: on Navigate to and Change to, layers that share a name and place in both frames or variants move, resize, rotate, fade, and change corner radius and solid fill color, and the rest fade out or in, in Play and in exported videos. Figma files keep Smart animate through a round trip, and agents set it with `set_reactions`.
+- Dissolve and Smart animate take an easing (Ease out, Ease in, Ease in and out, or Linear) in the Prototype section, read from and written to `.fig` files.
+- `pairdraw tokens --check` and the `token_drift` tool compare the variables with a stylesheet, a project folder, or W3C design token files and list every token that changed in code, on the canvas, or on both; the command exits with status 1 when anything differs.
+- A linked stylesheet is remembered with the document, by its path from the document's folder, and followed again when the document is reopened; pulling it brings in only what changed in the file since the last sync.
+- The variables dialog marks each variable that differs from the linked stylesheet and shows how many need review; pulling opens a review where each token changed on the canvas or in both places keeps the code or the canvas value, applying takes the side the review shows, so a conflict keeps the code value unless a person picks the canvas one. `pairdraw tokens --sync` and the `sync_tokens` tool bring code in the same way.
+- Design Check suggests binding a corner radius, auto layout gap or padding, or font size that equals a radius, spacing, or text token, and lint fixes bind it when exactly one token matches.
+- Variations: Let it cook on a layer, or Variations… in the layer's context menu, makes its variants versions of that layer side by side in a section beside it, and Duplicate as variation adds one by hand; the Variations section flips through them, uses one in place of the original in one undo step, keeping its id, name, and place in its auto layout, or discards them all. Agents make and pick them with `create_variations`, `list_variations`, and `pick_variation`, and scripts with `pairdraw.createVariations`.
+
+### Changed
+
+- The README and docs describe Figma's MCP write-to-canvas beta accurately and state what Pairdraw still offers: open source, local, no seat or usage-based billing, any agent, and `.fig` files you own.
+- The website's home page opens on a live canvas where an agent types the headline while a person comments, and its feature tabs show the editor's own tool call cards and alignment control.
+- A click in play goes to the topmost layer under the pointer that has an interaction, over that layer's whole box, or that shows a paint there, so a button's background runs its interaction as its label does and a filled sheet over a button keeps the click from it; an unfilled frame laid over a screen lets the click through, and masks hide what lies outside them.
+
+### Fixed
+
+- A file opened in a browser tab in the background is read right away instead of waiting until the tab is shown, and a page switch drawn there no longer fails with "The operation was timed out".
+- A sideways two-finger swipe on a Mac trackpad pans the canvas instead of going back in the browser's history, in Safari too.
+- A prototype's After delay on a layer inside a component now runs on its copies inside instances during play, as in Figma.
+- Flattening or combining layers no longer lets an agent pass off a colour the design memory does not allow: a merged layer is judged on the colours every layer it merged already shared.
+- Opening a draw.io file and saving it again keeps each connector’s waypoints, end constraints, and style as draw.io wrote them, until the connector is edited.
+- A Union, Subtract, Intersect or Exclude made in Pairdraw exports as its result path in SVG, HTML and JSX instead of its bounding box and operands.
+- SVG and HTML exports apply a shape mask to the layers after it instead of drawing the mask layer as a normal shape.
+- SVG, HTML, and Tailwind exports draw every visible stroke of a layer, in order, instead of only its first.
+- Noise and texture values a damaged `.fig` stores out of range are held within Figma's limits on import, so a NaN density no longer stops rendering.
+- The German landing page speaks informally, matching the app, and its disk-image download is described correctly.
+- The Russian landing page calls auto layout `Автораскладка`, and Spanish video export uses the same “Tras un retardo” trigger name as the Prototype panel.
+- Opening a document whose text uses a CSS generic family such as `ui-monospace` no longer tries to fetch it from a web font provider, so the document opens without hanging on a doomed network request.
+- A web-font fetch that never answers now times out and falls back to an installed or bundled face, so opening a page with an unknown font family no longer hangs or loses the page.
+- A CSS generic font family such as `ui-monospace` now draws with a face of its class when the host has one — a mono face for `ui-monospace` — and the bundled default otherwise, instead of always Inter.
+- Reading an image paint through the plugin API now returns its adjustment filters, and writing it back keeps the filters it names instead of resetting every slider to zero.
+- A While hovering interaction that opens an overlay closes when the pointer leaves its trigger, and a While pressing one closes on release.
+- A .pen or HTML import now tells the host about variables it does not define, missing image files, unknown node types, and empty HTML instead of losing content silently.
+- On macOS 26 in the dark icon style, the Dock shows the Pairdraw icon on its orange tile instead of a dark gray one.
+- Opening a Figma file with an override for a layer that was deleted from a nested component no longer fails; the stale record is skipped, as Figma does, while an ambiguous path still refuses the file.
+- An overlay opened from a Figma file plays at the corner placement the file records, instead of centered. A manual placement, and an overlay whose frame is on another page, still center when the file opens; the file keeps its own placement either way.
+- Editing a prototype interaction imported from Figma keeps its Smart animate, slide, push, or move animation instead of turning it into an instant cut.
+- A frame’s After delay starts when a hover, press, or instance timer’s dissolve ends, instead of while it is still running.
+- Prototype play crossfades a Dissolve for its own duration, after a delay as well as on a click, and counts the next After delay from when the transition ends, as Figma does.
+- Pasting an instance that contains nested instances into another document keeps the nested instances, their overrides, and their component property assignments, instead of failing with a duplicate fragment error.
+- A documentation page with no translation sends its other-language links to the English page instead of a missing one, and the published site serves a robots.txt naming its sitemap.
+- A watched stylesheet that changes no longer overwrites variable values edited on the canvas: only values changed in the file alone come in, as one undo step, and the rest wait for review.
+- A saved `.pen` document keeps the code name of each linked token and the selector each mode applies in, so a token renamed on the canvas or in its collection still matches the stylesheet after the document is reopened instead of being added a second time.
+- Cancel a running MCP video export: the app stops encoding and reports the call as cancelled.
+
+### Performance
+
+- Switching to a page in a large `.fig` loads the component sets its instances use rather than every page holding them, so a page with a few kit instances opens much faster and holds less memory. On nuxtui.fig (120 pages) the first page opens about four times faster and holds 97k layers instead of 354k, with a peak memory about 10% lower.
+- Deleting a frame of thousands of layers no longer stalls the editor: its undo step keeps light copies of the deleted layers instead of a deep copy of each.
+- Opening a `.fig` prepares its first page once instead of twice, and the canvas tile cache follows the device's memory and shrinks to the last view while the window is hidden.
+- Layers share one copy of their empty lists and records, so a layer takes about half the memory it did (2.4 KB instead of 4.6 KB), and material3.fig with every page loaded uses 96 MiB less heap (854 to 758 MiB).
+
 ## 0.19.2 — 2026-11-21
 
 Pairdraw 0.19.2 makes imported web pages and HTML match the page much more closely, lets tabs switch a component set's variants, adds Figma's headless UI object and `hasMissingFont` for scripts, makes one-page CLI commands load only that page, and fixes a long list of export, layout, text, component, chat, and desktop problems. Pairdraw 0.16.1 and later offer this release in the app.

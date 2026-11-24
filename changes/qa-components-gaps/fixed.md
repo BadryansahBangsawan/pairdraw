@@ -1,1 +1,0 @@
-- Pasting an instance that contains nested instances into another document keeps the nested instances, their overrides, and their component property assignments, instead of failing with a duplicate fragment error.

@@ -1,1 +1,0 @@
-- SVG and HTML exports apply a shape mask to the layers after it instead of drawing the mask layer as a normal shape.

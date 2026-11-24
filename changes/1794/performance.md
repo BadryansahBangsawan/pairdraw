@@ -1,1 +1,0 @@
-- Switching to a page in a large `.fig` loads the component sets its instances use rather than every page holding them, so a page with a few kit instances opens much faster and holds less memory.

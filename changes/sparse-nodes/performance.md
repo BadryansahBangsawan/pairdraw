@@ -1,1 +1,0 @@
-- Layers share one copy of their empty lists and records, so a layer takes about half the memory it did (2.4 KB instead of 4.6 KB), and material3.fig with every page loaded uses 96 MiB less heap (854 to 758 MiB).

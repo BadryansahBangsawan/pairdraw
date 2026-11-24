@@ -1,1 +1,0 @@
-- Opening a draw.io file and saving it again keeps each connector’s waypoints, end constraints, and style as draw.io wrote them, until the connector is edited.

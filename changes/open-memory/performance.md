@@ -1,1 +1,0 @@
-- Opening a `.fig` prepares its first page once instead of twice, and the canvas tile cache follows the device's memory and shrinks to the last view while the window is hidden.

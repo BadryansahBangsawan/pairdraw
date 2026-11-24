@@ -1,2 +1,0 @@
-- Cancel a running MCP video export: the app stops encoding and reports the call as cancelled.
-- Clean up a headless video export's temporary folder when the CLI is interrupted.

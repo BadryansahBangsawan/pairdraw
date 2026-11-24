@@ -1,1 +1,0 @@
-- Flattening or combining layers no longer lets an agent pass off a colour the design memory does not allow: a merged layer is judged on the colours every layer it merged already shared.

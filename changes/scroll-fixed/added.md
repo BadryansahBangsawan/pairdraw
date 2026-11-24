@@ -1,1 +1,0 @@
-- Added **Position when scrolling** for layers in a scrolling frame: Scroll with parent, Fixed, or Sticky. Play keeps fixed layers in place and sticks sticky ones to the frame's top or left edge, above the content that scrolls under them, and `.fig` files read and write the setting.

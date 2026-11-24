@@ -1,1 +1,0 @@
-- The color picker lists the solid colors used on the current page, most used first, so a color already in the document is one click away.

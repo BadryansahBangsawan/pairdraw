@@ -1,1 +1,0 @@
-- Added **Replace fonts**, reachable from the missing-fonts warning and the font-family menu; `list_fonts` gains `scope: "document"` to report every face across the document with its missing state and layer count, and `replace_fonts` swaps fonts over MCP and scripts in one undoable step.

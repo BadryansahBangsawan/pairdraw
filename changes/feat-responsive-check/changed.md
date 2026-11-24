@@ -1,1 +1,0 @@
-- The README and docs describe Figma's MCP write-to-canvas beta accurately and state what Pairdraw still offers: open source, local, no seat or usage-based billing, any agent, and `.fig` files you own.

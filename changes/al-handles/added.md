@@ -1,1 +1,0 @@
-- Added on-canvas auto layout handles: drag a frame's padding or gap to change it. Shift moves by the large nudge; Alt edits the opposite side on the dragged axis, and Alt+Shift all four sides. Instances edit their own values as an override.

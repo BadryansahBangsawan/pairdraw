@@ -41,6 +41,32 @@ import { pinnedRunBindingScales } from './units'
 export * from './resolution'
 
 /**
+ * Variables a list shows: every one but those deleted, on their own or with their collection,
+ * which only their bindings still reach.
+ */
+export function liveVariables(graph: SceneGraph): Variable[] {
+  return [...graph.variables.values()].filter(
+    (variable) =>
+      !variable.deleted && !graph.variableCollections.get(variable.collectionId)?.deleted
+  )
+}
+
+/** Collections a list shows: every one but those deleted. */
+export function liveCollections(graph: SceneGraph): VariableCollection[] {
+  return [...graph.variableCollections.values()].filter((collection) => !collection.deleted)
+}
+
+/**
+ * A collection's deleted variables, which its `variableIds` leave out. A deleted collection's
+ * variables are all deleted.
+ */
+export function deletedVariablesOf(graph: SceneGraph, collectionId: string): Variable[] {
+  return [...graph.variables.values()].filter(
+    (variable) => variable.collectionId === collectionId && variable.deleted
+  )
+}
+
+/**
  * Gives the runs that bind `fields` the scale they resolve with as their own, before the layer's
  * scale for those fields changes or goes, and the change to announce.
  */
@@ -57,9 +83,12 @@ function pinRunBindingScales(
 export function addVariable(graph: SceneGraph, variable: Variable): void {
   graph.variables.set(variable.id, variable)
   const collection = graph.variableCollections.get(variable.collectionId)
-  if (collection && !collection.variableIds.includes(variable.id)) {
-    collection.variableIds.push(variable.id)
-  }
+  if (!collection) return
+  // A collection lists its live variables, so one replaced by its deleted record leaves the list.
+  if (collection.variableIds.includes(variable.id) === !variable.deleted) return
+  collection.variableIds = variable.deleted
+    ? collection.variableIds.filter((id) => id !== variable.id)
+    : [...collection.variableIds, variable.id]
 }
 
 export function removeVariable(graph: SceneGraph, id: string): void {
@@ -160,6 +189,7 @@ export function removeCollection(graph: SceneGraph, id: string): void {
     for (const varId of Array.from(collection.variableIds)) {
       removeVariable(graph, varId)
     }
+    for (const variable of deletedVariablesOf(graph, id)) removeVariable(graph, variable.id)
   }
   graph.variableCollections.delete(id)
   graph.activeMode.delete(id)
@@ -301,7 +331,7 @@ export function getVariablesForCollection(graph: SceneGraph, collectionId: strin
 }
 
 export function getVariablesByType(graph: SceneGraph, type: VariableType): Variable[] {
-  return [...graph.variables.values()].filter((v) => v.type === type)
+  return liveVariables(graph).filter((v) => v.type === type)
 }
 
 const PAINT_BINDING_LISTS = ['fills', 'strokes'] as const satisfies readonly PaintBindingList[]

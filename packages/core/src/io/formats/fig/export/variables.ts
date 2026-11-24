@@ -22,6 +22,7 @@ import type {
 } from '@pairdraw/scene-graph'
 import { fractionalPosition, orderKeyBetween } from '@pairdraw/scene-graph/order-keys'
 import {
+  deletedVariablesOf,
   isUnsupportedVariableValue,
   foldFormula,
   formulaValueType,
@@ -80,7 +81,11 @@ export function assignVariableGuids(
       )
       modeIdToGuid.set(mode.modeId, modeGuid)
     }
-    for (const varId of col.variableIds) {
+    // Deleted variables are written too, so they keep their GUIDs like the listed ones.
+    for (const varId of [
+      ...col.variableIds,
+      ...deletedVariablesOf(graph, colId).map((item) => item.id)
+    ]) {
       const varGuid = assignVariableGuid(
         varId,
         localIdCounter,
@@ -265,11 +270,16 @@ export function appendVariableNodeChanges(
       })),
       pluginData: collectionPluginDataNodeChange(collection, modeKey),
       key: collection.key,
-      version: collection.version
+      version: collection.version,
+      ...(collection.deleted ? { isSoftDeleted: true } : {})
     })
-    for (const id of collection.variableIds) {
-      const variable = graph.variables.get(id)
-      if (!variable) continue
+    // Deleted variables follow the listed ones: the file keeps them for the layers bound to them.
+    const variables = [
+      ...collection.variableIds.flatMap((id) => graph.variables.get(id) ?? []),
+      ...deletedVariablesOf(graph, collection.id)
+    ]
+    for (const variable of variables) {
+      const id = variable.id
       changes.push({
         guid: ids.get(id) ?? stringToGuid(id),
         parentIndex: { guid: parent, position: nextPosition() },
@@ -291,7 +301,8 @@ export function appendVariableNodeChanges(
         },
         ...variableMetadataNodeChange(variable, modeKey),
         key: variable.key,
-        version: variable.version
+        version: variable.version,
+        ...(variable.deleted ? { isSoftDeleted: true } : {})
       })
     }
   }

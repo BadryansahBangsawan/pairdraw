@@ -241,10 +241,21 @@ export function materializeVariableResources(
       modeAttribute: readModeAttribute(resource),
       pluginData: pluginData.length > 0 ? pluginData : undefined,
       key: typeof resource.key === 'string' ? resource.key : undefined,
-      version: typeof resource.version === 'string' ? resource.version : undefined
+      version: typeof resource.version === 'string' ? resource.version : undefined,
+      ...(resource.isSoftDeleted ? { deleted: true } : {})
     })
   }
   addVariables(graph, resources, report, onUnsupportedExpression)
+}
+
+/** The collection a variable record names: by its reference, or else as its parent. */
+export function variableCollectionId(
+  variable: NodeChange,
+  resolve: ReturnType<typeof createResourceResolver>
+): string | undefined {
+  if (variable.variableSetID) return resolve(variable.variableSetID)
+  const parent = variable.parentIndex?.guid
+  return parent ? guidToString(parent) : undefined
 }
 
 function addVariables(
@@ -257,9 +268,7 @@ function addVariables(
   for (const resource of resources) {
     if (resource.type !== 'VARIABLE') continue
     const type = resource.variableResolvedType
-    const collectionId = resource.variableSetID
-      ? resolve(resource.variableSetID)
-      : resource.parentIndex?.guid && guidToString(resource.parentIndex.guid)
+    const collectionId = variableCollectionId(resource, resolve)
     const collection = collectionId && graph.variableCollections.get(collectionId)
     if (
       !resource.guid ||
@@ -293,7 +302,8 @@ function addVariables(
       collectionId,
       valuesByMode,
       ...metadata,
-      ...readVariableToken(resource, valuesByMode)
+      ...readVariableToken(resource, valuesByMode),
+      ...(resource.isSoftDeleted || collection.deleted ? { deleted: true } : {})
     })
   }
 }

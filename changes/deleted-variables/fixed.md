@@ -1,0 +1,1 @@
+- Variables and collections deleted in Figma stay out of every variable list, while layers bound to them still resolve them and `.fig` saves keep them deleted.

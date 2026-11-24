@@ -1276,6 +1276,11 @@ export interface Variable {
   key?: string
   /** Published library version (from NodeChange.version). Used for assetRef resolution in colorVar. */
   version?: string
+  /**
+   * Deleted as Figma deletes a variable: gone from its collection's `variableIds` and from every
+   * list of variables, while layers bound to it still resolve it and the file keeps it.
+   */
+  deleted?: true
 }
 
 /** Scalar numeric node fields accepted by numeric property controls. */
@@ -1315,6 +1320,11 @@ export interface VariableCollection {
   key?: string
   /** Published library version, which references by key carry with it. */
   version?: string
+  /**
+   * Deleted as Figma deletes a collection: gone from every list of collections, with its variables
+   * deleted too, while layers bound to them still resolve them and the file keeps them.
+   */
+  deleted?: true
 }
 
 /** Whether a collection is a library's copy, which takes no variables or modes of the file's. */

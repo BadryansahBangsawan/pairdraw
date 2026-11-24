@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useNow } from '@vueuse/core'
 import { computed, watch } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { useActiveNow } from '@/app/cloud/active-now'
 import { cloudSignedIn } from '@/app/cloud/connect/flow'
 import {
   acceptCloudInvitation,
@@ -24,7 +24,7 @@ import CloudInvitationDialog from './CloudInvitationDialog.vue'
 
 /** The invitation an opened link names, until it is accepted or dismissed. */
 const { locale } = useI18n()
-const now = useNow({ interval: 60_000 })
+const now = useActiveNow(() => cloudInvitation.value !== null, 60_000)
 const HOUR = 3_600_000
 
 const summary = computed(() => {

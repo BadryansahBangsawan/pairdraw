@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useDocumentVisibility, useNow } from '@vueuse/core'
+import { useDocumentVisibility } from '@vueuse/core'
 import { computed, watch } from 'vue'
 
 import { useCloudMessages, useI18n } from '@pairdraw/vue/i18n'
 
+import { useActiveNow } from '@/app/cloud/active-now'
 import {
   backCloudConnect,
   cancelCloudConnect,
@@ -43,7 +44,7 @@ import CloudConnectDialog from './CloudConnectDialog.vue'
 /** The one connect dialog, driven by the app's connect flow wherever it was opened from. */
 const { locale } = useI18n()
 const t = useCloudMessages()
-const now = useNow({ interval: 1000 })
+const now = useActiveNow(() => cloudDeviceSignIn.value.status === 'waiting', 1000)
 const official = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).host : null
 
 const device = computed(() => {

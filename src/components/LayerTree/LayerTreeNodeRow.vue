@@ -12,6 +12,7 @@ import LayerTreeActions from './LayerTreeActions.vue'
 import LayerTreeDisclosure from './LayerTreeDisclosure.vue'
 import LayerTreeDropIndicator from './LayerTreeDropIndicator.vue'
 import LayerTreeRowShell from './LayerTreeRowShell.vue'
+import { layerModeNames } from './mode-names'
 import type { LayerTreeChrome, LayerTreeItemActions } from './types'
 import { useLayerTreeUI } from './ui'
 
@@ -32,21 +33,13 @@ const emit = defineEmits<{
 
 const ui = useLayerTreeUI()
 const store = useEditorStore()
-/** The names of the variable modes set on the layer itself, tagged after its name as in Figma. */
-const modeNames = computed(() =>
-  (node.modeIds ?? []).flatMap((modeId) => {
-    for (const collection of store.graph.variableCollections.values()) {
-      const mode = collection.modes.find((candidate) => candidate.modeId === modeId)
-      if (mode) return [mode.name]
-    }
-    return []
-  })
-)
+const modeNames = computed(() => layerModeNames(store.graph, node.modeIds))
 const layerTree = tv(layerTreeTheme)
 const styles = computed(() =>
   layerTree({
     expanded,
     actionsVisible: node.locked || !node.visible,
+    trailingShown: node.locked || !node.visible,
     selected,
     focused: chrome.focused,
     dragging: chrome.draggingId === node.id,
@@ -62,6 +55,7 @@ const styles = computed(() =>
 <template>
   <LayerTreeRowShell
     :pad-left="padLeft"
+    :content-class="styles.content({ class: ui?.content })"
     data-test-id="layers-item"
     data-slot="row"
     :data-selected="selected || undefined"
@@ -100,19 +94,25 @@ const styles = computed(() =>
       </span>
     </span>
 
-    <LayerTreeActions
-      :node="node"
-      :ui="{
-        actions: styles.actions({ class: ui?.actions }),
-        action: styles.action({ class: ui?.action }),
-        lockIcon: layerTree({ actionActive: node.locked }).actionIcon({ class: ui?.actionIcon }),
-        visibilityIcon: layerTree({ actionActive: !node.visible }).actionIcon({
-          class: ui?.actionIcon
-        })
-      }"
-      @toggle-lock="actions.toggleLock"
-      @toggle-visibility="actions.toggleVisibility"
-    />
+    <template #end>
+      <span data-slot="trailing" :class="styles.trailing({ class: ui?.trailing })">
+        <LayerTreeActions
+          :node="node"
+          :ui="{
+            actions: styles.actions({ class: ui?.actions }),
+            action: styles.action({ class: ui?.action }),
+            lockIcon: layerTree({ actionActive: node.locked }).actionIcon({
+              class: ui?.actionIcon
+            }),
+            visibilityIcon: layerTree({ actionActive: !node.visible }).actionIcon({
+              class: ui?.actionIcon
+            })
+          }"
+          @toggle-lock="actions.toggleLock"
+          @toggle-visibility="actions.toggleVisibility"
+        />
+      </span>
+    </template>
 
     <LayerTreeDropIndicator
       :active="chrome.instructionTargetId === node.id"

@@ -1,9 +1,13 @@
 const layerTreeTheme = {
   slots: {
-    viewport: 'scrollbar-thin h-full overflow-y-auto px-2 pb-2',
+    // No padding here: scrolled names would show through it beside the buttons pinned to the edge.
+    viewport: 'scrollbar-thin h-full overflow-auto pb-2 text-xs',
     /** The top-level layer pinned over the list, inset like the rows beneath it. */
-    sticky: 'absolute inset-x-2 top-0 z-10 border-b border-border bg-panel',
-    row: 'group/row relative flex w-full cursor-pointer items-center gap-1 rounded-field border-none bg-transparent pr-1.5 text-left text-xs text-surface hover:bg-hover',
+    sticky: 'absolute inset-x-0 top-0 z-10 border-b border-border bg-panel',
+    row: 'group/row relative flex w-full cursor-pointer items-center gap-1 rounded-field border-none bg-panel text-left text-xs text-surface hover:bg-hover',
+    // Everything before the buttons, indented by depth. The indent is here and not on the row,
+    // since a sticky part stays inside its row's padding and the buttons must reach the edge.
+    content: 'flex h-full min-w-0 flex-1 items-center gap-1',
     disclosure:
       'flex w-4 shrink-0 cursor-pointer items-center justify-center text-current transition-transform',
     disclosurePlaceholder: 'w-4 shrink-0',
@@ -14,7 +18,10 @@ const layerTreeTheme = {
       'flex size-4 items-center justify-center rounded text-current outline-none hover:bg-hover focus-visible:ring-1 focus-visible:ring-panel-focus',
     actionIcon: 'size-3',
     dropIndicator: 'pointer-events-none absolute bg-accent',
-    renameRow: 'group/row relative flex w-full items-center gap-1 pr-1.5 text-xs text-surface',
+    // The buttons stay at the panel's edge however far the rows scroll sideways. While they show,
+    // they sit on the row's own background so a long name runs under them.
+    trailing: 'sticky inset-e-0 flex shrink-0 items-center gap-1 pe-1.5',
+    renameRow: 'group/row relative flex w-full items-center pe-1.5 text-xs text-surface',
     renameIcon: 'size-3 shrink-0 opacity-70',
     renameInput:
       'min-w-0 flex-1 rounded border border-accent bg-input px-1 py-0 text-xs text-surface outline-none'
@@ -48,6 +55,10 @@ const layerTreeTheme = {
     expanded: {
       true: { disclosure: 'rotate-90' },
       false: { disclosure: 'rotate-0' }
+    },
+    trailingShown: {
+      true: { trailing: 'bg-inherit' },
+      false: { trailing: 'group-focus-within/row:bg-inherit group-hover/row:bg-inherit' }
     },
     actionsVisible: {
       true: {},
@@ -91,6 +102,7 @@ const layerTreeTheme = {
     component: false,
     slot: false,
     expanded: false,
+    trailingShown: true,
     actionsVisible: true,
     actionActive: false,
     childDropTarget: false

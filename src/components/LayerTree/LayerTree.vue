@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScroll } from '@vueuse/core'
+import { useElementSize, useScroll } from '@vueuse/core'
 import {
   TreeItem,
   TreeVirtualizer,
@@ -8,7 +8,7 @@ import {
   ContextMenuPortal
 } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { nextTick, useAttrs, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue'
 
 import { useInlineRename } from '@pairdraw/vue/editor/inline-rename'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -27,12 +27,21 @@ import { useEditorStore } from '@/app/editor/active-store'
 import layerTreeTheme from '@/theme/layer-tree'
 
 import CanvasMenu from '../canvas/CanvasMenu.vue'
-import { LAYER_TREE_ROW_HEIGHT } from './geometry'
+import {
+  LAYER_TREE_BADGE,
+  LAYER_TREE_BADGE_TEXT_SIZE,
+  LAYER_TREE_BUTTONS,
+  LAYER_TREE_INDENT,
+  LAYER_TREE_NAME_START,
+  LAYER_TREE_ROW_HEIGHT
+} from './geometry'
 import LayerTreeNodeRow from './LayerTreeNodeRow.vue'
 import LayerTreeRenameRow from './LayerTreeRenameRow.vue'
 import LayerTreeStickyRow from './LayerTreeStickyRow.vue'
+import { layerModeNames } from './mode-names'
 import { provideLayerTreeUI } from './ui'
 import type { LayerTreeUI } from './ui'
+import { createTextMeasure, rowsOverflow } from './width'
 
 const { panels } = useI18n()
 
@@ -55,14 +64,16 @@ defineOptions({ inheritAttrs: false })
 
 const { ui } = defineProps<{ ui?: LayerTreeUI }>()
 
-const INDENT = 16
 const attrs = useAttrs()
 const styles = tv(layerTreeTheme)()
 provideLayerTreeUI(() => ui)
 const store = useEditorStore()
 const viewport = useTemplateRef<HTMLElement>('viewport')
+const root = useTemplateRef<InstanceType<typeof LayerTreeRoot>>('root')
 /** How far the rows are scrolled, for the pinned top-level row. */
 const { y: scrollTop } = useScroll(viewport)
+const { width: viewportWidth } = useElementSize(viewport)
+const measureText = createTextMeasure()
 const rename = useInlineRename((id, name) => store.renameNode(id, name))
 
 const renameControls = {
@@ -146,18 +157,76 @@ function chrome(scope: Omit<LayerTreeSlotScope, 'actions'>) {
     instruction: scope.instruction,
     instructionTargetId: scope.instructionTargetId,
     focused: scope.focused,
-    indent: INDENT
+    indent: LAYER_TREE_INDENT
   }
 }
 
 /**
+ * The rows' width, wider than the list for the widest row's whole name. It goes on the
+ * virtualizer's own element, over its `width: 100%`; its rows fill it, and a wider block runs past
+ * the list's end, so the list scrolls sideways. The rows are reactive, so a rename or a new mode
+ * badge widens it, while other renders reuse it.
+ */
+const rowsWidth = computed(() => {
+  const el = viewport.value
+  // The list sets the rows' text size, so its font is the names' font.
+  const style = el ? getComputedStyle(el) : null
+  const overflow = rowsOverflow(
+    root.value?.visibleRows ?? [],
+    {
+      font: style?.font ?? '',
+      badgeFont: style
+        ? `${style.fontWeight} ${LAYER_TREE_BADGE_TEXT_SIZE}px ${style.fontFamily}`
+        : '',
+      indent: LAYER_TREE_INDENT,
+      nameStart: LAYER_TREE_NAME_START,
+      buttons: LAYER_TREE_BUTTONS,
+      badge: LAYER_TREE_BADGE,
+      viewportWidth: viewportWidth.value
+    },
+    { modeNames: (row) => layerModeNames(store.graph, row.node.modeIds) },
+    measureText
+  )
+  return `calc(100% + ${overflow}px)`
+})
+
+/**
+ * The sideways scroll that shows a row with one level of its parent's indent before it, as
+ * Figma's layers panel does when a layer is selected; top two levels need none.
+ */
+function inlineScroll(level: number): number {
+  return Math.max(0, level - 2) * LAYER_TREE_INDENT
+}
+
+/**
+ * The sideways scroll a reveal asked for until the rows are wide enough to take it: a reveal can
+ * run before `rowsWidth` reaches the rows, when the list still has nowhere to scroll.
+ */
+const pendingInline = ref<number | null>(null)
+
+function applyInline(): void {
+  const el = viewport.value
+  if (!el || pendingInline.value === null) return
+  const desired = pendingInline.value
+  if (desired > 0 && el.scrollWidth <= el.clientWidth) return
+  el.scrollLeft = getComputedStyle(el).direction === 'rtl' ? -desired : desired
+  pendingInline.value = null
+}
+
+watch(rowsWidth, applyInline)
+
+/**
  * Bring a row into view. A nested row stops below the top-level row pinned over the top of the
- * list, so the pin never covers it; rows are one height, so their place is exact.
+ * list, so the pin never covers it; rows are one height, so their place is exact. Sideways, the
+ * list scrolls to the row's depth, so a deep layer's name shows instead of shrinking away.
  */
 function revealRow(rows: readonly LayerRow[], index: number) {
   const el = viewport.value
   const row = rows.at(index)
   if (!el || !row) return
+  // Mirrored, the start edge is on the right and sideways scroll runs negative from it.
+  pendingInline.value = inlineScroll(row.level)
+  applyInline()
   // A layer showing as the pinned row is in view already, so selecting it keeps the list still.
   if (stickyTopLevelRow(rows, el.scrollTop, LAYER_TREE_ROW_HEIGHT)?.index === index) return
   const top = index * LAYER_TREE_ROW_HEIGHT
@@ -197,13 +266,19 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
 </script>
 
 <template>
-  <LayerTreeRoot v-slot="scope" :indent-per-level="INDENT" multiple :aria-label="panels.layers">
+  <LayerTreeRoot
+    ref="root"
+    v-slot="scope"
+    :indent-per-level="LAYER_TREE_INDENT"
+    multiple
+    :aria-label="panels.layers"
+  >
     <ContextMenuRoot :modal="false">
       <!-- The trigger covers the pinned row too, so right-clicking it opens the layer menu. -->
       <ContextMenuTrigger as-child @contextmenu="onLayerRightClick">
         <div
           v-bind="attrs"
-          class="relative min-h-0 flex-1 overflow-hidden"
+          class="relative min-h-0 flex-1 overflow-hidden px-2"
           @focusin="scope.actions.setFocused(true)"
           @focusout="onFocusOut($event, scope.actions)"
         >
@@ -215,6 +290,7 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
           >
             <TreeVirtualizer
               v-slot="{ item, virtualizer }"
+              :style="{ minWidth: rowsWidth }"
               :estimate-size="LAYER_TREE_ROW_HEIGHT"
               :text-content="layerTextContent"
             >

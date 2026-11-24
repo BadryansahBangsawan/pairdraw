@@ -1,6 +1,14 @@
+import { mapValues, pickBy } from 'es-toolkit/object'
+import { isEmptyObject } from 'es-toolkit/predicate'
 import * as v from 'valibot'
 
-import type { BlendMode, Fill, GradientTransform, ImageScaleMode } from '@pairdraw/scene-graph'
+import type {
+  BlendMode,
+  Fill,
+  GradientTransform,
+  ImageFilters as SceneImageFilters,
+  ImageScaleMode
+} from '@pairdraw/scene-graph'
 import { BLACK } from '@pairdraw/scene-graph/constants'
 import { gradientTransformRows, IDENTITY_GRADIENT_TRANSFORM } from '@pairdraw/scene-graph/gradient'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
@@ -34,13 +42,10 @@ const GRADIENT_TYPES = [
 
 const SCALE_MODES = ['FILL', 'FIT', 'CROP', 'TILE'] as const satisfies readonly ImageScaleMode[]
 
-type ImageFilters = Record<
-  'exposure' | 'contrast' | 'saturation' | 'temperature' | 'tint' | 'highlights' | 'shadows',
-  number
->
+type ImageFilters = Required<SceneImageFilters>
 
-/** Pairdraw keeps no image filters; Figma reads every slider at 0 until one moves. */
-const NO_FILTERS: ImageFilters = {
+/** Figma reads every slider a paint or a script leaves out at 0. */
+const UNADJUSTED_FILTERS: ImageFilters = {
   exposure: 0,
   contrast: 0,
   saturation: 0,
@@ -300,6 +305,15 @@ function sceneTransform(
   return { m00, m01, m02, m10, m11, m12 }
 }
 
+function sceneFilters(filters: Partial<ImageFilters> | undefined): Pick<Fill, 'filters'> {
+  const moved = pickBy(filters ?? {}, Boolean)
+  return isEmptyObject(moved) ? {} : { filters: moved }
+}
+
+function figmaFilters(filters: SceneImageFilters | undefined): ImageFilters {
+  return mapValues(UNADJUSTED_FILTERS, (unadjusted, slider) => filters?.[slider] ?? unadjusted)
+}
+
 function sceneFill(paint: ParsedPaint, site: PaintSite): Fill {
   const base = {
     visible: paint.visible ?? true,
@@ -325,7 +339,8 @@ function sceneFill(paint: ParsedPaint, site: PaintSite): Fill {
       ...(hash !== null && { imageHash: hash }),
       ...(imageTransform && { imageTransform }),
       ...(paint.rotation !== undefined && { imageRotation: paint.rotation }),
-      ...(paint.scalingFactor !== undefined && { scale: paint.scalingFactor })
+      ...(paint.scalingFactor !== undefined && { scale: paint.scalingFactor }),
+      ...sceneFilters(paint.filters)
     }
   }
   return {
@@ -377,7 +392,7 @@ function figmaMediaPaint(paint: Fill, type: 'IMAGE' | 'VIDEO', base: ReadBase): 
     scaleMode,
     scalingFactor: scaleMode === 'TILE' ? (paint.scale ?? 1) : 1,
     ...(!crop && { rotation: paint.imageRotation ?? 0 }),
-    filters: { ...NO_FILTERS }
+    filters: figmaFilters(paint.filters)
   }
   const transform = rows(crop ? paint.imageTransform : undefined)
   const hash = paint.imageHash ?? null

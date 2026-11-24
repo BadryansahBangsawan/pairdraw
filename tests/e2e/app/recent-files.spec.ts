@@ -1,5 +1,4 @@
 import { expect, test } from '#tests/e2e/fixtures'
-
 import { waitForAppBoot } from '#tests/helpers/boot'
 
 // Each test here boots the app itself, and a cold dev server gets thirty seconds for the first

@@ -45,9 +45,9 @@ async function expectOpenedDocument(page: Page, name: string) {
           const store = window.pairdraw?.getStore?.()
           return Boolean(
             store &&
-              store.state.documentName === expected &&
-              store.graph.nodes.size > 0 &&
-              !store.state.preparation
+            store.state.documentName === expected &&
+            store.graph.nodes.size > 0 &&
+            !store.state.preparation
           )
         }, name),
       { timeout: 30_000 }

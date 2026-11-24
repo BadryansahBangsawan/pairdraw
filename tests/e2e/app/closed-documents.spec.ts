@@ -32,9 +32,9 @@ async function openFixtureInNewTab(page: Page) {
           const tab = tabs.getTabsSnapshot().find((entry) => entry.id === tabId)
           return Boolean(
             tab &&
-              tabs.getActiveTabId() === tabId &&
-              tab.store.graph.nodes.size > 100 &&
-              !tab.store.state.preparation
+            tabs.getActiveTabId() === tabId &&
+            tab.store.graph.nodes.size > 100 &&
+            !tab.store.state.preparation
           )
         }, openedTabId),
       { timeout: 30_000 }

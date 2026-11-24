@@ -11,8 +11,8 @@ export async function waitForDemo(page: Page) {
       const store = window.pairdraw?.getStore?.()
       return Boolean(
         store?.graph.getNode(store.state.currentPageId)?.name === 'Tour' &&
-          store.graph.nodes.size > 0 &&
-          !store.state.preparation
+        store.graph.nodes.size > 0 &&
+        !store.state.preparation
       )
     },
     undefined,

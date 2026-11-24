@@ -3,7 +3,7 @@ import { basename, dirname, extname, join, resolve } from 'node:path'
 import { toUint8Array } from 'js-base64'
 
 import type { PageCLIArgs } from '#cli/app/target'
-import { dim, printError } from '#cli/format'
+import { dim, printError, warn } from '#cli/format'
 import { outputBesideInput } from '#cli/options'
 import { runToolData } from '#cli/tool-data'
 
@@ -36,6 +36,7 @@ interface VideoResult {
   frameCount: number
   loops: boolean
   truncated: boolean
+  skippedClicks: { at: number; node: string }[]
   steps: { at: number; frame: string; trigger: string; transition: string }[]
 }
 
@@ -89,6 +90,12 @@ export async function exportVideo(format: string, args: VideoExportArgs): Promis
   const video = result as VideoResult
   if (video.error) fail(video.error)
   if (!video.base64) fail('The recording returned no file.')
+
+  for (const click of video.skippedClicks) {
+    console.error(
+      warn(`The click at ${click.at.toFixed(2)} s on '${click.node}' did not run in the recording`)
+    )
+  }
 
   const output = args.file
     ? outputBesideInput(

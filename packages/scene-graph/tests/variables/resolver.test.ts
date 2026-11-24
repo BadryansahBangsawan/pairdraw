@@ -2,8 +2,17 @@ import { expect, test } from 'bun:test'
 
 import { SceneGraph, type VariableValue } from '@pairdraw/scene-graph'
 import {
+  collectionsResolving,
   createVariableResolver,
+  getActiveModeId,
+  getNodeExplicitVariableModeId,
+  getNodeVariableModeId,
   parseVariableFormula,
+  resolveNumberVariable,
+  resolveVariable,
+  resolveVariableForNode,
+  resolveVariableInModes,
+  resolvedVariableModes,
   VariableResolutionError
 } from '@pairdraw/scene-graph/variables'
 
@@ -200,4 +209,108 @@ test('readers keep separate caches per node and mode', () => {
   expect(resolver.forNode(two.id).number(gap.id)).toBe(40)
   expect(resolver.forNode(one.id).number(gap.id)).toBe(8)
   expect(createVariableResolver(graph).forNode(two.id).number(gap.id)).toBe(40)
+})
+
+test('a mode id from another collection falls back to the collection active mode', () => {
+  const { graph, colors, spacing, red, gap } = setup()
+  graph.addMode(spacing.id, 'roomy', 'Roomy')
+  gap.valuesByMode.roomy = 24
+  red.valuesByMode.dark = { r: 0, g: 0, b: 1, a: 1 }
+  graph.setActiveMode(colors.id, 'dark')
+  // A caller that mixes the collections up. `roomy` is Spacing's mode, so it says nothing about
+  // Colors: the reader keeps Colors' active mode instead of silently reading its default mode.
+  const reader = createVariableResolver(graph).forMode(colors.id, 'roomy')
+  expect(reader.color(red.id)).toEqual({ r: 0, g: 0, b: 1, a: 1 })
+  expect(reader.resolve(red.id)).toEqual({ r: 0, g: 0, b: 1, a: 1 })
+
+  // Spacing owns that mode id, but the reader named Colors, so Spacing stays on its active mode.
+  expect(reader.number(gap.id)).toBe(8)
+})
+
+test('an explicit mode applies to its own collection, and an alias keeps the target collection active', () => {
+  const { graph, colors, spacing, red } = setup()
+  red.valuesByMode.dark = { r: 0, g: 0, b: 1, a: 1 }
+  graph.addMode(spacing.id, 'roomy', 'Roomy')
+  graph.setActiveMode(spacing.id, 'roomy')
+  const alias = graph.createVariable('Alias', 'COLOR', spacing.id, { aliasId: red.id })
+  alias.valuesByMode.roomy = { aliasId: red.id }
+
+  // The alias starts in Spacing, so Colors is read in its own active mode, not in Spacing's.
+  expect(createVariableResolver(graph).forMode(spacing.id, 'roomy').color(alias.id)).toEqual({
+    r: 1,
+    g: 0,
+    b: 0,
+    a: 1
+  })
+  // Naming Colors' mode reaches the alias through the same collection-keyed lookup.
+  expect(createVariableResolver(graph).forMode(colors.id, 'dark').color(alias.id)).toEqual({
+    r: 0,
+    g: 0,
+    b: 1,
+    a: 1
+  })
+})
+
+test('the resolver answers what the old exports answer', () => {
+  const { graph, colors, spacing, red, gap, label, shown } = setup()
+  red.valuesByMode.dark = { r: 0, g: 0, b: 1, a: 1 }
+  gap.valuesByMode.dark = 12
+  const derived = graph.createVariable('Derived', 'FLOAT', spacing.id, 0)
+  derived.valuesByMode[spacing.defaultModeId] = parseVariableFormula(
+    graph,
+    derived.id,
+    spacing.defaultModeId,
+    '{Gap} / 2'
+  ).value
+  const frame = graph.createNode('FRAME', graph.getPages()[0].id, {
+    variableModes: { [colors.id]: 'dark' }
+  })
+  const child = graph.createNode('RECTANGLE', frame.id)
+  const resolver = createVariableResolver(graph)
+  const readerModeFor = (collectionId: string) => getActiveModeId(graph, collectionId)
+
+  // Values: every literal type, a formula, and a per-node mode, active and default fallbacks.
+  for (const id of [red.id, gap.id, label.id, shown.id, derived.id]) {
+    expect(resolver.active().value(id)).toEqual(resolveVariable(graph, id))
+    expect(resolver.forNode(child.id).value(id)).toEqual(resolveVariableForNode(graph, child.id, id))
+    expect(resolver.forNode(child.id, 'default').value(id)).toEqual(
+      resolveVariableForNode(graph, child.id, id, 'default')
+    )
+  }
+  expect(resolver.active().number(derived.id)).toBe(resolveNumberVariable(graph, derived.id))
+
+  // Modes and dependencies.
+  expect(resolver.activeMode(colors.id)).toBe(getActiveModeId(graph, colors.id))
+  expect(resolver.modeFor(child.id, colors.id)).toBe(
+    getNodeVariableModeId(graph, child.id, colors.id)
+  )
+  expect(resolver.modeFor(child.id, spacing.id, 'default')).toBe(
+    getNodeVariableModeId(graph, child.id, spacing.id, 'default')
+  )
+  expect(resolver.explicitModeFor(child.id, colors.id)).toBe(
+    getNodeExplicitVariableModeId(graph, child.id, colors.id)
+  )
+  expect(resolver.modesFor(child.id)).toEqual(resolvedVariableModes(graph, child.id))
+  expect(resolver.dependencies([derived.id])).toEqual(collectionsResolving(graph, [derived.id]))
+
+  // Strict failures: the same code and message as the walker the resolver replaced.
+  const cycleA = graph.createVariable('CycleA', 'FLOAT', spacing.id, 0)
+  const cycleB = graph.createVariable('CycleB', 'FLOAT', spacing.id, 0)
+  cycleA.valuesByMode[spacing.defaultModeId] = { aliasId: cycleB.id }
+  cycleB.valuesByMode[spacing.defaultModeId] = { aliasId: cycleA.id }
+  const failure = (run: () => unknown) => {
+    try {
+      run()
+      return null
+    } catch (error) {
+      const resolution = error as VariableResolutionError
+      return { code: resolution.code, message: resolution.message }
+    }
+  }
+  expect(
+    failure(() => createVariableResolver(graph).active().resolve(cycleA.id))
+  ).toEqual(failure(() => resolveVariableInModes(graph, cycleA.id, readerModeFor)))
+  expect(failure(() => createVariableResolver(graph).active().resolve('missing'))).toEqual(
+    failure(() => resolveVariableInModes(graph, 'missing', readerModeFor))
+  )
 })

@@ -29,6 +29,10 @@ export interface VariableReader {
 export interface VariableResolver {
   forNode(nodeId: string, fallback?: VariableModeFallback): VariableReader
   active(): VariableReader
+  /**
+   * The collection's `modeId`, with every other collection in its active mode. A mode id from
+   * another collection is not an explicit mode here, so the collection keeps its active one.
+   */
   forMode(collectionId: string, modeId: string): VariableReader
   forModes(modeFor: (collectionId: string) => string): VariableReader
 
@@ -46,6 +50,12 @@ export interface VariableResolverOptions {
 
 function isColor(value: VariableLiteral): value is Color {
   return typeof value === 'object' && 'r' in value
+}
+
+/** Whether `modeId` names one of the collection's own modes. */
+function collectionHasMode(graph: SceneGraph, collectionId: string, modeId: string): boolean {
+  const collection = graph.variableCollections.get(collectionId)
+  return collection?.modes.some((mode) => mode.modeId === modeId) ?? false
 }
 
 function reader(
@@ -145,12 +155,13 @@ export function createVariableResolver(
       return cached('active', () => reader(graph, (id) => getActiveModeId(graph, id), overrides))
     },
     forMode(collectionId, modeId) {
-      return cached(JSON.stringify(['mode', collectionId, modeId]), () =>
-        reader(
-          graph,
-          (id) => (id === collectionId ? modeId : getActiveModeId(graph, id)),
-          overrides
-        )
+      // A mode id is scoped to its collection, so one from another collection selects nothing:
+      // it means "no explicit mode" for this collection, not that collection's default mode.
+      const mode = collectionHasMode(graph, collectionId, modeId)
+        ? modeId
+        : getActiveModeId(graph, collectionId)
+      return cached(JSON.stringify(['mode', collectionId, mode]), () =>
+        reader(graph, (id) => (id === collectionId ? mode : getActiveModeId(graph, id)), overrides)
       )
     },
     forModes(modeFor) {

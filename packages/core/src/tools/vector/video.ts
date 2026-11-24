@@ -212,6 +212,10 @@ export const exportVideo = defineTool({
       frameCount,
       loops: timeline.loops,
       truncated: timeline.truncated,
+      skippedClicks: timeline.skippedClicks.map((click) => ({
+        at: seconds(click.atMs),
+        node: graph.getNode(click.nodeId)?.name ?? click.nodeId
+      })),
       steps: timeline.steps.map((step) => ({
         at: seconds(step.atMs),
         frame: graph.getNode(step.frameId)?.name ?? step.frameId,

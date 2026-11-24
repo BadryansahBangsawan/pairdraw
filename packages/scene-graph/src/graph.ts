@@ -19,6 +19,7 @@ import { bindNodeEvents } from './events'
 import { TRANSFORM_FIELDS } from './fields/geometry'
 import { LAYOUT_AFFECTING_KEYS } from './fields/layout'
 import { withGeneratedFrameSize } from './generated'
+import { gridLayoutChanges } from './grid-values'
 import * as HitTest from './hit-test'
 import { generateId } from './ids'
 import * as Instances from './instances'
@@ -498,7 +499,7 @@ export class SceneGraph {
     const node = createDefaultNode(
       () => this.generateEntityId(),
       type,
-      pageLayoutOverrides(type, overrides)
+      pageLayoutOverrides(type, gridLayoutChanges(overrides))
     )
     Object.assign(node, strokeLineChanges(node, overrides))
     this.willChangeNode(parent)
@@ -517,7 +518,11 @@ export class SceneGraph {
     if (parentId === id) throw new Error(`Node "${id}" cannot be its own parent`)
     const parent = parentId === null ? undefined : this.nodes.get(parentId)
     if (parentId !== null && !parent) throw new Error(`Parent "${parentId}" does not exist`)
-    const node = createDefaultNode(() => id, type, pageLayoutOverrides(type, overrides))
+    const node = createDefaultNode(
+      () => id,
+      type,
+      pageLayoutOverrides(type, gridLayoutChanges(overrides))
+    )
     // `overrides` may be another node's snapshot, ID included.
     node.id = id
     if (parent && !parent.childIds.includes(id)) {
@@ -671,7 +676,7 @@ export class SceneGraph {
 
     const node = this.nodes.get(id)
     if (!node) return
-    const given = finiteGeometry(omitBy(changes, isUndefined))
+    const given = gridLayoutChanges(finiteGeometry(omitBy(changes, isUndefined)))
     assertPageLayout(node, given)
     this.applyNodeChanges(node, this.impliedChanges(node, given))
   }

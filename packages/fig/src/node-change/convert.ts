@@ -100,6 +100,7 @@ import type {
   VariantPropSpec,
   VariableModeMap
 } from '@pairdraw/scene-graph'
+import { gridLayoutChanges } from '@pairdraw/scene-graph/grid-values'
 import type { Vector, GUID } from '@pairdraw/scene-graph/primitives'
 
 import { savedFace } from './font/style'
@@ -234,12 +235,12 @@ function convertGridLayout(nc: NodeChange): Partial<SceneNode> {
   if (stackMode !== 'GRID') return {}
   const rows = orderedGridTracks(nc.gridRows)
   const columns = orderedGridTracks(nc.gridColumns)
-  return {
+  return gridLayoutChanges({
     gridTemplateRows: rows.map((track) => convertGridTrack(track.id, nc.gridRowsSizing)),
     gridTemplateColumns: columns.map((track) => convertGridTrack(track.id, nc.gridColumnsSizing)),
     gridRowGap: nc.gridRowGap ?? 0,
     gridColumnGap: nc.gridColumnGap ?? 0
-  }
+  })
 }
 
 interface GridFrameRecord {

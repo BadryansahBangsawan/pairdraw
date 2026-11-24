@@ -69,6 +69,8 @@ export interface TimelineStep {
 export interface Timeline {
   segments: TimelineSegment[]
   durationMs: number
+  /** Clicks the walk never ran: past the cap, or on a layer whose hit runs no reaction. */
+  skippedClicks: TimelineClick[]
   /** Play came back to the screen it started on, so the clip repeats seamlessly. */
   loops: boolean
   /** The flow went on past `maxMs`, where the timeline stops. */
@@ -224,6 +226,7 @@ function startWalk(graph: SceneGraph, options: TimelineOptions): { walk: Walk; s
     timers: armTimers(graph, session, 0),
     clicks: (options.clicks ?? []).toSorted((a, b) => a.atMs - b.atMs),
     clickIndex: 0,
+    skippedClicks: [],
     segments: [],
     steps: [],
     overlayPositions: {}
@@ -246,6 +249,7 @@ interface Walk {
   timers: ArmedTimer[]
   clicks: TimelineClick[]
   clickIndex: number
+  skippedClicks: TimelineClick[]
   segments: TimelineSegment[]
   steps: TimelineStep[]
   overlayPositions: Record<string, PrototypeOverlayPositionType>
@@ -275,6 +279,7 @@ function takeNextEvent(walk: Walk): WalkEvent | null {
   if (!click) return null
   const action = clickAction(walk.graph, walk.session, click, walk.clickIndex)
   walk.clickIndex += 1
+  if (!action) walk.skippedClicks.push(click)
   return { atMs: click.atMs, action, trigger: 'ON_CLICK' }
 }
 
@@ -328,7 +333,8 @@ function finish(walk: Walk, durationMs: number, end: 'ends' | 'loops' | 'truncat
     loops: end === 'loops',
     truncated: end === 'truncated',
     steps: walk.steps,
-    overlayPositions: walk.overlayPositions
+    overlayPositions: walk.overlayPositions,
+    skippedClicks: [...walk.skippedClicks, ...walk.clicks.slice(walk.clickIndex)]
   }
 }
 

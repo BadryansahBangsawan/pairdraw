@@ -412,3 +412,57 @@ describe('steps a timeline takes', () => {
     expect('mix' in quarter ? quarter.mix : null).toBeCloseTo(0.378138, 5)
   })
 })
+
+describe('clicks a recording never reaches', () => {
+  test('names the click past the cap and one that hits nothing', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    const button = graph.createNode('FRAME', a, {
+      name: 'Buy',
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 40
+    })
+    const plain = graph.createNode('RECTANGLE', a, {
+      name: 'Plain',
+      x: 120,
+      y: 10,
+      width: 80,
+      height: 40
+    })
+    react(graph, button.id, onClick(goTo(b)))
+
+    const timeline = planTimeline(graph, {
+      startFrameId: a,
+      clicks: [
+        { atMs: 200, nodeId: plain.id },
+        { atMs: 5000, nodeId: button.id }
+      ],
+      maxMs: 1000,
+      tailMs: TAIL_MS
+    })
+
+    expect(timeline.truncated).toBe(true)
+    expect(timeline.skippedClicks).toEqual([
+      { atMs: 200, nodeId: plain.id },
+      { atMs: 5000, nodeId: button.id }
+    ])
+  })
+
+  test('reports nothing when every click runs', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    const button = graph.createNode('RECTANGLE', a, { name: 'Go', width: 20, height: 20 })
+    react(graph, button.id, onClick(goTo(b)))
+
+    const timeline = planTimeline(graph, {
+      startFrameId: a,
+      clicks: [{ atMs: 400, nodeId: button.id }],
+      maxMs: 5000,
+      tailMs: TAIL_MS
+    })
+
+    expect(timeline.skippedClicks).toEqual([])
+  })
+})

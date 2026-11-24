@@ -200,7 +200,13 @@
       "import": "./dist/guides.js",
       "default": "./dist/guides.js"
     },
-    "./hit-test": {
+    "./grid-values": {
+      "types": "./dist/grid-values.d.ts",
+      "bun": "./src/grid-values.ts",
+      "import": "./dist/grid-values.js",
+      "default": "./dist/grid-values.js"
+    },
+  "./hit-test": {
       "types": "./dist/hit-test.d.ts",
       "bun": "./src/hit-test.ts",
       "import": "./dist/hit-test.js",

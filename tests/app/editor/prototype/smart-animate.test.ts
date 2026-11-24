@@ -9,11 +9,11 @@ import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import { usePlayScenes } from '@/app/editor/prototype/scenes'
 import { usePlaySmartAnimate } from '@/app/editor/prototype/smart-animate'
 import { createEditorStore } from '@/app/editor/session'
-import { animationsEnabled } from '@/app/shell/motion'
 import {
   updateAnimationPreference,
   updateRenderingPreferences
 } from '@/app/settings/preferences/store'
+import { animationsEnabled } from '@/app/shell/motion'
 
 /** Two screens whose Card moves, so a Smart animate has something to draw. */
 function screens() {
@@ -131,7 +131,12 @@ describe('play Smart animate on the display', () => {
     const set = graph.createNode('COMPONENT_SET', pageId, { y: 400 })
     const off = graph.createNode('COMPONENT', set.id, { name: 'State=Off', width: 40, height: 20 })
     graph.createNode('RECTANGLE', off.id, { name: 'Knob', x: 0, width: 20, height: 20 })
-    const on = graph.createNode('COMPONENT', set.id, { name: 'State=On', x: 60, width: 40, height: 20 })
+    const on = graph.createNode('COMPONENT', set.id, {
+      name: 'State=On',
+      x: 60,
+      width: 40,
+      height: 20
+    })
     graph.createNode('RECTANGLE', on.id, { name: 'Knob', x: 20, width: 20, height: 20 })
     const screen = graph.createNode('FRAME', pageId, { width: 100, height: 100 })
     const instance = graph.createInstance(off.id, screen.id)
@@ -141,10 +146,15 @@ describe('play Smart animate on the display', () => {
     const scope = effectScope()
     const wired = scope.run(() => {
       const smart = usePlaySmartAnimate(store)
-      const play = usePlayScenes(store, session, computed(() => ({ revision: 0 })), {
-        onAnimation: (animation, ms) => smart.start(animation, ms),
-        onAnimationStopped: () => smart.stop()
-      })
+      const play = usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 })),
+        {
+          onAnimation: (animation, ms) => smart.start(animation, ms),
+          onAnimationStopped: () => smart.stop()
+        }
+      )
       return { play, views: () => smart.views(play.views()) }
     })
     if (!wired) throw new Error('no wiring')

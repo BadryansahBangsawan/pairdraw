@@ -15,8 +15,9 @@ const reactionsInputSchema = v.pipe(
       "'EASE_IN' | 'EASE_IN_AND_OUT' | 'LINEAR' } }, overlayRelativePosition?: 'CENTER' | ... } | " +
       "{ type: 'BACK' } | { type: 'CLOSE' }] }]. NAVIGATE and OVERLAY point at a top-level frame " +
       'on the same page; CHANGE_TO at another variant of the set the layer is a variant of, an ' +
-      'instance of, or inside (set it once on the main component variant and every instance ' +
-      "gets it); SCROLL_TO at a layer in the layer's top-level frame. ON_HOVER and ON_PRESS undo " +
+      'instance of, or inside (set it once on the main component variant and every instance gets ' +
+      'it), named by destinationId or by variantProperties such as { State: "Hover" }; SCROLL_TO ' +
+      "at a layer in the layer's top-level frame. ON_HOVER and ON_PRESS undo " +
       'their action when the pointer leaves or lifts. SMART_ANIMATE moves the layers two frames or ' +
       'variants share by name and place, and fades the rest; easing defaults to EASE_OUT.'
   )

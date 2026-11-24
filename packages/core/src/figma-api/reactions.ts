@@ -14,6 +14,7 @@ import type {
 } from '@pairdraw/scene-graph'
 import { variantSetsAround } from '@pairdraw/scene-graph/components'
 import { PROTOTYPE_EASINGS } from '@pairdraw/scene-graph/constants'
+import { parseVariantName } from '@pairdraw/scene-graph/variant-name'
 
 import { issuePath } from '#core/figma-api/effects'
 import { asInstanceEdit, sameReaction } from '#core/prototype/reactions'
@@ -60,17 +61,31 @@ const transitionSchema = v.strictObject({
   easing: v.optional(easingSchema)
 })
 
+/** A variant's values for its set's properties, as `{ State: 'Hover', Size: 'Large' }`. */
+const variantPropertiesSchema = v.pipe(
+  v.record(v.string(), v.string()),
+  v.minEntries(1),
+  v.description(
+    "CHANGE_TO: the values of the variant to change to, in the layer's nearest component set, " +
+      'such as { State: "Hover" }. Resolved to the variant, so get_reactions reads it back as ' +
+      'a destinationId.'
+  )
+)
+
 const nodeActionSchema = v.strictObject({
   type: v.literal('NODE'),
-  destinationId: v.pipe(
-    v.string(),
-    v.minLength(1),
-    v.description(
-      'NAVIGATE/OVERLAY: a top-level frame on the page; CHANGE_TO: a variant of the set the ' +
-        "layer is a variant of, an instance of, or inside; SCROLL_TO: a layer in the layer's " +
-        'top-level frame.'
+  destinationId: v.optional(
+    v.pipe(
+      v.string(),
+      v.minLength(1),
+      v.description(
+        'NAVIGATE/OVERLAY: a top-level frame on the page; CHANGE_TO: a variant of the set the ' +
+          "layer is a variant of, an instance of, or inside; SCROLL_TO: a layer in the layer's " +
+          'top-level frame. Omit only for CHANGE_TO, and name the variant with variantProperties.'
+      )
     )
   ),
+  variantProperties: v.optional(variantPropertiesSchema),
   navigation: v.picklist([
     'NAVIGATE',
     'OVERLAY',
@@ -211,15 +226,74 @@ function toAction(
   reactionIndex: number
 ): PrototypeAction {
   if (action.type !== 'NODE') return { type: action.type }
-  assertDestination(action, context, reactionIndex)
+  const destinationId = resolveDestinationId(action, context, reactionIndex)
+  assertDestination({ ...action, destinationId }, context, reactionIndex)
   return {
     type: 'NODE',
-    nodeId: action.destinationId,
+    nodeId: destinationId,
     navigation: action.navigation,
     transition: fromFigmaTransition(action.transition),
     // Only an overlay uses the spot; Figma keeps CENTER on a navigation.
     overlayPosition: action.navigation === 'OVERLAY' ? action.overlayRelativePosition : 'CENTER'
   }
+}
+
+/**
+ * The layer a NODE action points at: its `destinationId`, or for a Change to, the variant of the
+ * layer's set whose `variantProperties` it names.
+ */
+function resolveDestinationId(
+  action: v.InferOutput<typeof nodeActionSchema>,
+  context: ReactionContext,
+  index: number
+): string {
+  const at = `reactions[${index}]`
+  const { destinationId, variantProperties, navigation } = action
+  if (destinationId && variantProperties) {
+    throw failure(`${at} names both destinationId and variantProperties; give one`)
+  }
+  if (variantProperties) {
+    if (navigation !== 'CHANGE_TO') {
+      throw failure(`${at}: variantProperties is for CHANGE_TO only, not ${navigation}`)
+    }
+    return variantByProperties(variantProperties, context, at)
+  }
+  if (!destinationId) {
+    throw failure(
+      navigation === 'CHANGE_TO'
+        ? `${at} must name the variant it Changes to, in destinationId or variantProperties`
+        : `${at} must name the layer it goes to, in destinationId`
+    )
+  }
+  return destinationId
+}
+
+/** The id of the variant of the sets around the layer whose properties are `properties`. */
+function variantByProperties(
+  properties: Record<string, string>,
+  context: ReactionContext,
+  at: string
+): string {
+  const sets = variantSetsAround(context.graph, context.nodeId)
+  const nearest = sets.at(0)
+  if (!nearest) {
+    throw failure(
+      `${at}: only a variant, an instance of one, or a layer inside one can Change to another variant`
+    )
+  }
+  for (const set of sets) {
+    for (const child of context.graph.getChildren(set.id)) {
+      if (child.type !== 'COMPONENT') continue
+      const values = { ...parseVariantName(child.name), ...child.componentPropertyValues }
+      if (Object.entries(properties).every(([name, value]) => values[name] === value)) {
+        return child.id
+      }
+    }
+  }
+  const wanted = Object.entries(properties)
+    .map(([name, value]) => `${name}=${value}`)
+    .join(', ')
+  throw failure(`${at}: no variant of ${nearest.name} with ${wanted}`)
 }
 
 function failure(message: string): Error {
@@ -232,7 +306,7 @@ function failure(message: string): Error {
  * top-level frame.
  */
 function assertDestination(
-  action: v.InferOutput<typeof nodeActionSchema>,
+  action: Pick<v.InferOutput<typeof nodeActionSchema>, 'navigation'> & { destinationId: string },
   context: ReactionContext,
   index: number
 ): void {

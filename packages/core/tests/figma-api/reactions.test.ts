@@ -1,8 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
-import { effectiveReactions, reactionAt, startSession } from '@pairdraw/core/prototype'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import {
+  createPlayScenes,
+  effectiveReactions,
+  reactionAt,
+  startSession
+} from '@pairdraw/core/prototype'
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { setReactions } from '#core/tools/modify/reactions'
 import { getReactions } from '#core/tools/read/reactions'
@@ -450,6 +457,101 @@ describe('reactions on layers inside a component', () => {
   })
 })
 
+describe('a Change to named by variant properties', () => {
+  test('resolves the variant of the layer\'s set and reads back its id', () => {
+    const { proxy, graph, off, on } = toggle()
+    Reflect.set(proxy(off.id), 'reactions', [
+      {
+        trigger: { type: 'ON_HOVER' },
+        actions: [{ type: 'NODE', variantProperties: { State: 'On' }, navigation: 'CHANGE_TO' }]
+      }
+    ])
+    expect(graph.getNode(off.id)?.prototypeReactions[0]?.actions[0]).toMatchObject({
+      type: 'NODE',
+      nodeId: on.id,
+      navigation: 'CHANGE_TO'
+    })
+  })
+
+  test('matches a variant whose values are stored, as an imported slash set names them', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { name: 'Tabs' })
+    const off = graph.createNode('COMPONENT', set.id, {
+      name: 'Off',
+      componentPropertyValues: { Variant: 'Off' }
+    })
+    graph.createNode('COMPONENT', set.id, {
+      name: 'On',
+      componentPropertyValues: { Variant: 'On' }
+    })
+    const proxy = new FigmaAPI(graph).getNodeById(off.id)
+    if (!proxy) throw new Error('no variant')
+    Reflect.set(proxy, 'reactions', [
+      {
+        trigger: { type: 'ON_CLICK' },
+        actions: [{ type: 'NODE', variantProperties: { Variant: 'On' }, navigation: 'CHANGE_TO' }]
+      }
+    ])
+    const destination = graph.getNode(off.id)?.prototypeReactions[0]?.actions[0]
+    expect(destination).toMatchObject({ navigation: 'CHANGE_TO' })
+    if (destination?.type !== 'NODE' || !destination.nodeId) throw new Error('no NODE action')
+    expect(graph.getNode(destination.nodeId)?.name).toBe('On')
+  })
+
+  test('refuses properties no variant of the set has', () => {
+    const { proxy, off } = toggle()
+    expect(() => {
+      Reflect.set(proxy(off.id), 'reactions', [
+        {
+          trigger: { type: 'ON_CLICK' },
+          actions: [{ type: 'NODE', variantProperties: { State: 'Pressed' }, navigation: 'CHANGE_TO' }]
+        }
+      ])
+    }).toThrow('no variant of Toggle with State=Pressed')
+  })
+
+  test('refuses variant properties on a navigation that is not Change to', () => {
+    const { proxy, off } = toggle()
+    expect(() => {
+      Reflect.set(proxy(off.id), 'reactions', [
+        {
+          trigger: { type: 'ON_CLICK' },
+          actions: [{ type: 'NODE', variantProperties: { State: 'On' }, navigation: 'NAVIGATE' }]
+        }
+      ])
+    }).toThrow('variantProperties is for CHANGE_TO')
+  })
+
+  test('refuses an action naming both a destination id and variant properties', () => {
+    const { proxy, off, on } = toggle()
+    expect(() => {
+      Reflect.set(proxy(off.id), 'reactions', [
+        {
+          trigger: { type: 'ON_CLICK' },
+          actions: [
+            {
+              type: 'NODE',
+              destinationId: on.id,
+              variantProperties: { State: 'On' },
+              navigation: 'CHANGE_TO'
+            }
+          ]
+        }
+      ])
+    }).toThrow('both destinationId and variantProperties')
+  })
+
+  test('refuses an action that names no destination at all', () => {
+    const { proxy, off } = toggle()
+    expect(() => {
+      Reflect.set(proxy(off.id), 'reactions', [
+        { trigger: { type: 'ON_CLICK' }, actions: [{ type: 'NODE', navigation: 'CHANGE_TO' }] }
+      ])
+    }).toThrow('name the variant it Changes to')
+  })
+})
+
 describe('prototype connection tools', () => {
   test('set_reactions writes what get_reactions reads back', async () => {
     const { figma, details, button } = screen()
@@ -480,6 +582,59 @@ describe('prototype connection tools', () => {
         ]
       })
     ).toThrow('ON_CLICK')
+  })
+
+  test('authors a hover Change to by variant properties, which plays and survives a .fig round trip', async () => {
+    const { graph, figma, screen, instance, off, on } = toggle()
+    const args = parseToolArgs('set_reactions', setReactions.input, {
+      id: instance.id,
+      reactions: [
+        {
+          trigger: { type: 'ON_HOVER' },
+          actions: [
+            {
+              type: 'NODE',
+              variantProperties: { State: 'On' },
+              navigation: 'CHANGE_TO',
+              transition: { type: 'SMART_ANIMATE', duration: 0.3, easing: { type: 'EASE_OUT' } }
+            }
+          ]
+        }
+      ]
+    })
+    const written = await setReactions.execute(figma, args)
+    expect(written).toMatchObject({
+      reactions: [
+        {
+          trigger: { type: 'ON_HOVER' },
+          actions: [{ destinationId: on.id, navigation: 'CHANGE_TO' }]
+        }
+      ]
+    })
+
+    const stored = graph.getNode(instance.id)?.prototypeReactions[0]
+    if (!stored) throw new Error('no reaction')
+    const scenes = createPlayScenes(() => graph)
+    const action = stored.actions[0]
+    const played = scenes.run(startSession(screen.id), {
+      sourceId: instance.id,
+      action,
+      transition: action.type === 'NODE' ? action.transition : null
+    })
+    expect(played.changed).toMatchObject({ instanceId: instance.id, from: off.id, to: on.id })
+    const shown = scenes.graphFor(screen.id).getNode(instance.id)
+    const kept = graph.getNode(instance.id)
+    if (!shown || !kept) throw new Error('no instance')
+    expect(instanceMainComponent(scenes.graphFor(screen.id), shown)?.id).toBe(on.id)
+    expect(instanceMainComponent(graph, kept)?.id).toBe(off.id)
+
+    const reopened = await parseFigFile((await exportFigFile(graph)).slice().buffer, {
+      populate: 'first-page'
+    })
+    expect(reopened.getNode(instance.id)?.prototypeReactions[0]).toMatchObject({
+      trigger: { type: 'ON_HOVER' },
+      actions: [{ nodeId: on.id, navigation: 'CHANGE_TO' }]
+    })
   })
 
   test('set_reactions writes a Change to on a variant, and get_reactions reads it back', async () => {

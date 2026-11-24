@@ -187,7 +187,7 @@ describe('geometry writes after edits', () => {
     expect(badge.x).toBe(150)
   })
 
-  test('edits in another top-level frame leave a layer’s placement lazy', () => {
+  test('a graph read lays out edits in another top-level frame', () => {
     const api = createAPI()
     const other = hugRow(api)
     const grown = api.createRectangle()
@@ -201,8 +201,8 @@ describe('geometry writes after edits', () => {
     void frame.width
     grown.resize(300, 20)
     badge.x = 50
-    // The badge's frame shares only the page with the edit, so nothing laid the other row out.
-    expect(graphOf(api).getNode(other.id)?.width).not.toBe(300)
+    // The read freshens the row the edit grew, even though the badge's frame is elsewhere.
+    expect(graphOf(api).getNode(other.id)?.width).toBe(300)
   })
 
   // Figma desktop, 2026-11-09: rescaling the laid-out button by 2 doubles it and its badge.
@@ -230,8 +230,8 @@ describe('geometry writes after edits', () => {
     row.appendChild(pinned)
     pinned.layoutPositioning = 'ABSOLUTE'
     pinned.x = 300
-    // Nothing has laid the row out yet: it still has the size it was made at.
-    expect(graphOf(api).getNode(row.id)?.width).toBe(100)
+    // The graph read is the first read, so it lays the row out once; the proxy sizes it now.
+    expect(graphOf(api).getNode(row.id)?.width).toBe(40)
     expect(row.width).toBe(40)
   })
 })

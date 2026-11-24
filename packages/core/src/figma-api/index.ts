@@ -26,6 +26,7 @@ import { listFigmaFonts } from './fonts/list'
 import { loadFigmaFont } from './fonts/load'
 import type { FigmaFontNameInput } from './fonts/names'
 import { variationAxisTags } from './fonts/variations'
+import { freshReadGraph } from './fresh-read'
 import * as images from './images'
 import type {
   FigmaBooleanOperationNode,
@@ -45,7 +46,7 @@ import type {
   FigmaVectorNode
 } from './node-types'
 import { startPendingLayout } from './pending-layout'
-import { flushPendingComponentSync, startPendingComponentSync } from './pending-sync'
+import { startPendingComponentSync } from './pending-sync'
 import {
   FigmaNodeProxy,
   INTERNAL_ID,
@@ -122,6 +123,7 @@ export interface FigmaAPIOptions {
 
 export { FigmaNodeProxy } from './proxy'
 export { getPageBackgrounds, setPageBackgrounds } from './page-backgrounds'
+export { freshRead, freshReadGraph } from './fresh-read'
 export { flushPendingLayout } from './pending-layout'
 export { flushPendingComponentSync } from './pending-sync'
 export type { FigmaEffect } from './effects'
@@ -185,6 +187,10 @@ const clientStorage: ClientStorageAPI = {
 }
 
 export class FigmaAPI implements NodeProxyHost {
+  /**
+   * The read-freshening proxy. It is not the raw graph, so an identity check against an editor's
+   * graph goes through `underlyingGraph`; node internals already hold the raw graph.
+   */
   readonly graph: SceneGraph
   private _currentPageId: string
   private _selection: FigmaNodeProxy[] = []
@@ -213,7 +219,7 @@ export class FigmaAPI implements NodeProxyHost {
   #pageSwitch = 0
 
   constructor(graph: SceneGraph, options: FigmaAPIOptions = {}) {
-    this.graph = graph
+    this.graph = freshReadGraph(graph)
     this.#fetch = options.fetch ?? ((input, init) => fetch(input, init))
     if (options.loadPage)
       setPageHost(this, { load: options.loadPage, pageOfNode: options.pageOfNode })
@@ -298,7 +304,6 @@ export class FigmaAPI implements NodeProxyHost {
   }
 
   getNodeById(id: string): FigmaNodeProxy | null {
-    flushPendingComponentSync(this.graph)
     const node = this.graph.getNode(id)
     return node ? this.wrapNode(id) : null
   }

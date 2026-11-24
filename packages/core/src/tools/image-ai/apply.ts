@@ -3,7 +3,6 @@ import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import { computeBounds } from '@pairdraw/scene-graph/geometry'
 
 import { TRANSPARENT } from '#core/constants'
-import { flushPendingLayout } from '#core/figma-api'
 import { storeImage } from '#core/figma-api/images'
 import { DEFAULT_SPACE_GAP, findEmptySpace } from '#core/tools/read/space'
 
@@ -90,7 +89,6 @@ export function placeBesideSiblings(graph: SceneGraph, nodeId: string): void {
   const parent = node?.parentId ? graph.getNode(node.parentId) : undefined
   if (!node || !parent) return
   if (parent.type !== 'CANVAS' && parent.layoutMode !== 'NONE') return
-  flushPendingLayout(graph)
   const obstacles = parent.childIds.flatMap((id) => {
     const sibling = id === nodeId ? undefined : graph.getNode(id)
     return sibling ? [getAxisAlignedBoundsInParent([sibling], parent.id, graph)] : []

@@ -42,6 +42,7 @@ import { installVisualNodeProxyAccessors } from './accessors/visual'
 import { installComponentPropertyAccessors } from './components'
 import { installDevStatusAccessors, type FigmaDevStatusValue } from './dev-status'
 import type { FigmaFontName } from './fonts/names'
+import { underlyingGraph } from './graph-ref'
 import type { FigmaFrameNode, FigmaInstanceNode } from './node-types'
 import { installInstanceOverrideAccessors, type FigmaInstanceOverride } from './overrides'
 import { getPageBackgrounds, setPageBackgrounds } from './page-backgrounds'
@@ -301,7 +302,7 @@ export class FigmaNodeProxy {
 
   constructor(id: string, graph: SceneGraph, api: NodeProxyHost) {
     this[INTERNAL_ID] = id
-    this[INTERNAL_GRAPH] = graph
+    this[INTERNAL_GRAPH] = underlyingGraph(graph)
     this[INTERNAL_API] = api
     const type = graph.getNode(id)?.type
     const internals = { id: INTERNAL_ID, graph: INTERNAL_GRAPH, api: INTERNAL_API }

@@ -1,6 +1,6 @@
 import { basename, resolve } from 'node:path'
 
-import { flushPendingLayout } from '@pairdraw/core/figma-api'
+import { freshRead, flushPendingLayout } from '@pairdraw/core/figma-api'
 import type { ToolDef } from '@pairdraw/core/tools'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -40,10 +40,10 @@ export async function headlessPreview(
   headless: HeadlessToolDocument,
   scale: number
 ): Promise<Uint8Array> {
-  // Edits nothing has read yet are laid out first, as saving lays them out.
-  flushPendingLayout(headless.graph)
   const exportImage = findCLITool(PREVIEW_TOOL)
-  return previewImage(await runHeadlessTool(headless, exportImage, previewArgs(scale)))
+  return freshRead(headless.graph, async () =>
+    previewImage(await runHeadlessTool(headless, exportImage, previewArgs(scale)))
+  )
 }
 
 /**

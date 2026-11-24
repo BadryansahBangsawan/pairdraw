@@ -6,6 +6,8 @@ import {
 
 import { syncComponentsHolding } from '#core/editor/component-sync'
 
+import { underlyingGraph } from './graph-ref'
+
 const syncByGraph = new WeakMap<SceneGraph, () => void>()
 
 /**
@@ -53,7 +55,8 @@ export function startPendingComponentSync(graph: SceneGraph, flush?: () => void)
  * read or written, only when it is in an instance, as only those layers change. Edits inside a
  * component then sync once, when an instance is next read, not once per edit.
  */
-export function flushPendingComponentSync(graph: SceneGraph, layerId?: string): void {
+export function flushPendingComponentSync(source: SceneGraph, layerId?: string): void {
+  const graph = underlyingGraph(source)
   const flush = syncByGraph.get(graph)
   if (!flush) return
   if (layerId !== undefined && !graph.closest(layerId, (node) => node.type === 'INSTANCE')) return

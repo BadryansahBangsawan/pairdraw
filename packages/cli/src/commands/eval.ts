@@ -6,7 +6,7 @@ import * as v from 'valibot'
 
 import { recordDocumentChange } from '@pairdraw/core'
 import { createDesignGuard } from '@pairdraw/core/design-memory'
-import { flushPendingLayout } from '@pairdraw/core/figma-api'
+import { freshRead, flushPendingLayout } from '@pairdraw/core/figma-api'
 import { compileScript } from '@pairdraw/core/tools'
 
 import { isAppMode, requireFile, rpcResponse } from '#cli/app/client'
@@ -144,7 +144,7 @@ export default defineCommand({
     if (preview) {
       const render = async () => {
         // The script's API has no raster export, so a headless one draws the page it left current.
-        const exporter = await createHeadlessFigma(graph)
+        const exporter = await freshRead(graph, () => createHeadlessFigma(graph))
         const page = exporter.getNodeById(figma.currentPageId)
         if (page) exporter.currentPage = page
         return headlessPreview({ graph, figma: exporter }, scale)

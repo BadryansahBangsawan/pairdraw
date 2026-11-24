@@ -4,7 +4,6 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import { applyGraphTransfer, prepareGraphTransfer } from '@pairdraw/scene-graph/transfer'
 
-import { flushPendingLayout } from '#core/figma-api'
 import { prepareSlotInsertion } from '#core/figma-api/slots'
 import { sceneGraphFromStyledHTML } from '#core/io/formats/html/layers'
 import { findPageId } from '#core/io/subgraph'
@@ -62,8 +61,6 @@ export const importHTML = defineTool({
     const bounds = getAxisAlignedBoundsInParent(roots, page.id, source)
     let topLeft = { x: args.x ?? 0, y: args.y ?? 0 }
     if (args.x === undefined || args.y === undefined) {
-      // What an earlier edit changed may not be laid out yet, and the free space depends on it.
-      flushPendingLayout(graph)
       const beside = spaceBesideContent(graph, parentId, bounds)
       topLeft = { x: args.x ?? beside.x, y: args.y ?? beside.y }
     }

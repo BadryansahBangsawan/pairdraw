@@ -5,7 +5,6 @@ import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import { computeBounds } from '@pairdraw/scene-graph/geometry'
 import type { Rect } from '@pairdraw/scene-graph/primitives'
 
-import { flushPendingLayout } from '#core/figma-api'
 import { findPageId } from '#core/io/subgraph'
 import { defineTool, toolNumber } from '#core/tools/schema'
 
@@ -176,7 +175,6 @@ export const findEmptySpaceTool = defineTool({
     if (args.near_id && nearParentId !== parentId) {
       return { error: `Node "${args.near_id}" is not a child of "${parentId}"` }
     }
-    flushPendingLayout(graph)
     const obstacles = childBoxes(graph, parentId)
     const near = args.near_id ? graph.getNode(args.near_id) : undefined
     let anchor = obstacles.length > 0 ? computeBounds(obstacles) : null

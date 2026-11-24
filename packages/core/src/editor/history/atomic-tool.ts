@@ -5,6 +5,7 @@ import type { Editor } from '#core/editor/create'
 import { ReadOnlyDocumentError } from '#core/editor/read-only'
 import { resolveEditorProfile, type EditorProfileInputs } from '#core/editor/views'
 import type { FigmaAPI } from '#core/figma-api'
+import { underlyingGraph } from '#core/figma-api/graph-ref'
 import { isAtomicTool, type ToolDef } from '#core/tools/schema'
 
 import { diffFields, type FieldChanges } from './diff'
@@ -63,10 +64,10 @@ export function executeAtomicTool(
   if (!isAtomicTool(def)) throw new Error(`Not an atomic tool: ${def.name}`)
   if (!resolveEditorProfile(editor.state).edits) throw new ReadOnlyDocumentError()
   options.signal?.throwIfAborted()
-  if (editor.graph !== figma.graph || options.isLive?.() === false) {
+  if (editor.graph !== underlyingGraph(figma.graph) || options.isLive?.() === false) {
     throw new Error('The target document is no longer open')
   }
-  const graph = figma.graph
+  const graph = underlyingGraph(figma.graph)
   if (graph.nodes.size + graph.variables.size > MAX_TRANSACTION_NODES) {
     throw new Error('Document too large for atomic agent editing (maximum 10000 nodes)')
   }

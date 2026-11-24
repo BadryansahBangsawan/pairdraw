@@ -7,6 +7,7 @@ import {
 
 import { createLayoutRunner } from '#core/layout/mutations'
 
+import { underlyingGraph } from './graph-ref'
 import { flushPendingComponentSync } from './pending-sync'
 
 interface PendingLayout {
@@ -32,7 +33,8 @@ function mergeImpact(into: SceneMutationImpact, from: SceneMutationImpact): void
  * one recorder for its lifetime, kept across APIs: a script that failed before its tool laid
  * out its edits leaves them for the next read to lay out.
  */
-export function startPendingLayout(graph: SceneGraph): void {
+export function startPendingLayout(source: SceneGraph): void {
+  const graph = underlyingGraph(source)
   if (pendingByGraph.has(graph)) return
   const pending: PendingLayout = { impact: createSceneMutationImpact(), flushing: false }
   pendingByGraph.set(graph, pending)
@@ -41,7 +43,8 @@ export function startPendingLayout(graph: SceneGraph): void {
 }
 
 /** Lays out the edits recorded since the last geometry read. */
-export function flushPendingLayout(graph: SceneGraph): void {
+export function flushPendingLayout(source: SceneGraph): void {
+  const graph = underlyingGraph(source)
   // Instances lay out what their components hold now.
   flushPendingComponentSync(graph)
   const pending = pendingByGraph.get(graph)
@@ -94,10 +97,11 @@ function editsReach(graph: SceneGraph, impact: SceneMutationImpact, node: SceneN
  * that builds many layers lays out once rather than once per layer.
  */
 export function flushPendingLayoutBefore(
-  graph: SceneGraph,
+  source: SceneGraph,
   node: SceneNode,
   { placesChildren = false }: { placesChildren?: boolean } = {}
 ): void {
+  const graph = underlyingGraph(source)
   const pending = pendingByGraph.get(graph)
   if (!pending || pending.flushing || pending.impact.changedNodeIds.size === 0) return
   const depends =

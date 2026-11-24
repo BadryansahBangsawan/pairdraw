@@ -88,6 +88,20 @@ describe('token links', () => {
     expect(readTokenSources(reopened)).toEqual([link])
   })
 
+  test('opens a document whose token sources are not a list, with no links', async () => {
+    const { readTokenSources } = await import('@pairdraw/scene-graph/token-sources')
+    const json = JSON.stringify({
+      version: '2.21',
+      children: [{ id: 'screen', type: 'frame' }],
+      tokenSources: 'x'
+    })
+
+    const reopened = parsePenFile(json)
+
+    expect(reopened.getPages().length).toBe(1)
+    expect(readTokenSources(reopened)).toEqual([])
+  })
+
   test('drops a link it cannot read and keeps the rest', async () => {
     const { readTokenSources } = await import('@pairdraw/scene-graph/token-sources')
     const json = JSON.stringify({

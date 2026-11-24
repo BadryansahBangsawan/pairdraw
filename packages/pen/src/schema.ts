@@ -296,6 +296,12 @@ const variableSchema = v.looseObject({
 /** A font file the document bundles, which its text names by `name` as a family. */
 const fontSchema = v.looseObject({ name: strSchema, url: strSchema })
 
+/** A document whose links are a list this reader can use; any other value is no link at all. */
+const penTokenSourcesSchema = v.pipe(
+  v.unknown(),
+  v.transform((value) => v.parse(tokenSourcesSchema, Array.isArray(value) ? value : []))
+)
+
 const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
   // The page's name. The format is single-page, so it belongs to the document.
@@ -311,7 +317,7 @@ const penDocumentSchema = v.looseObject({
   imports: v.optional(v.record(strSchema, strSchema)),
   variables: v.optional(v.record(strSchema, variableSchema)),
   /** The code the document's variables are linked to, as Core keeps it on the document node. */
-  tokenSources: v.optional(tokenSourcesSchema),
+  tokenSources: v.optional(penTokenSourcesSchema),
   children: v.array(nodeSchema)
 })
 

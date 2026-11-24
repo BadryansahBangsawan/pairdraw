@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 
+import { EDITOR_BOOT_WAIT_MS } from './timeouts'
+
 /**
  * The boot splash covers the page until the app draws its first content. A cold dev server
  * transforms the app's module graph on the first request, so the first load of a run can take
@@ -8,5 +10,5 @@ import type { Page } from '@playwright/test'
  * gives the canvas.
  */
 export async function waitForAppBoot(page: Page) {
-  await page.locator('#boot-splash').waitFor({ state: 'hidden', timeout: 30_000 })
+  await page.locator('#boot-splash').waitFor({ state: 'hidden', timeout: EDITOR_BOOT_WAIT_MS })
 }

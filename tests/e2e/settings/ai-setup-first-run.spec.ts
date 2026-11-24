@@ -2,21 +2,20 @@ import { expect, test } from '@playwright/test'
 
 import { waitForAppBoot } from '#tests/helpers/boot'
 import { waitForDemo } from '#tests/helpers/demo'
+import { EDITOR_BOOT_WAIT_MS, EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
 // `?test` suppresses the first-run lookup, so these load the app as a person would, with none
 // of the stored preferences the other browser tests start from. The browser has no companion,
 // so no coding agent can be found either.
 test.use({ storageState: { cookies: [], origins: [] } })
 
-// `waitForAppBoot` allows a cold dev server thirty seconds for the first load, but a test here has
-// fifteen, and the first one spent them on that load. Booting once beforehand, under the boot
-// allowance, leaves each test its own time.
-const BOOT_HOOK_TIMEOUT_MS = 61_000
+// Booting once beforehand leaves each test its own time, but the hook itself still needs the
+// boot allowance rather than the test's work budget.
 test.beforeAll(async ({ browser }) => {
-  test.setTimeout(BOOT_HOOK_TIMEOUT_MS)
+  test.setTimeout(EDITOR_SETUP_TIMEOUT_MS)
   const page = await browser.newPage()
   try {
-    await page.goto('/', { timeout: 30_000 })
+    await page.goto('/', { timeout: EDITOR_BOOT_WAIT_MS })
     await waitForAppBoot(page)
   } finally {
     await page.close()

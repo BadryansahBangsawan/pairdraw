@@ -5,6 +5,7 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 import { openDesignPanel } from './properties'
+import { EDITOR_BOOT_WAIT_MS } from './timeouts'
 
 /**
  * A build that names an official Cloud server asks it whether Cloud is open yet and carries on
@@ -52,9 +53,11 @@ export class CanvasHelper {
     await this.page
       .getByTestId('canvas-element')
       .and(this.page.locator('[data-ready="1"]'))
-      .waitFor({ timeout: 30000 })
-    await this.page.getByTestId('canvas-loading').waitFor({ state: 'hidden', timeout: 30000 })
-    await this.page.locator('#loader').waitFor({ state: 'detached', timeout: 30000 })
+      .waitFor({ timeout: EDITOR_BOOT_WAIT_MS })
+    await this.page
+      .getByTestId('canvas-loading')
+      .waitFor({ state: 'hidden', timeout: EDITOR_BOOT_WAIT_MS })
+    await this.page.locator('#loader').waitFor({ state: 'detached', timeout: EDITOR_BOOT_WAIT_MS })
     await this.useLightPage()
     if (designPanel) await openDesignPanel(this.page)
   }

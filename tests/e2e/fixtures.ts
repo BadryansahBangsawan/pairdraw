@@ -1,14 +1,12 @@
 import { test, expect, type Locator, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { EDITOR_BOOT_WAIT_MS, EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
-// `waitForInit` waits 30s for the canvas, 30s for the loading overlay, and 30s for the loader
-// (`tests/helpers/canvas.ts`). Navigation gets the same 30s. The project timeout is 15s, and
-// Playwright applies it to this hook, so a cold server was closed while the canvas wait was
-// still running. The extra second lets that wait fail itself. A boot that never finishes
-// still fails, and the message says so.
-const EDITOR_BOOT_WAIT_MS = 30_000
-const EDITOR_SETUP_HOOK_TIMEOUT_MS = EDITOR_BOOT_WAIT_MS * 4 + 1_000
+// `waitForInit` waits `EDITOR_BOOT_WAIT_MS` for the canvas, the loading overlay and the loader.
+// A hook that boots the editor takes `EDITOR_SETUP_TIMEOUT_MS`, which covers navigation plus those
+// three waits, instead of the project's shorter work budget; the project uses the same budget for
+// a test that boots the editor itself.
 
 export function useEditorSetup(url = '/?test') {
   let page: Page
@@ -17,7 +15,7 @@ export function useEditorSetup(url = '/?test') {
   test.describe.configure({ mode: 'serial' })
 
   test.beforeAll(async ({ browser }) => {
-    test.setTimeout(EDITOR_SETUP_HOOK_TIMEOUT_MS)
+    test.setTimeout(EDITOR_SETUP_TIMEOUT_MS)
     try {
       page = await browser.newPage()
       await page.goto(url, { timeout: EDITOR_BOOT_WAIT_MS })
@@ -53,8 +51,9 @@ export function useFreshEditor(url = '/?test') {
   let canvas: CanvasHelper | undefined
 
   test.beforeEach(async ({ browser }) => {
+    test.setTimeout(EDITOR_SETUP_TIMEOUT_MS)
     page = await browser.newPage()
-    await page.goto(url)
+    await page.goto(url, { timeout: EDITOR_BOOT_WAIT_MS })
     canvas = new CanvasHelper(page)
     await canvas.waitForInit()
   })

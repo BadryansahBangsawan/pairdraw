@@ -1,5 +1,7 @@
 import { defineConfig, type PlaywrightTestConfig } from '@playwright/test'
 
+import { EDITOR_SETUP_TIMEOUT_MS } from './tests/helpers/timeouts'
+
 const appPort = process.env.PAIRDRAW_TEST_PORT ?? '1420'
 const mcpPort = process.env.PAIRDRAW_TEST_MCP_PORT ?? '7600'
 for (const port of [appPort, mcpPort]) {
@@ -75,7 +77,9 @@ const appDefaults = {
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 15_000,
+  // A test may boot the editor itself, so it gets the boot budget the helpers wait with. A test
+  // that needs longer for its own work raises it where it does that work.
+  timeout: EDITOR_SETUP_TIMEOUT_MS,
   workers: 1,
   projects: [
     {

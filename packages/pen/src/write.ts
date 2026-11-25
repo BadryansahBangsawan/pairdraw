@@ -3,6 +3,7 @@ import { fromUint8Array } from 'js-base64'
 
 import type {
   BlendMode,
+  EnabledLibraryBinding,
   Fill,
   GradientTransform,
   LayoutAlign,
@@ -868,17 +869,8 @@ export function penDocumentFromGraph(
   const statuses = readStoredStatusWorkflow(graph)
   if (statuses) document.statuses = statuses
   if (imports) document.imports = imports
-  const enabledLibraries = [...graph.enabledLibraries.values()]
-  if (enabledLibraries.length > 0) {
-    document.enabledLibraries = enabledLibraries
-    // The definitions live on the hidden page, which a Pencil.dev file cannot hold, so the file
-    // records the bindings but the components it was built from come back as placeholders.
-    const enabled = enabledLibraries.filter((binding) => binding.enabled).length
-    if (enabled > 0)
-      state.warnings.push(
-        `Library components came from ${enabled} enabled ${enabled === 1 ? 'library' : 'libraries'}, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.`
-      )
-  }
+  const enabledLibraries = enabledLibrariesOf(graph, state)
+  if (enabledLibraries) document.enabledLibraries = enabledLibraries
   const publication = readSourceLibraryPublication(graph)
   if (publication) document.sourceLibraryPublication = publication
   if (pages.length > 1) {
@@ -894,6 +886,25 @@ export function penDocumentFromGraph(
   }
   reportDrops(state)
   return document
+}
+
+/**
+ * The library bindings a `.pen` file records, or null when the document has none. The definitions
+ * live on the hidden page, which a Pencil.dev file cannot hold, so the file records the bindings
+ * and says that the components it was built from come back as placeholders.
+ */
+function enabledLibrariesOf(
+  graph: SceneGraph,
+  state: PenWriteState
+): EnabledLibraryBinding[] | null {
+  const bindings = [...graph.enabledLibraries.values()]
+  if (bindings.length === 0) return null
+  const enabled = bindings.filter((binding) => binding.enabled).length
+  if (enabled > 0)
+    state.warnings.push(
+      `Library components came from ${enabled} enabled ${enabled === 1 ? 'library' : 'libraries'}, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.`
+    )
+  return bindings
 }
 
 /** Adds one sentence for each kind of content the written file had to leave out. */

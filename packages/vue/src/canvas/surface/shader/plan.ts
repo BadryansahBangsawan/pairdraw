@@ -1,3 +1,4 @@
+import type { ViewportTransform } from '@pairdraw/core/geometry'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
@@ -13,13 +14,6 @@ export interface PageShader {
   nodeIds: Set<string>
   /** Where the layers that paint it are, on the page. */
   bounds: Rect[]
-}
-
-/** The part of a view that decides what is on screen: its pan and zoom. */
-export interface PlaybackView {
-  panX: number
-  panY: number
-  zoom: number
 }
 
 /** Whether `node` and every layer above it are visible, so the canvas draws it. */
@@ -57,7 +51,7 @@ export function shadersOnPage(graph: SceneGraph, pageId: string): Map<string, Pa
 /** Whether any part of `bounds` is inside the view, at its pan and zoom. */
 export function onScreen(
   bounds: readonly Rect[],
-  view: PlaybackView,
+  view: ViewportTransform,
   viewport: { width: number; height: number }
 ): boolean {
   return bounds.some(

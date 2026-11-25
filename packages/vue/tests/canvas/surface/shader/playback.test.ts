@@ -77,7 +77,7 @@ function tabVisibility(initial: DocumentVisibilityState) {
   return {
     set(next: DocumentVisibilityState) {
       state = next
-      globalThis.document.dispatchEvent(new browser.Event('visibilitychange'))
+      browser.document.dispatchEvent(new browser.Event('visibilitychange'))
     }
   }
 }
@@ -111,7 +111,7 @@ async function preview(options: HarnessOptions = {}) {
   editor.state.panX = 0
   editor.state.panY = 0
   editor.state.zoom = 1
-  editor.state.canvasView = { id: 'play', revision: 0 }
+  editor.state.canvasView = { id: 'play', revision: 0, returnTo: { panX: 0, panY: 0, zoom: 1 } }
   editor.state.sceneVersion += 1
   /** The pane's own view, which a front end keeps reactive so the canvas follows it. */
   const view = reactive(editor.state)

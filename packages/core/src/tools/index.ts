@@ -43,6 +43,8 @@ export {
   compileScript,
   diffDocuments,
   diffPageLayersJSX,
+  layoutFrameAtWidth,
+  widthVariants,
   wrapEvalCode
 } from './analyze'
 export type { DocumentDiff, DocumentDiffOptions, LayerJSXChange } from './analyze'

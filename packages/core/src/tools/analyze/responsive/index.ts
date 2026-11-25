@@ -4,14 +4,14 @@ import * as v from 'valibot'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { computeAbsoluteBounds } from '@pairdraw/scene-graph/geometry'
 
-import { extractExportGraph } from '#core/io/subgraph'
-import { computeLayout, measureTextForLayout, sizeAutoResizingText } from '#core/layout'
+import { measureTextForLayout } from '#core/layout'
 import { collectNodeFontFaces } from '#core/text/requirements/collect'
 import {
   computeOverlaps,
   type OverlapItem,
   type OverlapSeverity
 } from '#core/tools/analyze/overlaps'
+import { layoutFrameAtWidth } from '#core/tools/analyze/responsive/widths'
 import { defineTool, nodeIdInputSchema, toolNumber } from '#core/tools/schema'
 import { boundedRasterScale, rasterScaleInputs } from '#core/tools/vector/export'
 
@@ -224,19 +224,12 @@ export const checkResponsive = defineTool({
     const results = []
 
     for (const width of widths) {
-      const extracted = extractExportGraph(figma.graph, { scope: 'node', nodeId: node.id })
-      const copy = extracted.graph
-      const pageId = extracted.pageId ?? figma.currentPageId
-      const target = copy.getNode(node.id)
-      if (!target) continue
+      const laid = layoutFrameAtWidth(figma.graph, figma.currentPageId, node.id, width)
+      if (!laid) continue
+      const { graph: copy, pageId, frame: target } = laid
 
-      copy.updateNode(node.id, { width })
-      sizeAutoResizingText(copy, node.id)
-      computeLayout(copy, node.id)
-
-      const laid = copy.getNode(node.id) ?? target
-      const { warnings, dropped } = collectWarnings(copy, laid, pageId, maxWarnings)
-      const scale = boundedRasterScale(laid.width, laid.height, args.scale, args.maxEdge)
+      const { warnings, dropped } = collectWarnings(copy, target, pageId, maxWarnings)
+      const scale = boundedRasterScale(target.width, target.height, args.scale, args.maxEdge)
       const bytes = await figma.exportGraphImage(copy, pageId, [node.id], {
         scale,
         format: 'PNG'
@@ -245,7 +238,7 @@ export const checkResponsive = defineTool({
 
       results.push({
         width,
-        height: Math.round(laid.height),
+        height: Math.round(target.height),
         mimeType: 'image/png',
         base64: fromUint8Array(bytes),
         byteLength: bytes.length,

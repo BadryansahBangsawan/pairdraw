@@ -16,6 +16,8 @@ export { compileScript, wrapEvalCode } from './analyze/eval/wrap'
 export { analyzeOverlaps, computeOverlaps } from './analyze/overlaps'
 export { checkResponsive } from './analyze/responsive'
 export type { ResponsiveWarning, ResponsiveWarningKind } from './analyze/responsive'
+export { layoutFrameAtWidth, widthVariants } from './analyze/responsive/widths'
+export type { FrameAtWidth } from './analyze/responsive/widths'
 export type {
   AnalyzeOverlapsArgs,
   AnalyzeOverlapsResult,

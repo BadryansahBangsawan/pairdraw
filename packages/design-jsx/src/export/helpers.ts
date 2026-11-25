@@ -1,14 +1,16 @@
-import type { SceneGraph, SceneNode, Effect, GridTrack } from '@pairdraw/scene-graph'
-import { colorToHex8 } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, SceneGraph, SceneNode, Effect, GridTrack } from '@pairdraw/scene-graph'
+import { colorToDocumentCSS, colorToHex8 } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
-export function formatColor(color: Color, opacity = 1): string {
-  return colorToHex8(color, opacity)
+/** A color as the JSX runtime reads it, in the document's profile, so a P3 color keeps its gamut. */
+export function formatColor(color: Color, opacity = 1, profile: ColorProfile = 'srgb'): string {
+  if (profile === 'srgb') return colorToHex8(color, opacity)
+  return colorToDocumentCSS({ ...color, a: opacity }, profile)
 }
 
-export function formatShadow(e: Effect): string | null {
+export function formatShadow(e: Effect, profile: ColorProfile = 'srgb'): string | null {
   if (e.type !== 'DROP_SHADOW' && e.type !== 'INNER_SHADOW') return null
-  return `${e.offset.x} ${e.offset.y} ${e.radius} ${formatColor(e.color, e.color.a)}`
+  return `${e.offset.x} ${e.offset.y} ${e.radius} ${formatColor(e.color, e.color.a, profile)}`
 }
 
 export function getNodeContext(node: SceneNode, graph: SceneGraph) {

@@ -158,7 +158,7 @@ function nodeToJSX(
     propAttribute
   )
   if (node.type === 'TEXT') {
-    const { children: content, inline } = textChildren(node, depth)
+    const { children: content, inline } = textChildren(node, depth, graph.documentColorSpace)
     for (let count = elementCount(content); count > 0; count--) layerIds?.push(null)
     return [jsx.element(tag, attributes, content, depth, inline)]
   }
@@ -238,7 +238,7 @@ export function designJSXElement(nodeId: string, graph: SceneGraph): DesignJSXEl
       .map(({ name, source }) => [name, source])
   )
   if (node.type === 'TEXT') {
-    const { children, inline } = textChildren(node, 0)
+    const { children, inline } = textChildren(node, 0, graph.documentColorSpace)
     return { tag, attributes, text: contentBetween(tag, children, inline), childIds: [] }
   }
   if (own) {

@@ -60,8 +60,8 @@ export function shapeWithTextProps(graph: SceneGraph, node: SceneNode): JSXProp[
   if (height !== SHAPE_WITH_TEXT_SIZE) props.push(['h', height])
   if (node.shapeTruncates) props.push(['truncate', true])
   if (node.rotation !== 0) props.push(['rotate', Math.round(node.rotation * 100) / 100])
-  collectFillProps(node, props)
-  collectStrokeProps(node, props)
+  collectFillProps(node, props, graph.documentColorSpace)
+  collectStrokeProps(node, props, graph.documentColorSpace)
   if (node.cornerRadius !== SHAPE_WITH_TEXT_CORNER_RADIUS)
     props.push(['rounded', node.cornerRadius])
   return props

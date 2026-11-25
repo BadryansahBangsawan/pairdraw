@@ -2,6 +2,7 @@ import { isEmptyObject, isEqual, omitBy, pick } from 'es-toolkit'
 
 import { jsx, type SyntaxNode } from '@pairdraw/emit'
 import type {
+  ColorProfile,
   SceneNode,
   TextParagraphSpacingField,
   TextParagraphStyle
@@ -49,13 +50,13 @@ function characterStyles(node: SceneNode): SpanStyle[] {
   )
 }
 
-function spanProps(style: SpanStyle, node: SceneNode): JSXProp[] {
+function spanProps(style: SpanStyle, node: SceneNode, profile: ColorProfile): JSXProp[] {
   const props: JSXProp[] = []
   if (style.fontSize !== undefined) props.push(['size', style.fontSize])
   if (style.fontFamily !== undefined) props.push(['font', style.fontFamily])
   if (style.fontWeight !== undefined) props.push(['weight', fontWeightValue(style.fontWeight)])
   if (style.italic !== undefined) props.push(['italic', style.italic])
-  if (style.fills) collectFillProps({ ...node, fills: style.fills }, props)
+  if (style.fills) collectFillProps({ ...node, fills: style.fills }, props, profile)
   if (style.lineHeight !== undefined) {
     props.push(['lineHeight', style.lineHeight ? textLengthJSX(style.lineHeight) : AUTO])
   }
@@ -64,7 +65,7 @@ function spanProps(style: SpanStyle, node: SceneNode): JSXProp[] {
   }
   if (style.textDecoration !== undefined)
     props.push(['textDecoration', TEXT_DECORATION.print(style.textDecoration)])
-  collectDecorationProps(style, node, props)
+  collectDecorationProps(style, node, props, profile)
   collectFontSettingProps(style, props)
   if (style.textCase !== undefined) props.push(['textCase', TEXT_CASE.print(style.textCase)])
   if (style.hyperlink) props.push(['href', style.hyperlink.value])
@@ -76,7 +77,8 @@ function inlineContent(
   node: SceneNode,
   styles: readonly SpanStyle[],
   start: number,
-  end: number
+  end: number,
+  profile: ColorProfile
 ): SyntaxNode[] {
   const content: SyntaxNode[] = []
   let from = start
@@ -87,7 +89,7 @@ function inlineContent(
     content.push(
       isEmptyObject(style)
         ? text
-        : jsx.element('Span', spanProps(style, node).map(propAttribute), [text], 0, true)
+        : jsx.element('Span', spanProps(style, node, profile).map(propAttribute), [text], 0, true)
     )
     from = index
   }
@@ -129,7 +131,11 @@ function paragraphProps(style: TextParagraphStyle): JSXProp[] {
  * `<Span>`s for characters styled apart, and as `<Paragraph>`s when a paragraph is a list item
  * or has spacing other than the text's.
  */
-export function textChildren(node: SceneNode, depth: number): TextChildren {
+export function textChildren(
+  node: SceneNode,
+  depth: number,
+  profile: ColorProfile = 'srgb'
+): TextChildren {
   const styles = characterStyles(node)
   const ranges = textParagraphRanges(node.text)
   const paragraphs = ranges.map((_, index) => ownParagraphStyle(node, index))
@@ -140,13 +146,13 @@ export function textChildren(node: SceneNode, depth: number): TextChildren {
     if (styles.every(isEmptyObject)) {
       return { children: node.text ? [jsx.text(node.text)] : [], inline: true }
     }
-    return { children: inlineContent(node, styles, 0, node.text.length), inline: true }
+    return { children: inlineContent(node, styles, 0, node.text.length, profile), inline: true }
   }
   const children = ranges.map(({ start, end }, index) =>
     jsx.element(
       'Paragraph',
       paragraphProps(paragraphs[index]).map(propAttribute),
-      inlineContent(node, styles, start, end),
+      inlineContent(node, styles, start, end, profile),
       depth + 1,
       true
     )

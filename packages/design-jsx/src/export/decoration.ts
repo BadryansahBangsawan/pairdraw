@@ -1,4 +1,4 @@
-import type { CharacterStyleOverride, SceneNode } from '@pairdraw/scene-graph'
+import type { CharacterStyleOverride, ColorProfile, SceneNode } from '@pairdraw/scene-graph'
 
 import { TEXT_DECORATION_STYLE } from '../enums'
 import { AUTO, CURRENT_COLOR } from '../overrides/text'
@@ -21,14 +21,15 @@ type DecorationStyle = Pick<
 export function collectDecorationProps(
   style: DecorationStyle,
   node: SceneNode,
-  props: JSXProp[]
+  props: JSXProp[],
+  profile: ColorProfile = 'srgb'
 ): void {
   const { textDecorationFills: fills } = style
   if (style.textDecorationStyle !== undefined)
     props.push(['textDecorationStyle', TEXT_DECORATION_STYLE.print(style.textDecorationStyle)])
   if (fills) {
     const fill = fills.at(0)
-    props.push(['textDecorationColor', fill ? paintPropValue(fill, node) : CURRENT_COLOR])
+    props.push(['textDecorationColor', fill ? paintPropValue(fill, node, profile) : CURRENT_COLOR])
   }
   if (style.textDecorationThickness !== undefined)
     props.push(['textDecorationThickness', style.textDecorationThickness ?? AUTO])

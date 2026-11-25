@@ -1,4 +1,5 @@
 import type {
+  ColorProfile,
   Effect,
   Fill,
   GradientTransform,
@@ -42,7 +43,7 @@ function options(entries: Options): Options | undefined {
   return Object.values(entries).some((value) => value !== undefined) ? entries : undefined
 }
 
-function fillValue(fill: Fill, node: SceneNode): JSXValue {
+function fillValue(fill: Fill, node: SceneNode, profile: ColorProfile): JSXValue {
   const visible = fill.visible ? undefined : false
   const shader = shaderOfPaint(node, fill)
   if (shader && isShaderPresetPaint(shader)) {
@@ -73,7 +74,7 @@ function fillValue(fill: Fill, node: SceneNode): JSXValue {
     )
   }
   if (fill.type === 'SOLID') {
-    const color = formatColor(fill.color, fill.color.a)
+    const color = formatColor(fill.color, fill.color.a, profile)
     const opacity = fill.opacity === fill.color.a ? undefined : fill.opacity
     return helperCall(
       'solid',
@@ -84,7 +85,7 @@ function fillValue(fill: Fill, node: SceneNode): JSXValue {
   const helper = GRADIENT_HELPERS[fill.type]
   if (helper && fill.gradientStops) {
     const stops = fill.gradientStops.map((stop) => [
-      formatColor(stop.color, stop.color.a),
+      formatColor(stop.color, stop.color.a, profile),
       stop.position
     ])
     return helperCall(
@@ -109,29 +110,37 @@ function fillValue(fill: Fill, node: SceneNode): JSXValue {
 }
 
 /** A single visible solid paint fits the `bg` or text `color` shorthand. */
-function solidShorthand(fills: Fill[]): string | null {
+function solidShorthand(fills: Fill[], profile: ColorProfile): string | null {
   if (fills.length !== 1) return null
   const [fill] = fills
   if (fill.type !== 'SOLID' || !fill.visible || blendMode(fill.blendMode)) return null
   // The shorthand has one alpha; a fill whose opacity differs from its colour's needs `solid`.
   if (fill.opacity !== fill.color.a) return null
-  return formatColor(fill.color, fill.color.a)
+  return formatColor(fill.color, fill.color.a, profile)
 }
 
 /** One paint as a colour prop takes it: a colour string when it is plain, its helper otherwise. */
-export function paintPropValue(fill: Fill, node: SceneNode): JSXValue {
-  return solidShorthand([fill]) ?? fillValue(fill, node)
+export function paintPropValue(
+  fill: Fill,
+  node: SceneNode,
+  profile: ColorProfile = 'srgb'
+): JSXValue {
+  return solidShorthand([fill], profile) ?? fillValue(fill, node, profile)
 }
 
-export function collectFillProps(node: SceneNode, props: JSXProp[]): void {
+export function collectFillProps(
+  node: SceneNode,
+  props: JSXProp[],
+  profile: ColorProfile = 'srgb'
+): void {
   if (node.fills.length === 0) {
     // A text is painted black unless it says it is not painted.
     if (node.type === 'TEXT') props.push(['fills', []])
     return
   }
-  const shorthand = solidShorthand(node.fills)
+  const shorthand = solidShorthand(node.fills, profile)
   if (shorthand) props.push([node.type === 'TEXT' ? 'color' : 'bg', shorthand])
-  else props.push(['fills', node.fills.map((fill) => fillValue(fill, node))])
+  else props.push(['fills', node.fills.map((fill) => fillValue(fill, node, profile))])
 }
 
 interface StrokeValue {
@@ -147,9 +156,9 @@ interface StrokeValue {
   visible?: false
 }
 
-function strokeValue(stroke: Stroke): StrokeValue {
+function strokeValue(stroke: Stroke, profile: ColorProfile): StrokeValue {
   return {
-    color: formatColor(stroke.color, stroke.color.a),
+    color: formatColor(stroke.color, stroke.color.a, profile),
     opacity: stroke.opacity === stroke.color.a ? undefined : stroke.opacity,
     weight: stroke.weight === 1 ? undefined : stroke.weight,
     align: stroke.align === 'INSIDE' ? undefined : STROKE_ALIGN.print(stroke.align),
@@ -182,8 +191,12 @@ function fitsStrokeShorthand(node: SceneNode, stroke: StrokeValue): boolean {
   return (stroke.cap ?? nodeCap) === nodeCap && (stroke.join ?? nodeJoin) === nodeJoin
 }
 
-export function collectStrokeProps(node: SceneNode, props: JSXProp[]): void {
-  const strokes = node.strokes.map(strokeValue)
+export function collectStrokeProps(
+  node: SceneNode,
+  props: JSXProp[],
+  profile: ColorProfile = 'srgb'
+): void {
+  const strokes = node.strokes.map((stroke) => strokeValue(stroke, profile))
   const [only] = strokes
   const shorthand = strokes.length === 1 && fitsStrokeShorthand(node, only)
   if (shorthand) {
@@ -231,7 +244,7 @@ function noiseSizeValue(size: Vector): JSXValue {
   return size.x === size.y ? size.x : { x: size.x, y: size.y }
 }
 
-function effectValue(effect: Exclude<Effect, ShaderEffect>): HelperCall {
+function effectValue(effect: Exclude<Effect, ShaderEffect>, profile: ColorProfile): HelperCall {
   const visible = effect.visible ? undefined : false
   if (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW') {
     return helperCall(
@@ -241,7 +254,7 @@ function effectValue(effect: Exclude<Effect, ShaderEffect>): HelperCall {
         y: effect.offset.y,
         radius: effect.radius,
         spread: effect.spread === 0 ? undefined : effect.spread,
-        color: formatColor(effect.color, effect.color.a),
+        color: formatColor(effect.color, effect.color.a, profile),
         visible,
         blendMode: blendMode(effect.blendMode),
         showShadowBehindNode: effect.showShadowBehindNode
@@ -256,9 +269,9 @@ function effectValue(effect: Exclude<Effect, ShaderEffect>): HelperCall {
         noiseType: grain.noiseType,
         noiseSize: noiseSizeValue(grain.noiseSize),
         density: grain.density,
-        color: formatColor(effect.color, effect.color.a),
+        color: formatColor(effect.color, effect.color.a, profile),
         secondaryColor: grain.secondaryColor
-          ? formatColor(grain.secondaryColor, grain.secondaryColor.a)
+          ? formatColor(grain.secondaryColor, grain.secondaryColor.a, profile)
           : undefined,
         opacity: grain.opacity,
         seed: grain.seed,
@@ -285,22 +298,22 @@ function effectValue(effect: Exclude<Effect, ShaderEffect>): HelperCall {
   )
 }
 
-function plainDropShadow(effect: Effect): string | null {
+function plainDropShadow(effect: Effect, profile: ColorProfile): string | null {
   const plain =
     effect.type === 'DROP_SHADOW' &&
     effect.spread === 0 &&
     !blendMode(effect.blendMode) &&
     effect.showShadowBehindNode === undefined
-  return plain ? formatShadow(effect) : null
+  return plain ? formatShadow(effect, profile) : null
 }
 
 /**
  * `shadow` and `blur` describe a plain drop shadow followed by a layer blur, each optional,
  * in the order the renderer appends them; anything else needs `effects`.
  */
-function effectShorthand(effects: Effect[]): JSXProp[] | null {
+function effectShorthand(effects: Effect[], profile: ColorProfile): JSXProp[] | null {
   if (effects.some((effect) => !effect.visible)) return null
-  const shadow = effects.length > 0 ? plainDropShadow(effects[0]) : null
+  const shadow = effects.length > 0 ? plainDropShadow(effects[0], profile) : null
   const rest = shadow ? effects.slice(1) : effects
   if (rest.length > 1 || rest.some((effect) => effect.type !== 'LAYER_BLUR')) return null
   const props: JSXProp[] = []
@@ -316,9 +329,17 @@ function hasJSXHelper(effect: Effect): effect is Exclude<Effect, ShaderEffect> {
   return effect.type !== 'SHADER' && Object.hasOwn(EFFECT_HELPERS, effect.type)
 }
 
-export function collectEffectProps(node: SceneNode, props: JSXProp[]): void {
+export function collectEffectProps(
+  node: SceneNode,
+  props: JSXProp[],
+  profile: ColorProfile = 'srgb'
+): void {
   // An effect without a helper cannot be written as JSX; leaving it out keeps the source importable.
   const effects = node.effects.filter(hasJSXHelper)
   if (effects.length === 0) return
-  props.push(...(effectShorthand(effects) ?? [['effects', effects.map(effectValue)]]))
+  props.push(
+    ...(effectShorthand(effects, profile) ?? [
+      ['effects', effects.map((effect) => effectValue(effect, profile))]
+    ])
+  )
 }

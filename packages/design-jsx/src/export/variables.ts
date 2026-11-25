@@ -327,7 +327,7 @@ function definitionExport(graph: SceneGraph, rootIds: readonly string[]): Variab
     if (typeof raw === 'number' || typeof raw === 'boolean') return raw
     if (typeof raw !== 'object') return undefined
     if ('aliasId' in raw) return variable(raw.aliasId)
-    return 'r' in raw ? formatColor(raw, raw.a) : undefined
+    return 'r' in raw ? formatColor(raw, raw.a, graph.documentColorSpace) : undefined
   }
   const values = (variables: Variable[], modeId: string, base?: string) =>
     Object.fromEntries(

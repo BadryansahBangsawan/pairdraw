@@ -1,6 +1,6 @@
 import { isEqual, omitBy, pick } from 'es-toolkit'
 
-import type { ArcData, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { ArcData, ColorProfile, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { DEFAULT_FONT_FAMILY } from '@pairdraw/scene-graph/constants'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
@@ -118,9 +118,9 @@ function collectCornerRadiiProps(node: SceneNode, props: JSXProp[]): void {
   }
 }
 
-function collectAppearanceProps(node: SceneNode, props: JSXProp[]): void {
-  collectFillProps(node, props)
-  collectStrokeProps(node, props)
+function collectAppearanceProps(node: SceneNode, props: JSXProp[], profile: ColorProfile): void {
+  collectFillProps(node, props, profile)
+  collectStrokeProps(node, props, profile)
   collectCornerRadiiProps(node, props)
 
   if (node.cornerSmoothing > 0) props.push(['cornerSmoothing', node.cornerSmoothing])
@@ -132,7 +132,7 @@ function collectAppearanceProps(node: SceneNode, props: JSXProp[]): void {
     props.push(['blendMode', BLEND_MODE.print(node.blendMode)])
   }
   if (node.clipsContent) props.push(['overflow', 'hidden'])
-  collectEffectProps(node, props)
+  collectEffectProps(node, props, profile)
 }
 
 function collectPositionProps(
@@ -257,7 +257,7 @@ export function fontWeightValue(weight: number): string | number {
   return weight
 }
 
-function collectTextNodeProps(node: SceneNode, props: JSXProp[]): void {
+function collectTextNodeProps(node: SceneNode, props: JSXProp[], profile: ColorProfile): void {
   const direction = resolveNodeTextDirection(node)
   if (node.fontSize !== 14) props.push(['size', node.fontSize])
   if (node.fontFamily && node.fontFamily !== DEFAULT_FONT_FAMILY)
@@ -277,7 +277,7 @@ function collectTextNodeProps(node: SceneNode, props: JSXProp[]): void {
   }
   if (node.textDecoration !== 'NONE')
     props.push(['textDecoration', TEXT_DECORATION.print(node.textDecoration)])
-  collectDecorationProps(ownTextFields(node, DECORATION_FIELDS), node, props)
+  collectDecorationProps(ownTextFields(node, DECORATION_FIELDS), node, props, profile)
   collectTextFontSettingProps(node, props)
   if (node.textCase !== 'ORIGINAL') props.push(['textCase', TEXT_CASE.print(node.textCase)])
   if (node.maxLines != null) props.push(['maxLines', node.maxLines])
@@ -357,9 +357,9 @@ export function collectProps(
   if (ctx.parentIsGrid) collectGridPositionProps(node, props)
   if (ctx.isFlex) collectFlexAlignmentProps(node, props)
   if (ctx.isAutoLayout) collectAutoLayoutPaddingProps(node, props)
-  collectAppearanceProps(node, props)
+  collectAppearanceProps(node, props, graph.documentColorSpace)
   if (node.type === 'TEXT') {
-    collectTextNodeProps(node, props)
+    collectTextNodeProps(node, props, graph.documentColorSpace)
     collectTextAutoResizeProp(node, ctx, props)
   }
   collectShapeNodeProps(node, props)

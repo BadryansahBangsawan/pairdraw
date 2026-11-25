@@ -1,7 +1,7 @@
 import { isEqual } from 'es-toolkit/predicate'
 import { fromUint8Array } from 'js-base64'
 
-import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import type { ColorProfile, SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import { BLACK } from '@pairdraw/scene-graph/constants'
 import { readIcon } from '@pairdraw/scene-graph/icons'
 import { imageMimeType } from '@pairdraw/scene-graph/images'
@@ -166,9 +166,14 @@ function addCornerRadii(style: DesignStyleDeclaration, node: SceneNode, css: Fie
   if (node.cornerRadius > 0) style['border-radius'] = css('cornerRadius', px(node.cornerRadius))
 }
 
-function addStroke(style: DesignStyleDeclaration, node: SceneNode, css: FieldCSS): void {
+function addStroke(
+  style: DesignStyleDeclaration,
+  node: SceneNode,
+  css: FieldCSS,
+  profile: ColorProfile
+): void {
   const stroke = node.strokes.find((item) => item.visible)
-  const literalColor = strokeColorToCSS(stroke)
+  const literalColor = strokeColorToCSS(stroke, profile)
   if (!literalColor || !stroke) return
   const color = css('strokes/0/color', literalColor)
   const borderStyle = node.dashPattern.length > 0 ? 'dashed' : 'solid'
@@ -193,14 +198,14 @@ function addStroke(style: DesignStyleDeclaration, node: SceneNode, css: FieldCSS
  * dash or take per-side weights, and outer and inner rings paint in separate CSS layers, so a
  * stroke order that alternates them is approximated.
  */
-function extraStrokeShadows(strokes: Stroke[], first: Stroke): string[] {
+function extraStrokeShadows(strokes: Stroke[], first: Stroke, profile: ColorProfile): string[] {
   const outer: string[] = []
   const inner: string[] = []
   let outside = 0
   let inside = first.weight
   for (const stroke of strokes) {
     if (!stroke.visible) continue
-    const color = strokeColorToCSS(stroke)
+    const color = strokeColorToCSS(stroke, profile)
     if (!color) continue
     if (stroke.align !== 'OUTSIDE') {
       inside += stroke.align === 'CENTER' ? stroke.weight / 2 : stroke.weight
@@ -352,22 +357,23 @@ const CSS_BLEND_MODES: Partial<Record<SceneNode['blendMode'], string>> = {
 function styleFromSceneNode(
   node: SceneNode,
   parent: SceneNode | undefined,
-  css: FieldCSS
+  css: FieldCSS,
+  profile: ColorProfile
 ): DesignStyleDeclaration {
   const style: DesignStyleDeclaration = {}
   addSize(style, node, parent, css)
   addPositioning(style, node, parent)
   addSizeConstraints(style, node, css)
-  const fill = fillToCSS(node.fills.at(0))
+  const fill = fillToCSS(node.fills.at(0), profile)
   if (fill) style['background-color'] = css('fills/0/color', fill)
-  const gradients = gradientFillsToCSS(node.fills, node.width, node.height)
+  const gradients = gradientFillsToCSS(node.fills, node.width, node.height, profile)
   if (gradients) style['background-image'] = gradients
   addImageStyle(style, node)
-  addStroke(style, node, css)
-  Object.assign(style, effectsToCSS(node.effects))
+  addStroke(style, node, css, profile)
+  Object.assign(style, effectsToCSS(node.effects, profile))
   const visibleStrokes = node.strokes.filter((stroke) => stroke.visible)
   if (visibleStrokes.length > 1) {
-    const rings = extraStrokeShadows(visibleStrokes.slice(1), visibleStrokes[0])
+    const rings = extraStrokeShadows(visibleStrokes.slice(1), visibleStrokes[0], profile)
     if (rings.length > 0) {
       style['box-shadow'] = [rings.join(', '), style['box-shadow']]
         .filter((shadow): shadow is string => Boolean(shadow))
@@ -408,15 +414,16 @@ function styleFromSceneNode(
 function styleFromTextNode(
   node: SceneNode,
   parent: SceneNode | undefined,
-  css: FieldCSS
+  css: FieldCSS,
+  profile: ColorProfile
 ): DesignStyleDeclaration {
   const style: DesignStyleDeclaration = {}
   addSize(style, node, parent, css)
   addPositioning(style, node, parent)
   addLayoutChild(style, node, parent)
   if (resolveNodeTextDirection(node) === 'RTL') style.direction = 'rtl'
-  const color = fillToCSS(node.fills.at(0))
-  style.color = color ? css('fills/0/color', color) : cssColor(BLACK)
+  const color = fillToCSS(node.fills.at(0), profile)
+  style.color = color ? css('fills/0/color', color) : cssColor(BLACK, profile)
   style['font-family'] = node.fontFamily
   style['font-size'] = css('fontSize', px(node.fontSize))
   style['font-weight'] = String(node.fontWeight)
@@ -435,7 +442,7 @@ function styleFromTextNode(
   if (node.textAlignHorizontal !== 'LEFT')
     style['text-align'] = node.textAlignHorizontal.toLowerCase()
   if (node.opacity < 1) style.opacity = css('opacity', String(node.opacity))
-  Object.assign(style, textEffectsToCSS(node.effects))
+  Object.assign(style, textEffectsToCSS(node.effects, profile))
   if (node.textDecoration !== 'NONE') {
     style['text-decoration-line'] =
       node.textDecoration === 'UNDERLINE' ? 'underline' : 'line-through'
@@ -587,7 +594,11 @@ function sceneNodeToDesignNode(
   const css: FieldCSS = (field, literal) => tokens?.reference(node, field, modes) ?? literal
 
   if (node.type === 'TEXT') {
-    const content = textElementContent(node, styleFromTextNode(node, parent, css))
+    const content = textElementContent(
+      node,
+      styleFromTextNode(node, parent, css, graph.documentColorSpace),
+      graph.documentColorSpace
+    )
     return {
       type: 'element',
       tagName: content.tagName,
@@ -601,7 +612,12 @@ function sceneNodeToDesignNode(
 
   // An icon is one drawing, however many paths it has.
   if (VECTOR_SHAPES.has(node.type) || readIcon(node)) {
-    const vector = vectorDesignNode(context, node, attrs, styleFromSceneNode(node, parent, css))
+    const vector = vectorDesignNode(
+      context,
+      node,
+      attrs,
+      styleFromSceneNode(node, parent, css, graph.documentColorSpace)
+    )
     if (vector) return vector
   }
 
@@ -618,7 +634,7 @@ function sceneNodeToDesignNode(
     }
   }
 
-  const style = styleFromSceneNode(node, parent, css)
+  const style = styleFromSceneNode(node, parent, css, graph.documentColorSpace)
   const shader = layerShader(graph, node)
   if (shader) addShaderLayerStyle(style)
   return {

@@ -1,4 +1,5 @@
 import type {
+  ColorProfile,
   Effect,
   Fill,
   GradientStop,
@@ -7,21 +8,21 @@ import type {
   Stroke,
   TextLength
 } from '@pairdraw/scene-graph'
-import { colorToCSS, colorToHex } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import { blurSigma } from '@pairdraw/scene-graph/geometry'
 import { gradientPoint } from '@pairdraw/scene-graph/gradient'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { DesignStyleDeclaration } from '../types'
 
-/** Opaque colors as hex, which Tailwind matches to its palette; translucent ones as `rgba()`. */
-export function cssColor(color: Color): string {
-  return color.a >= 1 ? colorToHex(color) : colorToCSS(color)
+/** A color as CSS in the document's profile, so a Display P3 color keeps its gamut. */
+export function cssColor(color: Color, profile: ColorProfile = 'srgb'): string {
+  return colorToDocumentCSS(color, profile)
 }
 
-export function fillToCSS(fill: Fill | undefined): string | undefined {
+export function fillToCSS(fill: Fill | undefined, profile: ColorProfile = 'srgb') {
   if (fill?.type !== 'SOLID' || !fill.visible) return undefined
-  return cssColor({ ...fill.color, a: fill.opacity })
+  return cssColor({ ...fill.color, a: fill.opacity }, profile)
 }
 
 /** A number CSS reads the same back: six decimals, no trailing zeros or negative zero. */
@@ -30,8 +31,8 @@ function cssNumber(value: number): string {
   return String(rounded === 0 ? 0 : rounded)
 }
 
-function stopToCSS(stop: GradientStop, opacity: number): string {
-  const color = cssColor({ ...stop.color, a: stop.color.a * opacity })
+function stopToCSS(stop: GradientStop, opacity: number, profile: ColorProfile): string {
+  const color = cssColor({ ...stop.color, a: stop.color.a * opacity }, profile)
   return `${color} ${cssNumber(stop.position * 100)}%`
 }
 
@@ -45,13 +46,18 @@ function positionToCSS(point: Vector): string {
  * maps the box's unit square onto gradient space; its inverse gives the line's ends, the
  * ellipse's centre and radii, or the sweep's start ray. Diamond gradients have no CSS spelling.
  */
-export function gradientFillToCSS(fill: Fill, width: number, height: number): string | undefined {
+export function gradientFillToCSS(
+  fill: Fill,
+  width: number,
+  height: number,
+  profile: ColorProfile = 'srgb'
+): string | undefined {
   const transform = fill.gradientTransform
   const stops = fill.gradientStops
   if (!fill.visible || !transform || !stops || stops.length === 0 || width <= 0 || height <= 0) {
     return undefined
   }
-  const painted = stops.map((stop) => stopToCSS(stop, fill.opacity)).join(', ')
+  const painted = stops.map((stop) => stopToCSS(stop, fill.opacity, profile)).join(', ')
   if (fill.type === 'GRADIENT_LINEAR') {
     const start = gradientPoint(transform, { x: 0, y: 0.5 })
     const end = gradientPoint(transform, { x: 1, y: 0.5 })
@@ -90,11 +96,12 @@ export function gradientFillToCSS(fill: Fill, width: number, height: number): st
 export function gradientFillsToCSS(
   fills: Fill[],
   width: number,
-  height: number
+  height: number,
+  profile: ColorProfile = 'srgb'
 ): string | undefined {
   const layers: string[] = []
   for (let index = fills.length - 1; index >= 0; index--) {
-    const css = gradientFillToCSS(fills[index], width, height)
+    const css = gradientFillToCSS(fills[index], width, height, profile)
     if (css) layers.push(css)
   }
   return layers.length > 0 ? layers.join(', ') : undefined
@@ -121,9 +128,12 @@ export function borderWidths(node: SceneNode): Record<BorderSide, number> {
   }
 }
 
-export function strokeColorToCSS(stroke: Stroke | undefined): string | undefined {
+export function strokeColorToCSS(
+  stroke: Stroke | undefined,
+  profile: ColorProfile = 'srgb'
+): string | undefined {
   if (!stroke?.visible) return undefined
-  return cssColor({ ...stroke.color, a: stroke.opacity })
+  return cssColor({ ...stroke.color, a: stroke.opacity }, profile)
 }
 
 function px(value: number): string {
@@ -134,7 +144,7 @@ function px(value: number): string {
  * A shadow as `box-shadow` writes it, or as `text-shadow` does without its spread. CSS blurs a
  * shadow by half its blur length, so the length is twice the sigma the canvas blurs it by.
  */
-function shadowToCSS(effect: ShadowEffect, spread = true): string {
+function shadowToCSS(effect: ShadowEffect, spread = true, profile: ColorProfile = 'srgb'): string {
   const inset = effect.type === 'INNER_SHADOW' ? 'inset ' : ''
   const parts = [
     `${inset}${px(effect.offset.x)}`,
@@ -142,7 +152,7 @@ function shadowToCSS(effect: ShadowEffect, spread = true): string {
     px(2 * blurSigma(effect.radius))
   ]
   if (spread) parts.push(px(effect.spread))
-  parts.push(cssColor(effect.color))
+  parts.push(cssColor(effect.color, profile))
   return parts.join(' ')
 }
 
@@ -174,12 +184,15 @@ function addBlurs(style: DesignStyleDeclaration, visible: Effect[]): void {
  * Every visible shadow, in order, plus layer and background blur, blurred as the canvas draws
  * them: CSS's `blur()` takes the Gaussian sigma itself.
  */
-export function effectsToCSS(effects: Effect[]): DesignStyleDeclaration {
+export function effectsToCSS(
+  effects: Effect[],
+  profile: ColorProfile = 'srgb'
+): DesignStyleDeclaration {
   const style: DesignStyleDeclaration = {}
   const visible = effects.filter((effect) => effect.visible)
   const shadows = visible.filter(isShadow)
   if (shadows.length > 0)
-    style['box-shadow'] = shadows.map((effect) => shadowToCSS(effect)).join(', ')
+    style['box-shadow'] = shadows.map((effect) => shadowToCSS(effect, true, profile)).join(', ')
   addBlurs(style, visible)
   return style
 }
@@ -188,12 +201,15 @@ export function effectsToCSS(effects: Effect[]): DesignStyleDeclaration {
  * Text's effects: each visible drop shadow as `text-shadow`, which has no spread and shadows the
  * glyphs, and its layer and background blurs. An inner shadow has no form CSS gives text.
  */
-export function textEffectsToCSS(effects: Effect[]): DesignStyleDeclaration {
+export function textEffectsToCSS(
+  effects: Effect[],
+  profile: ColorProfile = 'srgb'
+): DesignStyleDeclaration {
   const style: DesignStyleDeclaration = {}
   const visible = effects.filter((effect) => effect.visible)
   const shadows = visible.filter(isDropShadow)
   if (shadows.length > 0) {
-    style['text-shadow'] = shadows.map((effect) => shadowToCSS(effect, false)).join(', ')
+    style['text-shadow'] = shadows.map((effect) => shadowToCSS(effect, false, profile)).join(', ')
   }
   addBlurs(style, visible)
   return style

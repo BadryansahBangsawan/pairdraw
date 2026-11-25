@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import IconGithub from '~icons/lucide/github'
 import IconShieldCheck from '~icons/lucide/shield-check'
+import IconGithub from '~icons/simple-icons/github'
 
 import { provideLandingMessages, type LandingMessages } from '../content/messages'
 import ActionButton from '../ui/ActionButton.vue'

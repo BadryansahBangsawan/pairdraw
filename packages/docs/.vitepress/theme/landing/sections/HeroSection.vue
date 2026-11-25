@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import IconDownload from '~icons/lucide/download'
-import IconGithub from '~icons/lucide/github'
 import IconLoader from '~icons/lucide/loader'
 import IconPause from '~icons/lucide/pause'
 import IconPlay from '~icons/lucide/play'
 import IconSparkles from '~icons/lucide/sparkles'
+import IconGithub from '~icons/simple-icons/github'
 
 import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'

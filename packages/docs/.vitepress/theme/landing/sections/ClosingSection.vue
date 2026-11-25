@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
 import { ref, useTemplateRef } from 'vue'
-import IconApple from '~icons/lucide/apple'
 import IconDownload from '~icons/lucide/download'
-import IconMonitor from '~icons/lucide/monitor'
 import IconSparkles from '~icons/lucide/sparkles'
-import IconTerminal from '~icons/lucide/terminal'
+import IconApple from '~icons/simple-icons/apple'
+import IconLinux from '~icons/simple-icons/linux'
+import IconWindows from '~icons/simple-icons/windows'
 
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
@@ -29,7 +29,7 @@ const { system } = defineProps<{ system: VisitorSystem | null }>()
 const messages = useLandingMessages()
 const localePath = useLocalePath()
 const downloadLabel = useDownloadLabel(() => system)
-const ICONS = { mac: IconApple, windows: IconMonitor, linux: IconTerminal }
+const ICONS = { mac: IconApple, windows: IconWindows, linux: IconLinux }
 
 const frame = useTemplateRef<HTMLElement>('frame')
 const action = useTemplateRef<HTMLElement>('action')

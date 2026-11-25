@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { fromPercent, toPercent } from '@pairdraw/vue/controls/color-model'
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -22,7 +21,7 @@ const percentText = (value: number) => `${Math.round(toPercent(value))}%`
       :display-value="Math.round(ctx.okhcl.okhcl.h)"
       :display-min="0"
       :display-max="360"
-      :thumb-fill="colorToCSS(ctx.okhclSliderPreview?.okhclHue ?? ctx.color)"
+      :thumb-fill="ctx.cssColor(ctx.okhclSliderPreview?.okhclHue ?? ctx.color)"
       gradient="background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);"
       data-test-id="color-slider-okhcl-h"
       @update:model-value="ctx.updateOkHCLChannel('h', $event)"
@@ -40,7 +39,7 @@ const percentText = (value: number) => `${Math.round(toPercent(value))}%`
       :display-max="40"
       suffix="%"
       :gradient="ctx.okhclSliderGradient?.okhclChroma ?? undefined"
-      :thumb-fill="colorToCSS(ctx.okhclSliderPreview?.okhclChroma ?? ctx.color)"
+      :thumb-fill="ctx.cssColor(ctx.okhclSliderPreview?.okhclChroma ?? ctx.color)"
       :format-value-text="percentText"
       data-test-id="color-slider-okhcl-c"
       @update:model-value="ctx.updateOkHCLChannel('c', $event)"
@@ -58,7 +57,7 @@ const percentText = (value: number) => `${Math.round(toPercent(value))}%`
       :display-max="100"
       suffix="%"
       :gradient="ctx.okhclSliderGradient?.okhclLightness ?? undefined"
-      :thumb-fill="colorToCSS(ctx.okhclSliderPreview?.okhclLightness ?? ctx.color)"
+      :thumb-fill="ctx.cssColor(ctx.okhclSliderPreview?.okhclLightness ?? ctx.color)"
       :format-value-text="percentText"
       data-test-id="color-slider-okhcl-l"
       @update:model-value="ctx.updateOkHCLChannel('l', $event)"
@@ -76,8 +75,8 @@ const percentText = (value: number) => `${Math.round(toPercent(value))}%`
       :display-max="100"
       suffix="%"
       checkerboard
-      :gradient="`background: linear-gradient(to right, transparent, ${colorToCSS({ ...ctx.color, a: 1 })})`"
-      :thumb-fill="colorToCSS(ctx.color)"
+      :gradient="`background: linear-gradient(to right, transparent, ${ctx.cssColor({ ...ctx.color, a: 1 })})`"
+      :thumb-fill="ctx.cssColor(ctx.color)"
       :format-value-text="percentText"
       data-test-id="color-slider-okhcl-a"
       @update:model-value="ctx.updateOkHCLChannel('a', $event)"

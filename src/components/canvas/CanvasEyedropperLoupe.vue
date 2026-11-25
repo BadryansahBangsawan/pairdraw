@@ -7,13 +7,20 @@
 import { tv } from 'tailwind-variants'
 import { computed, useTemplateRef, watchEffect } from 'vue'
 
-import { colorToCSS, colorToHexRaw } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS, colorToHexRaw } from '@pairdraw/scene-graph/color'
 import type { EyedropperLoupe } from '@pairdraw/vue/canvas/eyedropper'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import { remToPx } from '@/app/shell/root-font-size'
 import theme from '@/theme/canvas/eyedropper-loupe'
 
 const loupeTheme = tv(theme)
+// The loupe samples a document's canvas, so its swatch shows the color in that document's profile.
+const store = useEditorStore()
+const swatch = computed(() => {
+  const color = loupe.color.value
+  return color ? colorToDocumentCSS(color, store.graph.documentColorSpace) : undefined
+})
 
 /** From the card's corner to the centre pixel's centre: 0.375rem padding and 4.5 pixels of 0.5rem. */
 const LOUPE_CENTRE_OFFSET_REM = 0.375 + 4.5 * 0.5
@@ -48,7 +55,7 @@ watchEffect(() => {
         <span :class="styles.centre()" />
       </div>
       <div :class="styles.value()">
-        <span :class="styles.swatch()" :style="{ background: colorToCSS(loupe.color.value) }" />
+        <span :class="styles.swatch()" :style="{ background: swatch }" />
         <span data-test-id="eyedropper-loupe-value">{{ colorToHexRaw(loupe.color.value) }}</span>
       </div>
     </div>

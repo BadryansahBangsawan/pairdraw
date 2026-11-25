@@ -84,6 +84,7 @@ function onCancel(cause: 'press' | 'escape'): void {
     <Tip :label="messages.accentCustom">
       <ColorPicker
         :color="customColor"
+        :color-profile="'srgb'"
         escape-reverts
         :eyedropper="false"
         @update="onCustomColor"

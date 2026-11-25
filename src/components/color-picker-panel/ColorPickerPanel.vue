@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ColorProfile } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { OkHCLControls } from '@pairdraw/vue/controls/color-model'
 
@@ -11,12 +12,15 @@ import HueAlphaSliders from '@/components/color-picker-panel/HueAlphaSliders.vue
 const {
   color,
   okhcl = null,
-  eyedropper = false
+  eyedropper = false,
+  colorProfile = 'srgb'
 } = defineProps<{
   color: Color
   okhcl?: OkHCLControls | null
   /** Offers sampling the canvas, for pickers that edit a document's colors. */
   eyedropper?: boolean
+  /** The profile the color is stored in; a Display P3 document shows its gamut. */
+  colorProfile?: ColorProfile
 }>()
 
 const emit = defineEmits<{
@@ -33,6 +37,9 @@ provideColorPickerPanel(
     },
     get eyedropper() {
       return eyedropper
+    },
+    get colorProfile() {
+      return colorProfile
     }
   },
   emit

@@ -3,10 +3,11 @@ import { tv } from 'tailwind-variants'
 import { computed, ref, watch } from 'vue'
 
 import type { Fill, MeshGradientPoint } from '@pairdraw/scene-graph'
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import { isMeshFill, resampleMeshPoints } from '@pairdraw/scene-graph/gradient'
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import fillPickerTheme from '@/theme/fill-picker'
@@ -66,8 +67,11 @@ function resize(nextColumns: number, nextRows: number): void {
   })
 }
 
+const store = useEditorStore()
+
 function pointStyle(point: MeshGradientPoint): string {
-  return colorToCSS({ ...point.color, a: point.color.a * fill.opacity })
+  const color = { ...point.color, a: point.color.a * fill.opacity }
+  return colorToDocumentCSS(color, store.graph.documentColorSpace)
 }
 </script>
 

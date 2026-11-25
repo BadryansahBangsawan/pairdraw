@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
+import { computed, type VNode } from 'vue'
 
+import type { ColorProfile } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { OkHCLControls } from '@pairdraw/vue/controls/color-model'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { ColorPickerRoot, type PickerCancelCause } from '@pairdraw/vue/primitives/ColorPicker'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import { useEyedropperKeepOpen } from '@/components/color-picker-panel/eyedropper'
 import { usePopoverUI } from '@/components/ui/overlay/popover'
@@ -15,9 +17,12 @@ const {
   color,
   okhcl = null,
   escapeReverts = false,
-  eyedropper = true
+  eyedropper = true,
+  colorProfile
 } = defineProps<{
   color: Color
+  /** The profile the color is stored in; the open document's unless one is given. */
+  colorProfile?: ColorProfile
   okhcl?: OkHCLControls | null
   /**
    * For a colour with no undo history, such as a preference: Escape closing the picker puts back
@@ -38,6 +43,9 @@ const emit = defineEmits<{
   cancel: [cause: PickerCancelCause]
 }>()
 const cls = usePopoverUI({ content: 'w-56 p-2' })
+// A design's colors are stored in its document's profile; a preference picks its own, in sRGB.
+const store = useEditorStore()
+const profile = computed(() => colorProfile ?? store.graph.documentColorSpace)
 // Settings has no document behind it to sample, nor always an editor to sample with.
 const keepOpen = eyedropper ? useEyedropperKeepOpen() : undefined
 </script>
@@ -65,6 +73,7 @@ const keepOpen = eyedropper ? useEyedropperKeepOpen() : undefined
         :color="currentColor"
         :okhcl="okhcl"
         :eyedropper="eyedropper"
+        :color-profile="profile"
         @update="update"
       />
     </template>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useColorPickerPanelContext } from '@/components/color-picker-panel/context'
@@ -19,7 +18,7 @@ const { panels } = useI18n()
       :number-value="Math.round(ctx.hslColor.h ?? 0)"
       :number-min="0"
       :number-max="360"
-      :thumb-fill="colorToCSS(ctx.sliderPreview.hue)"
+      :thumb-fill="ctx.cssColor(ctx.sliderPreview.hue)"
       data-test-id="color-slider-hue"
       @update="ctx.updateRGBAHue($event.space === 'hsl' ? $event.h : 0)"
       @update-number="ctx.updateRGBAHue"
@@ -36,7 +35,7 @@ const { panels } = useI18n()
       :number-max="100"
       suffix="%"
       checkerboard
-      :thumb-fill="colorToCSS(ctx.color)"
+      :thumb-fill="ctx.cssColor(ctx.color)"
       data-test-id="color-slider-alpha"
       @update="ctx.updateRGBAAlpha($event.alpha)"
       @update-number="ctx.updateRGBAAlpha($event / 100)"

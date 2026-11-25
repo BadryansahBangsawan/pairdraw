@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { useDocumentColors } from '@pairdraw/vue/controls/document-colors'
 
 import { useColorPickerPanelContext } from '@/components/color-picker-panel/context'
 
-const { panels, update } = useColorPickerPanelContext()
+const { panels, update, cssColor } = useColorPickerPanelContext()
 const colors = useDocumentColors()
 </script>
 
@@ -16,9 +15,9 @@ const colors = useDocumentColors()
         v-for="entry in colors"
         :key="`${entry.color.r},${entry.color.g},${entry.color.b},${entry.color.a}`"
         type="button"
-        :aria-label="colorToCSS(entry.color)"
+        :aria-label="cssColor(entry.color)"
         class="size-4 cursor-pointer rounded-sm border border-border p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
-        :style="{ background: colorToCSS(entry.color) }"
+        :style="{ background: cssColor(entry.color) }"
         @click="update(entry.color)"
       />
     </div>

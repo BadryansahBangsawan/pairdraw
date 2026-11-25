@@ -2,7 +2,8 @@
 import { tv } from 'tailwind-variants'
 
 import type { Fill } from '@pairdraw/scene-graph'
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 import { useI18n } from '@pairdraw/vue/i18n'
 import {
   GradientEditorRoot,
@@ -11,6 +12,7 @@ import {
 } from '@pairdraw/vue/primitives/GradientEditor'
 import { inputValue } from '@pairdraw/vue/shared/dom-events'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import PaintField from '@/components/inputs/PaintField.vue'
@@ -23,6 +25,9 @@ const emit = defineEmits<{ update: [fill: Fill] }>()
 const activeStop = defineModel<number>('activeStop')
 const { panels, editor } = useI18n()
 const fillPicker = tv(fillPickerTheme)
+const store = useEditorStore()
+// A stop is stored in the document's profile, so its swatch shows the color the canvas draws.
+const stopCSS = (color: Color) => colorToDocumentCSS(color, store.graph.documentColorSpace)
 
 function barStopClass(active: boolean, dragging: boolean) {
   return fillPicker({ active, dragging }).barStop()
@@ -68,7 +73,7 @@ function listStopClass(active: boolean) {
           :dragging="idx === bar.draggingIndex"
           :removable="bar.stops.length > 2"
           :class="barStopClass(idx === bar.activeStopIndex, idx === bar.draggingIndex)"
-          :style="{ left: `${stop.position * 100}%`, background: colorToCSS(stop.color) }"
+          :style="{ left: `${stop.position * 100}%`, background: stopCSS(stop.color) }"
           @select="root.actions.selectStop"
           @update-position="root.actions.updateStopPosition"
           @remove="root.actions.removeStop"

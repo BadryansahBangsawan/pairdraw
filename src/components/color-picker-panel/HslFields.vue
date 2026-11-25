@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { inputNumberValue } from '@pairdraw/vue/shared/dom-events'
 
@@ -50,7 +49,7 @@ const { panels } = useI18n()
     :number-min="0"
     :number-max="100"
     suffix="%"
-    :thumb-fill="colorToCSS(ctx.sliderPreview.hslSaturation)"
+    :thumb-fill="ctx.cssColor(ctx.sliderPreview.hslSaturation)"
     data-test-id="color-slider-hsl-s"
     @update="ctx.onRekaColorUpdate"
     @update-number="ctx.updateHSLChannelValue('s', $event)"
@@ -66,7 +65,7 @@ const { panels } = useI18n()
     :number-min="0"
     :number-max="100"
     suffix="%"
-    :thumb-fill="colorToCSS(ctx.sliderPreview.hslLightness)"
+    :thumb-fill="ctx.cssColor(ctx.sliderPreview.hslLightness)"
     data-test-id="color-slider-hsl-l"
     @update="ctx.onRekaColorUpdate"
     @update-number="ctx.updateHSLChannelValue('l', $event)"

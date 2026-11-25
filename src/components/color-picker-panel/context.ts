@@ -1,6 +1,8 @@
 import { computed, inject, provide, proxyRefs } from 'vue'
 import type { InjectionKey, ShallowUnwrapRef } from 'vue'
 
+import type { ColorProfile } from '@pairdraw/scene-graph'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { useColorModel, type OkHCLControls } from '@pairdraw/vue/controls/color-model'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -10,6 +12,8 @@ interface ColorPanelProps {
   okhcl?: OkHCLControls | null
   /** Offers sampling the canvas, for pickers that edit a document's colors. */
   eyedropper?: boolean
+  /** The profile the color is stored in, so a preview shows the color the canvas draws. */
+  colorProfile?: ColorProfile | undefined
 }
 
 type ColorPanelEmit = (event: 'update', color: Color) => void
@@ -35,6 +39,9 @@ function createColorPickerPanelContext(props: ColorPanelProps, emit: ColorPanelE
       ]
   )
   const isOkHCLFormat = computed(() => colorModel.format.value === 'okhcl' && okhcl.value)
+  const colorProfile = computed(() => props.colorProfile ?? 'srgb')
+  /** A stored color as CSS in the document's profile, for swatches and slider thumbs. */
+  const cssColor = (color: Color) => colorToDocumentCSS(color, colorProfile.value)
 
   function setFieldFormat(value: string) {
     colorModel.setFormat(value)
@@ -65,7 +72,9 @@ function createColorPickerPanelContext(props: ColorPanelProps, emit: ColorPanelE
     updateHSBChannelValue: colorModel.updateHSBChannel,
     updateOkHCLChannel: colorModel.updateOkHCLChannel,
     updateColor: colorModel.updateColor,
-    eyedropper: computed(() => props.eyedropper ?? false)
+    eyedropper: computed(() => props.eyedropper ?? false),
+    colorProfile,
+    cssColor
   }
 }
 

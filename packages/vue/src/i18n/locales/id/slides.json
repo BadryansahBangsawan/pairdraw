@@ -1,0 +1,22 @@
+{
+  "title": "Slide",
+  "listLabel": "Slide di halaman ini",
+  "slideLabel": "Slide {number}: {name}",
+  "reorderHint": "Seret untuk mengurutkan ulang, atau tekan Alt dengan panah atas atau bawah.",
+  "slideMoved": "{name} dipindahkan ke slide {number}.",
+  "present": "Presentasikan ({shortcut})",
+  "presentFromSlide": "Presentasikan dari slide ini",
+  "exportPDF": "Ekspor slide ke PDF",
+  "exportPPTX": "Ekspor slide ke PowerPoint",
+  "exportPPTXFailed": "Tidak dapat mengekspor slide: {error}",
+  "emptyTitle": "Belum ada slide",
+  "emptyDescription": "Frame tingkat atas di halaman ini menjadi slide, sesuai urutan layer.",
+  "nothingToPresent": "Tambahkan frame tingkat atas ke halaman ini untuk mempresentasikannya.",
+  "presentation": "Presentasi",
+  "previousSlide": "Slide sebelumnya",
+  "nextSlide": "Slide berikutnya",
+  "position": "{number} dari {count}",
+  "fitToScreen": "Sesuaikan dengan layar",
+  "actualSize": "Ukuran sebenarnya",
+  "exitPresentation": "Keluar dari presentasi ({shortcut})"
+}

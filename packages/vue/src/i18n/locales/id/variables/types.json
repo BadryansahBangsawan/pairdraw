@@ -1,0 +1,10 @@
+{
+  "color": "Warna",
+  "colorHint": "Nilai warna",
+  "number": "Angka",
+  "numberHint": "Ukuran, jarak, opasitas",
+  "text": "Teks",
+  "textHint": "Isi teks dan label",
+  "boolean": "Boolean",
+  "booleanHint": "Benar atau salah"
+}

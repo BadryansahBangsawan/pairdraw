@@ -1,0 +1,33 @@
+{
+  "dialogTitle": "Pulihkan pekerjaan yang belum disimpan",
+  "dialogDescription": "Pairdraw menemukan dokumen dari sesi sebelumnya.",
+  "restoreFailed": "Tidak dapat memulihkan dokumen ini.",
+  "settingsTitle": "Pemulihan",
+  "settingsDescription": "Kelola salinan pemulihan lokal untuk dokumen yang belum disimpan.",
+  "preserveUnsavedWork": "Pertahankan pekerjaan yang belum disimpan secara otomatis",
+  "preserveUnsavedWorkDescription": "Simpan salinan pemulihan lokal agar dokumen dapat dipulihkan setelah komputer mati mendadak.",
+  "restore": "Pulihkan",
+  "discard": "Buang",
+  "drafts": "Draf",
+  "draftsDescription": "Desain baru tetap ada di perangkat ini sampai Anda menyimpannya ke tempat lain.",
+  "loadingDrafts": "Memuat draf",
+  "noDrafts": "Belum ada draf",
+  "noDraftsDescription": "Desain baru disimpan di sini sebagai draf selagi Anda mengerjakannya.",
+  "draftsOff": "Draf nonaktif",
+  "draftsOffDescription": "Desain baru hanya disimpan di sini selagi “Pertahankan pekerjaan yang belum disimpan secara otomatis” aktif di Pengaturan dan browser ini menyimpan data situs.",
+  "deleteDraft": "Hapus draf",
+  "deleteDraftConfirmation": "Hapus draf “{name}”?",
+  "deleteDraftsConfirmation": {
+    "many": "Hapus {count} draf?"
+  },
+  "deleteDraftDescription": "Draf hanya disimpan di perangkat ini. Ini tidak dapat dibatalkan.",
+  "deleteDraftFailed": "Tidak dapat menghapus draf “{name}”. Coba lagi.",
+  "draftUnavailable": "Draf ini tidak lagi tersedia.",
+  "recoveredChangesTitle": "Perubahan yang dipulihkan",
+  "recoveredChangesDescription": "“{name}” memiliki perubahan dari {time} yang tidak pernah disimpan ke file. Simpan ke file, simpan sebagai file baru, atau buang.",
+  "saveRecovered": "Simpan",
+  "saveRecoveredAs": "Simpan Sebagai…",
+  "discardRecovered": "Jangan Simpan",
+  "recoveredChangesFailed": "Tidak dapat menyimpan perubahan yang dipulihkan: {error}",
+  "backupUnavailable": "Cadangan perubahan ini tidak lagi tersedia."
+}

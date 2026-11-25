@@ -1,0 +1,22 @@
+{
+  "move": "Pindah",
+  "frame": "Frame",
+  "section": "Section",
+  "rectangle": "Persegi panjang",
+  "ellipse": "Elips",
+  "line": "Garis",
+  "polygon": "Poligon",
+  "star": "Bintang",
+  "pen": "Pen",
+  "pencil": "Pensil",
+  "text": "Teks",
+  "sticky": "Sticky note",
+  "shape": "Bentuk",
+  "connector": "Konektor",
+  "hand": "Tangan",
+  "comment": "Comment",
+  "zoom": "Zoom",
+  "scale": "Scale",
+  "eyedropper": "Pipet",
+  "eyedropperSample": "Ambil warna dari canvas"
+}

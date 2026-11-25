@@ -1,0 +1,19 @@
+{
+  "mode": "Mode Shader",
+  "open": "Buka dalam Mode Shader",
+  "region": "Mode Shader: {name}",
+  "done": "Selesai",
+  "leave": "Tinggalkan Mode Shader ({shortcut})",
+  "play": "Putar",
+  "pause": "Jeda",
+  "restart": "Kembali ke awal",
+  "phase": "Fase animasi",
+  "position": "{time} dari {duration}",
+  "preview": "Pratinjau shader",
+  "settings": "Pengaturan shader",
+  "starting": "Memulai shader…",
+  "failed": "Shader ini tidak dapat diputar di sini, sehingga frame statisnya yang ditampilkan.",
+  "readOnly": "Dokumen ini hanya bisa dibaca: shader tetap diputar, tetapi pengaturannya tidak dapat diubah.",
+  "inputs": "Input",
+  "bindInput": "Ikat input"
+}

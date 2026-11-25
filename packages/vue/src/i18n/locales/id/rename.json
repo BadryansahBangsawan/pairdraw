@@ -1,0 +1,14 @@
+{
+  "title": "Ganti nama",
+  "layers": "Ganti nama {count} layer",
+  "preview": "Pratinjau",
+  "match": "Cocokkan",
+  "to": "Ganti nama menjadi",
+  "currentName": "Nama saat ini",
+  "layerName": "Nama layer",
+  "numberAscending": "Angka ↑",
+  "numberDescending": "Angka ↓",
+  "startAscendingFrom": "Mulai naik dari",
+  "stopDescendingAt": "Berhenti turun di",
+  "invalidPattern": "Ekspresi reguler tidak valid"
+}

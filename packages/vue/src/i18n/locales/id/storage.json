@@ -1,0 +1,16 @@
+{
+  "workspace": "Workspace penyimpanan",
+  "openWorkspace": "Buka workspace",
+  "emptyStorageWorkspace": "Belum ada dokumen tersimpan.",
+  "notConfigured": "Konfigurasikan penyimpanan sebelum menggunakan workspace ini.",
+  "providerS3": "Penyimpanan S3",
+  "providerR2": "Cloudflare R2",
+  "providerAmazonS3": "Amazon S3",
+  "providerBackblaze": "Backblaze B2",
+  "loadingWorkspace": "Memuat workspace penyimpanan…",
+  "endpoint": "Endpoint",
+  "bucket": "Bucket",
+  "region": "Region",
+  "accessKeyID": "Access key ID",
+  "secretAccessKey": "Secret access key"
+}

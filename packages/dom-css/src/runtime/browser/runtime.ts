@@ -7,6 +7,8 @@ import type {
   DesignNode
 } from '#dom-css/types'
 
+import { sandboxedDesignDocument } from './sandbox'
+
 export interface BrowserCSSRuntimeOptions {
   document?: Document
   sandbox?: 'shadow-root' | 'iframe'
@@ -220,7 +222,7 @@ async function computeStylesInShadowRoot(
   shadow.append(style)
 
   const content = browserDocument.createElement('div')
-  content.innerHTML = serializeHTML(designDocument)
+  content.innerHTML = serializeHTML(sandboxedDesignDocument(designDocument))
   shadow.append(content)
   browserDocument.body.append(host)
 
@@ -256,7 +258,7 @@ async function computeStylesInIframe(
     iframeDocument.head.append(style)
 
     const content = iframeDocument.createElement('div')
-    content.innerHTML = serializeHTML(designDocument)
+    content.innerHTML = serializeHTML(sandboxedDesignDocument(designDocument))
     iframeDocument.body.append(content)
 
     // The sandbox sits offscreen, where WebKit never runs an animation frame of its own; the

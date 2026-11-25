@@ -121,7 +121,8 @@ describe('vectorize_image', () => {
     registerImageVectorizer(graph, { vectorize: async () => oklch })
 
     const result = await tool.execute(figma, { id: node.id })
-    if (!result || !('id' in result)) throw new Error('no frame')
+    if (!result || typeof result !== 'object' || !('id' in result) || typeof result.id !== 'string')
+      throw new Error(`no frame in ${JSON.stringify(result)}`)
     const frame = getNodeOrThrow(graph, result.id)
     const vector = frame.childIds.map((id) => getNodeOrThrow(graph, id))[0]
     const fill = vector?.fills.find((paint) => paint.type === 'SOLID')

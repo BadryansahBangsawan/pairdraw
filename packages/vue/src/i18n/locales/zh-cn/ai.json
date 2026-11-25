@@ -156,6 +156,7 @@
   "modelCapabilityToolsShort": "工具",
   "modelCapabilityVisionShort": "视觉",
   "selectDesignModel": "选择设计模型",
+  "designModelName": "设计模型",
   "modelNeedsCredential": "需要密钥",
   "modelAgentConnection": "代理",
   "modelConnectionChecking": "检查中…",

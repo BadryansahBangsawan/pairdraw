@@ -210,7 +210,7 @@ defineExpose({
               v-for="profile in profiles"
               :key="profile.id"
               :value="profile.id"
-              :text-value="`${profile.name} ${profileMetadata(profile)}`"
+              :text-value="`${profile.name || ai.designModelName} ${profileMetadata(profile)}`"
               :class="selectCls.item"
             >
               <SelectItemIndicator :class="ui.indicator()">

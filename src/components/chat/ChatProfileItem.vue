@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from '@pairdraw/vue/i18n'
+
 import type { AIModelProfile } from '@/app/ai/models'
 import { profileLogoSource } from '@/app/ai/models/provider-logo'
 import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
@@ -10,6 +12,7 @@ const { profile, metadata } = defineProps<{
   metadata: string
 }>()
 
+const { ai } = useI18n()
 const ui = chatProfileTheme()
 </script>
 
@@ -17,7 +20,7 @@ const ui = chatProfileTheme()
   <span class="contents">
     <ProviderLogo v-bind="profileLogoSource(profile)" />
     <span :class="ui.text()">
-      <span :class="ui.name()">{{ profile.name }}</span>
+      <span :class="ui.name()">{{ profile.name || ai.designModelName }}</span>
       <span :class="ui.metadata()">{{ metadata }}</span>
     </span>
     <span

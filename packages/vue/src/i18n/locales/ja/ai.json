@@ -156,6 +156,7 @@
   "modelCapabilityToolsShort": "ツール",
   "modelCapabilityVisionShort": "ビジョン",
   "selectDesignModel": "デザインモデルを選択",
+  "designModelName": "デザインモデル",
   "modelNeedsCredential": "キーが必要",
   "modelAgentConnection": "エージェント",
   "modelConnectionChecking": "確認中…",

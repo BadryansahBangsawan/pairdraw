@@ -243,6 +243,7 @@
   "modelCapabilityToolsShort": "Alat",
   "modelCapabilityVisionShort": "Vision",
   "selectDesignModel": "Pilih model desain",
+  "designModelName": "Model desain",
   "modelNeedsCredential": "Perlu kunci",
   "modelAgentConnection": "Agent",
   "modelConnectionChecking": "Memeriksa…",

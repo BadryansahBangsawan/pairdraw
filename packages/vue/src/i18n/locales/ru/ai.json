@@ -156,6 +156,7 @@
   "modelCapabilityToolsShort": "Инструменты",
   "modelCapabilityVisionShort": "Зрение",
   "selectDesignModel": "Выбрать модель для дизайна",
+  "designModelName": "Модель дизайна",
   "modelNeedsCredential": "Нужен ключ",
   "modelAgentConnection": "Агент",
   "modelConnectionChecking": "Проверка…",

@@ -138,7 +138,7 @@ const { connectionState, refresh: refreshAgents } = useModelConnectionStates(sta
                   />
                 </span>
               </template>
-              {{ profile.name }}
+              {{ profile.name || ai.designModelName }}
               <template #description>
                 {{ profile.providerName
                 }}<span v-if="profile.modelName"> · {{ profile.modelName }}</span>

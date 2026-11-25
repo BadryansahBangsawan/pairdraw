@@ -294,6 +294,7 @@ export const aiMessageDefaults = {
   modelCapabilityToolsShort: 'Tools',
   modelCapabilityVisionShort: 'Vision',
   selectDesignModel: 'Select design model',
+  designModelName: 'Design model',
   modelNeedsCredential: 'Needs key',
   modelAgentConnection: 'Agent',
   modelConnectionChecking: 'Checking…',

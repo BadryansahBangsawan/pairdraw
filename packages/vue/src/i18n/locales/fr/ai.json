@@ -156,6 +156,7 @@
   "modelCapabilityToolsShort": "Outils",
   "modelCapabilityVisionShort": "Vision",
   "selectDesignModel": "Sélectionner le modèle de conception",
+  "designModelName": "Modèle de design",
   "modelNeedsCredential": "Clé requise",
   "modelAgentConnection": "Agent",
   "modelConnectionChecking": "Vérification…",

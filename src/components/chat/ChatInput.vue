@@ -225,9 +225,11 @@ const selectedModelName = computed(() => {
 })
 
 // The composer switches configured Design-role profiles; raw provider model selection lives in Settings.
-const selectedProfileName = computed(
-  () => designModelProfile.value?.name ?? selectedModelName.value
-)
+const selectedProfileName = computed(() => {
+  const profile = designModelProfile.value
+  if (!profile) return selectedModelName.value
+  return profile.name || ai.value.designModelName
+})
 </script>
 
 <template>

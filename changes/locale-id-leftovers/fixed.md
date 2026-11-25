@@ -1,0 +1,2 @@
+- The chat composer names the design model in the interface language instead of falling back to English.
+- The Indonesian comment empty state reads as a full sentence ("Klik di canvas untuk menambahkan komentar."), and the prototype overflow select no longer clips its "No scrolling" choice.

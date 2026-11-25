@@ -202,7 +202,7 @@ function legacySettings(): AIModelSettings {
   const displayModel = customModelID || modelID
   const name = displayModel
     ? provider?.models.find((model) => model.id === displayModel)?.name || displayModel
-    : 'Design model'
+    : ''
   const maxOutputTokens = Number(readLegacyAIModelStorage('ai-max-output-tokens'))
   const curatedCapabilities = customModelID ? null : curatedModelCapabilities(providerID, modelID)
   return {

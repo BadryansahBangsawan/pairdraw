@@ -188,6 +188,18 @@ export const aiMessageDefaults = {
   changePreviewHint:
     'Before and after images kept with each AI edit in the chat history. Larger previews take more storage.',
   changePreviewOff: 'Off, structure only',
+  turnRenders: 'Changed frames in chat',
+  turnRendersHint:
+    'A reply that changed frames shows small before and after renders of them, below its text.',
+  turnRendersTitle: 'Changed frames',
+  turnRendersMore: params('+{count} more frames'),
+  turnRendersRendering: 'Rendering changes…',
+  turnRendersCleared: 'Renders cleared to save memory',
+  turnRendersUnavailable: 'Renders are unavailable here',
+  turnRendersCount: params('{count} frames changed'),
+  turnRenderWidth: params('{width}px wide'),
+  turnRenderNewFrame: 'New frame',
+  turnRenderDeleted: 'Deleted',
   /** Home's prompt that starts a new design in the AI chat. */
   promptStartTitle: 'What do you want to design?',
   promptStartLabel: 'Describe a design',

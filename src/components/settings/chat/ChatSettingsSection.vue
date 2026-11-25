@@ -11,7 +11,8 @@ import {
   changePreviewSize,
   maxAgentSteps,
   reasoningDisplay,
-  showTokenUsage
+  showTokenUsage,
+  turnRenders
 } from '@/app/ai/chat/preferences'
 import { AGENT_STEP_LIMIT_MIN, AGENT_STEP_LIMIT_MAX } from '@/app/ai/reply/schema'
 import { openToolAccessSettings } from '@/app/automation/tool-access/settings/use'
@@ -64,6 +65,13 @@ const previewOptions = computed(() => [
           :label="ai.changePreview"
           :options="previewOptions"
           :ui="{ trigger: 'w-full sm:w-52' }"
+        />
+      </SettingsRow>
+      <SettingsRow :label="ai.turnRenders" :description="ai.turnRendersHint">
+        <AppSwitch
+          v-model="turnRenders"
+          :label="ai.turnRenders"
+          data-test-id="settings-ai-turn-renders"
         />
       </SettingsRow>
       <SettingsRow

@@ -110,6 +110,8 @@ export interface AppPreferences {
     animateEdits: boolean
     /** Whether the built-in chat asks before each tool call that changes the document. */
     approveActions: boolean
+    /** Whether a reply that changed top-level frames shows their before and after renders. */
+    turnRenders: boolean
     /** Whether a long chat is compacted into a summary before the context fills up. */
     compactAutomatically: boolean
     /** Whether the chat shows each reply's token usage and the conversation's running cost. */
@@ -172,6 +174,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     animateEdits: true,
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
     approveActions: false,
+    // A reply shows the frames it changed, in small before and after renders, unless turned off.
+    turnRenders: true,
     // A long chat summarizes itself before the window fills; Settings → AI turns it off.
     compactAutomatically: true,
     // The token and cost meter shows by default; Settings → AI turns it off.
@@ -252,6 +256,7 @@ const appPreferencesSchema = section(
       canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
       animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
       approveActions: v.fallback(v.boolean(), defaults.chat.approveActions),
+      turnRenders: v.fallback(v.boolean(), defaults.chat.turnRenders),
       compactAutomatically: v.fallback(v.boolean(), defaults.chat.compactAutomatically),
       showTokenUsage: v.fallback(v.boolean(), defaults.chat.showTokenUsage)
     }),

@@ -73,6 +73,17 @@ export const approveActions = computed({
   }
 })
 
+/** Whether a reply shows the frames it changed, in before and after renders; Settings → AI turns it off. */
+export const turnRenders = computed({
+  get: () => appPreferences.value.chat.turnRenders,
+  set: (turnRenders: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, turnRenders }
+    }
+  }
+})
+
 /** Whether a long chat compacts itself before the context fills; Settings → AI turns it off. */
 export const compactAutomatically = computed({
   get: () => appPreferences.value.chat.compactAutomatically,

@@ -13,6 +13,14 @@ import { EDITOR_BOOT_WAIT_MS } from './timeouts'
  */
 const OFFICIAL_CLOUD_ORIGIN = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).origin : null
 
+/**
+ * The styling sandbox is an iframe without `allow-scripts`, so a script that reaches it never runs.
+ * Chromium and WebKit still report the blocked attempt as a console error, which fails a spec that
+ * asserts no errors for markup the app never wrote; what reaches that frame is asserted where it is
+ * built, in `packages/dom-css/tests/runtime/sandbox.test.ts`.
+ */
+const BLOCKED_SANDBOX_SCRIPT = /^Blocked script execution in .* frame is sandboxed/
+
 /** The app binds `$mod` to Meta on macOS and to Control elsewhere. */
 const PRIMARY_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control'
 
@@ -28,6 +36,7 @@ export class CanvasHelper {
     page.on('console', (msg) => {
       if (msg.type() !== 'error') return
       if (OFFICIAL_CLOUD_ORIGIN && msg.location().url.startsWith(OFFICIAL_CLOUD_ORIGIN)) return
+      if (BLOCKED_SANDBOX_SCRIPT.test(msg.text())) return
       this.errors.push(msg.text())
     })
   }

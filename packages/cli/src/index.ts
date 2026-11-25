@@ -38,8 +38,9 @@ export function withStdinValues(argv: string[]): string[] {
 /**
  * Commands that read positionals no argument claims: `export` takes several files for storybook,
  * and `export storybook` is the subcommand that documents them. `export` checks its own extras.
+ * `check` takes several design files and reads them all.
  */
-const VARIADIC_COMMANDS = new Set(['export', 'storybook'])
+const VARIADIC_COMMANDS = new Set(['export', 'storybook', 'check'])
 
 /** A command this file defines directly, rather than one a module resolves on demand. */
 function isCommand(value: unknown): value is CommandDef {

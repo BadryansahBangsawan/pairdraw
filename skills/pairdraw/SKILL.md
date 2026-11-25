@@ -90,6 +90,15 @@ pairdraw tokens design.fig --check src/app.css  # list tokens that differ from c
 pairdraw tokens design.fig --sync src/app.css --write  # bring code-only changes in; canvas edits are kept
 ```
 
+### Check a pull request
+
+```bash
+pairdraw check designs/home.pen designs/settings.fig --out pairdraw-report  # renders, token drift, design-memory findings
+pairdraw check designs/home.pen --base .pairdraw-base --fail-on error  # only findings this change introduced fail
+```
+
+The repository's `.github/actions/pairdraw-check` action wraps it for a pull request: one comment, updated in place.
+
 ### Search and XPath query
 
 ```bash

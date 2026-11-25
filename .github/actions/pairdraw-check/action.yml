@@ -1,0 +1,201 @@
+name: Pairdraw design check
+description: Renders changed .fig and .pen frames, compares tokens with their stylesheet, lists new design-memory findings, and keeps one pull-request comment up to date.
+
+inputs:
+  version:
+    description: Version of @pairdraw/cli to install. Pin it to a release tag of this action.
+    required: false
+    default: latest
+  files:
+    description: Design files to check, separated by newlines or spaces. Empty checks the pull request's changed .fig and .pen files.
+    required: false
+    default: ''
+  config:
+    description: Settings file, as `pairdraw check --config`. Used only when it exists.
+    required: false
+    default: .pairdraw/check.json
+  base:
+    description: Git ref whose copies of the changed files are the baseline for new findings. Empty uses the pull request's merge base.
+    required: false
+    default: ''
+  fail-on:
+    description: Findings that fail the job, as `pairdraw check --fail-on`. Empty keeps the config file's level.
+    required: false
+    default: ''
+  comment:
+    description: Post or update the one pull-request comment.
+    required: false
+    default: 'true'
+  node-version:
+    description: Node version the CLI runs on.
+    required: false
+    default: '22'
+  out:
+    description: Folder for the report and the renders.
+    required: false
+    default: ''
+
+outputs:
+  report:
+    description: Path to report.json.
+    value: ${{ steps.check.outputs.report }}
+  exit-code:
+    description: The check's exit code, 0 pass, 1 findings, 2 could not run.
+    value: ${{ steps.check.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install the Pairdraw CLI
+      shell: bash
+      env:
+        CLI_VERSION: ${{ inputs.version }}
+      run: npm install --global "@pairdraw/cli@${CLI_VERSION}"
+
+    - name: Find the design files and the baseline
+      id: plan
+      shell: bash
+      env:
+        INPUT_FILES: ${{ inputs.files }}
+        INPUT_BASE: ${{ inputs.base }}
+        BASE_REF: ${{ github.base_ref }}
+      run: |
+        set -euo pipefail
+        out="${RUNNER_TEMP}/pairdraw-check-plan"
+        base_dir="${RUNNER_TEMP}/pairdraw-base"
+        mkdir -p "$out"
+        rm -rf "$base_dir"
+        mkdir -p "$base_dir"
+
+        # One commit to compare with: the named ref, else the pull request's base branch.
+        git fetch --no-tags --depth=1 origin "${INPUT_BASE:-$BASE_REF}"
+        merge_base="$(git merge-base FETCH_HEAD HEAD)"
+
+        if [ -n "$INPUT_FILES" ]; then
+          printf '%s\n' $INPUT_FILES | sed '/^$/d' > "$out/files.txt"
+        else
+          git diff --name-only --diff-filter=ACMR -z "${merge_base}...HEAD" -- '*.fig' '*.pen' \
+            | tr '\0' '\n' | sed '/^$/d' > "$out/files.txt"
+        fi
+
+        if [ ! -s "$out/files.txt" ]; then
+          echo "No design files changed."
+          echo "files=" >> "$GITHUB_OUTPUT"
+          echo "base=" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Design files kept in Git LFS arrive as pointers; pull the ones being checked.
+        if command -v git-lfs >/dev/null 2>&1; then
+          git lfs pull --include="$(paste -sd, "$out/files.txt")" >/dev/null 2>&1 || true
+        fi
+
+        while IFS= read -r path; do
+          if git cat-file -e "${merge_base}:${path}" 2>/dev/null; then
+            mkdir -p "$base_dir/$(dirname "$path")"
+            git show "${merge_base}:${path}" > "$base_dir/$path"
+          fi
+        done < "$out/files.txt"
+
+        {
+          echo "files<<PAIRDRAW_FILES"
+          cat "$out/files.txt"
+          echo "PAIRDRAW_FILES"
+          echo "base=$base_dir"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Check the design files
+      id: check
+      shell: bash
+      env:
+        FILES: ${{ steps.plan.outputs.files }}
+        BASE_DIR: ${{ steps.plan.outputs.base }}
+        CONFIG: ${{ inputs.config }}
+        FAIL_ON: ${{ inputs['fail-on'] }}
+        OUT: ${{ inputs.out }}
+      run: |
+        set -uo pipefail
+        out="${OUT:-${RUNNER_TEMP}/pairdraw-report}"
+        mkdir -p "$out"
+        args=()
+        while IFS= read -r path; do
+          [ -n "$path" ] && args+=("$path")
+        done <<< "$FILES"
+
+        if [ "${#args[@]}" -eq 0 ]; then
+          pairdraw check --out "$out" > "$out/run.log" 2>&1 || true
+        else
+          extra=()
+          [ -f "$CONFIG" ] && extra+=(--config "$CONFIG")
+          [ -n "$BASE_DIR" ] && extra+=(--base "$BASE_DIR")
+          [ -n "$FAIL_ON" ] && extra+=(--fail-on "$FAIL_ON")
+          code=0
+          pairdraw check "${args[@]}" "${extra[@]}" --out "$out" > "$out/run.log" 2>&1 || code=$?
+          echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+          cat "$out/run.log" >&2
+        fi
+        echo "report=$out/report.json" >> "$GITHUB_OUTPUT"
+        echo "dir=$out" >> "$GITHUB_OUTPUT"
+
+    - name: Upload the report and the renders
+      if: ${{ steps.check.outputs.report != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pairdraw-check-${{ github.event.pull_request.number || github.ref_name }}
+        path: ${{ steps.check.outputs.dir }}
+        if-no-files-found: ignore
+        retention-days: 14
+
+    - name: Update the pull-request comment
+      if: ${{ inputs.comment == 'true' && github.event.pull_request.number }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+        IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        FILES: ${{ steps.plan.outputs.files }}
+        OUT: ${{ inputs.out }}
+      run: |
+        set -uo pipefail
+        out="${OUT:-${RUNNER_TEMP}/pairdraw-report}"
+        body_file="$out/comment.md"
+        marker='<!-- pairdraw-check -->'
+
+        if [ -z "${FILES//[[:space:]]/}" ]; then
+          printf '%s\n\nNo design files changed in this pull request.\n' "$marker" > "$body_file"
+        elif [ -f "$out/report.md" ]; then
+          { cat "$out/report.md"; printf '\n[Report and renders](%s) are kept as an artifact of this run.\n' "$RUN_URL"; } > "$body_file"
+        else
+          printf '%s\n\nThe design check did not finish; see the job log.\n' "$marker" > "$body_file"
+        fi
+
+        if [ "${IS_FORK}" = "true" ]; then
+          echo "::warning::A pull request from a fork has a read-only token, so the comment is skipped."
+          exit 0
+        fi
+
+        existing="$(gh api --paginate "repos/${REPO}/issues/${PR}/comments?per_page=100" \
+          --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" 2>/dev/null | head -n 1)"
+        payload="$(jq -Rs '{body: .}' < "$body_file")"
+        if [ -n "$existing" ]; then
+          printf '%s' "$payload" | gh api --method PATCH "repos/${REPO}/issues/comments/${existing}" --input - >/dev/null
+        else
+          printf '%s' "$payload" | gh api --method POST "repos/${REPO}/issues/${PR}/comments" --input - >/dev/null
+        fi || echo "::warning::The Pairdraw comment could not be written; the report is in the artifact."
+
+    - name: Fail on findings
+      shell: bash
+      env:
+        CODE: ${{ steps.check.outputs.exit-code }}
+      run: |
+        if [ -n "${CODE:-}" ] && [ "$CODE" != "0" ]; then
+          echo "::error::pairdraw check exited ${CODE}"
+          exit "$CODE"
+        fi

@@ -1,5 +1,6 @@
 import agent from './agent'
 import analyze from './analyze'
+import check from './check'
 import convert from './convert'
 import designMemory from './design-memory'
 import diff from './diff'
@@ -33,6 +34,7 @@ import variables from './variables'
 export const COMMANDS = {
   agent,
   analyze,
+  check,
   convert,
   'design-memory': designMemory,
   diff,

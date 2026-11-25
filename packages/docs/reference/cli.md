@@ -139,6 +139,25 @@ pairdraw tokens app.fig --project ./app --write
 
 `--out` is refused with `--import` or `--project`: it writes dtcg token files, while an import writes the document itself with `--write` or `--output`.
 
+## check
+
+Check design documents in CI: render each frame at several widths, compare variables with the stylesheet they come from, and list the design memory's findings. Nothing is written back to a document.
+
+```sh
+pairdraw check [files...] [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--config` | Settings file (default: `.pairdraw/check.json`) |
+| `--base` | Folder holding the base revision's copies at the same paths, so only findings this change introduced fail |
+| `--out` | Report folder (default: `pairdraw-report`): `report.json`, `report.md`, `renders/` |
+| `--image-base` | URL prefix for the render images in `report.md` |
+| `--fail-on` | `error`, `warning`, or `never`; overrides the settings file |
+| `--json` | Output the report as JSON |
+
+Exit codes: `0` pass, `1` findings at the configured level, `2` the check could not run. See [CI Checks on a Pull Request](/programmable/cli/check) for the settings file and the GitHub Action.
+
 ## export
 
 Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories, or record the page's prototype as an MP4, GIF, or WebM video. The app does not offer PowerPoint or draw.io export; the CLI does.

@@ -1,5 +1,5 @@
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
-import { basename, dirname, isAbsolute, join, relative, sep } from 'node:path'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 
 import { defineCommand } from 'citty'
 import { compact } from 'es-toolkit/array'
@@ -8,19 +8,15 @@ import {
   defaultTokenImportOptions,
   importTokensIntoGraph,
   planTokenImport,
-  planTokenSync,
   readCSSDesignTokens,
-  readTokenSourceFiles,
   syncTokenFiles,
-  tokenSourceForFiles,
-  type DesignSystemIssue,
-  type DesignTokenSourceFile,
-  type TokenDrift
+  type DesignSystemIssue
 } from '@pairdraw/core/io/formats/design-tokens'
-import { importDesignSystemFolder, readDesignSystemFolder } from '@pairdraw/core/node/design-system'
+import { importDesignSystemFolder } from '@pairdraw/core/node/design-system'
 import type { TokensResult } from '@pairdraw/core/rpc'
 
 import { requireFile } from '#cli/app/client'
+import { driftLine, pathFromDocument, readTokenSource, tokenDriftForFile } from '#cli/check/tokens'
 import { fmtList, ok, printJSON, writeStdout } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
@@ -252,23 +248,6 @@ async function importProject(
   else if (args.output) await writeDocumentFile(graph, args.output)
 }
 
-/** A stylesheet or token file as it is, or a project folder's stylesheets as an import reads them. */
-async function readTokenSource(
-  path: string
-): Promise<{ files: DesignTokenSourceFile[]; issues: DesignSystemIssue[] }> {
-  if ((await stat(path)).isDirectory()) return readDesignSystemFolder(path)
-  return { files: [{ path: basename(path), text: await readFile(path, 'utf8') }], issues: [] }
-}
-
-function driftLine(drift: TokenDrift): string {
-  const where = `${drift.collection} / ${drift.variable}${drift.mode ? ` (${drift.mode})` : ''}`
-  const values = [
-    drift.code === undefined ? undefined : `code ${drift.code}`,
-    drift.canvas === undefined ? undefined : `canvas ${drift.canvas}`
-  ].filter((part) => part !== undefined)
-  return `${where}: ${drift.kind}${values.length > 0 ? `, ${values.join(', ')}` : ''}`
-}
-
 /**
  * Compares the document's variables with linked code and lists every token that differs, for a
  * check in CI: the process exits 1 when anything does. The document is not changed.
@@ -279,18 +258,10 @@ async function checkTokens(
   args: { json?: boolean }
 ): Promise<void> {
   const document = requireFile(file)
-  const graph = await loadDocument(document)
-  populateWholeDocument(graph)
-  const source = await readTokenSource(sourcePath)
-  const { bundles, issues } = readTokenSourceFiles(graph, source.files)
-  issues.unshift(...source.issues)
-  // The link records its path from the document's folder; a stylesheet is also found by name.
-  const fromDocument = pathFromDocument(document, sourcePath)
-  const link = tokenSourceForFiles(graph, source.files, fromDocument)
-  const { drift } = planTokenSync(graph, bundles, link)
+  const { inSync, drift, issues } = await tokenDriftForFile(document, sourcePath)
   if (args.json) {
-    await printJSON({ in_sync: drift.length === 0, drift, issues })
-  } else if (drift.length === 0) {
+    await printJSON({ in_sync: inSync, drift, issues })
+  } else if (inSync) {
     console.log(ok(`Variables match ${sourcePath}`))
   } else {
     // Through the stream: a CI log reads the report from a pipe, which takes 64 KB at once.
@@ -309,14 +280,7 @@ async function checkTokens(
       )
     )
   // Exiting at once would cut off what the pipe has not taken yet.
-  if (drift.length > 0) process.exitCode = 1
-}
-
-/** Where code is from the document's folder; none where no relative path reaches it. */
-function pathFromDocument(document: string, sourcePath: string): string | undefined {
-  const path = relative(dirname(document), sourcePath)
-  // On Windows a file on another drive has no relative path: `relative` returns it whole.
-  return isAbsolute(path) ? undefined : path.split(sep).join('/')
+  if (!inSync) process.exitCode = 1
 }
 
 const CONFLICT_CHOICES = ['skip', 'code', 'canvas'] as const

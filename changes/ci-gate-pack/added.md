@@ -1,0 +1,1 @@
+- `pairdraw check` and the `pairdraw-check` GitHub Action check a pull request's `.fig` and `.pen` changes: frames rendered at several widths, token drift, and new design-memory findings, reported in one comment kept up to date.

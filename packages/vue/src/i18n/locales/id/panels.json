@@ -840,7 +840,7 @@
   "prototypeVideoExport": "Ekspor",
   "prototypeVideoRecording": "Merekam frame {done} dari {total}",
   "prototypeOverflow": "Pengguliran overflow",
-  "prototypeOverflowNone": "Tanpa pengguliran",
+  "prototypeOverflowNone": "Tidak ada",
   "prototypeOverflowVertical": "Vertikal",
   "prototypeOverflowHorizontal": "Horizontal",
   "prototypeOverflowBoth": "Kedua arah",

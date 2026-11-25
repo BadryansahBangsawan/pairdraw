@@ -62,7 +62,7 @@ Every shape can have a fill. The fill section supports:
 - **Gradient** — Linear, Radial, Angular, or Diamond with editable gradient stops. While the gradient's picker is open, the canvas shows its handles: drag an end or a radius dot to move it, hold <kbd>Shift</kbd> to turn it in 15° steps, and drag a stop's square to slide the stop along the line
 - **Mesh** — a grid of colored points that blends across the layer. The Mesh tab shows each point: select one to recolor it, or change **Columns** and **Rows** to resample the grid (up to 4 each way). Mesh paints on fills and strokes; `.fig` files keep the grid and show its own color elsewhere, and `.pen` `mesh_gradient` paints import
 - **Image** — select an image file as the fill, or paste an address in **Image URL** and choose **Load** to fetch a PNG, JPEG, GIF, or WebP image from the web (or a `data:` URL) of up to 64 MB
-- **Shader** — an animated GLSL shader: start from the gallery in the shader fill picker, add effects to it, or paste a preset copied from shaders.com
+- **Shader** — an animated GLSL shader: start from one of the 21 complete shaders in the gallery, add effects to it, tune a gradient effect's stops or the shape it draws on in the properties panel, or paste a preset copied from shaders.com. Preview plays the shaders on screen; the canvas, files, and other formats keep a still frame.
 
 An image fill is placed in one of five modes: **Fill** covers the layer and crops the image, **Fit** shows the whole image inside the layer, **Stretch** stretches the whole image to the layer's proportions, **Crop** lets you choose the part of the image to show, and **Tile** repeats the image. Stretch is stored as a crop of the whole image, as `.pen` files store it and Figma reads it.
 

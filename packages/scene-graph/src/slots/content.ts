@@ -1,6 +1,10 @@
 import { isGeneratedFrame } from '../generated'
 import type { SceneGraph } from '../graph'
-import { getInstanceOverride, setInstanceOverride } from '../instances/overrides'
+import {
+  getInstanceOverride,
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '../instances/overrides'
 import { cloneChildrenWithMapping } from '../instances/sync'
 import type { SceneNode } from '../types'
 import { applyBoundPaintColorsIn } from '../variables/paints'
@@ -63,7 +67,7 @@ export function claimSlotContent(
 ): void {
   const { frame, instance, propertyId } = scope
   if (ownsSlotContent(graph, frame, propertyId)) return
-  const overrides = instance.instanceOverrides
+  const overrides = ownInstanceOverrides(instance)
   for (const node of descendants(graph, frame, false)) {
     overrides.descendants.delete(node.id)
     if (node.type !== 'INSTANCE') {
@@ -76,10 +80,10 @@ export function claimSlotContent(
       if (!fields) continue
       for (const [field, value] of fields)
         if (field !== 'sourceComponentId')
-          setInstanceOverride(node.instanceOverrides, node.id, inner.id, field, value)
+          setInstanceOverride(ownInstanceOverrides(node), node.id, inner.id, field, value)
       overrides.descendants.delete(inner.id)
     }
-    graph.updateNode(node.id, { instanceOverrides: node.instanceOverrides })
+    graph.updateNode(node.id, { instanceOverrides: ownInstanceOverrides(node) })
   }
   graph.updateNode(instance.id, {
     instanceOverrides: overrides,

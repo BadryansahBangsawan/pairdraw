@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { DEFAULT_HISTORY_LIMIT } from '@pairdraw/scene-graph/undo'
 
 /**
@@ -18,7 +18,7 @@ function restoreAfter(edits: number, componentsPerEdit = 1) {
   if (!instance) throw new Error('no instance')
   const [copyId] = instance.childIds
   graph.updateNode(copyId, { text: 'override' })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copyId, 'text', 'override')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copyId, 'text', 'override')
 
   graph.deleteNode(a.id)
   graph.syncInstances(list.id)

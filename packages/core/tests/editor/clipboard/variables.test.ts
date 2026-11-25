@@ -10,6 +10,7 @@ import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   bindingOverrideField,
+  ownInstanceOverrides,
   setInstanceOverride,
   variableModeOverrideField
 } from '@pairdraw/scene-graph/instances/overrides'
@@ -19,7 +20,7 @@ import { remapClipboardVariableBindings } from '#core/editor/clipboard/variables
 test('a pasted instance override follows the collections and variables the paste copied', () => {
   const graph = new SceneGraph()
   const instance = graph.createNode('INSTANCE', graph.getPages()[0].id, { name: 'Outer' })
-  const state = instance.instanceOverrides
+  const state = ownInstanceOverrides(instance)
   setInstanceOverride(state, instance.id, 'nested', variableModeOverrideField('sizes'))
   setInstanceOverride(state, instance.id, 'nested', variableModeOverrideField('themes'))
   setInstanceOverride(state, instance.id, 'nested', bindingOverrideField('width'), 'gap')
@@ -62,7 +63,7 @@ function pinnedNestedMode() {
   const outer = expectDefined(graph.createInstance(card.id, page, { name: 'Outer' }))
   const nested = expectDefined(graph.getChildren(outer.id)[0])
   for (const field of ['variableModes', variableModeOverrideField(sizes.id)]) {
-    setInstanceOverride(outer.instanceOverrides, outer.id, nested.id, field)
+    setInstanceOverride(ownInstanceOverrides(outer), outer.id, nested.id, field)
   }
   return { graph, outer }
 }
@@ -100,7 +101,7 @@ test('a variable a pasted instance binds on a nested layer follows the paste int
   const outer = expectDefined(graph.createInstance(card.id, page, { name: 'Outer' }))
   const nested = expectDefined(graph.getChildren(outer.id)[0])
   setInstanceOverride(
-    outer.instanceOverrides,
+    ownInstanceOverrides(outer),
     outer.id,
     nested.id,
     bindingOverrideField('width'),

@@ -7,7 +7,7 @@ import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 import { materializeDocument, parseFigBuffer } from '@pairdraw/fig'
 import { initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 // Figma stores fill on the child and keeps that axis fixed in the frame's own sizing; a hugging
 // value there wins over the fill, so a filled row or button opened in Figma shrank to its content.
@@ -132,7 +132,7 @@ describe('own sizing of frames that fill their parent', () => {
     })
     // The instance hugs as an override of its component, as editing it in the canvas records.
     setInstanceOverride(
-      instance.instanceOverrides,
+      ownInstanceOverrides(instance),
       instance.id,
       instance.id,
       'primaryAxisSizing',

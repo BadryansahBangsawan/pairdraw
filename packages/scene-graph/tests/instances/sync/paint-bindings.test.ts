@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { SceneGraph, type Stroke } from '@pairdraw/scene-graph'
 import { colorToFill } from '@pairdraw/scene-graph/color'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
@@ -32,7 +32,7 @@ test.each(['fills', 'strokes'] as const)(
     const literal = [paint({ r: 0.1, g: 0.2, b: 0.3, a: 1 })]
     // The outer instance claims the shape's paints; the shape itself binds nothing.
     graph.updateNode(nested().id, { [list]: literal, boundVariables: {} })
-    setInstanceOverride(placed.instanceOverrides, placed.id, nested().id, list, literal)
+    setInstanceOverride(ownInstanceOverrides(placed), placed.id, nested().id, list, literal)
 
     graph.syncInstance(placed.id)
 

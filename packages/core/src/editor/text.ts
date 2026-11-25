@@ -3,6 +3,7 @@ import { copyDerivedGlyphs, copyGeometryPaths } from '@pairdraw/scene-graph/copy
 import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
 import {
   cloneInstanceOverrideState,
+  ownInstanceOverrides,
   setInstanceOverride,
   type InstanceOverrideState
 } from '@pairdraw/scene-graph/instances/overrides'
@@ -102,7 +103,7 @@ function applyTextInstanceOverride(
   for (const instanceId of instanceIds) {
     const instance = ctx.graph.getNode(instanceId)
     if (instance?.type !== 'INSTANCE') continue
-    setInstanceOverride(instance.instanceOverrides, instance.id, nodeId, 'text', text)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, nodeId, 'text', text)
     ctx.graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
   }
 }

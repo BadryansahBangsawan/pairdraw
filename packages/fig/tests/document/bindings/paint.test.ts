@@ -3,7 +3,10 @@ import { expect, test } from 'bun:test'
 import { applyDocumentPaintBindings } from '#fig/document/bindings/paint'
 
 import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
 const BLACK_FILL: Fill = {
@@ -65,7 +68,7 @@ test("an instance's copy takes its variable's color", () => {
 
 test('a copy whose fills the instance overrides shows its variable, then keeps its edits', () => {
   const { graph, instance, copy } = setup()
-  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'fills', copy.fills)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'fills', copy.fills)
   applyDocumentPaintBindings(graph, [copy])
   expect(copy.fills[0].color).toEqual({ r: 1, g: 1, b: 1, a: 1 })
   expect(copy.fills[0].opacity).toBeCloseTo(0.2)

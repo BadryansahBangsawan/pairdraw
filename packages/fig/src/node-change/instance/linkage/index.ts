@@ -1,5 +1,8 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 function linkSubtree(
   graph: SceneGraph,
@@ -12,7 +15,7 @@ function linkSubtree(
   if (!compParent || !instParent) return
 
   const instRoot = graph.getNode(instRootId)
-  const overrides = instRoot?.instanceOverrides
+  const overrides = instRoot ? ownInstanceOverrides(instRoot) : undefined
 
   const compChildren = compParent.childIds
     .map((id) => graph.getNode(id))

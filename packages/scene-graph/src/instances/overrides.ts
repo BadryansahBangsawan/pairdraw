@@ -1,5 +1,7 @@
 export type InstanceOverrideField = string
 
+import type { SceneNode } from '../types'
+
 export interface InstanceOverrideState {
   self: Map<InstanceOverrideField, unknown>
   descendants: Map<string, Map<InstanceOverrideField, unknown>>
@@ -72,6 +74,53 @@ export function isLayerReferenceOverride(field: InstanceOverrideField): boolean 
 
 export function createInstanceOverrideState(): InstanceOverrideState {
   return { self: new Map(), descendants: new Map() }
+}
+
+const SHARED_STATE_WRITE =
+  'the shared empty instance overrides are read-only; call ownInstanceOverrides(node) first'
+
+/** A map the shared state throws from on every write, which still answers all reads. */
+class SharedOverrideMap<K, V> extends Map<K, V> {
+  override set(key: K, value: V): this {
+    void key
+    void value
+    throw new Error(SHARED_STATE_WRITE)
+  }
+
+  override delete(key: K): boolean {
+    void key
+    throw new Error(SHARED_STATE_WRITE)
+  }
+
+  override clear(): void {
+    throw new Error(SHARED_STATE_WRITE)
+  }
+}
+
+/**
+ * What a layer holds until it records an override of its own. Shared and frozen, so an empty state
+ * costs nothing per layer and a write that skipped `ownInstanceOverrides` throws where it happens
+ * instead of reaching every layer of every document.
+ */
+export const EMPTY_INSTANCE_OVERRIDES: InstanceOverrideState = Object.freeze({
+  self: new SharedOverrideMap<InstanceOverrideField, unknown>(),
+  descendants: new SharedOverrideMap<string, Map<InstanceOverrideField, unknown>>()
+})
+
+export function isEmptyInstanceOverrideState(state: InstanceOverrideState): boolean {
+  return state.self.size === 0 && state.descendants.size === 0
+}
+
+/**
+ * The layer's own override state, giving it a fresh one when it still holds the shared empty
+ * state. Writers record through this and then persist it with `updateNode`, so the change reaches
+ * events and undo instead of only the layer.
+ */
+export function ownInstanceOverrides(node: SceneNode): InstanceOverrideState {
+  if (node.instanceOverrides !== EMPTY_INSTANCE_OVERRIDES) return node.instanceOverrides
+  const owned = createInstanceOverrideState()
+  node.instanceOverrides = owned
+  return owned
 }
 
 export interface SerializedOverrideValue {

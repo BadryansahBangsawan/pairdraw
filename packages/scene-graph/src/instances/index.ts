@@ -24,6 +24,7 @@ import {
   hasInstanceOverride as hasNodeInstanceOverride,
   type InstanceOverrideState,
   overriddenAssignmentId,
+  ownInstanceOverrides,
   REPLACED_LAYER_OVERRIDE,
   setInstanceOverride,
   variableModeOverrideField
@@ -134,14 +135,20 @@ function recordNestedSwap(graph: SceneGraph, instance: SceneNode, componentId: s
   )
   if (typeof existing !== 'string' && instance.componentId)
     setInstanceOverride(
-      owner.instanceOverrides,
+      ownInstanceOverrides(owner),
       owner.id,
       instance.id,
       'sourceComponentId',
       instance.componentId
     )
-  setInstanceOverride(owner.instanceOverrides, owner.id, instance.id, 'componentId', componentId)
-  graph.updateNode(owner.id, { instanceOverrides: owner.instanceOverrides })
+  setInstanceOverride(
+    ownInstanceOverrides(owner),
+    owner.id,
+    instance.id,
+    'componentId',
+    componentId
+  )
+  graph.updateNode(owner.id, { instanceOverrides: ownInstanceOverrides(owner) })
 }
 
 export interface SwapInstanceOptions {
@@ -299,8 +306,9 @@ function syncInstancesOf(
         updateSyncedProps(graph, instance, updates, (key) =>
           isProtectedSyncField(instance, key, protectedField)
         )
-        const context = createInstanceSyncContext(instance.id, instance.instanceOverrides)
-        syncChildren(graph, component.id, instance.id, instance.instanceOverrides, context)
+        const owned = ownInstanceOverrides(instance)
+        const context = createInstanceSyncContext(instance.id, owned)
+        syncChildren(graph, component.id, instance.id, owned, context)
         removeLeftoverCopies(graph, context, removals)
       }
     })
@@ -526,7 +534,7 @@ export function recordAssignmentOverride(
   const outer = assignmentOverrideOwner(graph, instanceId)
   if (!outer) return
   setInstanceOverride(
-    outer.instanceOverrides,
+    ownInstanceOverrides(outer),
     outer.id,
     instanceId,
     assignmentOverrideField(propertyId),
@@ -594,9 +602,9 @@ function forgetOverridesOf(graph: SceneGraph, nodeId: string): void {
   if (!parentId) return
   graph.closest(parentId, (ancestor) => {
     if (ancestor.type !== 'INSTANCE') return false
-    const { descendants } = ancestor.instanceOverrides
-    if (ids.some((id) => descendants.delete(id)))
-      graph.updateNode(ancestor.id, { instanceOverrides: ancestor.instanceOverrides })
+    const owned = ownInstanceOverrides(ancestor)
+    if (ids.some((id) => owned.descendants.delete(id)))
+      graph.updateNode(ancestor.id, { instanceOverrides: owned })
     return false
   })
 }
@@ -663,13 +671,13 @@ export function replaceInstanceLayer(
   })
   graph.deleteNode(target.id)
   setInstanceOverride(
-    owner.instanceOverrides,
+    ownInstanceOverrides(owner),
     owner.id,
     replacementId,
     REPLACED_LAYER_OVERRIDE,
     layerId
   )
-  graph.updateNode(owner.id, { instanceOverrides: owner.instanceOverrides })
+  graph.updateNode(owner.id, { instanceOverrides: ownInstanceOverrides(owner) })
   return true
 }
 

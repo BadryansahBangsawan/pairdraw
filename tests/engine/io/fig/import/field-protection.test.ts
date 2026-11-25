@@ -3,7 +3,10 @@ import { describe, expect, test } from 'bun:test'
 import { materializeDocument } from '@pairdraw/fig'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph, type Fill, type Stroke } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 function pageId(graph: SceneGraph): string {
   return graph.getPages()[0].id
@@ -99,9 +102,9 @@ describe('fig import override field protection', () => {
       fills: [blueFill],
       boundVariables: { 'fills/0/color': 'target-color', width: 'target-width' }
     })
-    setInstanceOverride(instance.instanceOverrides, instance.id, target.id, 'text', true)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, target.id, 'text', true)
     setInstanceOverride(
-      instance.instanceOverrides,
+      ownInstanceOverrides(instance),
       instance.id,
       target.id,
       'boundVariables/width',
@@ -132,7 +135,7 @@ describe('fig import override field protection', () => {
       visible: true,
       strokes: [blueStroke]
     })
-    setInstanceOverride(instance.instanceOverrides, instance.id, target.id, 'strokes', true)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, target.id, 'strokes', true)
     graph.syncInstances(component.id)
 
     const synced = graph.getNode(target.id)

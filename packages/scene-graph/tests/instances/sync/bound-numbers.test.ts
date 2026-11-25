@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
 function must<T>(value: T | null | undefined, what: string): T {
@@ -28,7 +28,7 @@ function chipInLargeCard() {
   must(graph.createInstance(chip.id, card.id), 'chip in card')
   const placed = must(graph.createInstance(card.id, page), 'placed card')
   // The placed card sets its own mode, as the editor and the reader record it.
-  setInstanceOverride(placed.instanceOverrides, placed.id, placed.id, 'variableModes')
+  setInstanceOverride(ownInstanceOverrides(placed), placed.id, placed.id, 'variableModes')
   graph.updateNode(placed.id, { variableModes: { [collection.id]: large } })
   reconcileVariableBindings(graph)
   const nested = () => must(graph.getChildren(placed.id)[0], 'nested chip')
@@ -77,7 +77,7 @@ test('syncing a component that rebinds a number keeps the value its instance ove
   graph.bindVariable(chip.id, 'opacity', faded.id)
   reconcileVariableBindings(graph)
   const instance = must(graph.createInstance(chip.id, page), 'instance')
-  setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'opacity')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'opacity')
   graph.updateNode(instance.id, { opacity: 0.3 })
 
   graph.bindVariable(chip.id, 'opacity', dim.id)
@@ -107,7 +107,7 @@ test('syncing keeps a right-constrained layer at its x as its bound width grows'
   })
   graph.bindVariable(bar.id, 'width', width.id)
   const placed = must(graph.createInstance(box.id, page), 'placed box')
-  setInstanceOverride(placed.instanceOverrides, placed.id, placed.id, 'variableModes')
+  setInstanceOverride(ownInstanceOverrides(placed), placed.id, placed.id, 'variableModes')
   graph.updateNode(placed.id, { variableModes: { [collection.id]: large } })
   reconcileVariableBindings(graph)
 
@@ -149,7 +149,7 @@ test('syncing a component keeps a bound number its instance overrides', () => {
   graph.bindVariable(chip.id, 'opacity', faded.id)
   reconcileVariableBindings(graph)
   const instance = must(graph.createInstance(chip.id, page), 'instance')
-  setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'opacity')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'opacity')
   graph.updateNode(instance.id, { opacity: 0.3 })
 
   graph.updateNode(chip.id, { width: 60 })

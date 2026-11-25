@@ -12,6 +12,7 @@ import {
 } from '@pairdraw/scene-graph/instances'
 import {
   cloneInstanceOverrideState,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -112,13 +113,13 @@ export function createComponentPropertyActions(
       if (!componentId) return
       ctx.graph.swapInstanceComponent(target.node.id, componentId)
       setInstanceOverride(
-        instance.instanceOverrides,
+        ownInstanceOverrides(instance),
         instance.id,
         target.node.id,
         'sourceComponentId',
         target.source.id
       )
-      ctx.graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
+      ctx.graph.updateNode(instance.id, { instanceOverrides: ownInstanceOverrides(instance) })
     }
   }
 

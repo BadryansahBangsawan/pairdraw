@@ -1,7 +1,7 @@
 import type { SceneGraph } from '../graph'
 import { findInstanceAncestor, recordAssignmentOverride } from '../instances'
 import { instanceMainComponent } from '../instances/main-component'
-import { setInstanceOverride } from '../instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '../instances/overrides'
 import { walkInstanceSources } from '../instances/source-walk'
 import { randomHex } from '../random'
 import type {
@@ -103,7 +103,7 @@ function applyTextProperty(
     if (item.field !== 'TEXT' || item.node.type !== 'TEXT') continue
     graph.updateNode(item.node.id, { text: value })
     if (findInstanceAncestor(graph, item.node.id)) {
-      setInstanceOverride(owner.instanceOverrides, owner.id, item.node.id, 'text', value)
+      setInstanceOverride(ownInstanceOverrides(owner), owner.id, item.node.id, 'text', value)
     }
   }
 }
@@ -120,7 +120,7 @@ function applyBooleanProperty(
     graph.updateNode(item.node.id, { visible: value === 'true' })
     if (instance) {
       setInstanceOverride(
-        owner.instanceOverrides,
+        ownInstanceOverrides(owner),
         owner.id,
         item.node.id,
         'visible',
@@ -139,16 +139,22 @@ function applyInstanceSwapProperty(
   for (const item of targets) {
     if (item.field !== 'INSTANCE_SWAP' || item.node.type !== 'INSTANCE') continue
     graph.swapInstanceComponent(item.node.id, target.id)
-    setInstanceOverride(owner.instanceOverrides, owner.id, item.node.id, 'name', target.name)
-    setInstanceOverride(owner.instanceOverrides, owner.id, item.node.id, 'componentId', target.id)
+    setInstanceOverride(ownInstanceOverrides(owner), owner.id, item.node.id, 'name', target.name)
     setInstanceOverride(
-      owner.instanceOverrides,
+      ownInstanceOverrides(owner),
+      owner.id,
+      item.node.id,
+      'componentId',
+      target.id
+    )
+    setInstanceOverride(
+      ownInstanceOverrides(owner),
       owner.id,
       item.node.id,
       'sourceComponentId',
       item.source.id
     )
-    graph.updateNode(owner.id, { instanceOverrides: owner.instanceOverrides })
+    graph.updateNode(owner.id, { instanceOverrides: ownInstanceOverrides(owner) })
   }
 }
 

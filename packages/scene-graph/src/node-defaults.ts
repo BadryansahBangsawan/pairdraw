@@ -6,7 +6,7 @@ import {
 } from './constants'
 import { normalizeEffects } from './effects'
 import { EMPTY_LIST, EMPTY_RECORD, shareEmptyNodeValues } from './empty-values'
-import { createInstanceOverrideState } from './instances/overrides'
+import { EMPTY_INSTANCE_OVERRIDES } from './instances/overrides'
 import { NO_LETTER_SPACING } from './text/lengths'
 import type { NodeType, SceneNode, SourceMetadata } from './types'
 
@@ -232,7 +232,7 @@ export function createDefaultNode(
     shapeUserHeight: 0,
     shapeTruncates: false,
     componentId: null,
-    instanceOverrides: createInstanceOverrideState(),
+    instanceOverrides: EMPTY_INSTANCE_OVERRIDES,
     componentPropertyDefinitions: EMPTY_LIST,
     componentPropertyReferences: EMPTY_LIST,
     componentPropertyAssignments: EMPTY_RECORD,

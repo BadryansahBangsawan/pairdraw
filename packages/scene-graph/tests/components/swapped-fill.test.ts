@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 import { expectDefined } from '../helpers/assert'
 
@@ -37,7 +37,7 @@ function swappedBadge(template?: (graph: SceneGraph, badge: SceneNode) => void) 
   const target = graph.getChildren(outer.id)[0]
   const swap = (component: SceneNode) => {
     graph.updateNode(target.id, { componentId: component.id })
-    setInstanceOverride(outer.instanceOverrides, outer.id, target.id, 'componentId', component.id)
+    setInstanceOverride(ownInstanceOverrides(outer), outer.id, target.id, 'componentId', component.id)
     graph.syncInstance(outer.id)
   }
   swap(done)
@@ -69,13 +69,13 @@ test('an edit to the new component reaches the swapped badge', () => {
 test('a fill the template overrides on the badge survives the swap, bound or plain, as in Figma', () => {
   const bound = swappedBadge((graph, badge) => {
     graph.updateNode(badge.id, { boundVariables: { 'fills/0/color': 'purple' } })
-    setInstanceOverride(badge.instanceOverrides, badge.id, badge.id, 'boundVariables/fills/0/color', true)
+    setInstanceOverride(ownInstanceOverrides(badge), badge.id, badge.id, 'boundVariables/fills/0/color', true)
   })
   expect(bound.target.boundVariables['fills/0/color']).toBe('purple')
   const plain = swappedBadge((graph, badge) => {
     graph.updateNode(badge.id, { fills: solid(0.5, 0, 1), boundVariables: {} })
-    setInstanceOverride(badge.instanceOverrides, badge.id, badge.id, 'fills', badge.fills)
-    setInstanceOverride(badge.instanceOverrides, badge.id, badge.id, 'boundVariables/fills/0/color', true)
+    setInstanceOverride(ownInstanceOverrides(badge), badge.id, badge.id, 'fills', badge.fills)
+    setInstanceOverride(ownInstanceOverrides(badge), badge.id, badge.id, 'boundVariables/fills/0/color', true)
   })
   expect(plain.target.fills).toEqual(solid(0.5, 0, 1))
   expect(plain.target.boundVariables['fills/0/color']).toBeUndefined()
@@ -89,9 +89,9 @@ test('the swapped badge keeps its own fill, binding and style overrides through 
     variableBindingScales: { 'fills/0/color': 3 },
     fillStyleId: 'style-own'
   })
-  setInstanceOverride(target.instanceOverrides, target.id, target.id, 'fills', target.fills)
-  setInstanceOverride(target.instanceOverrides, target.id, target.id, 'boundVariables/fills/0/color', true)
-  setInstanceOverride(target.instanceOverrides, target.id, target.id, 'fillStyleId', 'style-own')
+  setInstanceOverride(ownInstanceOverrides(target), target.id, target.id, 'fills', target.fills)
+  setInstanceOverride(ownInstanceOverrides(target), target.id, target.id, 'boundVariables/fills/0/color', true)
+  setInstanceOverride(ownInstanceOverrides(target), target.id, target.id, 'fillStyleId', 'style-own')
   graph.updateNode(done.id, { fills: solid(0, 0, 1), boundVariables: { 'fills/0/color': 'blue' } })
   graph.syncInstance(outer.id)
   expect(target.fills).toEqual(todo.fills)
@@ -103,7 +103,7 @@ test('the swapped badge keeps its own fill, binding and style overrides through 
 test('its own plain fill override keeps the swapped badge unbound', () => {
   const { graph, outer, target } = swappedBadge()
   graph.updateNode(target.id, { fills: solid(0.5, 0, 1), boundVariables: { opacity: 'faded' } })
-  setInstanceOverride(target.instanceOverrides, target.id, target.id, 'fills', target.fills)
+  setInstanceOverride(ownInstanceOverrides(target), target.id, target.id, 'fills', target.fills)
   graph.syncInstance(outer.id)
   expect(target.fills).toEqual(solid(0.5, 0, 1))
   expect(target.boundVariables).toEqual({ opacity: 'faded' })
@@ -112,7 +112,7 @@ test('its own plain fill override keeps the swapped badge unbound', () => {
 test('clearing its own fill binding leaves the swapped badge unbound', () => {
   const { graph, outer, target } = swappedBadge()
   graph.updateNode(target.id, { boundVariables: { opacity: 'faded' }, variableBindingScales: {} })
-  setInstanceOverride(target.instanceOverrides, target.id, target.id, 'boundVariables', true)
+  setInstanceOverride(ownInstanceOverrides(target), target.id, target.id, 'boundVariables', true)
   graph.syncInstance(outer.id)
   expect(target.boundVariables).toEqual({ opacity: 'faded' })
   expect(target.variableBindingScales['fills/0/color']).toBeUndefined()
@@ -121,14 +121,14 @@ test('clearing its own fill binding leaves the swapped badge unbound', () => {
 test('a fill or style the outer instance overrides on the swapped badge wins', () => {
   const { graph, done, outer, target } = swappedBadge()
   graph.updateNode(target.id, { fills: [], fillStyleId: 'style-outer' })
-  setInstanceOverride(outer.instanceOverrides, outer.id, target.id, 'fills', [])
-  setInstanceOverride(outer.instanceOverrides, outer.id, target.id, 'fillStyleId', 'style-outer')
+  setInstanceOverride(ownInstanceOverrides(outer), outer.id, target.id, 'fills', [])
+  setInstanceOverride(ownInstanceOverrides(outer), outer.id, target.id, 'fillStyleId', 'style-outer')
   for (let pass = 0; pass < 2; pass++) {
     graph.syncInstance(outer.id)
     expect(target.fills).toEqual([])
     expect(target.fillStyleId).toBe('style-outer')
   }
-  outer.instanceOverrides.descendants.get(target.id)?.delete('fills')
+  ownInstanceOverrides(outer).descendants.get(target.id)?.delete('fills')
   graph.syncInstance(outer.id)
   expect(target.fills).toEqual(done.fills)
   expect(target.fillStyleId).toBe('style-outer')

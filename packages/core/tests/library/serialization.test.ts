@@ -11,6 +11,7 @@ import {
 import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   getInstanceOverride,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -28,7 +29,7 @@ describe('stored library revisions', () => {
     const values = [{ $bytes: 'AQID' }, { $pairdrawType: 'pairdraw/map', entries: [] }]
     for (const [index, value] of values.entries())
       setInstanceOverride(
-        instance.instanceOverrides,
+        ownInstanceOverrides(instance),
         instance.id,
         instance.id,
         `pluginData/${index}`,

@@ -1,5 +1,7 @@
 import { expect, test } from 'bun:test'
 
+import { ownInstanceOverrides } from '@pairdraw/scene-graph/instances/overrides'
+
 import { createEditorStore } from '@/app/editor/session/create'
 
 test('pasting a component and instance together remaps their component references', async () => {
@@ -15,7 +17,7 @@ test('pasting a component and instance together remaps their component reference
     name: 'Instance child',
     componentId: child.id
   })
-  instance.instanceOverrides.descendants.set(child.id, new Map([['name', 'Overridden']]))
+  ownInstanceOverrides(instance).descendants.set(child.id, new Map([['name', 'Overridden']]))
   editor.select([component.id, instance.id])
   const payload = await editor.prepareCopy()
   if (!payload.snapshot) throw new Error('Missing snapshot')

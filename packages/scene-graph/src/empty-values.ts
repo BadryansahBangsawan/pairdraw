@@ -1,5 +1,10 @@
 import { isEmptyObject, isPlainObject } from 'es-toolkit'
 
+import {
+  EMPTY_INSTANCE_OVERRIDES,
+  isEmptyInstanceOverrideState,
+  type InstanceOverrideState
+} from './instances/overrides'
 import type { SceneNode, SourceMetadata } from './types'
 
 /**
@@ -39,8 +44,19 @@ function sharedEmptyRecord(value: unknown): unknown {
 }
 
 function sharedEmptyValue(field: string, value: unknown): unknown {
+  if (field === 'instanceOverrides') return sharedEmptyOverrideState(value)
   if (Array.isArray(value)) return OWN_LIST_FIELDS.has(field) ? value : sharedEmptyList(value)
   return RECORD_FIELDS.has(field) ? sharedEmptyRecord(value) : value
+}
+
+/** An override state with nothing in it, so a layer that cleared its overrides shares the empty one. */
+function sharedEmptyOverrideState(value: unknown): unknown {
+  if (!isPlainObject(value)) return value
+  const { self, descendants } = value as Partial<InstanceOverrideState>
+  if (!(self instanceof Map) || !(descendants instanceof Map)) return value
+  return isEmptyInstanceOverrideState(value as InstanceOverrideState)
+    ? EMPTY_INSTANCE_OVERRIDES
+    : value
 }
 
 /**

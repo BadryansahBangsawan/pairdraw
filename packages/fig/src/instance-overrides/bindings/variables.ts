@@ -9,6 +9,7 @@ import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import type { SceneNode } from '@pairdraw/scene-graph'
 import {
   bindingOverrideField,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -36,13 +37,13 @@ export function recordVariableBindingClaims(
     const field = entry.variableField && VARIABLE_BINDING_FIELDS_INVERSE[entry.variableField]
     if (!field) continue
     setInstanceOverride(
-      owner.instanceOverrides,
+      ownInstanceOverrides(owner),
       owner.id,
       target.id,
       bindingOverrideField(field),
       target.boundVariables[field] ?? null
     )
-    setInstanceOverride(owner.instanceOverrides, owner.id, target.id, 'boundVariables')
+    setInstanceOverride(ownInstanceOverrides(owner), owner.id, target.id, 'boundVariables')
   }
 }
 

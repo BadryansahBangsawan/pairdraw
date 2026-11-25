@@ -228,7 +228,8 @@ export function removeLeftoverCopies(
     const overrides = new Map<string, Map<string, unknown>>()
     for (const removed of nodes) {
       const fields = context.overrides.descendants.get(removed.id)
-      if (fields) overrides.set(removed.id, new Map(fields))
+      if (!fields) continue
+      overrides.set(removed.id, new Map(fields))
       context.overrides.descendants.delete(removed.id)
     }
     let copies = store.byInstance.get(context.instanceId)

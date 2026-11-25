@@ -4,7 +4,7 @@ import { expectDefined } from '#core-tests/helpers/assert'
 
 import { createEditor } from '@pairdraw/core'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { variableFontFamily } from '@pairdraw/scene-graph/variables'
 
 import { fontManager } from '#core/text/font/manager'
@@ -112,7 +112,7 @@ test('a font family an instance overrides keeps its own value', () => {
   const layer = expectDefined(graph.getNode(placed.childIds[0]))
   const editor = createEditor({ graph })
 
-  setInstanceOverride(placed.instanceOverrides, placed.id, layer.id, 'fontFamily', 'Lora')
+  setInstanceOverride(ownInstanceOverrides(placed), placed.id, layer.id, 'fontFamily', 'Lora')
   graph.updateNode(layer.id, { fontFamily: 'Lora' })
 
   editor.updateVariableValue(family.id, brand.defaultModeId, 'Space Grotesk')

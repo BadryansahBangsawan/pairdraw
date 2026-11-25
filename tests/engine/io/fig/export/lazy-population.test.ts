@@ -4,7 +4,10 @@ import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { cloneSceneGraphForFigExport } from '@pairdraw/core/kiwi/fig/parse/transfer'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 function lazyExportGraph() {
   const graph = new SceneGraph()
@@ -30,8 +33,8 @@ function createEditedInstance(
   if (!instance) throw new Error(`Could not create instance: ${name}`)
   const textId = instance.childIds[0]
   graph.updateNode(textId, { text })
-  setInstanceOverride(instance.instanceOverrides, instance.id, textId, 'text', text)
-  graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, textId, 'text', text)
+  graph.updateNode(instance.id, { instanceOverrides: ownInstanceOverrides(instance) })
 
   return { instance, textId }
 }

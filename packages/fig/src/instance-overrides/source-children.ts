@@ -1,5 +1,8 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 import type { MaterializedInstance } from './materialize-instance'
 import { occurrences } from './occurrence/path'
@@ -130,7 +133,7 @@ export function linkInstanceSourceChildren(
   }
   for (const { owner, target, source } of links) {
     setInstanceOverride(
-      owner.instanceOverrides,
+      ownInstanceOverrides(owner),
       owner.id,
       target.id,
       'sourceComponentId',
@@ -138,7 +141,7 @@ export function linkInstanceSourceChildren(
     )
     if (target.type === 'INSTANCE' && target.componentId !== source.componentId) {
       setInstanceOverride(
-        owner.instanceOverrides,
+        ownInstanceOverrides(owner),
         owner.id,
         target.id,
         'componentId',

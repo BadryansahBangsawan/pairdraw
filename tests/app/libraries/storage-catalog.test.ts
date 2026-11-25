@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { getInstanceOverride, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  getInstanceOverride,
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 import type { LibraryObjectStore } from '@/app/integrations/storage'
 import { StorageLibraryCatalog } from '@/app/libraries/catalog/storage'
@@ -84,7 +88,7 @@ describe('storage library catalog', () => {
     })
     const instance = graph.createInstance(nestedComponent.id, component.id)
     if (!instance) throw new Error('Expected instance')
-    setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'pluginData', {
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'pluginData', {
       $pairdrawType: 'pairdraw/map',
       entries: []
     })

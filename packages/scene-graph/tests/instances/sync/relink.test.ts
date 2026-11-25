@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   copiedComponentLayerId,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -18,7 +19,7 @@ function replacedLabel(text: string) {
   const instance = graph.createInstance(component.id, page)
   const copy = instance ? graph.getChildren(instance.id)[0] : undefined
   if (!instance || !copy) throw new Error('Expected the instance and its copy')
-  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'sourceComponentId', old.id)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'sourceComponentId', old.id)
   const label = graph.createNode('TEXT', component.id, { name: 'Label', text })
   graph.deleteNode(old.id)
   return { graph, component, instance, copy, label }

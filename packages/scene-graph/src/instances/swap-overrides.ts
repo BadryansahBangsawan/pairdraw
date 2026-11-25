@@ -5,6 +5,7 @@ import {
   isLayerReferenceOverride,
   overriddenBindingField,
   overriddenVariableModeCollection,
+  ownInstanceOverrides,
   setInstanceOverride
 } from './overrides'
 import { copyProp } from './sync'
@@ -117,7 +118,7 @@ export function restoreInstanceOverrides(
     const changes = changesFor(layer)
     if (Object.keys(changes).length) graph.updateNode(child.id, changes)
     for (const field of layer.fields)
-      setInstanceOverride(instance.instanceOverrides, instance.id, child.id, field)
+      setInstanceOverride(ownInstanceOverrides(instance), instance.id, child.id, field)
   }
-  graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
+  graph.updateNode(instance.id, { instanceOverrides: ownInstanceOverrides(instance) })
 }

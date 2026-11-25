@@ -7,7 +7,7 @@ import { parseFigBuffer } from '@pairdraw/fig'
 import { symbolDataOf } from '@pairdraw/fig/instance-overrides'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { rescaleNodeTree } from '@pairdraw/scene-graph/scaling'
 
 test('serializes self size claims against the instance main component', async () => {
@@ -21,9 +21,9 @@ test('serializes self size claims against the instance main component', async ()
   if (!instance) throw new Error('Missing instance')
   rescaleNodeTree(graph, instance.id, 0.5)
   graph.updateNode(instance.id, { width: 16, height: 16, paddingLeft: 10 })
-  setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'width', 16)
-  setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'paddingLeft', 10)
-  setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'height', 16)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'width', 16)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'paddingLeft', 10)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'height', 16)
   const bytes = await exportFigFile(graph)
   const { nodeChanges } = parseFigBuffer(bytes.buffer as ArrayBuffer)
   const exported = nodeChanges.find((node) => node.type === 'INSTANCE')

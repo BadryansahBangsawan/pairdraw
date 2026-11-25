@@ -5,6 +5,7 @@ import { applyComponentPropertyValue } from '@pairdraw/scene-graph/components'
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import {
   deleteInstanceOverride,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -31,7 +32,7 @@ test('outer sync preserves a nested edit without blocking sibling or other-field
   expect(secondText.text).toBe('Component edit')
   expect(graph.getChildren(firstNested.id)).toHaveLength(1)
 
-  deleteInstanceOverride(firstNested.instanceOverrides, firstNested.id, firstText.id, 'text')
+  deleteInstanceOverride(ownInstanceOverrides(firstNested), firstNested.id, firstText.id, 'text')
   graph.syncInstances(outer.id)
   expect(firstText.text).toBe('Component edit')
 })
@@ -61,7 +62,7 @@ function cardWithAssignedBadge() {
   const siblingLabel = graph.getChildren(graph.getChildren(sibling.id)[0].id)[0]
   // The card instance edits the label, as a Figma file records a text override on it.
   graph.updateNode(label.id, { text: 'Bonus amount' })
-  setInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, label.id, 'text')
   return { graph, badge, card, instance, nested, label, siblingLabel }
 }
 
@@ -75,7 +76,7 @@ test('a text edit in the outer instance outranks the assignment its component ma
     expect(siblingLabel.text).toBe('Multiplier')
   }
   expect(label.opacity).toBe(0.5)
-  deleteInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text')
+  deleteInstanceOverride(ownInstanceOverrides(instance), instance.id, label.id, 'text')
   graph.syncInstances(card.id)
   expect(label.text).toBe('Multiplier')
 })
@@ -89,7 +90,7 @@ test('an assignment made through an outer instance outranks the text edit at tha
   // A text edit of the same label made through that instance is at that same level, and in
   // Figma the assignment wins whatever order the two edits were made in.
   graph.updateNode(label.id, { text: 'Bonus amount' })
-  setInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text', 'Bonus amount')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, label.id, 'text', 'Bonus amount')
 
   graph.syncInstances(card.id)
 

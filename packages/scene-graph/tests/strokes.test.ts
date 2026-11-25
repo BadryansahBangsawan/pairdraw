@@ -4,7 +4,7 @@ import { omit } from 'es-toolkit'
 
 import { SceneGraph, type SceneNode, type Stroke } from '@pairdraw/scene-graph'
 import { instanceOverrideFields, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { changesMoreThanStrokeLines, strokeLineChanges } from '@pairdraw/scene-graph/strokes'
 import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
@@ -249,7 +249,7 @@ describe('copies keep their own stroke lines through swaps and modes', () => {
     graph.bindVariable(shape.id, 'strokeWeight', weight.id)
     const instance = graph.createInstance(main.id, page.id)
     if (!instance) throw new Error('instance not created')
-    setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'variableModes')
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'variableModes')
     graph.updateNode(instance.id, { variableModes: { [collection.id]: large } })
     reconcileVariableBindings(graph)
     const copy = graph.getNode(instance.childIds[0])

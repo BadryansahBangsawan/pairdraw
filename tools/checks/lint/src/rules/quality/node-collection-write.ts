@@ -39,7 +39,9 @@ const NODE_RECORD_FIELDS: ReadonlySet<string> = new Set([
   'variableBindingScales',
   'variableAssignmentScales',
   'variableModes',
-  'rawNodeFields'
+  'rawNodeFields',
+  // A state of two maps, shared while it is empty like the records above.
+  'instanceOverrides'
 ])
 
 /**

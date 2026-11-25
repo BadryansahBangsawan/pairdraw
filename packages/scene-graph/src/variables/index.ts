@@ -6,6 +6,7 @@ import type { SceneGraph } from '../graph'
 import { findInstanceAncestor } from '../instances'
 import {
   bindingOverrideField,
+  ownInstanceOverrides,
   setInstanceOverride,
   variableModeOverrideField
 } from '../instances/overrides'
@@ -262,9 +263,15 @@ export function removeMode(graph: SceneGraph, collectionId: string, modeId: stri
     const variableModes = omit(node.variableModes, [collectionId])
     graph.willChangeNode(node)
     node.variableModes = variableModes
-    node.instanceOverrides.self.delete(overrideField)
-    for (const overrides of node.instanceOverrides.descendants.values())
-      overrides.delete(overrideField)
+    const state = node.instanceOverrides
+    const claimsMode =
+      state.self.has(overrideField) ||
+      [...state.descendants.values()].some((fields) => fields.has(overrideField))
+    if (claimsMode) {
+      const owned = ownInstanceOverrides(node)
+      owned.self.delete(overrideField)
+      for (const overrides of owned.descendants.values()) overrides.delete(overrideField)
+    }
     graph.emitter.emit('node:updated', node.id, { variableModes })
   }
   if (graph.activeMode.get(collectionId) === modeId) {
@@ -506,14 +513,15 @@ function markBoundVariablesOverrideOnInstance(
   const nearest = findInstanceAncestor(graph, nodeId)
   const instances = uniq(compact([nearest, owner])).filter((x) => x.id !== nodeId)
   for (const instance of instances) graph.willChangeNode(instance)
-  if (nearest) setInstanceOverride(nearest.instanceOverrides, nearest.id, nodeId, 'boundVariables')
-  setInstanceOverride(owner.instanceOverrides, owner.id, nodeId, 'boundVariables')
+  if (nearest)
+    setInstanceOverride(ownInstanceOverrides(nearest), nearest.id, nodeId, 'boundVariables')
+  setInstanceOverride(ownInstanceOverrides(owner), owner.id, nodeId, 'boundVariables')
   // Each instance claims the binding it changed alone, so the layer's other bindings keep
   // following their components, as Figma claims only the paint or effect a script edits.
   if (field)
     for (const instance of instances)
       setInstanceOverride(
-        instance.instanceOverrides,
+        ownInstanceOverrides(instance),
         instance.id,
         nodeId,
         bindingOverrideField(field),

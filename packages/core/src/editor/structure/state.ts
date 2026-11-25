@@ -1,6 +1,7 @@
 import { findInstanceAncestor } from '@pairdraw/scene-graph/instances'
 import {
   cloneInstanceOverrideState,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -32,7 +33,7 @@ export function createStructureStateActions(ctx: EditorContext) {
     const forward = () => {
       const instance = findInstanceAncestor(ctx.graph, id)
       if (instance)
-        setInstanceOverride(instance.instanceOverrides, instance.id, id, 'visible', true)
+        setInstanceOverride(ownInstanceOverrides(instance), instance.id, id, 'visible', true)
       show(visible)
     }
     forward()

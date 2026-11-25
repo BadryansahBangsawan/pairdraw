@@ -10,7 +10,7 @@ import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 import { materializeDocument, parseFigBuffer } from '@pairdraw/fig'
 import { symbolDataOf } from '@pairdraw/fig/instance-overrides'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 const fixture = readFixture('nested-binding-ownership-records.json', capturedFigRecordsSchema)
 
@@ -30,7 +30,7 @@ for (const scale of [0.5, 2]) {
       pairdraw.bindVariable(nested.id, 'paddingRight', { id: '293742:7' })
       if (literalClaim) {
         createEditor({ graph }).updateNodeWithUndo(root.id, { paddingLeft: 12 })
-        setInstanceOverride(root.instanceOverrides, root.id, root.id, 'paddingLeft', 12)
+        setInstanceOverride(ownInstanceOverrides(root), root.id, root.id, 'paddingLeft', 12)
       }
       expectDefined(api.getNodeById(root.id)).rescale(scale)
       expect([

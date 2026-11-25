@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import { expectDefined } from '../helpers/assert'
@@ -18,7 +18,7 @@ for (const protectedField of ['width', 'text'] as const) {
     const instance = expectDefined(graph.createInstance(component.id, graph.getPages()[0].id))
     const clone = graph.getChildren(instance.id)[0]
     graph.updateNode(clone.id, { text: 'Override', visible: true, width: 160 })
-    setInstanceOverride(instance.instanceOverrides, instance.id, clone.id, protectedField, true)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, clone.id, protectedField, true)
     graph.syncInstances(component.id)
     expect(clone.text).toBe(protectedField === 'text' ? 'Override' : source.text)
     expect(clone.width).toBe(protectedField === 'width' ? 160 : 80)
@@ -39,7 +39,7 @@ test('component synchronization updates and removes opacity bindings while prese
     boundVariables: { ...instance.boundVariables, width: 'width-var' }
   })
   setInstanceOverride(
-    instance.instanceOverrides,
+    ownInstanceOverrides(instance),
     instance.id,
     instance.id,
     'boundVariables/width',
@@ -74,12 +74,12 @@ test('a component edit reaches every field its instances do not override, as in 
   })
   const plain = expectDefined(graph.createInstance(card.id, page))
   const wide = expectDefined(graph.createInstance(card.id, page, { width: 300 }))
-  setInstanceOverride(wide.instanceOverrides, wide.id, wide.id, 'width', 300)
+  setInstanceOverride(ownInstanceOverrides(wide), wide.id, wide.id, 'width', 300)
   const overridden = expectDefined(graph.createInstance(card.id, page))
   const overriddenBar = graph.getChildren(overridden.id)[1]
   graph.updateNode(overriddenBar.id, { strokeWeight: 6 })
   setInstanceOverride(
-    overridden.instanceOverrides,
+    ownInstanceOverrides(overridden),
     overridden.id,
     overriddenBar.id,
     'strokeWeight',
@@ -130,7 +130,7 @@ test('restyled ranges reach instances, except one that overrides its text', () =
   const copy = graph.getChildren(instance.id)[0]
   const runs = [{ start: 0, length: 2, style: { fontWeight: 700 } }]
   graph.updateNode(copy.id, { text: 'Hi there', styleRuns: runs })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'text', 'Hi there')
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'text', 'Hi there')
   const italic = [{ start: 0, length: 5, style: { italic: true } }]
   graph.updateNode(text.id, { styleRuns: italic })
   graph.syncInstances(label.id)
@@ -178,7 +178,7 @@ test('a path edited in a component reaches its instances, drawn at their size', 
   // Resized as Figma's resize records it, as the instance's own size.
   graph.updateNode(doubled.id, { width: 400, height: 240 })
   for (const field of ['width', 'height'])
-    setInstanceOverride(doubled.instanceOverrides, doubled.id, doubled.id, field, true)
+    setInstanceOverride(ownInstanceOverrides(doubled), doubled.id, doubled.id, field, true)
   const copyIn = (instance: SceneNode) => graph.getChildren(instance.id)[0]
 
   graph.updateNode(shape.id, {
@@ -230,7 +230,7 @@ test('a copy keeps its own outlines while its path matches, and drops a stale st
     fillGeometry: outline(7),
     strokeGeometry: outline(8)
   })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'strokeWeight', true)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'strokeWeight', true)
 
   graph.syncInstances(card.id)
   expect([...copy.fillGeometry[0].commandsBlob, ...copy.strokeGeometry[0].commandsBlob]).toEqual([
@@ -322,7 +322,7 @@ test('a copy that sizes itself to its own content keeps that size through a comp
   graph.updateNode(copyText.id, { text: '2', width: 8 })
   graph.updateNode(copyLabel.id, { width: 8 })
   graph.updateNode(instance.id, { width: 24 })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copyText.id, 'text', true)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copyText.id, 'text', true)
 
   graph.updateNode(text.id, { width: 64, letterSpacing: pixelLength(1) })
   graph.updateNode(label.id, { width: 64 })
@@ -351,8 +351,8 @@ test('content-sized copies retain their constraint anchor through live component
     })
     const instance = expectDefined(graph.createInstance(component.id, graph.getPages()[0].id))
     graph.updateNode(instance.id, { width: 300, height: 160 })
-    setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'width', true)
-    setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, 'height', true)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'width', true)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, 'height', true)
     const copy = graph.getChildren(instance.id)[0]
     graph.updateNode(copy.id, { width: 10, height: 6 })
     graph.updateNode(source.id, { opacity: 0.5 })
@@ -395,7 +395,7 @@ test('anchor correction respects equal parent sizes, bound positions and auto-la
     graph.updateNode(copy.id, { x: 40, y: 35, width: 10, height: 6 })
     if (mode === 'protected') {
       graph.updateNode(copy.id, { boundVariables: { x: 'local-x', y: 'local-y' } })
-      setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'boundVariables', true)
+      setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'boundVariables', true)
     }
     if (mode === 'scaled') {
       graph.updateNode(instance.id, { componentScale: 2 })
@@ -481,7 +481,7 @@ test('a text copy styled on its own keeps the size it measured, as a badge label
   const instance = expectDefined(graph.createInstance(badge.id, page))
   const [copy] = graph.getChildren(instance.id)
   graph.updateNode(copy.id, { fontSize: 14, width: 43, height: 18 })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'fontSize', true)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copy.id, 'fontSize', true)
 
   graph.updateNode(label.id, { width: 38 })
   graph.syncInstances(badge.id)
@@ -512,7 +512,7 @@ test('a copy that fills its parent keeps the size layout gave it', () => {
   const [copyColumn] = graph.getChildren(instance.id)
   const [, copyDivider] = graph.getChildren(copyColumn.id)
   graph.updateNode(copyDivider.id, { visible: false })
-  setInstanceOverride(instance.instanceOverrides, instance.id, copyDivider.id, 'visible', true)
+  setInstanceOverride(ownInstanceOverrides(instance), instance.id, copyDivider.id, 'visible', true)
   graph.updateNode(copyColumn.id, { height: 28 })
 
   graph.updateNode(column.id, { itemSpacing: 5 })

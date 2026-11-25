@@ -4,6 +4,7 @@ import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import { cloneNodeProps } from '@pairdraw/scene-graph/copy'
 import {
   getInstanceOverride,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -125,7 +126,7 @@ describe('cloneNodeProps deep-copies overrides values', () => {
     const instance = expectDefined(graph.createInstance(component.id, page), 'instance')
     if (!instance) throw new Error('instance failed')
     const instanceChild = graph.getChildren(instance.id)[0]
-    setInstanceOverride(instance.instanceOverrides, instance.id, instanceChild.id, 'fills', [
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, instanceChild.id, 'fills', [
       { type: 'SOLID', color: { r: 0, g: 0, b: 1, a: 1 }, visible: true, opacity: 1 }
     ])
 

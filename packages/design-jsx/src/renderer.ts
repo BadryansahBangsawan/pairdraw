@@ -2,7 +2,10 @@ import { omitBy } from 'es-toolkit/object'
 
 import type { NodeType, SceneGraph, SceneNode, VariableModeMap } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
 import type { RekaScope } from './behaviours'
@@ -455,7 +458,7 @@ async function renderInstanceNode(
     graph.createInstance(component.id, parentId, overrides) ?? graph.createNode('FRAME', parentId)
   try {
     for (const [field, value] of Object.entries(overrides)) {
-      setInstanceOverride(instance.instanceOverrides, instance.id, instance.id, field, value)
+      setInstanceOverride(ownInstanceOverrides(instance), instance.id, instance.id, field, value)
     }
     graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
     applyBindings(graph, instance.id, bindings)
@@ -504,7 +507,7 @@ function applyInstanceOverrides(
     const child = descendants.find((n) => n.name === childName)
     if (!child || !(prop in child)) continue
     graph.updateNode(child.id, { [prop]: value })
-    setInstanceOverride(instance.instanceOverrides, instance.id, child.id, prop, value)
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, child.id, prop, value)
     mutated = true
   }
   if (mutated) {

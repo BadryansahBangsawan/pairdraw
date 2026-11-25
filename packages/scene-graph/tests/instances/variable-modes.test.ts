@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import {
+  ownInstanceOverrides,
   overriddenVariableModeCollection,
   variableModeOverrideField
 } from '@pairdraw/scene-graph/instances/overrides'
@@ -82,7 +83,7 @@ describe('an instance’s variable modes', () => {
   test('keep every mode under an override of the whole map, as files record it', () => {
     const { graph, component, instance } = componentWithModes()
     graph.updateNode(instance.id, { variableModes: { theme: 'dark' } })
-    instance.instanceOverrides.self.set('variableModes', true)
+    ownInstanceOverrides(instance).self.set('variableModes', true)
     graph.updateNode(component.id, { variableModes: { theme: 'light', density: 'comfortable' } })
     graph.syncInstances(component.id)
     expect(graph.getNode(instance.id)?.variableModes).toEqual({ theme: 'dark' })

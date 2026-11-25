@@ -5,7 +5,11 @@ import { fromUint8Array } from 'js-base64'
 
 import { buildPairdrawClipboardHTML, parsePairdrawClipboard } from '@pairdraw/core/clipboard'
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
-import { getInstanceOverride, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  getInstanceOverride,
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { storeImageBytes } from '#tests/helpers/scene'
@@ -76,7 +80,7 @@ describe('clipboard roundtrip with images', () => {
     graph.createNode('TEXT', component.id, { text: 'Default' })
     const instance = expectDefined(graph.createInstance(component.id, page.id), 'instance')
     const child = expectDefined(graph.getChildren(instance.id)[0], 'instance child')
-    setInstanceOverride(instance.instanceOverrides, instance.id, child.id, 'text', 'Custom')
+    setInstanceOverride(ownInstanceOverrides(instance), instance.id, child.id, 'text', 'Custom')
 
     const parsed = expectDefined(
       parsePairdrawClipboard(buildPairdrawClipboardHTML([instance], graph)),

@@ -3,7 +3,11 @@ import { describe, expect, test } from 'bun:test'
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { createInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  createInstanceOverrideState,
+  ownInstanceOverrides,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 import { collectSubtrees } from '#core/editor/history/subtree'
 
@@ -77,7 +81,7 @@ describe('cloneTree deep-copies boundVariables, overrides, and styleRuns', () =>
     expect(clone.boundVariables['fills/0/color']).toBe('v2')
   })
 
-  test('clone.overrides is not the same reference as original', () => {
+  test('clone.overrides keeps an override recorded on the clone away from the original', () => {
     const graph = new SceneGraph()
     const node = graph.createNode('RECTANGLE', pageId(graph), {
       name: 'Original',
@@ -90,7 +94,10 @@ describe('cloneTree deep-copies boundVariables, overrides, and styleRuns', () =>
       (() => {
         throw new Error('clone failed')
       })()
-    expect(clone.instanceOverrides).not.toBe(original?.instanceOverrides)
+    setInstanceOverride(ownInstanceOverrides(clone), clone.id, clone.id, 'width', 40)
+
+    expect(clone.instanceOverrides.self.get('width')).toBe(40)
+    expect(original.instanceOverrides.self.size).toBe(0)
   })
 
   test('clone.styleRuns is not the same reference as original', () => {
@@ -209,7 +216,7 @@ describe('instance child bindings are independent from component', () => {
     expect(instanceChild.boundVariables['fills/0/color']).toBe('v2')
   })
 
-  test('instance child overrides is not shared with component child', () => {
+  test('instance child overrides stay with the instance, not the component child', () => {
     const graph = new SceneGraph()
     const page = pageId(graph)
 
@@ -233,7 +240,16 @@ describe('instance child bindings are independent from component', () => {
       })()
     const instanceChild = graph.getChildren(instance.id)[0]
 
-    expect(instanceChild.instanceOverrides).not.toBe(compChild.instanceOverrides)
+    setInstanceOverride(
+      ownInstanceOverrides(instance),
+      instance.id,
+      instanceChild.id,
+      'width',
+      20
+    )
+
+    expect(instance.instanceOverrides.descendants.get(instanceChild.id)?.get('width')).toBe(20)
+    expect(compChild.instanceOverrides.descendants.size).toBe(0)
   })
 
   test('instance child source.fig is not shared with component child', () => {

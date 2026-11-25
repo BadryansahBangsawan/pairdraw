@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 import { expectDefined } from '../helpers/assert'
 
@@ -25,16 +25,16 @@ for (const legacyOwner of ['outer', 'self'] as const) {
     })
     const whole = legacyOwner === 'outer' ? outer : instance
     const granular = legacyOwner === 'outer' ? instance : outer
-    setInstanceOverride(whole.instanceOverrides, whole.id, instance.id, 'boundVariables', true)
+    setInstanceOverride(ownInstanceOverrides(whole), whole.id, instance.id, 'boundVariables', true)
     setInstanceOverride(
-      granular.instanceOverrides,
+      ownInstanceOverrides(granular),
       granular.id,
       instance.id,
       'boundVariables',
       true
     )
     setInstanceOverride(
-      granular.instanceOverrides,
+      ownInstanceOverrides(granular),
       granular.id,
       instance.id,
       'boundVariables/paddingLeft',

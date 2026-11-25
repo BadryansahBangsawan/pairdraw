@@ -35,7 +35,8 @@ test('a layer inside an instance holds its component layer’s unchanged values'
   expect(layer.fills).toBe(source.fills)
   expect(layer.effects).toBe(source.effects)
   expect(layer.source).not.toBe(source.source)
-  expect(layer.instanceOverrides).not.toBe(source.instanceOverrides)
+  // Neither has an override, so both hold the one shared empty state until one records its own.
+  expect(layer.instanceOverrides).toBe(source.instanceOverrides)
   // The layout Figma saved is part of the layer's own source metadata, yet still the same.
   expect(layer.source.fig.layout).not.toBeNull()
   expect(layer.source.fig.layout).toBe(source.source.fig.layout)

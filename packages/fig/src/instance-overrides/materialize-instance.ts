@@ -5,6 +5,7 @@ import type { SceneGraph, GeometryPath, SceneNode } from '@pairdraw/scene-graph'
 import { scaleGeometryPaths } from '@pairdraw/scene-graph/copy'
 import {
   bindingOverrideField,
+  ownInstanceOverrides,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
 import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
@@ -181,7 +182,7 @@ export function materializeInstance(
     if (!owner) return
     for (const claim of current.bindingClaims) {
       if (claim.origin === 'assignment' && claim.field === 'visible') {
-        setInstanceOverride(owner.instanceOverrides, owner.id, node.id, 'visible', node.visible)
+        setInstanceOverride(ownInstanceOverrides(owner), owner.id, node.id, 'visible', node.visible)
       }
     }
   }
@@ -239,7 +240,7 @@ export function materializeInstance(
     const sourceChildId = sourceChildren.get(current)
     if (owner && current.mainComponentId !== null && sourceChildId) {
       setInstanceOverride(
-        owner.instanceOverrides,
+        ownInstanceOverrides(owner),
         owner.id,
         node.id,
         'sourceComponentId',
@@ -248,7 +249,7 @@ export function materializeInstance(
       const sourceChild = graph.getNode(sourceChildId)
       if (sourceChild?.componentId !== node.componentId) {
         setInstanceOverride(
-          owner.instanceOverrides,
+          ownInstanceOverrides(owner),
           owner.id,
           node.id,
           'componentId',
@@ -293,7 +294,7 @@ function recordPaintBindingClaims(
     if (!alias) continue
     const field = bindingOverrideField(`${scene}/${index}/color`)
     setInstanceOverride(
-      owner.instanceOverrides,
+      ownInstanceOverrides(owner),
       owner.id,
       target.id,
       field,
@@ -301,7 +302,8 @@ function recordPaintBindingClaims(
     )
     declared = true
   }
-  if (declared) setInstanceOverride(owner.instanceOverrides, owner.id, target.id, 'boundVariables')
+  if (declared)
+    setInstanceOverride(ownInstanceOverrides(owner), owner.id, target.id, 'boundVariables')
 }
 
 function recordPropertyClaims(nodes: ReadonlyMap<InstanceOccurrence, SceneNode>): void {
@@ -318,7 +320,7 @@ function recordPropertyClaims(nodes: ReadonlyMap<InstanceOccurrence, SceneNode>)
         for (const scene of field.scene) {
           const value = target[scene]
           setInstanceOverride(
-            owner.instanceOverrides,
+            ownInstanceOverrides(owner),
             owner.id,
             target.id,
             scene,

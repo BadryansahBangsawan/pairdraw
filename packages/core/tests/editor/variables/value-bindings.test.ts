@@ -4,7 +4,7 @@ import { expectDefined } from '#core-tests/helpers/assert'
 
 import { createEditor } from '@pairdraw/core'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { ownInstanceOverrides, setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 function boundText() {
   const graph = new SceneGraph()
@@ -65,7 +65,7 @@ test('text and visibility an instance overrides keep their own values', () => {
   const editor = createEditor({ graph })
 
   // Typing in the layer records its text as the instance's own, as the text editor does.
-  setInstanceOverride(placed.instanceOverrides, placed.id, layer.id, 'text', 'Keep')
+  setInstanceOverride(ownInstanceOverrides(placed), placed.id, layer.id, 'text', 'Keep')
   graph.updateNode(layer.id, { text: 'Keep' })
   editor.toggleNodeVisibility(layer.id)
 

@@ -179,31 +179,6 @@ html:has(.landing-home) .VPLocalNav {
       inset: 5px;
       border: 1.5px solid var(--lp-agent);
       border-radius: max(0px, calc(var(--lp-draw-radius) - 5px));
-      /* Four 8px white handles with a 1.5px violet border, all inside the frame's clip. */
-      background-image:
-        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
-        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
-        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
-        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff);
-      background-repeat: no-repeat;
-      background-size:
-        8px 8px,
-        5px 5px,
-        8px 8px,
-        5px 5px,
-        8px 8px,
-        5px 5px,
-        8px 8px,
-        5px 5px;
-      background-position:
-        0 0,
-        1.5px 1.5px,
-        100% 0,
-        calc(100% - 1.5px) 1.5px,
-        0 100%,
-        1.5px calc(100% - 1.5px),
-        100% 100%,
-        calc(100% - 1.5px) calc(100% - 1.5px);
       content: '';
       pointer-events: none;
       animation-name: lp-draw-box;
@@ -216,6 +191,55 @@ html:has(.landing-home) .VPLocalNav {
     /* Once the frame has arrived, the selection lets go, and stays gone on the way back up. */
     .landing-home [data-draw][data-drawn]::before {
       animation-name: lp-draw-box, lp-draw-leave;
+      animation-timeline: --lp-draw, auto;
+      animation-duration: auto, 480ms;
+      animation-delay: 0s, 900ms;
+      animation-fill-mode: both, both;
+      animation-timing-function: var(--lp-ease-out), var(--lp-ease-out);
+    }
+
+    /* The handles sit in an unrounded layer, so the frame's radius never clips them. */
+    .landing-home [data-draw]::after {
+      position: absolute;
+      z-index: 3;
+      inset: 5px;
+      /* White face first, violet border under it: two layers per corner. */
+      background-image:
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent));
+      background-repeat: no-repeat;
+      background-size:
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px;
+      background-position:
+        1.5px 1.5px,
+        0 0,
+        calc(100% - 1.5px) 1.5px,
+        100% 0,
+        1.5px calc(100% - 1.5px),
+        0 100%,
+        calc(100% - 1.5px) calc(100% - 1.5px),
+        100% 100%;
+      border-radius: 0;
+      content: '';
+      pointer-events: none;
+      animation-name: lp-handles;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-draw;
+      animation-range: entry 20% entry 60%;
+    }
+
+    .landing-home [data-draw][data-drawn]::after {
+      animation-name: lp-handles, lp-draw-leave;
       animation-timeline: --lp-draw, auto;
       animation-duration: auto, 480ms;
       animation-delay: 0s, 900ms;
@@ -262,6 +286,16 @@ html:has(.landing-home) .VPLocalNav {
 
     to {
       clip-path: inset(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes lp-handles {
+    from {
+      opacity: 0;
+    }
+
+    to {
       opacity: 1;
     }
   }

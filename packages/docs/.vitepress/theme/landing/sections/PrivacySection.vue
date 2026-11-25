@@ -48,15 +48,27 @@ const ICONS = [IconHardDrive, IconKeyRound, IconUsers]
               </g>
               <g class="wire-line">
                 <path
-                  class="strand"
-                  d="M110 58h38"
+                  d="M110 58h12"
                   stroke="var(--lp-agent)"
                   stroke-width="2.5"
                   stroke-dasharray="6 6"
                 />
                 <path
                   class="strand"
-                  d="M154 55h60"
+                  d="M122 58h34"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+                <path
+                  class="strand b"
+                  d="M160 55h46"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+                <path
+                  d="M206 55h10"
                   stroke="var(--lp-agent)"
                   stroke-width="2.5"
                   stroke-dasharray="6 6"
@@ -154,7 +166,12 @@ h2 {
       animation-range: entry 10% cover 35%;
     }
 
-    .strand + .strand {
+    .strand {
+      --wire-shift: -6px;
+    }
+
+    .strand.b {
+      --wire-shift: 6px;
       animation-delay: var(--lp-stagger);
     }
   }
@@ -167,7 +184,7 @@ h2 {
 
     to {
       opacity: 0;
-      transform: translateX(12px);
+      transform: translateX(var(--wire-shift, 6px));
     }
   }
 }

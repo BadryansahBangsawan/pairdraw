@@ -63,12 +63,32 @@ for (const colorSpace of ['srgb', 'display-p3'] as const) {
       { colorSpace, samples }
     )
     await canvas.waitForRender()
-    expect(
-      await readScenePixels(
-        page,
-        samples.map((_, index) => ({ x: 56 + index * 32, y: 56 }))
-      )
-    ).toEqual(samples.map((rgb) => [...rgb, 255]))
+    const expected = samples.map((rgb) => [...rgb, 255])
+    // The canvas moves when the document-space banner appears and the view pans to keep the drawing
+    // still, so the sampled canvas pixels carry the view's pan and zoom, as in play's overlapPoint.
+    const points = await page.evaluate(
+      ({ count }) => {
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Editor unavailable')
+        const { panX, panY, zoom } = store.state
+        return Array.from({ length: count }, (_, index) => ({
+          x: (56 + index * 32) * zoom + panX,
+          y: 56 * zoom + panY
+        }))
+      },
+      { count: samples.length }
+    )
+    const pixels = await readScenePixels(page, points)
+    const deltas = pixels.map((pixel, stripe) =>
+      pixel.map((value, channel) => value - (expected[stripe]?.[channel] ?? 0))
+    )
+    // A display-p3 document reaches the sRGB canvas through the colour-managed presentation, which
+    // can round a channel by one; the sample is here to catch a bitmap that never draws at all.
+    const tolerance = colorSpace === 'display-p3' ? 1 : 0
+    expect({
+      within: deltas.every((row) => row.every((delta) => Math.abs(delta) <= tolerance)),
+      deltas
+    }).toMatchObject({ within: true })
     canvas.assertNoErrors()
   })
 }

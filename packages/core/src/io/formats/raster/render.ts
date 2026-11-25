@@ -444,7 +444,9 @@ export function renderThumbnail(
   if (!frame) return null
   const { bounds, scale, width: pixelW, height: pixelH } = frame
   // The page's own background, which the editor's page colour matches only while it is open.
-  const background = getPageColor(graph.getNode(pageId))
+  const stored = getPageColor(graph.getNode(pageId))
+  // The page's color is stored in the document's profile, as every color is.
+  const background = renderer.renderColor(stored)
 
   return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, format, quality, (canvas) => {
     canvas.clear(ck.Color4f(background.r, background.g, background.b, 1))
@@ -465,8 +467,9 @@ export function drawRegionToImage(
   const pixelW = Math.max(1, Math.round((bounds.maxX - bounds.minX) * scale))
   const pixelH = Math.max(1, Math.round((bounds.maxY - bounds.minY) * scale))
   if (!graph.getNode(pageId) || !Number.isFinite(pixelW * pixelH)) return null
+  const pageBackground = renderer.renderColor(renderer.pageColor)
   return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, 'PNG', 100, (canvas) => {
-    canvas.clear(ck.Color4f(renderer.pageColor.r, renderer.pageColor.g, renderer.pageColor.b, 1))
+    canvas.clear(ck.Color4f(pageBackground.r, pageBackground.g, pageBackground.b, 1))
     canvas.scale(scale, scale)
     canvas.translate(-bounds.minX, -bounds.minY)
   })

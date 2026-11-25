@@ -1,6 +1,7 @@
 import type { RuntimeEffect } from 'canvaskit-wasm'
 
-import type { NoiseEffect, NoiseEffectParams } from '@pairdraw/scene-graph'
+import type { ColorProfile, NoiseEffect, NoiseEffectParams } from '@pairdraw/scene-graph'
+import { toExtendedSRGB } from '@pairdraw/scene-graph/color'
 
 import { noiseLevelShares, noiseMeanLevel } from './table'
 
@@ -120,17 +121,24 @@ export function noiseTileInputs(effect: NoiseEffect) {
   }
 }
 
-/** A uniform's values under the name the shader declares it, in declaration order. */
-export function noiseUniformValues(effect: NoiseEffect): Record<string, number[]> {
+/**
+ * A uniform's values under the name the shader declares it, in declaration order. Colors are the
+ * document's, given to the shader as extended sRGB so Skia converts them into its space.
+ */
+export function noiseUniformValues(
+  effect: NoiseEffect,
+  profile: ColorProfile = 'srgb'
+): Record<string, number[]> {
   const grain = effect.noise
   const size = Math.max(grain.noiseSize.x, grain.noiseSize.y)
-  const secondary = grain.secondaryColor ?? effect.color
+  const primary = toExtendedSRGB(effect.color, profile)
+  const secondary = toExtendedSRGB(grain.secondaryColor ?? effect.color, profile)
   return {
     cell: [noiseCell(grain.noiseSize.x), noiseCell(grain.noiseSize.y)],
     contrast: [noiseContrast(size)],
     center: [noiseMeanLevel(noiseLevelShares(grain.density))],
     mode: [NOISE_MODE[grain.noiseType]],
-    primary: [effect.color.r, effect.color.g, effect.color.b, effect.color.a],
+    primary: [primary.r, primary.g, primary.b, primary.a],
     secondary: [secondary.r, secondary.g, secondary.b, secondary.a],
     opacity: [grain.opacity ?? 1],
     snap: [0],

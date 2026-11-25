@@ -106,7 +106,9 @@ function drawSilhouetteDropShadow(
   draw: () => void
 ): void {
   const ck = r.ck
-  const color = ck.Color4f(effect.color.r, effect.color.g, effect.color.b, effect.color.a)
+  // Stored in the document's profile, as every paint is; Skia converts it to its surface.
+  const drawn = r.renderColor(effect.color)
+  const color = ck.Color4f(drawn.r, drawn.g, drawn.b, drawn.a)
   const sigma = blurSigma(effect.radius)
   const morphology = spreadFilter(r, spread)
   const filter = morphology
@@ -298,8 +300,9 @@ function drawSilhouetteInnerShadow(
     draw()
 
     r.effectLayerPaint.setBlendMode(ck.BlendMode.SrcIn)
+    const drawn = r.renderColor(effect.color)
     tintFilter = ck.ColorFilter.MakeBlend(
-      ck.Color4f(effect.color.r, effect.color.g, effect.color.b, effect.color.a),
+      ck.Color4f(drawn.r, drawn.g, drawn.b, drawn.a),
       ck.BlendMode.SrcIn
     )
     r.effectLayerPaint.setColorFilter(tintFilter)

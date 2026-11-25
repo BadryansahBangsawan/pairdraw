@@ -57,7 +57,7 @@ export function renderFigmaNoiseEffects(
       const levels = tileShader(r, levelTile, blend)
       const colors = tileShader(r, colorTile, false)
       const shader = effect.makeShaderWithChildren(
-        packNoiseUniforms(effect, noiseUniformValues(noise)),
+        packNoiseUniforms(effect, noiseUniformValues(noise, r.documentColorSpace)),
         [levels, colors]
       )
       paint.setShader(shader)

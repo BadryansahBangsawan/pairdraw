@@ -177,6 +177,17 @@ export function attachRoomVoice({ awareness, peers, connection }: RoomVoiceOptio
   }
 
   const levels = useIntervalFn(() => void readLevels(), LEVEL_INTERVAL_MS, { immediate: false })
+  /**
+   * Levels are read only while a speaking indicator can change: in the call, and either our own
+   * microphone is live or someone else's track can be heard. A muted tab alone in the call reads
+   * nothing, ten times a second, for nobody.
+   */
+  const readsLevels = computed(
+    () => joined.value && media !== null && (!muted.value || audio.value.size > 0)
+  )
+  const stopLevels = watch(readsLevels, (live) => (live ? levels.resume() : levels.pause()), {
+    immediate: true
+  })
 
   function publish() {
     awareness.setLocalStateField('voice', joined.value ? { muted: muted.value } : null)
@@ -185,7 +196,6 @@ export function attachRoomVoice({ awareness, peers, connection }: RoomVoiceOptio
   function leave() {
     if (!joined.value) return
     joined.value = false
-    levels.pause()
     lastHeard.clear()
     speaking.value = new Set()
     publish()
@@ -205,7 +215,6 @@ export function attachRoomVoice({ awareness, peers, connection }: RoomVoiceOptio
       joined.value = true
       publish()
       reconcile()
-      if (media) levels.resume()
       return true
     },
     setMuted(next) {
@@ -220,6 +229,7 @@ export function attachRoomVoice({ awareness, peers, connection }: RoomVoiceOptio
     dispose() {
       disposed = true
       leave()
+      stopLevels()
       levels.pause()
       stopMembers()
       stopLeave()

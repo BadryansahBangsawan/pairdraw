@@ -8,8 +8,11 @@ import { createEditorStore, type EditorStore } from '@/app/editor/session'
 
 import { createMemoryRooms, type MemorySend } from '#tests/helpers/collab/memory-transport'
 import { asDouble } from '#tests/helpers/doubles'
+import { armedAt, withIntervalArms } from '#tests/helpers/interval-arms'
 
 const ROOM = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+/** Matches the level sampler in the room, which is what these tests count. */
+const LEVEL_INTERVAL_MS = 100
 
 const noSavedCopy = () => ({ whenSynced: Promise.resolve(), destroy: () => undefined })
 
@@ -138,6 +141,32 @@ describe('room voice calls', () => {
       expect(host.voice.joined.value).toBe(false)
       await settle()
       expect(guest.voice.members.value).toEqual([])
+    })
+  })
+
+  test('reads no levels while muted and alone, and reads them once they can change', async () => {
+    await withIntervalArms(async (armed) => {
+      await withCall(async (host, guest, { settle }) => {
+        host.voice.join(true)
+        await settle()
+        expect(armedAt(armed, LEVEL_INTERVAL_MS)).toBe(0)
+
+        host.voice.setMuted(false)
+        await settle()
+        expect(armedAt(armed, LEVEL_INTERVAL_MS)).toBe(1)
+
+        host.voice.setMuted(true)
+        await settle()
+        expect(armedAt(armed, LEVEL_INTERVAL_MS)).toBe(0)
+
+        // Someone else in the call can speak while we are muted, so their level is still read:
+        // ours resumes, and theirs was already reading its own.
+        guest.voice.join(false)
+        guest.voice.setMicrophone(microphone('guest-mic'))
+        await settle()
+        expect(host.voice.audio.value.size).toBe(1)
+        expect(armedAt(armed, LEVEL_INTERVAL_MS)).toBe(2)
+      })
     })
   })
 })

@@ -9,7 +9,7 @@ export default {
     // Pins sit at their zoomed canvas positions in here; panning only moves this layer.
     pins: 'absolute top-0 left-0',
     // The strokes people circle with, painted in the accent color under the pins.
-    stroke: 'pointer-events-none absolute block bg-current text-accent/60',
+    stroke: 'pointer-events-none absolute block bg-current text-accent/35',
     // A 32px speech bubble whose square corner points at the commented spot, as Figma draws it;
     // hovering opens it in place into a preview of the comment.
     // The ring edges it in both themes; hovering or dragging lifts it.

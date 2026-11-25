@@ -57,7 +57,7 @@ const menuCls = useMenuUI({ content: 'min-w-40' })
 const ui = commentsTheme()
 const threadCls = usePopoverUI({ content: ui.card() })
 const draftCls = usePopoverUI({ content: ui.draftCard() })
-const { activeThreadId, draft, showOnCanvas, listShowResolved, commentsOnly } = comments
+const { activeThreadId, draft, stroke, showOnCanvas, listShowResolved, commentsOnly } = comments
 const commenting = computed(() => store.state.activeTool === 'COMMENT')
 
 const draftText = ref('')
@@ -68,7 +68,7 @@ const threadCard = useTemplateRef<{ focus: () => void }>('threadCard')
 watch(commenting, (on) => {
   if (!on) {
     draft.value = null
-    stroke.value = null
+    comments.cancelStrokeIfDrawing()
   }
 })
 
@@ -95,33 +95,18 @@ const DRAG_THRESHOLD = 4
 /** Screen pixels between the points kept while drawing; a pointer sends far more than a stroke needs. */
 const SAMPLE_DISTANCE = 1.5
 
-/** The stroke being drawn: its canvas points, and where the press started, in screen pixels. */
-const stroke = ref<{
-  pointerId: number
-  points: Vector[]
-  start: Vector
-  startScreen: Vector
-} | null>(null)
-
 /**
  * Listeners that only matter between a press and its release. Their target is the canvas while a
- * stroke is in progress and nothing otherwise, so an idle Comment tool keeps no pointer or key
- * handler; VueUse adds and removes them as the target changes.
+ * stroke is in progress and nothing otherwise, so an idle Comment tool keeps no pointer handler;
+ * VueUse adds and removes them as the target changes. Escape is the editor's to take, which asks
+ * `cancelStrokeIfDrawing` before it would leave the tool.
  */
 const strokeTarget = computed<HTMLCanvasElement | null>(() => (stroke.value ? canvasEl : null))
-const strokeWindow = computed<Window | null>(() => (stroke.value ? window : null))
-
-function onStrokeEscape(event: KeyboardEvent) {
-  if (event.key !== 'Escape' || !stroke.value) return
-  event.stopImmediatePropagation()
-  cancelStroke()
-}
 
 useEventListener(strokeTarget, 'pointermove', moveStroke)
 useEventListener(strokeTarget, 'pointerup', releaseStroke)
 useEventListener(strokeTarget, 'pointercancel', cancelStroke)
 useEventListener(strokeTarget, 'contextmenu', cancelStroke)
-useEventListener(strokeWindow, 'keydown', onStrokeEscape, { capture: true })
 
 // Pins show unless View → Comments hid them; the Comment tool always shows them, as in Figma.
 const pins = computed(() => {
@@ -227,7 +212,7 @@ function releaseStroke(event: PointerEvent) {
 /** Drops an unfinished stroke: nothing reaches the document, and the tool stays. */
 function cancelStroke() {
   const current = stroke.value
-  stroke.value = null
+  comments.cancelStrokeIfDrawing()
   if (current && canvasEl?.hasPointerCapture(current.pointerId)) {
     canvasEl.releasePointerCapture(current.pointerId)
   }

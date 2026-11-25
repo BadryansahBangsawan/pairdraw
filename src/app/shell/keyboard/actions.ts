@@ -112,7 +112,11 @@ export function createKeyboardActions({
     }
     // Figma clears the selection at any depth; Shift+Enter is the way up a level.
     if (store.state.enteredContainerId) store.exitContainers()
-    if (useComments().closeCard()) return
+    // A comment stroke being drawn is a gesture in progress, as a pen path is: Escape takes it
+    // back and keeps the tool, before it would close a card or leave the tool.
+    const comments = useComments()
+    if (comments.cancelStrokeIfDrawing()) return
+    if (comments.closeCard()) return
     store.clearSelection()
     store.setTool('SELECT')
   }

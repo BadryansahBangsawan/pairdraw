@@ -36,13 +36,22 @@ function preference<K extends keyof CommentPreferences>(
   })
 }
 
+/** A stroke being drawn in the Comment tool: its pointer, canvas points, and where the press began. */
+export interface CommentStroke {
+  pointerId: number
+  points: Vector[]
+  start: Vector
+  startScreen: Vector
+}
+
 /**
  * The active document's comments and the comment UI's state, one for the whole app: the canvas
  * layer, the sidebar list, menus and shortcuts share it, and it follows whichever tab is active.
  * Changes are document changes but never undo steps, as in Figma.
  *
- * Escape closes things in order: the composer and the card's popover close themselves, and the
- * editor's Escape asks `closeCard` before it leaves the Comment tool.
+ * Escape closes things in order: the composer and the card's popover close themselves, the
+ * editor's Escape takes back a stroke still being drawn, then asks `closeCard` before it leaves
+ * the Comment tool.
  */
 export const useComments = createGlobalState(() => {
   const identity = useCollabIdentity()
@@ -50,6 +59,8 @@ export const useComments = createGlobalState(() => {
 
   const activeThreadId = ref<string | null>(null)
   const draft = ref<CommentDraft | null>(null)
+  /** The stroke in progress, which becomes the thread's region when it is released. */
+  const stroke = ref<CommentStroke | null>(null)
   /** Deleting asks first; the confirmation dialog listens for which thread. */
   const deleteRequested = createEventHook<string>()
   const listQuery = ref('')
@@ -63,6 +74,7 @@ export const useComments = createGlobalState(() => {
   const documentComments = followDocumentComments(storeRef, () => {
     activeThreadId.value = null
     draft.value = null
+    stroke.value = null
   })
   const { threads, mutate, update, pinPosition } = documentComments
 
@@ -102,6 +114,13 @@ export const useComments = createGlobalState(() => {
     draft.value = null
     activeThreadId.value = null
     return open
+  }
+
+  /** Take back a stroke being drawn; true when there was one, so Escape stops at the stroke. */
+  function cancelStrokeIfDrawing(): boolean {
+    if (!stroke.value) return false
+    stroke.value = null
+    return true
   }
 
   function addThread(text: string) {
@@ -183,6 +202,7 @@ export const useComments = createGlobalState(() => {
     threads,
     activeThreadId,
     draft,
+    stroke,
     onDeleteRequested: deleteRequested.on,
     author: computed(() => me.value.name),
     commentsOnly,
@@ -196,6 +216,7 @@ export const useComments = createGlobalState(() => {
     startDraft,
     toggleThread,
     closeCard,
+    cancelStrokeIfDrawing,
     addThread,
     movePin,
     reply,

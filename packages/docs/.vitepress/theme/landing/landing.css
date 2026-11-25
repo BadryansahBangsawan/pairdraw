@@ -159,57 +159,94 @@ html:has(.landing-home) .VPLocalNav {
   @supports (animation-timeline: view()) {
     .landing-home [data-draw] {
       position: relative;
+      --lp-draw-radius: 0px;
       view-timeline-name: --lp-draw;
       view-timeline-axis: block;
+    }
+
+    .landing-home .tabs[data-draw] {
+      --lp-draw-radius: 20px;
+    }
+
+    .landing-home .terminal[data-draw] {
+      --lp-draw-radius: 18px;
     }
 
     /* The box: a corner drag out from the top left, then the frame's own edges. */
     .landing-home [data-draw]::before {
       position: absolute;
       z-index: 2;
-      inset: 0;
+      inset: 5px;
       border: 1.5px solid var(--lp-agent);
-      background-image: radial-gradient(
-        circle,
-        #fff 0 2.5px,
-        var(--lp-agent) 2.5px 4px,
-        transparent 4px
-      );
+      border-radius: max(0px, calc(var(--lp-draw-radius) - 5px));
+      /* Four 8px white handles with a 1.5px violet border, all inside the frame's clip. */
+      background-image:
+        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
+        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
+        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff),
+        linear-gradient(var(--lp-agent), var(--lp-agent)), linear-gradient(#fff, #fff);
       background-repeat: no-repeat;
-      background-size: 9px 9px;
+      background-size:
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px;
       background-position:
         0 0,
+        1.5px 1.5px,
         100% 0,
+        calc(100% - 1.5px) 1.5px,
         0 100%,
-        100% 100%;
+        1.5px calc(100% - 1.5px),
+        100% 100%,
+        calc(100% - 1.5px) calc(100% - 1.5px);
       content: '';
       pointer-events: none;
       animation-name: lp-draw-box;
       animation-fill-mode: both;
       animation-timing-function: var(--lp-ease-out);
       animation-timeline: --lp-draw;
-      animation-range: entry 4% entry 34%;
+      animation-range: entry 4% entry 60%;
     }
 
-    /* What the frame holds fills in after the box, one piece after the next. */
-    .landing-home [data-draw] > * {
+    /* Once the frame has arrived, the selection lets go, and stays gone on the way back up. */
+    .landing-home [data-draw][data-drawn]::before {
+      animation-name: lp-draw-box, lp-draw-leave;
+      animation-timeline: --lp-draw, auto;
+      animation-duration: auto, 480ms;
+      animation-delay: 0s, 900ms;
+      animation-fill-mode: both, both;
+      animation-timing-function: var(--lp-ease-out), var(--lp-ease-out);
+    }
+
+    /* What the frame holds fills in once, the first time it is seen; the box then lets go. */
+    .lp-draw-ready [data-draw]:not([data-drawn]) > * {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+    }
+
+    .lp-draw-ready [data-draw][data-drawn] > * {
       animation-name: lp-draw-content;
       animation-fill-mode: both;
       animation-timing-function: var(--lp-ease-out);
-      animation-timeline: --lp-draw;
-      animation-range: entry 34% entry 64%;
+      animation-duration: 520ms;
+      animation-delay: calc(var(--i, 0) * var(--lp-stagger));
     }
 
     .landing-home [data-draw] > :nth-child(2) {
-      animation-range: entry 44% entry 74%;
+      --i: 1;
     }
 
     .landing-home [data-draw] > :nth-child(3) {
-      animation-range: entry 54% entry 84%;
+      --i: 2;
     }
 
     .landing-home [data-draw] > :nth-child(n + 4) {
-      animation-range: entry 64% entry 94%;
+      --i: 3;
     }
   }
 
@@ -226,6 +263,12 @@ html:has(.landing-home) .VPLocalNav {
     to {
       clip-path: inset(0);
       opacity: 1;
+    }
+  }
+
+  @keyframes lp-draw-leave {
+    to {
+      opacity: 0;
     }
   }
 

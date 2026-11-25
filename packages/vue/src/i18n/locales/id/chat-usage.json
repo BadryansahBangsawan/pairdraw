@@ -1,0 +1,16 @@
+{
+  "usageLabel": "Penggunaan token",
+  "turnTokens": "{tokens} token",
+  "turnTokensCost": "{tokens} token · {cost}",
+  "chatTokens": "{tokens} token di chat ini",
+  "chatTokensCost": "{tokens} token · {cost} di chat ini",
+  "usageInput": "Input",
+  "usageCachedInput": "Input cache",
+  "usageOutput": "Output",
+  "usageReasoning": "Reasoning",
+  "usageCost": "Estimasi biaya",
+  "usageTurns": "{count} balasan",
+  "usageHint": "Dihitung dari token yang dilaporkan setiap balasan. Biaya adalah estimasi pada harga resmi model.",
+  "usageNoCost": "Tidak ada harga untuk model ini, jadi hanya token yang ditampilkan.",
+  "usageAgentHint": "Dihitung dari token yang dilaporkan agent. Coding agent tidak memiliki harga dolar."
+}

@@ -1,16 +1,15 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
+import { expectDefined } from '#core-tests/helpers/assert'
+import { registerTestFont } from '#core-tests/helpers/figma-api'
 import * as v from 'valibot'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { PairdrawAPI } from '@pairdraw/core/pairdraw-api'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { getCSS } from '#core/tools/read/css'
 import { setRadius } from '#core/tools/modify/geometry'
-
-import { expectDefined } from '#core-tests/helpers/assert'
-import { registerTestFont } from '#core-tests/helpers/figma-api'
+import { getCSS } from '#core/tools/read/css'
 
 beforeAll(async () => {
   await registerTestFont()
@@ -41,9 +40,7 @@ function card() {
   const box = figma.createRectangle()
   box.name = 'Box'
   box.resize(40, 40)
-  box.fills = [
-    { type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1, visible: true }
-  ]
+  box.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1, visible: true }]
   frame.appendChild(box)
   return { figma, graph, frame, box }
 }
@@ -84,12 +81,12 @@ describe('get_css', () => {
   test('a bound fill reads as the token with its value in CSS fallback form', () => {
     const { figma, graph, frame } = card()
     const collection = graph.createCollection('Theme')
-    const brand = graph.createVariable(
-      'color/brand',
-      'COLOR',
-      collection.id,
-      { r: 0.31, g: 0.275, b: 0.898, a: 1 }
-    )
+    const brand = graph.createVariable('color/brand', 'COLOR', collection.id, {
+      r: 0.31,
+      g: 0.275,
+      b: 0.898,
+      a: 1
+    })
     const variable = expectDefined(graph.variables.get(brand.id), 'brand')
     new PairdrawAPI(figma).bindVariable(frame.id, 'fills/0/color', variable)
 
@@ -107,9 +104,7 @@ describe('get_css', () => {
     text.fontSize = 14
     text.fontWeight = 600
     text.maxLines = 2
-    text.fills = [
-      { type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 1, visible: true }
-    ]
+    text.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 1, visible: true }]
 
     expect(output(getCSS.execute(figma, { id: text.id, depth: 0 }))).toBe(
       `"Start free"#${text.id} ${Math.round(text.width)}×${Math.round(text.height)} {font:600 14px/auto Inter;color:#FFFFFF;max-lines:2}`
@@ -170,17 +165,12 @@ describe('get_css', () => {
     box.layoutAlign = 'STRETCH'
     box.layoutGrow = 1
 
-    expect(output(getCSS.execute(figma, { id: box.id, depth: 0 }))).toContain(
-      'stretch;grow:1'
-    )
+    expect(output(getCSS.execute(figma, { id: box.id, depth: 0 }))).toContain('stretch;grow:1')
   })
 
   test('reads independent corners as the radius shorthand', () => {
     const { figma, frame } = card()
-    setRadius.execute(
-      figma,
-      v.parse(setRadius.input, { id: frame.id, radius: '12px 12px 4px 0' })
-    )
+    setRadius.execute(figma, v.parse(setRadius.input, { id: frame.id, radius: '12px 12px 4px 0' }))
 
     expect(output(getCSS.execute(figma, { id: frame.id, depth: 0 }))).toMatch(
       /radius:12px 12px 4px 0(?=[};])/
@@ -205,13 +195,8 @@ describe('get_css', () => {
 
   test('a radius read here writes back unchanged', () => {
     const { figma, frame } = card()
-    setRadius.execute(
-      figma,
-      v.parse(setRadius.input, { id: frame.id, radius: '12px 12px 4px 0' })
-    )
-    const read = /radius:([^;}]+)/.exec(
-      output(getCSS.execute(figma, { id: frame.id, depth: 0 }))
-    )
+    setRadius.execute(figma, v.parse(setRadius.input, { id: frame.id, radius: '12px 12px 4px 0' }))
+    const read = /radius:([^;}]+)/.exec(output(getCSS.execute(figma, { id: frame.id, depth: 0 })))
 
     setRadius.execute(
       figma,
@@ -310,8 +295,62 @@ describe('get_css', () => {
       }
     ]
 
+    expect(output(getCSS.execute(figma, { id: box.id, depth: 0 }))).toContain('border:1px #808080')
+  })
+})
+
+describe('get_css in a Display P3 document', () => {
+  /** A box in a document whose stored components are Display P3, as its Document section sets. */
+  function p3() {
+    const graph = new SceneGraph()
+    graph.documentColorSpace = 'display-p3'
+    const figma = new FigmaAPI(graph)
+    const box = figma.createRectangle()
+    box.name = 'Box'
+    box.resize(40, 40)
+    box.fills = [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 }, opacity: 1, visible: true }]
+    return { graph, figma, box }
+  }
+
+  test('reads a fill, stroke, and shadow as color(display-p3 …)', () => {
+    const { figma, box } = p3()
+    box.strokes = [
+      { type: 'SOLID', color: { r: 0.31, g: 0.275, b: 0.898 }, opacity: 1, visible: true }
+    ]
+    box.effects = [
+      {
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 1, a: 1 },
+        offset: { x: 4, y: 4 },
+        radius: 8,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL'
+      }
+    ]
+
+    expect(output(getCSS.execute(figma, { id: box.id, depth: 0 }))).toBe(
+      `Box#${box.id} 40×40 {bg:color(display-p3 1 0 0);border:1px color(display-p3 0.31 0.275 0.898);shadow:4px 4px 8px color(display-p3 0 0 1)}`
+    )
+  })
+
+  test('a bound fill keeps the fallback in the document profile', () => {
+    const { figma, graph, box } = p3()
+    const collection = graph.createCollection('Theme')
+    const brand = graph.createVariable('color/brand', 'COLOR', collection.id, {
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1
+    })
+    new PairdrawAPI(figma).bindVariable(
+      box.id,
+      'fills/0/color',
+      expectDefined(graph.variables.get(brand.id), 'brand')
+    )
+
     expect(output(getCSS.execute(figma, { id: box.id, depth: 0 }))).toContain(
-      'border:1px #808080'
+      'bg:var(--color/brand, color(display-p3 1 0 0))'
     )
   })
 })

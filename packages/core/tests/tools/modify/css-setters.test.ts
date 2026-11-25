@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
+import { expectDefined } from '#core-tests/helpers/assert'
 import * as v from 'valibot'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
@@ -7,8 +8,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { setRadius } from '#core/tools/modify/geometry'
 import { setFill } from '#core/tools/modify/paint'
-
-import { expectDefined } from '#core-tests/helpers/assert'
+import { getCSS } from '#core/tools/read/css'
 
 function doc() {
   const graph = new SceneGraph()
@@ -162,6 +162,74 @@ describe('set_fill takes a token name', () => {
     expect(expectDefined(graph.getNode(box.id), 'box').fills[0]).toMatchObject({
       type: 'SOLID',
       color: { r: 1, g: 0, b: 0 }
+    })
+  })
+})
+
+describe('set_fill takes the colours get_css writes in a Display P3 document', () => {
+  /** A box in a document whose stored components are Display P3. */
+  function p3Doc() {
+    const graph = new SceneGraph()
+    graph.documentColorSpace = 'display-p3'
+    const figma = new FigmaAPI(graph)
+    const box = figma.createRectangle()
+    box.resize(100, 60)
+    return { graph, figma, box }
+  }
+
+  function fillOf(graph: SceneGraph, id: string) {
+    return expectDefined(graph.getNode(id), 'box').fills[0]
+  }
+
+  test('a color(display-p3 …) string stores the components it names', () => {
+    const { graph, figma, box } = p3Doc()
+
+    setFill.execute(
+      figma,
+      v.parse(setFill.input, { id: box.id, color: 'color(display-p3 1 0.2 0.1)' })
+    )
+
+    expect(fillOf(graph, box.id)).toMatchObject({
+      type: 'SOLID',
+      color: { r: 1, g: 0.2, b: 0.1 }
+    })
+  })
+
+  test('a token whose fallback is a p3 colour still binds', () => {
+    const { graph, figma, box } = p3Doc()
+    const collection = graph.createCollection('Theme')
+    const variable = graph.createVariable('color/brand', 'COLOR', collection.id, {
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1
+    })
+
+    const result = setFill.execute(
+      figma,
+      v.parse(setFill.input, { id: box.id, color: 'var(--color/brand, color(display-p3 1 0 0))' })
+    )
+
+    expect(result).toMatchObject({ bound: 'color/brand' })
+    expect(expectDefined(graph.getNode(box.id), 'box').boundVariables['fills/0/color']).toBe(
+      variable.id
+    )
+    expect(fillOf(graph, box.id)).toMatchObject({ color: { r: 1, g: 0, b: 0 } })
+  })
+
+  test('the wide-gamut colour get_css wrote paints back unchanged', () => {
+    const { graph, figma, box } = p3Doc()
+    const wide = { r: 1, g: 0.2, b: 0.1, a: 1 }
+    box.fills = [{ type: 'SOLID', color: { ...wide }, opacity: 1, visible: true }]
+    const css = (getCSS.execute(figma, { id: box.id, depth: 0 }) as { css: string }).css
+    const written = expectDefined(/bg:([^;}]+)/.exec(css)?.[1], 'bg')
+    expect(written).toBe('color(display-p3 1 0.2 0.1)')
+
+    const other = figma.createRectangle()
+    setFill.execute(figma, v.parse(setFill.input, { id: other.id, color: written }))
+
+    expect(fillOf(graph, other.id)).toMatchObject({
+      color: { r: wide.r, g: wide.g, b: wide.b }
     })
   })
 })

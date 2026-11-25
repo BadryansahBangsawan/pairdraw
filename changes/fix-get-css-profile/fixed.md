@@ -1,0 +1,1 @@
+- `get_css` writes a color in the document's profile, as `get_jsx` does: `#RRGGBB` in an sRGB document, unchanged, and `color(display-p3 0.31 0.275 0.898)` in a Display P3 one, inside the `var(--token, …)` fallback too, so a wide-gamut color reads and writes back as the color it is.

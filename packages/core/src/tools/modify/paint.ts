@@ -25,8 +25,11 @@ const STRETCH_IMAGE_TRANSFORM: [[number, number, number], [number, number, numbe
   [0, 1, 0]
 ]
 
-/** `var(--color/brand)` or `var(--color/brand, #4F46E5)`: a token by name, as `get_css` writes it. */
-const COLOR_TOKEN = /^var\(\s*--([^,()]+?)\s*(?:,[^)]*)?\)$/
+/**
+ * `var(--color/brand)` or `var(--color/brand, #4F46E5)`: a token by name, as `get_css` writes it.
+ * The fallback runs to the last `)`, since a Display P3 document writes one as `color(display-p3 …)`.
+ */
+const COLOR_TOKEN = /^var\(\s*--([^,()]+?)\s*(?:,(.*))?\)$/
 
 function colorVariablesNamed(figma: FigmaAPI, name: string): Variable[] {
   const matches: Variable[] = []

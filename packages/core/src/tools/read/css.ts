@@ -1,13 +1,15 @@
 import * as v from 'valibot'
 
-import type { SceneGraph, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
-import { colorToHex } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, SceneGraph, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { defineTool, nodeIdsField, toolNumber } from '#core/tools/schema'
 
 /**
- * A subtree as CSS-shaped lines: one line per node, lengths in px, colours as hex with the token
- * that binds them in `var(--name, #hex)` form. This is the read side of the CSS shorthand the
+ * A subtree as CSS-shaped lines: one line per node, lengths in px, colours in the document's
+ * profile with the token that binds them in `var(--name, …)` form: hex in an sRGB document,
+ * `color(display-p3 …)` in a Display P3 one. This is the read side of the CSS shorthand the
  * setters accept, so a value read here can be written back unchanged.
  */
 export const DEFAULT_MAX_BYTES = 6000
@@ -76,18 +78,27 @@ function boundName(graph: SceneGraph, node: SceneNode, field: string): string | 
   return graph.variables.get(variableId)?.name ?? null
 }
 
-/** `#RRGGBB`, or `var(--token, #RRGGBB)` when a variable paints it. */
-function paintOf(node: SceneNode, graph: SceneGraph, field: string, hex: string): string {
+/**
+ * A stored colour as the shorthand writes it: `#RRGGBB` in an sRGB document, `color(display-p3 …)`
+ * in a Display P3 one, where hex would name a different colour. The shorthand carries no alpha, as
+ * it never has, so the paint's opacity is left to `opacity`.
+ */
+function cssColor(color: Color, profile: ColorProfile): string {
+  return colorToDocumentCSS({ ...color, a: 1 }, profile)
+}
+
+/** A colour in the document's profile, or `var(--token, …)` when a variable paints it. */
+function paintOf(node: SceneNode, graph: SceneGraph, field: string, paint: string): string {
   const name = boundName(graph, node, field)
-  return name ? `var(--${name}, ${hex})` : hex
+  return name ? `var(--${name}, ${paint})` : paint
 }
 
 function background(node: SceneNode, graph: SceneGraph): string | null {
   const index = node.fills.findIndex((candidate) => candidate.type === 'SOLID' && candidate.visible)
   const solid = index === -1 ? undefined : node.fills[index]
   if (solid) {
-    const hex = colorToHex({ ...solid.color, a: solid.opacity })
-    return paintOf(node, graph, `fills/${index}/color`, hex)
+    const paint = cssColor(solid.color, graph.documentColorSpace)
+    return paintOf(node, graph, `fills/${index}/color`, paint)
   }
   const otherIndex = node.fills.findIndex((candidate) => candidate.visible)
   const other = otherIndex === -1 ? undefined : node.fills[otherIndex]
@@ -99,8 +110,8 @@ function border(node: SceneNode, graph: SceneGraph): string | null {
   const index = node.strokes.findIndex((candidate) => candidate.visible)
   const stroke = index === -1 ? undefined : node.strokes[index]
   if (!stroke) return null
-  const hex = colorToHex({ ...stroke.color, a: stroke.opacity })
-  return `${px(stroke.weight)} ${paintOf(node, graph, `strokes/${index}/color`, hex)}`
+  const paint = cssColor(stroke.color, graph.documentColorSpace)
+  return `${px(stroke.weight)} ${paintOf(node, graph, `strokes/${index}/color`, paint)}`
 }
 
 /** Padding in CSS order, compressed to the fewest values that say the same thing. */
@@ -115,16 +126,16 @@ function padding(node: SceneNode): string | null {
   return `${px(top)} ${px(right)} ${px(bottom)} ${px(left)}`
 }
 
-function shadowOf(prefix: string, effect: ShadowEffect): string {
-  return `${prefix}:${px(effect.offset.x)} ${px(effect.offset.y)} ${px(effect.radius)} ${colorToHex(effect.color)}`
+function shadowOf(prefix: string, effect: ShadowEffect, profile: ColorProfile): string {
+  return `${prefix}:${px(effect.offset.x)} ${px(effect.offset.y)} ${px(effect.radius)} ${cssColor(effect.color, profile)}`
 }
 
-function effects(node: SceneNode): string[] {
+function effects(node: SceneNode, profile: ColorProfile): string[] {
   const out: string[] = []
   for (const effect of node.effects) {
     if (!effect.visible) continue
-    if (effect.type === 'DROP_SHADOW') out.push(shadowOf('shadow', effect))
-    else if (effect.type === 'INNER_SHADOW') out.push(shadowOf('inner-shadow', effect))
+    if (effect.type === 'DROP_SHADOW') out.push(shadowOf('shadow', effect, profile))
+    else if (effect.type === 'INNER_SHADOW') out.push(shadowOf('inner-shadow', effect, profile))
     else if (effect.type === 'LAYER_BLUR' || effect.type === 'FOREGROUND_BLUR')
       out.push(`blur:${px(effect.radius)}`)
     else out.push('backdrop-blur')
@@ -168,7 +179,7 @@ function boxDecls(node: SceneNode, graph: SceneGraph): string[] {
   if (node.maxWidth !== null) out.push(`max-w:${px(node.maxWidth)}`)
   if (node.minHeight !== null) out.push(`min-h:${px(node.minHeight)}`)
   if (node.maxHeight !== null) out.push(`max-h:${px(node.maxHeight)}`)
-  out.push(...effects(node))
+  out.push(...effects(node, graph.documentColorSpace))
   if (node.opacity !== 1) out.push(`opacity:${Math.round(node.opacity * 100) / 100}`)
   if (node.clipsContent) out.push('clip')
   return out
@@ -298,6 +309,7 @@ export const getCSS = defineTool({
   description:
     'Read a node subtree as compact CSS-like lines: `Name#id W×H {flex:row;gap:12px;padding:16px 24px;bg:var(--color/brand, #4F46E5);radius:8px}`. ' +
     'Lengths are px; short names: flex (implies display:flex), gap, padding, justify, items, wrap, hug, stretch, grow, bg, border, radius, min/max-w/h, shadow, blur, opacity, clip; text: `font:600 14px/20px Inter`, color, text-align, max-lines. ' +
+    "Colours follow the document's profile, as get_jsx writes them: `#RRGGBB` in an sRGB document, `color(display-p3 r g b)` in a Display P3 one, and either inside the `var()` fallback. " +
     'Use it for geometry and style; describe gives roles and design issues. The setters accept the same shorthand (padding/gap/radius strings, `var(--token)` colours).',
   execution: { kind: 'sync', mutation: 'none' },
   input: v.strictObject({

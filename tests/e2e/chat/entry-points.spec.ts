@@ -42,7 +42,7 @@ test.describe('Run sticky as prompt', () => {
   })
 })
 
-test.describe('Apply with AI', () => {
+test.describe('Fix with agent', () => {
   const list = (page: Page) => page.locator('[data-slot="comments-panel"]')
   const items = (page: Page) => list(page).locator('[data-slot="comment-list-item"]')
 

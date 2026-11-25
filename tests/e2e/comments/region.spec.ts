@@ -36,12 +36,15 @@ test('dragging in the Comment tool draws a region and keeps the note on it', asy
   await expect(pins()).toHaveCount(1)
   await expect(regions()).toHaveCount(1)
 
-  // The stroke goes away with its thread and comes back when it is shown again.
+  // Outside the Comment tool the stroke follows the View → Comments toggle, and comes back.
   await editor.page.keyboard.press('Escape')
+  await moveTool().click()
   await expect(regions()).toHaveCount(1)
   await editor.page.keyboard.press('Shift+KeyC')
+  await expect(pins()).toHaveCount(0)
   await expect(regions()).toHaveCount(0)
   await editor.page.keyboard.press('Shift+KeyC')
+  await expect(pins()).toHaveCount(1)
   await expect(regions()).toHaveCount(1)
 })
 
@@ -51,7 +54,8 @@ test('a plain click still drops a pin with no region', async () => {
   await editor.page.mouse.click(box.x + 320, box.y + 300)
   await expect(composer()).toBeFocused()
   await composer().press('Escape')
-  await expect(pins()).toHaveCount(2)
+  // The draft pin and its note are gone; the thread drawn in the first test remains.
+  await expect(pins()).toHaveCount(1)
   await expect(regions()).toHaveCount(1)
 })
 
@@ -66,6 +70,7 @@ test('Escape takes back a stroke that was not sent, and the tool stays', async (
   await expect(draftRegion()).toHaveCount(0)
   await expect(commentTool()).toHaveAttribute('aria-pressed', 'true')
   await editor.page.mouse.up()
-  await expect(pins()).toHaveCount(2)
+  // Cancelling stores nothing: only the thread from the first test is left.
+  await expect(pins()).toHaveCount(1)
   await expect(moveTool()).toHaveAttribute('aria-pressed', 'false')
 })

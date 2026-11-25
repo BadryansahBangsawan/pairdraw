@@ -97,7 +97,8 @@ test('typing a hex into a Display P3 document shows the same hex back', async ()
     if (!store) throw new Error('Pairdraw store not initialized')
     const id = [...store.state.selectedIds][0]
     if (!id) return null
-    return store.graph.getNode(id)?.effects[0]?.color ?? null
+    const effect = store.graph.getNode(id)?.effects[0]
+    return effect && 'color' in effect ? effect.color : null
   })
   // Stored as the document's Display P3 components, not as the sRGB numbers typed.
   expect(stored?.r).not.toBeCloseTo(0.9176, 3)

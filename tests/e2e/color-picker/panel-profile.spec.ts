@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 
+import type { Fill } from '@pairdraw/scene-graph'
+
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { propertySection } from '#tests/helpers/properties'
@@ -18,7 +20,7 @@ const STORED = {
 async function openOnRect(
   page: Page,
   colorSpace: 'srgb' | 'display-p3',
-  fill: Record<string, unknown>
+  fill: Omit<Fill, 'opacity' | 'visible'>
 ) {
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
@@ -47,7 +49,7 @@ async function openOnRect(
 
 /** The solid fill row's hex field and its swatch. */
 function fillRow(page: Page) {
-  const fills = propertySection(page, 'Fills')
+  const fills = propertySection(page, 'Fill')
   return {
     hex: fills.locator('[data-property="color-hex"]').first(),
     swatch: fills.locator('[data-slot="swatch"]').first()
@@ -107,7 +109,7 @@ test('the sRGB solid fill picker keeps its sliders in sRGB', async ({ page }) =>
   const canvas = await openOnRect(page, 'srgb', { type: 'SOLID', color: STORED })
   await page.getByTestId('fill-picker-swatch').first().click()
   const thumb = page.getByTestId('color-slider-alpha').locator('[role="slider"]')
-  await expect(thumb).toHaveAttribute('style', /#EA3323/)
+  await expect(thumb).toHaveAttribute('style', /rgb\(234, 51, 35\)/)
   canvas.assertNoErrors()
 })
 

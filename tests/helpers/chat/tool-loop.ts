@@ -1,5 +1,8 @@
 import type { Page } from '@playwright/test'
 
+/** One message of the model prompt, as the scripted transports below hand it to the tool loop. */
+export type PromptMessage = { role: string; content: unknown }
+
 /**
  * Replaces the chat transport with the app's own tool loop, driven by a scripted model, so
  * replies run real tools, edit the document, and save the conversation as in production.
@@ -18,7 +21,6 @@ export async function injectToolLoopTransport(page: Page): Promise<void> {
       inputTokens: { total: 1, noCache: 1, cacheRead: undefined, cacheWrite: undefined },
       outputTokens: { total: 1, text: 1, reasoning: undefined }
     }
-    type PromptMessage = { role: string; content: unknown }
     const textOf = (message: PromptMessage | undefined) =>
       Array.isArray(message?.content)
         ? message.content.map((part: { text?: string }) => part.text ?? '').join('')

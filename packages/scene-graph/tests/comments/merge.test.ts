@@ -37,6 +37,22 @@ test('keeps threads from both copies and the newer edit of a shared one', () => 
   expect(merged.find((entry) => entry.id === 'a')?.resolved).toBe(true)
 })
 
+test('a newer edit without a region keeps the region its thread was drawn with', () => {
+  const region = {
+    points: [
+      [0, 0],
+      [30, 8]
+    ] as [number, number][],
+    width: 2,
+    bounds: { minX: -1, minY: -1, maxX: 31, maxY: 9 }
+  }
+  const [merged] = mergeCommentThreads(
+    [thread('a', { region })],
+    [thread('a', { updatedAt: '2026-10-08T12:00:00.000Z', resolved: true })]
+  )
+  expect(merged).toMatchObject({ id: 'a', resolved: true, region })
+})
+
 test('joins replies and never brings a deleted thread or reply back', () => {
   const [merged] = mergeCommentThreads(
     [thread('a', { deleted: true, replies: [reply('r'), reply('mine')] })],

@@ -101,6 +101,29 @@ describe('document data in a room', () => {
     })
   })
 
+  test('a marked region on a thread reaches the other peer', async () => {
+    const mark = {
+      points: [
+        [10, 10],
+        [40, 10],
+        [40, 40],
+        [10, 40]
+      ] as [number, number][],
+      width: 2,
+      bounds: { minX: 9, minY: 9, maxX: 41, maxY: 41 }
+    }
+    await withRoom(
+      async ({ guest }) => {
+        expect(expectDefined(readComments(guest.graph)[0], 'thread').region).toEqual(mark)
+      },
+      (host) =>
+        writeComments(
+          host.graph,
+          readComments(host.graph).map((item) => ({ ...item, region: mark }))
+        )
+    )
+  })
+
   test('people commenting at once all keep their threads', async () => {
     await withRoom(async ({ host, guest, settle }) => {
       comment(host, thread('t2', 'Ann'))

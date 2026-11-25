@@ -1,7 +1,7 @@
 import type { SceneGraph } from '../graph'
 import type { Color, Vector } from '../primitives'
 import { randomHex } from '../random'
-import type { CommentReply, CommentThread, SceneNode } from '../types'
+import type { CommentRegion, CommentReply, CommentThread, SceneNode } from '../types'
 
 /** Who writes a comment: their name and, in a collaboration room, their color. */
 export interface CommentAuthor {
@@ -87,12 +87,14 @@ export function createCommentThread(
     at: Vector
     /** Pin it on this layer's top-level layer rather than on whatever is at `at`. */
     node?: SceneNode
+    /** The area the person circled, when the comment was drawn rather than clicked. */
+    region?: CommentRegion | null
     author: CommentAuthor
     text: string
     now: string
   }
 ): CommentThread {
-  const { pageId, at, node, author, text, now } = options
+  const { pageId, at, node, region, author, text, now } = options
   return {
     id: newCommentId('c'),
     pageId,
@@ -104,6 +106,7 @@ export function createCommentThread(
     createdAt: now,
     updatedAt: now,
     resolved: false,
+    ...(region ? { region } : {}),
     replies: []
   }
 }

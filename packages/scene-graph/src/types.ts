@@ -707,6 +707,16 @@ export interface CommentReply {
   deleted?: boolean
 }
 
+/** A stroke drawn over the commented area in Comment mode, kept with its thread. */
+export interface CommentRegion {
+  /** Stroke points, in canvas units relative to the thread's pin anchor. */
+  points: [number, number][]
+  /** Stroke width in canvas units. */
+  width: number
+  /** Bounds of the stroke including its width, relative to the same anchor. */
+  bounds: { minX: number; minY: number; maxX: number; maxY: number }
+}
+
 /** A canvas comment thread, kept in the document's root plugin data. */
 export interface CommentThread {
   id: string
@@ -734,6 +744,8 @@ export interface CommentThread {
   resolvedAt?: string | null
   /** Deleted threads stay as tombstones so a stale copy cannot bring them back. */
   deleted?: boolean
+  /** The area the person circled, when the thread was drawn rather than pinned. */
+  region?: CommentRegion | null
   replies: CommentReply[]
 }
 

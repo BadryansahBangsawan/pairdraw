@@ -34,6 +34,9 @@ export function mergeCommentThreads(
     const newer = thread.updatedAt >= other.updatedAt ? thread : other
     byId.set(thread.id, {
       ...newer,
+      // A region is only ever set together with its thread, so a copy that lacks one — written by
+      // an older build or read before the person drew — does not erase it.
+      region: newer.region ?? thread.region ?? other.region,
       deleted: thread.deleted || other.deleted,
       replies: mergeReplies(other.replies, thread.replies)
     })

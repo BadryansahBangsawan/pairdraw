@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { CommentThread } from '../types'
+import type { CommentRegion, CommentThread } from '../types'
 
 // Lenient on purpose: other tools may write comments, so missing fields get defaults and one
 // malformed thread is skipped instead of hiding every comment.
@@ -19,6 +19,28 @@ const commentEntry = {
 }
 
 const commentReplySchema = v.object({ id: v.string(), ...commentEntry })
+
+/** Points one thread's region may carry; a file asking for more is not a stroke a person drew. */
+export const MAX_COMMENT_REGION_POINTS = 512
+
+const finiteSchema = v.pipe(v.number(), v.finite())
+const commentPointSchema = v.tuple([finiteSchema, finiteSchema])
+
+/** The stroke a person circled with: its points and width, and the box they span. */
+const commentRegionSchema: v.GenericSchema<unknown, CommentRegion> = v.object({
+  points: v.pipe(
+    v.array(commentPointSchema),
+    v.minLength(2),
+    v.maxLength(MAX_COMMENT_REGION_POINTS)
+  ),
+  width: v.pipe(finiteSchema, v.minValue(0)),
+  bounds: v.object({
+    minX: finiteSchema,
+    minY: finiteSchema,
+    maxX: finiteSchema,
+    maxY: finiteSchema
+  })
+})
 
 const commentThreadSchema = v.object({
   id: v.string(),
@@ -45,7 +67,15 @@ export const commentThreadsSchema: v.GenericSchema<unknown, CommentThread[]> = v
       const parsed = v.safeParse(commentThreadSchema, item)
       if (!parsed.success) return []
       const thread = parsed.output
-      return [{ ...thread, updatedAt: thread.updatedAt || thread.createdAt }]
+      // A stroke that cannot be read is dropped; the note it was drawn around is still worth keeping.
+      const region = v.safeParse(commentRegionSchema, (item as { region?: unknown }).region)
+      return [
+        {
+          ...thread,
+          updatedAt: thread.updatedAt || thread.createdAt,
+          ...(region.success ? { region: region.output } : {})
+        }
+      ]
     })
   )
 )

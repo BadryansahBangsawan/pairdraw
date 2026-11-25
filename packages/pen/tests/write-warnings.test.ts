@@ -62,6 +62,30 @@ describe('writing a .pen file', () => {
     expect(warnings).toEqual([])
   })
 
+  test('labels AVIF bytes as AVIF in the embedded data URL', () => {
+    const avif = new Uint8Array([
+      0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66, 0x00, 0x00, 0x00, 0x00
+    ])
+    const graph = parseDocument([{ id: 'photo', type: 'rectangle', width: 10, height: 10 }])
+    const hash = computeImageHash(avif)
+    graph.images.set(hash, avif)
+    graph.updateNode('photo', {
+      fills: [
+        {
+          type: 'IMAGE',
+          color: { r: 0, g: 0, b: 0, a: 1 },
+          opacity: 1,
+          visible: true,
+          imageHash: hash
+        }
+      ]
+    })
+
+    const url = paintURL(parsePenDocument(writePenDocument(graph)).children[0])
+
+    expect(url?.startsWith('data:image/avif;base64,')).toBe(true)
+  })
+
   test('leaves out an image fill whose bytes are missing, and says so', () => {
     const { graph } = imageGraph()
     graph.images.clear()

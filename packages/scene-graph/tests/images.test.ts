@@ -94,6 +94,14 @@ describe('imageMimeType', () => {
     expect(imageMimeType(JPEG)).toBe('image/jpeg')
   })
 
+  test('reads an AVIF brand from the ISO media header', () => {
+    const avif = new Uint8Array([
+      0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66, 0x00, 0x00, 0x00,
+      0x00
+    ])
+    expect(imageMimeType(avif)).toBe('image/avif')
+  })
+
   test('reports bytes it cannot read as PNG', () => {
     expect(imageMimeType(new TextEncoder().encode('RIFF\0\0\0\0WAVEfmt '))).toBe('image/png')
     expect(imageMimeType(new Uint8Array())).toBe('image/png')

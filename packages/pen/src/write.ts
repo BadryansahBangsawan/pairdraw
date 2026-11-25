@@ -25,6 +25,7 @@ import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-sources'
 
 import { networkToSVGPath } from './geometry'
+import { penCropTransform } from './images'
 import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 import type {
   PenDocument,
@@ -215,29 +216,10 @@ function imagePaint(state: PenWriteState, fill: Fill): PenPaint | null {
   if (fill.imageScaleMode === 'FIT') paint.mode = 'contain'
   if (fill.imageScaleMode === 'CROP') {
     paint.mode = 'stretch'
-    const transform = fill.imageTransform && cropTransform(fill.imageTransform)
+    const transform = fill.imageTransform && penCropTransform(fill.imageTransform)
     if (transform) paint.transform = transform
   }
   return paint
-}
-
-/**
- * A crop's image-space window as pen.dev's affine, which maps the crop back onto the image so a
- * reader inverts it into the same window. The tuple is `[a, b, c, d, tx, ty]`: columns first.
- */
-function cropTransform(
-  crop: GradientTransform
-): [number, number, number, number, number, number] | null {
-  const det = crop.m00 * crop.m11 - crop.m01 * crop.m10
-  if (Math.abs(det) < 1e-12) return null
-  return [
-    crop.m11 / det,
-    -crop.m10 / det,
-    -crop.m01 / det,
-    crop.m00 / det,
-    (crop.m01 * crop.m12 - crop.m11 * crop.m02) / det,
-    (crop.m10 * crop.m02 - crop.m00 * crop.m12) / det
-  ]
 }
 
 function penPaint(

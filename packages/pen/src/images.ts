@@ -41,7 +41,7 @@ export function createImageStore(
 }
 
 /** pen.dev's affine `[a, b, c, d, tx, ty]`, inverted, as the scene graph's matrix. */
-export function invertAffine([a, b, c, d, tx, ty]: readonly number[]): Matrix | null {
+function invertAffine([a, b, c, d, tx, ty]: readonly number[]): Matrix | null {
   const det = a * d - b * c
   if (Math.abs(det) < 1e-12) return null
   return {
@@ -52,6 +52,18 @@ export function invertAffine([a, b, c, d, tx, ty]: readonly number[]): Matrix | 
     m11: a / det,
     m12: (b * tx - a * ty) / det
   }
+}
+
+/**
+ * A crop's image-space window as pen.dev's affine, which maps the crop back onto the image so a
+ * reader inverts it into the same window. The tuple is `[a, b, c, d, tx, ty]`: columns first.
+ */
+export function penCropTransform(
+  crop: Matrix
+): [number, number, number, number, number, number] | null {
+  const inverse = invertAffine([crop.m00, crop.m10, crop.m01, crop.m11, crop.m02, crop.m12])
+  if (!inverse) return null
+  return [inverse.m00, inverse.m10, inverse.m01, inverse.m11, inverse.m02, inverse.m12]
 }
 
 function compose(outer: Matrix, inner: Matrix): Matrix {

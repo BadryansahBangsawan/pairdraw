@@ -13,7 +13,7 @@ export function computeImageHash(data: Uint8Array): string {
   return bytesToHex(sha1(data))
 }
 
-export type ImageMimeType = 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp'
+export type ImageMimeType = 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp' | 'image/avif'
 
 /** The image types documents store, by the name `image-size` gives each format. */
 const IMAGE_MIME_TYPES: Partial<Record<string, ImageMimeType>> = {
@@ -58,12 +58,36 @@ export function imageHeader(data: Uint8Array): ImageHeader | null {
   return type ? { type, width: header.width, height: header.height } : null
 }
 
+/** A four-character ISO media brand at `start`, or an empty string when the bytes are short. */
+function isoBrand(data: Uint8Array, start: number): string {
+  if (start + 4 > data.length) return ''
+  return String.fromCharCode(
+    data[start] ?? 0,
+    data[start + 1] ?? 0,
+    data[start + 2] ?? 0,
+    data[start + 3] ?? 0
+  )
+}
+
+/** Whether bytes are an AVIF image, whose `ftyp` box names the brand or lists it as compatible. */
+function isAVIF(data: Uint8Array): boolean {
+  if (isoBrand(data, 4) !== 'ftyp') return false
+  const size = ((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]) >>> 0
+  const isAvif = (brand: string) => brand === 'avif' || brand === 'avis'
+  if (isAvif(isoBrand(data, 8))) return true
+  const end = Math.min(size >= 16 ? size : data.length, data.length)
+  // The major brand is followed by a minor version, then the compatible brands.
+  for (let start = 16; start + 4 <= end; start += 4) if (isAvif(isoBrand(data, start))) return true
+  return false
+}
+
 /**
  * The media type of encoded image bytes, read from their header, for writing them out as a data
- * URL or file. Bytes it cannot read are reported as PNG, as image fills began.
+ * URL or file. AVIF is read from its ISO media brand, which `image-size` does not decode. Bytes it
+ * cannot read are reported as PNG, as image fills began.
  */
 export function imageMimeType(data: Uint8Array): ImageMimeType {
-  return imageHeader(data)?.type ?? 'image/png'
+  return imageHeader(data)?.type ?? (isAVIF(data) ? 'image/avif' : 'image/png')
 }
 
 /** An image's size in pixels, read from its header; null for bytes it cannot read. */

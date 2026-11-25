@@ -32,8 +32,10 @@ function sourceCountsTime(source: string): boolean {
   return counts
 }
 
-/** What the clock reads of the editor: the document, the view, and the canvas it draws into. */
-type ClockSource = Pick<Editor, 'graph' | 'state' | 'getViewportSize'>
+/** What the clock reads of the editor: the document and the view, plus the canvas's size. */
+type ClockSource = Pick<Editor, 'graph' | 'state'> & {
+  getViewportSize: () => { width: number; height: number }
+}
 
 /** Whether `node` and every layer above it are visible, as the canvas decides what to draw. */
 function isShown(node: SceneNode, graph: SceneGraph): boolean {
@@ -87,7 +89,10 @@ export function repaintsForTime(source: ClockSource): boolean {
   return false
 }
 
-export function createShaderClock(editor: Editor) {
+export function createShaderClock(
+  editor: Editor,
+  getViewportSize: () => { width: number; height: number }
+) {
   let needsRepaint = false
   let scanDue = true
   let lastScan = 0
@@ -115,7 +120,9 @@ export function createShaderClock(editor: Editor) {
     if (scanDue && now - lastScan >= SCAN_INTERVAL_MS) {
       lastScan = now
       scanDue = false
-      needsRepaint = animationsEnabled.value && repaintsForTime(editor)
+      needsRepaint =
+        animationsEnabled.value &&
+        repaintsForTime({ graph: editor.graph, state: editor.state, getViewportSize })
     }
     if (!needsRepaint) return
     editor.requestRepaint()

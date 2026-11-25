@@ -60,6 +60,7 @@ import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
+import { animationsEnabled } from '@/app/shell/motion'
 import CanvasEyedropperLoupe from '@/components/canvas/CanvasEyedropperLoupe.vue'
 import CommentsLayer from '@/components/comments/CommentsLayer.vue'
 import PreparationOverlay from '@/components/preparation/canvas/PreparationOverlay.vue'
@@ -198,6 +199,7 @@ useCanvas(sceneCanvasRef, store, {
   sceneRenderer: appRuntimeConfig.sceneRenderer,
   maxPixelRatio: appRuntimeConfig.maxPixelRatio,
   reducedEffects: appRuntimeConfig.reducedEffects,
+  animations: () => animationsEnabled.value,
   onReady: canvasReady,
   onFailed: (error) =>
     store.preparationController.failCanvas(

@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { Editor } from '@pairdraw/core'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { createShaderSourcePaint, withShaderPaints } from '@pairdraw/scene-graph/shaders'
 
@@ -16,7 +15,7 @@ const STILL = `#version 300 es
 precision highp float;
 void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }`
 
-type ClockSource = Pick<Editor, 'graph' | 'state' | 'getViewportSize'>
+type ClockSource = Parameters<typeof repaintsForTime>[0]
 
 function clockSource(
   graph: SceneGraph,

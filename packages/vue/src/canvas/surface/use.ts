@@ -64,6 +64,7 @@ export function useCanvas(
       getView: () => options?.getRenderState?.() ?? editor.state,
       getViewport: () => ({ width: viewport.width.value, height: viewport.height.value }),
       markDirty: surface.markDirty,
+      getAnimations: options?.animations,
       getPixelRatio: () => canvasPixelRatio(options?.maxPixelRatio)
     })
   }

@@ -1,5 +1,7 @@
 import * as v from 'valibot'
 
+import { SHADER_SHAPES } from './shapes'
+
 /** A prop of an effect, as the `shaders` library's controls describe it. */
 export type ShaderPropControl = { key: string; label: string; group: string; default: unknown } & (
   | { kind: 'range'; min: number; max: number; step: number }
@@ -8,6 +10,10 @@ export type ShaderPropControl = { key: string; label: string; group: string; def
   | { kind: 'checkbox' }
   | { kind: 'position' }
   | { kind: 'text' }
+  /** Gradient stops, edited as a list of colour and position. */
+  | { kind: 'stops' }
+  /** The shape an effect draws on, chosen by type and kept in its JSON. */
+  | { kind: 'shape'; options: string[] }
   /** Gradient stops, shapes, uploads, and the like, edited in the preset's JSON. */
   | { kind: 'other' }
 )
@@ -19,6 +25,8 @@ export interface ShaderEffect {
   description: string
   /** Whether it changes what is drawn beneath it, such as a blur, rather than drawing its own. */
   filter: boolean
+  /** Whether it draws a new picture as time passes, so a preset of it may need a player. */
+  animated: boolean
   props: ShaderPropControl[]
 }
 
@@ -48,6 +56,16 @@ const selectUISchema = v.object({
 })
 const plainUISchema = v.object({
   type: uiTypes('color', 'checkbox', 'position', 'origin', 'text'),
+  label: labelSchema,
+  group: v.optional(v.string())
+})
+const stopsUISchema = v.object({
+  type: uiTypes('gradient-stops'),
+  label: labelSchema,
+  group: v.optional(v.string())
+})
+const shapeUISchema = v.object({
+  type: uiTypes('shape'),
   label: labelSchema,
   group: v.optional(v.string())
 })
@@ -89,6 +107,25 @@ function control(key: string, metadata: unknown): ShaderPropControl | null {
       options
     }
   }
+  const shape = v.safeParse(shapeUISchema, ui)
+  if (shape.success) {
+    return {
+      ...base,
+      label: shape.output.label ?? words(key),
+      group: shape.output.group ?? '',
+      kind: 'shape',
+      options: [...SHADER_SHAPES]
+    }
+  }
+  const stops = v.safeParse(stopsUISchema, ui)
+  if (stops.success) {
+    return {
+      ...base,
+      label: stops.output.label ?? words(key),
+      group: stops.output.group ?? '',
+      kind: 'stops'
+    }
+  }
   const plain = v.safeParse(plainUISchema, ui)
   if (plain.success) {
     const [type] = [plain.output.type].flat()
@@ -109,7 +146,8 @@ const registryEntrySchema = v.object({
   category: v.string(),
   description: v.optional(v.string()),
   requiresChild: v.optional(v.boolean()),
-  propsMetadata: v.optional(v.record(v.string(), v.unknown()))
+  propsMetadata: v.optional(v.record(v.string(), v.unknown())),
+  definition: v.optional(v.object({ animatedTime: v.optional(v.unknown()) }))
 })
 
 /** An effect's name in words, `FilmGrain` as Film grain, as the properties panel names effects. */
@@ -135,13 +173,23 @@ export function loadShaderCatalog(): Promise<ShaderEffect[]> {
         category,
         description = '',
         requiresChild = false,
-        propsMetadata = {}
+        propsMetadata = {},
+        definition
       } = parsed.output
       const props = Object.entries(propsMetadata).flatMap(([key, metadata]) => {
         const item = control(key, metadata)
         return item ? [item] : []
       })
-      return [{ name, category, description, filter: requiresChild, props }]
+      return [
+        {
+          name,
+          category,
+          description,
+          filter: requiresChild,
+          animated: definition?.animatedTime !== undefined,
+          props
+        }
+      ]
     })
   )
   return catalog

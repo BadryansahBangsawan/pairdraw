@@ -32,6 +32,11 @@ export interface UseCanvasOptions {
    */
   reducedEffects?: boolean
   /**
+   * Whether the person allows motion, which shader playback in a preview follows: without it a
+   * shader keeps its still frame. Defaults to true.
+   */
+  animations?: () => boolean
+  /**
    * Forces ruler visibility on or off for this canvas.
    *
    * When omitted, the composable falls back to viewport and URL-param logic.

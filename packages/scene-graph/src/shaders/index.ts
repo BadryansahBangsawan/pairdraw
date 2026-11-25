@@ -1,3 +1,4 @@
+export * from './animation'
 export * from './directives'
 export * from './model'
 export * from './schema'

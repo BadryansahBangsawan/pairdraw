@@ -9,15 +9,14 @@ import {
   type EditorState
 } from '@pairdraw/core'
 import type { SkiaRenderer } from '@pairdraw/core/canvas'
-import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
-  isShaderPresetPaint,
-  readShaderPaints,
-  shaderOfPaint,
+  presetAnimates,
+  type ShaderEffectMotion,
   type ShaderPreset
 } from '@pairdraw/scene-graph/shaders'
 
 import { shaderFrames } from '#vue/canvas/surface/shader/frames'
+import { onScreen, shadersOnPage, type PageShader } from '#vue/canvas/surface/shader/plan'
 import { canDrawShaders } from '#vue/canvas/surface/shader/rasterizer'
 
 /** The longest side a playing shader is drawn at, however large it is on screen. */
@@ -34,6 +33,33 @@ const COPY_FRAME_MS = 1000 / 30
 const VIEW_CHECK_MS = 200
 /** How much a shader's size on screen may change before it is drawn at the new size. */
 const RESIZE_FACTOR = 1.5
+/**
+ * The most shaders a page plays at once. Each player is a WebGPU canvas, so a document of
+ * hundreds of shader layers plays the ones on screen and stays within what a GPU can hold.
+ */
+const MAX_PLAYERS = 16
+
+/** Whether this is a development build, read without tying the package to Vite's types. */
+const DEVELOPMENT = (Reflect.get(import.meta, 'env') as { DEV?: boolean } | undefined)?.DEV === true
+
+/** What a canvas is playing, for tests and diagnostics that read it from the page. */
+export interface ShaderPlaybackStats {
+  /** Players that exist: one per shader image, on screen or kept for when it scrolls back. */
+  players: number
+  /** Players on screen after the last sync, which are the ones the frame loop draws. */
+  visible: number
+  /** Whether the frame loop runs at all. */
+  running: boolean
+  /** Shader frames drawn so far, one per player per step, which stops when nothing is visible. */
+  frames: number
+}
+
+const playbackStats = new WeakMap<Editor, ShaderPlaybackStats>()
+
+/** What `editor`'s canvas is playing, or null while it plays no shaders. */
+export function shaderPlaybackStats(editor: Editor): ShaderPlaybackStats | null {
+  return playbackStats.get(editor) ?? null
+}
 
 /** A shader playing on its own WebGPU canvas, shown wherever its image is painted. */
 interface Player {
@@ -52,35 +78,6 @@ interface Player {
   elapsed: number
 }
 
-interface PageShader {
-  preset: ShaderPreset
-  nodeIds: Set<string>
-  /** Where the layers that paint it are, on the page. */
-  bounds: Rect[]
-}
-
-/** Each image a shader paint on `pageId` shows, with its preset and the layers painting it. */
-function shadersOnPage(editor: Editor, pageId: string) {
-  const found = new Map<string, PageShader>()
-  for (const node of editor.graph.getAllNodes()) {
-    if (readShaderPaints(node).length === 0 || !editor.graph.isDescendant(node.id, pageId)) continue
-    for (const paint of [...node.fills, ...node.strokes]) {
-      const shader = shaderOfPaint(node, paint)
-      // Code the user wrote is drawn by the canvas compiler, not by the preset player.
-      if (!shader || !paint.visible || !isShaderPresetPaint(shader)) continue
-      const entry = found.get(shader.image) ?? {
-        preset: shader.preset,
-        nodeIds: new Set<string>(),
-        bounds: []
-      }
-      entry.nodeIds.add(node.id)
-      entry.bounds.push(editor.graph.getAbsoluteBounds(node.id))
-      found.set(shader.image, entry)
-    }
-  }
-  return found
-}
-
 /**
  * Plays the shader paints on screen while the editor previews a page: each runs on a WebGPU
  * canvas at about its size on screen, and its frames replace the still frame wherever the canvas
@@ -95,6 +92,11 @@ export function useShaderPlayback(options: {
   getView: () => Pick<EditorState, 'panX' | 'panY' | 'zoom' | 'currentPageId'> & EditorProfileInputs
   getViewport: () => { width: number; height: number }
   markDirty: () => void
+  /**
+   * Whether the person allows motion. Without it, a page's shaders keep their still frames, and
+   * playing them is a choice they can turn off.
+   */
+  getAnimations?: () => boolean
   /**
    * The device pixels the canvas draws per CSS pixel, which may be capped below the display's;
    * shaders play at that density too. The display's ratio by default.
@@ -117,12 +119,72 @@ export function useShaderPlayback(options: {
   const failed = new Map<string, string>()
   /** Renderers to let go of once the frame being drawn is done with them. */
   const retired: Player[] = []
+  /**
+   * What the library says of each effect's motion, by name. Loading it is deferred until a page
+   * draws a shader; until then a preset is played, as it always was.
+   */
+  let motions: Map<string, ShaderEffectMotion> | null = null
   let last = 0
   let stepping = false
   /** Where the next frame starts drawing, when the last one ran out of time. */
   let turn = 0
   /** Whether this browser needs each frame copied before the canvas can show it. */
   let copyFrames = false
+  /** Shader frames drawn since the canvas started, which the stats report. */
+  let framesDrawn = 0
+  /** Players the last sync left on screen. */
+  let shownPlayers = 0
+  /** Whether the page was told once that it plays the most shaders it may. */
+  let warnedFull = false
+
+  /** Records what this canvas is playing, which tests and diagnostics read from the page. */
+  function report() {
+    playbackStats.set(editor, {
+      players: players.size,
+      visible: shownPlayers,
+      running: shownPlayers > 0,
+      frames: framesDrawn
+    })
+  }
+
+  let loadingMotions = false
+
+  /**
+   * Reads the library's motion metadata, once, the first time a page draws a preset shader: a
+   * document with no shaders never downloads it.
+   */
+  function loadMotions() {
+    if (motions !== null || loadingMotions) return
+    loadingMotions = true
+    void import('shaders/registry')
+      .then(({ getAllShaders }) => {
+        const known = new Map<string, ShaderEffectMotion>()
+        for (const entry of getAllShaders()) {
+          const { name, definition } = entry as {
+            name?: unknown
+            definition?: { animatedTime?: unknown; props?: Record<string, unknown> }
+          }
+          if (typeof name !== 'string') continue
+          known.set(name, {
+            animates: definition?.animatedTime !== undefined,
+            speed: definition?.props?.speed !== undefined
+          })
+        }
+        motions = known
+        sync()
+        return undefined
+      })
+      .catch(() => {
+        loadingMotions = false
+      })
+  }
+
+  /** Whether `preset` draws a new picture from one frame to the next. */
+  function animates(preset: ShaderPreset): boolean {
+    if (motions === null) return true
+    return presetAnimates(preset, (type) => motions?.get(type))
+  }
+
 
   function release() {
     for (const player of retired.splice(0)) {
@@ -159,16 +221,28 @@ export function useShaderPlayback(options: {
     }
   }
 
-  function onScreen(bounds: Rect[]): boolean {
-    const { panX, panY, zoom } = getView()
-    const view = getViewport()
-    return bounds.some(
-      (rect) =>
-        rect.x * zoom + panX < view.width &&
-        (rect.x + rect.width) * zoom + panX > 0 &&
-        rect.y * zoom + panY < view.height &&
-        (rect.y + rect.height) * zoom + panY > 0
-    )
+  /** Whether any layer painting a shader is in view, so it is worth drawing. */
+  function shown(bounds: Rect[]): boolean {
+    return onScreen(bounds, getView(), getViewport())
+  }
+
+  /**
+   * Makes room for one more player, by letting go of one that is off screen. False when the page
+   * already plays the most it may.
+   */
+  function makeRoom() {
+    if (players.size < MAX_PLAYERS) return true
+    for (const [hash, player] of players) {
+      if (!player.visible) {
+        stop(hash)
+        return true
+      }
+    }
+    if (DEVELOPMENT && !warnedFull) {
+      warnedFull = true
+      console.warn(`A page plays at most ${MAX_PLAYERS} shaders; the rest keep their still frames.`)
+    }
+    return false
   }
 
   /**
@@ -271,17 +345,27 @@ export function useShaderPlayback(options: {
     return false
   }
 
-  function sync() {
-    const view = getView()
-    const playing = resolveEditorProfile(view).live !== null && canDrawShaders()
-    const wanted = playing ? shadersOnPage(editor, view.currentPageId) : new Map()
+  /** The shaders a page should play: the ones in preview that draw a new picture each frame. */
+  function wantedShaders(playing: boolean, pageId: string): Map<string, PageShader> {
+    if (!playing) return new Map()
+    const wanted = shadersOnPage(editor.graph, pageId)
+    if (wanted.size > 0) loadMotions()
+    for (const [hash, shader] of wanted) {
+      // A shader that draws one picture forever keeps its still frame, which is that picture.
+      if (!animates(shader.preset)) wanted.delete(hash)
+    }
+    return wanted
+  }
+
+  /** Starts, resizes, or retires the players that draw `wanted`, and marks the ones on screen. */
+  function placePlayers(wanted: Map<string, PageShader>) {
     for (const [hash, player] of players) {
       const shader = wanted.get(hash)
       if (!shader || JSON.stringify(shader.preset) !== player.preset) stop(hash)
     }
     for (const [hash, shader] of wanted) {
       if (failed.get(hash) !== JSON.stringify(shader.preset)) failed.delete(hash)
-      const visible = onScreen(shader.bounds)
+      const visible = shown(shader.bounds)
       const size = screenSize(shader.bounds)
       const existing = players.get(hash)
       if (
@@ -293,17 +377,31 @@ export function useShaderPlayback(options: {
       ) {
         void start(hash, shader.preset, size, existing)
       }
-      if (!players.has(hash) && visible && !failed.has(hash)) void start(hash, shader.preset, size)
+      if (!players.has(hash) && visible && !failed.has(hash) && makeRoom()) {
+        void start(hash, shader.preset, size)
+      }
       const player = players.get(hash)
       if (!player) continue
       player.nodeIds = shader.nodeIds
       player.visible = visible
     }
-    if (players.size > 0) resume()
+  }
+
+  function sync() {
+    const view = getView()
+    const playing =
+      (options.getAnimations?.() ?? true) &&
+      resolveEditorProfile(view).live !== null &&
+      canDrawShaders()
+    placePlayers(wantedShaders(playing, view.currentPageId))
+    // Only a player on screen draws, so none on screen is nothing to animate.
+    shownPlayers = [...players.values()].filter((player) => player.visible).length
+    if (shownPlayers > 0) resume()
     else {
       pause()
       last = 0
     }
+    report()
   }
 
   const { pause, resume } = useRafFn(
@@ -340,6 +438,8 @@ export function useShaderPlayback(options: {
       player.drawnAt = now
       await player.renderer?.renderFrame({ deltaSeconds: delta, waitForGpu: false })
       if (player.disposed) continue
+      framesDrawn += 1
+      report()
       // Preview's islands draw their shader layers from this frame, in this same task.
       frames.publish(hash, player.canvas)
       if (!copyFrames && uploads(renderer, hash, player)) drew = true
@@ -379,7 +479,8 @@ export function useShaderPlayback(options: {
     () => [
       resolveEditorProfile(getView()).live !== null,
       getView().currentPageId,
-      editor.state.sceneVersion
+      editor.state.sceneVersion,
+      options.getAnimations?.() ?? true
     ],
     sync,
     {
@@ -400,7 +501,26 @@ export function useShaderPlayback(options: {
     { throttle: VIEW_CHECK_MS }
   )
 
+  /**
+   * A hidden tab draws nothing, so its players are let go of rather than left running; coming
+   * back starts them again. A browser already stops animation frames for a hidden tab; stopping
+   * the players too gives the GPU and their memory back.
+   */
+  function onVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+      for (const hash of Array.from(players.keys())) stop(hash)
+    } else {
+      sync()
+    }
+  }
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', onVisibilityChange)
+  }
+
   onScopeDispose(() => {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
     pause()
     for (const hash of Array.from(players.keys())) stop(hash)
     release()

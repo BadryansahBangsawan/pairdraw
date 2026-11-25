@@ -1,5 +1,11 @@
 import type { ChatTransport, UIMessage } from 'ai'
 
+import type { Editor } from '@pairdraw/core'
+import {
+  shaderPlaybackStats,
+  type ShaderPlaybackStats
+} from '@pairdraw/vue/canvas/surface/shader/playback'
+
 import type { CollabReturn } from '@/app/collab/context'
 import type { RoomStatus } from '@/app/collab/room/status'
 import type { EditorStore } from '@/app/editor/session/create'
@@ -27,6 +33,8 @@ interface PairdrawTestHooks {
   }
   /** Sends a request through the MCP bridge's command handler, as an MCP client's call arrives. */
   automation?: (command: string, args: unknown) => Promise<unknown>
+  /** What the canvas plays: its players, the ones on screen, and whether its frame loop runs. */
+  shaderPlayback?: () => ShaderPlaybackStats | null
 }
 
 export interface PairdrawWindowAPI {
@@ -97,6 +105,17 @@ export function exposeChatTransportOverride(
   setChatTransport: (factory: () => ChatTransport<UIMessage>) => void
 ) {
   windowAPI().setChatTransport = setChatTransport
+}
+
+/**
+ * Lets an end-to-end test read what a canvas plays, as a preview starts and stops its shaders.
+ * Development builds with the test runtime only, like the other hooks beside it.
+ */
+export function exposeShaderPlayback(editor: Editor) {
+  if (!IS_BROWSER || !import.meta.env.DEV) return
+  if (!appRuntimeConfig.test) return
+  const testHooks = (windowAPI().test ??= {})
+  testHooks.shaderPlayback = () => shaderPlaybackStats(editor)
 }
 
 export function setPairdrawOpenFileHandler(openFile: (path: string) => Promise<void>) {

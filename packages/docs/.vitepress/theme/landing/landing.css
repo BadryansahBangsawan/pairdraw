@@ -34,6 +34,8 @@ html:has(.landing-home) {
   --lp-column: min(1200px, 100% - 2 * var(--lp-gutter));
   /* An easing for things that arrive and settle. */
   --lp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* One step between things that arrive together, so they read in order. */
+  --lp-stagger: 50ms;
   /* Shared pieces styled with the docs theme's variables read the landing's palette here. */
   --vp-c-divider: var(--lp-line);
   --vp-c-bg-soft: var(--lp-surface);
@@ -145,6 +147,99 @@ html:has(.landing-home) .VPLocalNav {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/*
+ * A frame on the page is drawn when it comes into view: the editor's selection, with its corner
+ * handles, first, then what the frame holds. Scroll-driven, so it costs no frame loop; where the
+ * browser has no scroll timelines, or the visitor asked for less motion, the frame is simply
+ * there.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-home [data-draw] {
+      position: relative;
+      view-timeline-name: --lp-draw;
+      view-timeline-axis: block;
+    }
+
+    /* The box: a corner drag out from the top left, then the frame's own edges. */
+    .landing-home [data-draw]::before {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      border: 1.5px solid var(--lp-agent);
+      background-image: radial-gradient(
+        circle,
+        #fff 0 2.5px,
+        var(--lp-agent) 2.5px 4px,
+        transparent 4px
+      );
+      background-repeat: no-repeat;
+      background-size: 9px 9px;
+      background-position:
+        0 0,
+        100% 0,
+        0 100%,
+        100% 100%;
+      content: '';
+      pointer-events: none;
+      animation-name: lp-draw-box;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-draw;
+      animation-range: entry 4% entry 34%;
+    }
+
+    /* What the frame holds fills in after the box, one piece after the next. */
+    .landing-home [data-draw] > * {
+      animation-name: lp-draw-content;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-draw;
+      animation-range: entry 34% entry 64%;
+    }
+
+    .landing-home [data-draw] > :nth-child(2) {
+      animation-range: entry 44% entry 74%;
+    }
+
+    .landing-home [data-draw] > :nth-child(3) {
+      animation-range: entry 54% entry 84%;
+    }
+
+    .landing-home [data-draw] > :nth-child(n + 4) {
+      animation-range: entry 64% entry 94%;
+    }
+  }
+
+  @keyframes lp-draw-box {
+    from {
+      clip-path: inset(0 100% 100% 0);
+      opacity: 0;
+    }
+
+    12% {
+      opacity: 1;
+    }
+
+    to {
+      clip-path: inset(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes lp-draw-content {
+    from {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+    }
+
+    to {
+      clip-path: inset(0);
+      opacity: 1;
+    }
+  }
 }
 
 @media (max-width: 900px) {

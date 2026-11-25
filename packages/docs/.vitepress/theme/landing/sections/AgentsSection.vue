@@ -96,7 +96,13 @@ function position(index: number): Vector {
       </div>
 
       <span class="lp-frame-title frame-title">{{ messages.agents.frame }}</span>
-      <div ref="canvas" class="canvas" :data-reduced="reduced || undefined" aria-hidden="true">
+      <div
+        ref="canvas"
+        class="canvas"
+        data-draw
+        :data-reduced="reduced || undefined"
+        aria-hidden="true"
+      >
         <div class="report">
           <div class="report-head">
             <strong>{{ messages.agents.report }}</strong>

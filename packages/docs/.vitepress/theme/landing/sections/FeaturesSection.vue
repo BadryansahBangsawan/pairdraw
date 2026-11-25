@@ -109,6 +109,7 @@ const tabCount = computed(() => FEATURE_TABS.length)
             :model-value="active"
             orientation="vertical"
             class="tabs"
+            data-draw
             @update:model-value="choose"
           >
             <div class="list">

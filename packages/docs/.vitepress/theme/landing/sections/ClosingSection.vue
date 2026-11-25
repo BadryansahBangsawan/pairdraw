@@ -62,7 +62,7 @@ useEventListener(frame, 'pointerleave', () => {
   <section class="lp-section" aria-labelledby="closing-title">
     <div class="lp-column">
       <span class="lp-frame-title">{{ messages.closing.frame }}</span>
-      <div ref="frame" class="frame" :data-following="you ? true : undefined">
+      <div ref="frame" class="frame" data-draw :data-following="you ? true : undefined">
         <div class="copy">
           <h2 id="closing-title">{{ messages.closing.title }}</h2>
           <div ref="action" class="action">

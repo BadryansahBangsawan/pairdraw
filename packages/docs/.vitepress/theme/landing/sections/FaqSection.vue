@@ -40,7 +40,7 @@ const lede = computed(() => {
           </template>
         </p>
       </div>
-      <AccordionRoot type="multiple" class="questions" :default-value="['0']">
+      <AccordionRoot type="multiple" class="questions" data-draw :default-value="['0']">
         <AccordionItem
           v-for="(item, index) in messages.faq.items"
           :key="index"

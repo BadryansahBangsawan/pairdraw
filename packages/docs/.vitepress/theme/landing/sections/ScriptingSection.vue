@@ -38,6 +38,7 @@ const { seen, running } = useSceneActivity(terminal)
       <figure
         ref="terminal"
         class="terminal"
+        data-draw
         :data-seen="seen || undefined"
         :data-running="running || undefined"
         :aria-label="messages.scripting.terminal"

@@ -12,8 +12,17 @@ const SIZE = 40
 const P3_RED = { r: 1, g: 0, b: 0, a: 1 }
 
 const ck = await initCanvasKit()
-const renderer = new SkiaRenderer(ck, expectDefined(ck.MakeSurface(SIZE, SIZE), 'surface'))
-afterAll(() => renderer.destroy())
+const renderers: SkiaRenderer[] = []
+afterAll(() => {
+  for (const renderer of renderers) renderer.destroy()
+})
+
+/** A renderer that has drawn nothing yet, so no earlier test can leave it in another profile. */
+function freshRenderer(): SkiaRenderer {
+  const renderer = new SkiaRenderer(ck, expectDefined(ck.MakeSurface(SIZE, SIZE), 'surface'))
+  renderers.push(renderer)
+  return renderer
+}
 
 /** `png` decoded, with the component at `x`, `y` read in Display P3. */
 function pixelInP3(png: Uint8Array, x: number, y: number): number[] {
@@ -75,7 +84,7 @@ const warmShadow: Effect = {
 test('a silhouette shadow draws its color in the document profile', () => {
   const { graph, pageId, frameId } = shadowCard([warmShadow])
   const png = expectDefined(
-    renderNodesToImage(ck, renderer, graph, pageId, [frameId], { scale: 1, format: 'PNG' }),
+    renderNodesToImage(ck, freshRenderer(), graph, pageId, [frameId], { scale: 1, format: 'PNG' }),
     'png'
   )
   // Inside the offset shadow only: the shape sits at x 0..40, the shadow at x 60..100.
@@ -85,7 +94,8 @@ test('a silhouette shadow draws its color in the document profile', () => {
   expect(pixel[2]).toBeCloseTo(77, -1)
 })
 
-test('a page background clears in the document profile', () => {
+/** A Display P3 page whose background is P3 red, with a layer that has no paint of its own. */
+function redPage() {
   const graph = new SceneGraph()
   graph.documentColorSpace = 'display-p3'
   const page = graph.getPages()[0]
@@ -94,7 +104,39 @@ test('a page background clears in the document profile', () => {
   ])
   // A layer with no paint: the thumbnail shows the page's own background through it.
   graph.createNode('FRAME', page.id, { name: 'Empty', width: 40, height: 40, fills: [] })
-  const png = expectDefined(renderThumbnail(ck, renderer, graph, page.id, 40, 40), 'png')
+  return { graph, pageId: page.id }
+}
+
+/** An sRGB page with a layer, to leave a renderer in the sRGB profile. */
+function srgbPage() {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  graph.createNode('FRAME', page.id, { name: 'Empty', width: 40, height: 40, fills: [] })
+  return { graph, pageId: page.id }
+}
+
+/** Opens a renderer on a page that clears it, so its profile carries into the next render. */
+function renderOnce(renderer: SkiaRenderer, graph: SceneGraph, pageId: string): void {
+  const [first] = graph.getChildren(pageId)
+  if (!first) throw new Error('no layer')
+  renderNodesToImage(ck, renderer, graph, pageId, [first.id], { scale: 1, format: 'PNG' })
+}
+
+test('a page background clears in the document profile on a fresh renderer', () => {
+  const { graph, pageId } = redPage()
+  const png = expectDefined(renderThumbnail(ck, freshRenderer(), graph, pageId, 40, 40), 'png')
+  const [r, g, b] = pixelInP3(png, 20, 20)
+  expect(r).toBeGreaterThan(250)
+  expect(g).toBeLessThan(5)
+  expect(b).toBeLessThan(5)
+})
+
+test('a page background clears in its own profile after an sRGB render', () => {
+  const renderer = freshRenderer()
+  const srgb = srgbPage()
+  renderOnce(renderer, srgb.graph, srgb.pageId)
+  const { graph, pageId } = redPage()
+  const png = expectDefined(renderThumbnail(ck, renderer, graph, pageId, 40, 40), 'png')
   const [r, g, b] = pixelInP3(png, 20, 20)
   expect(r).toBeGreaterThan(250)
   expect(g).toBeLessThan(5)

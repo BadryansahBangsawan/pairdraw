@@ -445,10 +445,11 @@ export function renderThumbnail(
   const { bounds, scale, width: pixelW, height: pixelH } = frame
   // The page's own background, which the editor's page colour matches only while it is open.
   const stored = getPageColor(graph.getNode(pageId))
-  // The page's color is stored in the document's profile, as every color is.
-  const background = renderer.renderColor(stored)
 
   return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, format, quality, (canvas) => {
+    // The page's color is stored in the document's profile, and `renderToSurface` has just told
+    // the renderer which that is; converting before that call would use the previous document's.
+    const background = renderer.renderColor(stored)
     canvas.clear(ck.Color4f(background.r, background.g, background.b, 1))
     canvas.translate(-bounds.minX * scale, -bounds.minY * scale)
     canvas.scale(scale, scale)
@@ -467,8 +468,9 @@ export function drawRegionToImage(
   const pixelW = Math.max(1, Math.round((bounds.maxX - bounds.minX) * scale))
   const pixelH = Math.max(1, Math.round((bounds.maxY - bounds.minY) * scale))
   if (!graph.getNode(pageId) || !Number.isFinite(pixelW * pixelH)) return null
-  const pageBackground = renderer.renderColor(renderer.pageColor)
   return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, 'PNG', 100, (canvas) => {
+    // `renderToSurface` has just set the renderer's profile, so the page color converts in it.
+    const pageBackground = renderer.renderColor(renderer.pageColor)
     canvas.clear(ck.Color4f(pageBackground.r, pageBackground.g, pageBackground.b, 1))
     canvas.scale(scale, scale)
     canvas.translate(-bounds.minX, -bounds.minY)

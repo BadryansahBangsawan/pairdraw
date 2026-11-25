@@ -1,3 +1,5 @@
+import * as v from 'valibot'
+
 import type { PluginDataEntry, SceneNode } from '@pairdraw/scene-graph'
 
 import type { PenNode, PenOverride } from './schema'
@@ -49,6 +51,44 @@ export const UNRESOLVED_REF = 'unresolvedRef'
 export function unresolvedRef(pen: PenOverride): string | undefined {
   const ref = pen[UNRESOLVED_REF]
   return typeof ref === 'string' ? ref : undefined
+}
+
+/**
+ * The pen fields the component for an icon was drawn from, kept on it: a layer inside a component
+ * that swaps its glyph names the icon in the override, not the component, so a save needs them
+ * back to write the swap. Other pen clients ignore the entry.
+ */
+const ICON_ORIGIN_KEY = 'pen/iconOrigin'
+
+const iconOriginSchema = v.object({
+  library: v.optional(v.pipe(v.string(), v.nonEmpty())),
+  icon: v.pipe(v.string(), v.nonEmpty()),
+  weight: v.optional(v.number())
+})
+
+/** The pen fields an icon component was drawn from. */
+export type PenIconOrigin = v.InferOutput<typeof iconOriginSchema>
+
+/** Keeps the fields an icon component was drawn from on it. */
+export function writeIconOrigin(node: SceneNode, origin: PenIconOrigin): void {
+  const key = `${PEN_PLUGIN_DATA_NAMESPACE}/${ICON_ORIGIN_KEY}`
+  const originEntry: PluginDataEntry = {
+    pluginId: PEN_PLUGIN_DATA_NAMESPACE,
+    key,
+    value: JSON.stringify(origin)
+  }
+  node.pluginData = [...node.pluginData.filter((item) => item.key !== key), originEntry]
+}
+
+/** The fields the component `node` draws as an icon is, or undefined for any other component. */
+export function readIconOrigin(node: SceneNode | undefined): PenIconOrigin | undefined {
+  const key = `${PEN_PLUGIN_DATA_NAMESPACE}/${ICON_ORIGIN_KEY}`
+  const stored = node?.pluginData.find(
+    (item) => item.pluginId === PEN_PLUGIN_DATA_NAMESPACE && item.key === key
+  )
+  if (!stored) return undefined
+  const parsed = v.safeParse(v.pipe(v.string(), v.parseJson(), iconOriginSchema), stored.value)
+  return parsed.success ? parsed.output : undefined
 }
 
 /** As `setSharedPluginData` stores an entry, so the Figma API reads and replaces it. */

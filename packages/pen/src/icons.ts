@@ -16,6 +16,7 @@ import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { iconName, iconOptions } from './assets'
 import type { Build } from './nodes'
+import { writeIconOrigin } from './plugin-data'
 import type { PenNode } from './schema'
 import { resolveOptionalNumber, resolveString } from './variables'
 
@@ -80,6 +81,11 @@ function iconComponent(build: Build, pen: PenNode, width: number, height: number
     width,
     height,
     fills: [{ type: 'SOLID', color: { ...BLACK }, opacity: 1, visible: true }]
+  })
+  writeIconOrigin(component, {
+    library: library || undefined,
+    icon,
+    weight: resolveOptionalNumber(pen.weight, ctx)
   })
   drawIcon(component, pen, build)
   build.iconComponents.set(key, component.id)

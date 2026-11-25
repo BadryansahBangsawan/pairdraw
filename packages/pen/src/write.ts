@@ -27,11 +27,11 @@ import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { readStoredStatusWorkflow } from '@pairdraw/scene-graph/statuses'
 import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-sources'
 
+import { readPenImports, readSourceLibraryPublication } from './document-libraries'
 import { networkToSVGPath } from './geometry'
 import { penCropTransform } from './images'
 import { importedComponentIds } from './library'
-import { readPenImports, readSourceLibraryPublication } from './document-libraries'
-import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
+import { PEN_PLUGIN_DATA_NAMESPACE, readIconOrigin } from './plugin-data'
 import type {
   PenDocument,
   PenEffect,
@@ -71,6 +71,8 @@ type PenWriteState = {
   collections: ReadonlyMap<string, VariableCollection>
   /** Nodes the document will contain, so an instance refs only a component that is written. */
   writtenIds: ReadonlySet<string>
+  /** Components the file resolves through its `imports`, which a ref may name without writing them. */
+  importedIds: ReadonlySet<string>
   /** What the file cannot hold, reported once writing leaves it out. */
   warnings: string[]
   drops: {
@@ -624,41 +626,85 @@ const OVERRIDABLE_FIELDS: ReadonlySet<string> = new Set([
 
 /**
  * The path a copy sits at in its component, from the instance down: the ids of the layers it
- * copies, as pen names a `descendants` override.
+ * copies, as pen names a `descendants` override. A copy that swapped its component copies `swapOf`
+ * instead of the component it draws.
  */
-function overridePath(graph: SceneGraph, instanceId: string, copyId: string): string | null {
+function overridePath(
+  graph: SceneGraph,
+  instanceId: string,
+  copyId: string,
+  swapOf?: string
+): string | null {
   const parts: string[] = []
   let current = graph.getNode(copyId)
   while (current && current.id !== instanceId) {
-    if (!current.componentId) return null
-    parts.unshift(current.componentId)
+    const id = current.id === copyId && swapOf ? swapOf : current.componentId
+    if (!id) return null
+    parts.unshift(id)
     current = current.parentId ? graph.getNode(current.parentId) : undefined
   }
   return current ? parts.join('/') : null
 }
 
 /**
- * The fields an instance changes on its component's layers, as the `ref` it writes carries them:
- * each overridden layer the copy's values that differ from it. Without them a reopen would draw
- * every instance as the component has it, dropping what the user overrode.
+ * The fields a swap override names an icon by: pen carries the glyph, not the component drawn.
+ */
+function iconOverride(graph: SceneGraph, componentId: string | null): PenOverride | undefined {
+  const origin = readIconOrigin(componentId ? graph.getNode(componentId) : undefined)
+  if (!origin) return undefined
+  const override: PenOverride = { icon: origin.icon }
+  if (origin.library) override.library = origin.library
+  if (origin.weight !== undefined) override.weight = origin.weight
+  return override
+}
+
+/**
+ * The overrides an instance writes, and whether one of them is a swap the file cannot name. A
+ * layer that swapped its component draws another component than the one it copies, which pen holds
+ * as a glyph for an icon; any other swap is what the instance shows, not what it links to.
  */
 function instanceDescendants(
   state: PenWriteState,
   node: SceneNode
-): Record<string, PenOverride> | undefined {
+): { descendants?: Record<string, PenOverride>; unrepresentable: boolean } {
   const overridden = [...node.instanceOverrides.descendants.keys()]
-  if (overridden.length === 0) return undefined
+  if (overridden.length === 0) return { unrepresentable: false }
   // Comparing writes fields the moment a document writes them, but their drops are counted once.
   const probe: PenWriteState = {
     ...state,
     drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
   }
   const descendants: Record<string, PenOverride> = {}
+  let unrepresentable = false
   for (const copyId of overridden) {
-    const path = overridePath(state.graph, node.id, copyId)
+    const overrides = node.instanceOverrides.descendants.get(copyId)
+    const swapped = overrides?.has('componentId') === true
+    const swapOf = swapped ? overrides.get('sourceComponentId') : undefined
+    const path = overridePath(
+      state.graph,
+      node.id,
+      copyId,
+      typeof swapOf === 'string' ? swapOf : undefined
+    )
     const copy = state.graph.getNode(copyId)
-    const master = copy?.componentId ? state.graph.getNode(copy.componentId) : undefined
-    if (!path || !copy || !master) continue
+    if (!path || !copy) {
+      unrepresentable = true
+      continue
+    }
+    if (swapped) {
+      const icon = iconOverride(state.graph, copy.componentId)
+      if (!icon) {
+        unrepresentable = true
+        continue
+      }
+      descendants[path] = icon
+      continue
+    }
+    const master = copy.componentId ? state.graph.getNode(copy.componentId) : undefined
+    if (!master) {
+      unrepresentable = true
+      continue
+    }
     const own = writeNode(probe, copy)
     const base = writeNode(probe, master)
     const override: PenOverride = {}
@@ -667,7 +713,10 @@ function instanceDescendants(
     }
     if (Object.keys(override).length > 0) descendants[path] = override
   }
-  return Object.keys(descendants).length > 0 ? descendants : undefined
+  return {
+    descendants: Object.keys(descendants).length > 0 ? descendants : undefined,
+    unrepresentable
+  }
 }
 
 function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNode): boolean {
@@ -689,11 +738,18 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
   if (effects.length > 0)
     result.effect = effects.length === 1 ? effectOf(effects[0]) : effects.map(effectOf)
   if (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') result.reusable = true
-  if (node.type === 'INSTANCE' && node.componentId && state.writtenIds.has(node.componentId)) {
+  if (
+    node.type === 'INSTANCE' &&
+    node.componentId &&
+    (state.writtenIds.has(node.componentId) || state.importedIds.has(node.componentId))
+  ) {
+    const overrides = instanceDescendants(state, node)
+    // The file names a swap through the library it imports; one it cannot name is written as the
+    // layers the instance draws, which keeps what it shows, as before the library work.
+    if (overrides.unrepresentable && !state.writtenIds.has(node.componentId)) return false
     result.type = 'ref'
     result.ref = node.componentId
-    const descendants = instanceDescendants(state, node)
-    if (descendants) result.descendants = descendants
+    if (overrides.descendants) result.descendants = overrides.descendants
     return true
   }
   return false
@@ -762,7 +818,8 @@ export function penDocumentFromGraph(
     graph,
     variables,
     collections,
-    writtenIds: new Set([...writtenNodeIds(graph), ...importedComponentIds(graph, imports ?? {})]),
+    writtenIds: writtenNodeIds(graph),
+    importedIds: importedComponentIds(graph, imports ?? {}),
     warnings: options.warnings ?? [],
     drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
   }

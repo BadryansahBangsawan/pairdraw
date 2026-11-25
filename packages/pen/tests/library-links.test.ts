@@ -9,8 +9,10 @@ import {
   type PenImports,
   type PenNode
 } from '@pairdraw/pen'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { swapInstanceComponent } from '@pairdraw/scene-graph/instances'
 
-import { getNodeOrThrow } from './helpers/assert'
+import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'
 
 const LIBRARY_PATH = '../library/ui.lib.pen'
@@ -53,6 +55,32 @@ const publication = {
 }
 
 const binding = { libraryId: 'pen:ui', revisionId: LIBRARY_PATH, enabled: true }
+
+/** A library whose component holds an icon a consumer can swap. */
+const iconLibrary: PenDocument = {
+  version: '2.21',
+  children: [
+    {
+      id: 'button',
+      type: 'frame',
+      reusable: true,
+      width: 64,
+      height: 24,
+      children: [
+        { id: 'glyph', type: 'icon', library: 'lucide', icon: 'moon', width: 16, height: 16 }
+      ]
+    }
+  ]
+}
+
+const iconImports = (): PenImports =>
+  new Map([['ui', importedDocument('ui', LIBRARY_PATH, iconLibrary, new Map())]])
+
+/** The component the first layer an instance shows is an instance of. */
+function shownComponentName(graph: SceneGraph, instanceId: string): string | undefined {
+  const copy = graph.getChildren(instanceId)[0]
+  return copy?.componentId ? graph.getNode(copy.componentId)?.name : undefined
+}
 
 describe('a .pen file keeps the library links it declares', () => {
   test('writes back the imports the document declares', () => {
@@ -149,5 +177,40 @@ describe('a .pen file keeps the library links it declares', () => {
     writePenDocument(graph, { warnings })
 
     expect(warnings.filter((warning) => warning.includes('re-enable')).length).toBe(0)
+  })
+
+  test('writes the icon an imported instance swaps in, and draws it on reopen', () => {
+    const screen: PenNode[] = [
+      { id: 'cta', type: 'ref', ref: 'ui:button', descendants: { 'ui:glyph': { icon: 'star' } } }
+    ]
+    const graph = parseDocument(screen, { imports }, { imports: iconImports() })
+    const before = shownComponentName(graph, 'cta')
+    expect(before).toContain('star')
+
+    const document = parsePenDocument(writePenDocument(graph))
+    expect(document.children[0]?.descendants).toEqual({
+      'ui:glyph': { library: 'lucide', icon: 'star' }
+    })
+    expect(writePenDocument(graph)).not.toContain('iconOrigin')
+
+    const reopened = parsePenFile(writePenDocument(graph), { imports: iconImports() })
+    expect(shownComponentName(reopened, 'cta')).toBe(before)
+  })
+
+  test('writes an imported instance whose nested layer swaps to a plain layer as a frame', () => {
+    const graph = parseDocument(
+      [
+        { id: 'other', type: 'frame', reusable: true, width: 10, height: 10, fill: '#FFCC00' },
+        { id: 'cta', type: 'ref', ref: 'ui:button' }
+      ],
+      { imports },
+      { imports: iconImports() }
+    )
+    swapInstanceComponent(graph, expectDefined(graph.getChildren('cta')[0]).id, 'other')
+
+    const document = parsePenDocument(writePenDocument(graph))
+    expect(document.children.find((node) => node.id === 'cta')?.type).toBe('frame')
+    const reopened = parsePenFile(writePenDocument(graph), { imports: iconImports() })
+    expect(getNodeOrThrow(reopened, 'cta').type).toBe('FRAME')
   })
 })

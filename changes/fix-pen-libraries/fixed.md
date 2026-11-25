@@ -1,1 +1,1 @@
-- A saved `.pen` file keeps the libraries it imports, so instances of their components stay linked when the file reopens, and keeps the libraries the document enabled and the library it publishes as.
+- A saved `.pen` file keeps the libraries it imports, so instances of their components stay linked when the file reopens and keep the icon a layer inside one swaps in, and keeps the libraries the document enabled and the library it publishes as.

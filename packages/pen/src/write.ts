@@ -76,6 +76,8 @@ type PenWriteState = {
   importedIds: ReadonlySet<string>
   /** What the file cannot hold, reported once writing leaves it out. */
   warnings: string[]
+  /** The same facts as kinds, for a host that shows them in its own language. */
+  details: PenWriteWarning[]
   drops: {
     images: number
     effects: number
@@ -85,10 +87,58 @@ type PenWriteState = {
   }
 }
 
+/**
+ * What a written `.pen` file could not hold, as facts rather than a sentence: the app shows these
+ * in the reader's language, while the CLI and MCP print `penWriteWarningText` of each.
+ */
+export type PenWriteWarning =
+  | { kind: 'merged-pages'; pages: number; name: string }
+  | { kind: 'display-p3-colors' }
+  | { kind: 'library-definitions'; count: number }
+  | { kind: 'missing-image-fills'; count: number }
+  | { kind: 'dropped-effects'; count: number }
+  | { kind: 'dropped-filters'; count: number }
+  | { kind: 'dropped-scroll'; count: number }
+  | { kind: 'dropped-font-features'; count: number }
+
+/** The English sentence a write warning has always been reported as. */
+export function penWriteWarningText(warning: PenWriteWarning): string {
+  switch (warning.kind) {
+    case 'merged-pages':
+      return `Pencil.dev files hold one page; ${warning.pages} pages were merged into “${warning.name}”.`
+    case 'display-p3-colors':
+      return 'Colors are written as sRGB hex, the only form a Pencil.dev file holds; a Display P3 color outside sRGB comes out as the nearest sRGB color.'
+    case 'library-definitions':
+      return `Library components came from ${warning.count} enabled ${warning.count === 1 ? 'library' : 'libraries'}, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.`
+    case 'missing-image-fills':
+      return `Image fills with missing image data were left out (${warning.count}); Pencil.dev files cannot hold a paint without its image.`
+    case 'dropped-effects':
+      return `Noise and texture effects were left out (${warning.count}); Pencil.dev files have no form for them.`
+    case 'dropped-filters':
+      return `Image adjustment filters were left out (${warning.count}); Pencil.dev files have no form for them.`
+    case 'dropped-scroll':
+      return `Scroll overflow was left out (${warning.count}); Pencil.dev files have no form for it.`
+    case 'dropped-font-features':
+      return `OpenType font features were left out (${warning.count}); Pencil.dev files have no form for them.`
+    default: {
+      const unhandled: never = warning
+      throw new Error(`Unhandled pen write warning: ${String(unhandled)}`)
+    }
+  }
+}
+
+/** Records a warning as its sentence and its kind, in the order it was found. */
+function emit(state: PenWriteState, warning: PenWriteWarning): void {
+  state.details.push(warning)
+  state.warnings.push(penWriteWarningText(warning))
+}
+
 /** What a caller learns about content a written `.pen` file cannot hold. */
 export interface PenWriteOptions {
   /** Collects one sentence per kind of content left out, in place of silently losing it. */
   warnings?: string[]
+  /** Collects the same facts as kinds, for a host that shows them in its own language. */
+  warningDetails?: PenWriteWarning[]
 }
 
 /** Snaps matrix values that are within floating-point noise of an integer. */
@@ -822,6 +872,7 @@ export function penDocumentFromGraph(
     writtenIds: writtenNodeIds(graph),
     importedIds: importedComponentIds(graph, imports ?? {}),
     warnings: options.warnings ?? [],
+    details: [],
     drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
   }
   const pages = graph.getPages()
@@ -875,16 +926,13 @@ export function penDocumentFromGraph(
   if (publication) document.sourceLibraryPublication = publication
   if (pages.length > 1) {
     const name = document.name ?? 'Page 1'
-    state.warnings.push(
-      `Pencil.dev files hold one page; ${pages.length} pages were merged into “${name}”.`
-    )
+    emit(state, { kind: 'merged-pages', pages: pages.length, name })
   }
   if (graph.documentColorSpace === 'display-p3') {
-    state.warnings.push(
-      'Colors are written as sRGB hex, the only form a Pencil.dev file holds; a Display P3 color outside sRGB comes out as the nearest sRGB color.'
-    )
+    emit(state, { kind: 'display-p3-colors' })
   }
   reportDrops(state)
+  options.warningDetails?.push(...state.details)
   return document
 }
 
@@ -900,36 +948,18 @@ function enabledLibrariesOf(
   const bindings = [...graph.enabledLibraries.values()]
   if (bindings.length === 0) return null
   const enabled = bindings.filter((binding) => binding.enabled).length
-  if (enabled > 0)
-    state.warnings.push(
-      `Library components came from ${enabled} enabled ${enabled === 1 ? 'library' : 'libraries'}, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.`
-    )
+  if (enabled > 0) emit(state, { kind: 'library-definitions', count: enabled })
   return bindings
 }
 
 /** Adds one sentence for each kind of content the written file had to leave out. */
 function reportDrops(state: PenWriteState): void {
   const { images, effects, filters, scroll, fontFeatures } = state.drops
-  if (images > 0)
-    state.warnings.push(
-      `Image fills with missing image data were left out (${images}); Pencil.dev files cannot hold a paint without its image.`
-    )
-  if (effects > 0)
-    state.warnings.push(
-      `Noise and texture effects were left out (${effects}); Pencil.dev files have no form for them.`
-    )
-  if (filters > 0)
-    state.warnings.push(
-      `Image adjustment filters were left out (${filters}); Pencil.dev files have no form for them.`
-    )
-  if (scroll > 0)
-    state.warnings.push(
-      `Scroll overflow was left out (${scroll}); Pencil.dev files have no form for it.`
-    )
-  if (fontFeatures > 0)
-    state.warnings.push(
-      `OpenType font features were left out (${fontFeatures}); Pencil.dev files have no form for them.`
-    )
+  if (images > 0) emit(state, { kind: 'missing-image-fills', count: images })
+  if (effects > 0) emit(state, { kind: 'dropped-effects', count: effects })
+  if (filters > 0) emit(state, { kind: 'dropped-filters', count: filters })
+  if (scroll > 0) emit(state, { kind: 'dropped-scroll', count: scroll })
+  if (fontFeatures > 0) emit(state, { kind: 'dropped-font-features', count: fontFeatures })
 }
 
 export function stringifyPenDocument(document: PenDocument): string {

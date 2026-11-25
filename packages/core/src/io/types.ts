@@ -1,12 +1,14 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
 import type { TailwindStylesheetLoader } from '@pairdraw/dom-css/export'
+import type { PenWriteWarning } from '@pairdraw/pen'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
 
 import type { SkiaRenderer } from '#core/canvas'
 import type { IconProvider } from '#core/icons'
 
+import type { DrawioWriteWarning } from './formats/drawio/warnings'
 import type { RasterExportFormat } from './formats/raster'
 
 export type IOFormatRole = 'native-document' | 'interchange-document' | 'derived-export'
@@ -154,7 +156,15 @@ export interface ExportResult {
   assets?: ExportAsset[]
   /** What the format could not hold, such as the variables draw.io has no model for. */
   warnings?: string[]
+  /** The same facts as kinds, for a host that shows them in its own language. */
+  warningDetails?: WriteDocumentWarning[]
 }
+
+/**
+ * What a writer could not put in its file, as facts: the pen and draw.io writers name their own
+ * kinds, and a host translates them instead of printing the English `warnings` sentences.
+ */
+export type WriteDocumentWarning = PenWriteWarning | DrawioWriteWarning
 
 export interface HTMLExportOptions {
   html?: 'fragment' | 'standalone'

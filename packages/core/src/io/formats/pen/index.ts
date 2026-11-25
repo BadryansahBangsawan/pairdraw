@@ -9,7 +9,8 @@ import {
   withUsedImports,
   writePenDocument,
   type PenIconRequest,
-  type PenIconSource
+  type PenIconSource,
+  type PenWriteWarning
 } from '@pairdraw/pen'
 
 import { defaultIcons, drawIcon, type IconData, type IconProvider } from '#core/icons'
@@ -209,14 +210,15 @@ export const penFormat: IOFormatAdapter<'pen'> = {
   },
   async writeDocument(graph) {
     const warnings: string[] = []
-    const data = writePenDocument(graph, { warnings })
+    const warningDetails: PenWriteWarning[] = []
+    const data = writePenDocument(graph, { warnings, warningDetails })
     return {
       format: 'pen',
       mimeType: 'application/json',
       extension: 'pen',
       data,
       encoding: 'utf8',
-      ...(warnings.length > 0 ? { warnings } : {})
+      ...(warningDetails.length > 0 ? { warnings, warningDetails } : {})
     }
   }
 }

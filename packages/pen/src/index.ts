@@ -22,7 +22,9 @@ export {
 export type { PenDocument, PenFont, PenNode, PenOverride } from './schema'
 export {
   penDocumentFromGraph,
+  penWriteWarningText,
   stringifyPenDocument,
   writePenDocument,
-  type PenWriteOptions
+  type PenWriteOptions,
+  type PenWriteWarning
 } from './write'

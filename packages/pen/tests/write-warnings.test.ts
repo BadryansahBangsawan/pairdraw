@@ -2,7 +2,14 @@ import { describe, expect, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { parsePenDocument, parsePenFile, writePenDocument, type PenNode } from '@pairdraw/pen'
+import {
+  parsePenDocument,
+  parsePenFile,
+  penWriteWarningText,
+  writePenDocument,
+  type PenNode,
+  type PenWriteWarning
+} from '@pairdraw/pen'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 
 import { parseDocument } from './helpers/document'
@@ -190,5 +197,43 @@ describe('a Display P3 document', () => {
     const warnings: string[] = []
     writePenDocument(graph, { warnings })
     expect(warnings.some((line) => line.includes('sRGB'))).toBe(false)
+  })
+})
+
+describe('write warning details', () => {
+  test('reports the same facts as kinds and as text', () => {
+    const graph = parseDocument([{ id: 'first', type: 'rectangle', width: 10, height: 10 }])
+    const second = graph.addPage('Second')
+    graph.createNode('RECTANGLE', second.id, { name: 'Second card', width: 10, height: 10 })
+    const warnings: string[] = []
+    const warningDetails: PenWriteWarning[] = []
+
+    writePenDocument(graph, { warnings, warningDetails })
+
+    expect(warningDetails).toEqual([{ kind: 'merged-pages', pages: 2, name: 'Page 1' }])
+    expect(warnings).toEqual(warningDetails.map(penWriteWarningText))
+  })
+
+  test('the text of every kind is the sentence the writer used to push', () => {
+    expect(penWriteWarningText({ kind: 'merged-pages', pages: 2, name: 'Page 1' })).toBe(
+      'Pencil.dev files hold one page; 2 pages were merged into “Page 1”.'
+    )
+    expect(penWriteWarningText({ kind: 'missing-image-fills', count: 1 })).toBe(
+      'Image fills with missing image data were left out (1); Pencil.dev files cannot hold a paint without its image.'
+    )
+    expect(penWriteWarningText({ kind: 'library-definitions', count: 2 })).toBe(
+      'Library components came from 2 enabled libraries, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.'
+    )
+  })
+
+  test('a document with nothing to report collects neither text nor kinds', () => {
+    const graph = parseDocument([{ id: 'card', type: 'rectangle', width: 10, height: 10 }])
+    const warnings: string[] = []
+    const warningDetails: PenWriteWarning[] = []
+
+    writePenDocument(graph, { warnings, warningDetails })
+
+    expect(warnings).toEqual([])
+    expect(warningDetails).toEqual([])
   })
 })

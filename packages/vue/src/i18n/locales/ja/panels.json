@@ -850,5 +850,6 @@
   "prototypeScrollBehavior": "スクロール時の位置",
   "prototypeScrollBehaviorScrolls": "親と一緒にスクロール",
   "prototypeScrollBehaviorFixed": "固定",
-  "prototypeScrollBehaviorSticky": "スティッキー"
+  "prototypeScrollBehaviorSticky": "スティッキー",
+  "exportColorSpaceNote": "sRGB で書き出されます。Display P3 ドキュメントの色は sRGB に変換されます。"
 }

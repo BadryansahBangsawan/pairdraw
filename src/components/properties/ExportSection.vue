@@ -85,6 +85,16 @@ const showsPDFPages = computed(
   () => pdfTogether.value && activeSettings.value.some((setting) => setting.format === 'pdf')
 )
 
+/** Formats that write 8-bit sRGB pixels or operators, whatever the document's profile. */
+const SRGB_ONLY_FORMATS = new Set(['jpg', 'webp', 'pdf'])
+
+/** Whether a chosen export maps a Display P3 document's colors into sRGB, as the note says. */
+const mapsToSRGB = computed(
+  () =>
+    editorStore.graph.documentColorSpace === 'display-p3' &&
+    activeSettings.value.some((setting) => SRGB_ONLY_FORMATS.has(setting.format))
+)
+
 function exportOptions(setting: ExportSetting): ExportOptions {
   return {
     scale: setting.scale,
@@ -241,6 +251,10 @@ watch(previewKey, updatePreview, { flush: 'post' })
         </IconButton>
       </template>
     </PanelItemRow>
+
+    <p v-if="mapsToSRGB" class="text-[11px] text-muted" data-test-id="export-color-space-note">
+      {{ panels.exportColorSpaceNote }}
+    </p>
 
     <p v-if="showsPDFPages" class="text-[11px] text-muted" data-test-id="export-pdf-pages">
       {{ panels.exportPDFPages }}

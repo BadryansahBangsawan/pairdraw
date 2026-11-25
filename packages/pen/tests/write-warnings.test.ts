@@ -175,3 +175,20 @@ describe('writing a .pen file', () => {
     expect(warnings).toEqual(['Pencil.dev files hold one page; 2 pages were merged into “Page 1”.'])
   })
 })
+
+describe('a Display P3 document', () => {
+  test('warns that its colors are written as sRGB hex', () => {
+    const graph = parseDocument([{ id: 'card', type: 'rectangle', width: 10, height: 10 }])
+    graph.documentColorSpace = 'display-p3'
+    const warnings: string[] = []
+    writePenDocument(graph, { warnings })
+    expect(warnings.some((line) => line.includes('sRGB'))).toBe(true)
+  })
+
+  test('says nothing about color space for an sRGB document', () => {
+    const graph = parseDocument([{ id: 'card', type: 'rectangle', width: 10, height: 10 }])
+    const warnings: string[] = []
+    writePenDocument(graph, { warnings })
+    expect(warnings.some((line) => line.includes('sRGB'))).toBe(false)
+  })
+})

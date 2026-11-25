@@ -861,5 +861,6 @@
   "prototypeScrollBehavior": "Posición al desplazar",
   "prototypeScrollBehaviorScrolls": "Desplazar con el padre",
   "prototypeScrollBehaviorFixed": "Fijo",
-  "prototypeScrollBehaviorSticky": "Pegajoso"
+  "prototypeScrollBehaviorSticky": "Pegajoso",
+  "exportColorSpaceNote": "Exportado en sRGB: los colores de un documento Display P3 se convierten a ese espacio."
 }

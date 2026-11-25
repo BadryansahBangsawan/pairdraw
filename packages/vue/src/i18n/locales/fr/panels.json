@@ -861,5 +861,6 @@
   "prototypeScrollBehavior": "Position au défilement",
   "prototypeScrollBehaviorScrolls": "Défiler avec le parent",
   "prototypeScrollBehaviorFixed": "Fixe",
-  "prototypeScrollBehaviorSticky": "Collant"
+  "prototypeScrollBehaviorSticky": "Collant",
+  "exportColorSpaceNote": "Exporté en sRGB : les couleurs d'un document Display P3 y sont converties."
 }

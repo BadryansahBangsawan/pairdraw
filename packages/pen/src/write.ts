@@ -736,6 +736,11 @@ export function penDocumentFromGraph(
       `Pencil.dev files hold one page; ${pages.length} pages were merged into “${name}”.`
     )
   }
+  if (graph.documentColorSpace === 'display-p3') {
+    state.warnings.push(
+      'Colors are written as sRGB hex, the only form a Pencil.dev file holds; a Display P3 color outside sRGB comes out as the nearest sRGB color.'
+    )
+  }
   reportDrops(state)
   return document
 }

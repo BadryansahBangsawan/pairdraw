@@ -872,5 +872,6 @@
   "prototypeScrollBehavior": "Pozycja podczas przewijania",
   "prototypeScrollBehaviorScrolls": "Przewijaj z rodzicem",
   "prototypeScrollBehaviorFixed": "Stała",
-  "prototypeScrollBehaviorSticky": "Przyklejona"
+  "prototypeScrollBehaviorSticky": "Przyklejona",
+  "exportColorSpaceNote": "Eksport w sRGB: kolory dokumentu Display P3 są do niego mapowane."
 }

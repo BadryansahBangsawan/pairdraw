@@ -861,5 +861,6 @@
   "prototypeScrollBehavior": "Position beim Scrollen",
   "prototypeScrollBehaviorScrolls": "Mit übergeordnetem Frame scrollen",
   "prototypeScrollBehaviorFixed": "Fixiert",
-  "prototypeScrollBehaviorSticky": "Haftend"
+  "prototypeScrollBehaviorSticky": "Haftend",
+  "exportColorSpaceNote": "Als sRGB exportiert: Die Farben eines Display-P3-Dokuments werden darauf abgebildet."
 }

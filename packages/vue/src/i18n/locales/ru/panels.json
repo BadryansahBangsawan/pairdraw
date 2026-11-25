@@ -872,5 +872,6 @@
   "prototypeScrollBehavior": "Положение при прокрутке",
   "prototypeScrollBehaviorScrolls": "Прокручивать с родителем",
   "prototypeScrollBehaviorFixed": "Фиксировано",
-  "prototypeScrollBehaviorSticky": "Прилипает"
+  "prototypeScrollBehaviorSticky": "Прилипает",
+  "exportColorSpaceNote": "Экспорт в sRGB: цвета документа Display P3 преобразуются в это пространство."
 }

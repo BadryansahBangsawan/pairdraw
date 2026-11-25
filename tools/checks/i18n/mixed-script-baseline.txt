@@ -195,6 +195,7 @@ ja:panels.behaviourAddVariants
 ja:panels.colorHintHsb
 ja:panels.colorHintHsl
 ja:panels.colorHintOkhcl
+ja:panels.exportColorSpaceNote
 ja:panels.imageURL
 ja:panels.imageURLInvalid
 ja:panels.imageURLPlaceholder
@@ -426,6 +427,7 @@ zh-cn:panels.behaviourAddVariants
 zh-cn:panels.colorHintHsb
 zh-cn:panels.colorHintHsl
 zh-cn:panels.colorHintOkhcl
+zh-cn:panels.exportColorSpaceNote
 zh-cn:panels.imageURLInvalid
 zh-cn:panels.imageURLTooLarge
 zh-cn:panels.imageURLUnsupported

@@ -592,6 +592,7 @@ export const panelMessageDefaults = {
   exportHTMLLayerNames: 'Layer names as attributes',
   exportHTMLLayerIds: 'Layer IDs as attributes',
   exportPDFPages: 'One PDF, a page per layer in selection order',
+  exportColorSpaceNote: "Exported in sRGB: a Display P3 document's colors are mapped into it.",
   create: 'Create',
   add: 'Add',
   createVariable: 'Create variable',

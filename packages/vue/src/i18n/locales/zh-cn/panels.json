@@ -850,5 +850,6 @@
   "prototypeScrollBehavior": "滚动时位置",
   "prototypeScrollBehaviorScrolls": "随父级滚动",
   "prototypeScrollBehaviorFixed": "固定",
-  "prototypeScrollBehaviorSticky": "粘性"
+  "prototypeScrollBehaviorSticky": "粘性",
+  "exportColorSpaceNote": "以 sRGB 导出：Display P3 文档的颜色会转换到 sRGB。"
 }

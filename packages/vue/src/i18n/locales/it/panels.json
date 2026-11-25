@@ -861,5 +861,6 @@
   "prototypeScrollBehavior": "Posizione durante lo scorrimento",
   "prototypeScrollBehaviorScrolls": "Scorri con il genitore",
   "prototypeScrollBehaviorFixed": "Fisso",
-  "prototypeScrollBehaviorSticky": "Appiccicoso"
+  "prototypeScrollBehaviorSticky": "Appiccicoso",
+  "exportColorSpaceNote": "Esportato in sRGB: i colori di un documento Display P3 vengono convertiti in quello spazio."
 }

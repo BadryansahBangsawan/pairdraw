@@ -12,7 +12,7 @@
   "deleteCommentDescription": "コメントとすべての返信が全員から削除されます。",
   "deleteReply": "返信を削除",
   "copyText": "テキストをコピー",
-  "applyWithAI": "AIで反映",
+  "fixWithAgent": "エージェントで修正",
   "applyOpenWithAI": "未解決のコメントをAIで反映",
   "goToComment": "コメントへ移動",
   "moreActions": "その他の操作",

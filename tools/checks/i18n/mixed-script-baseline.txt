@@ -148,7 +148,6 @@ ja:collaboration.voiceDeniedDescription
 ja:commands.paletteDescription
 ja:commands.toggleAIChat
 ja:comments.applyOpenWithAI
-ja:comments.applyWithAI
 ja:credentials.apiKey
 ja:credentials.getAPIKey
 ja:credentials.rememberDevice
@@ -384,7 +383,6 @@ zh-cn:collaboration.voiceDeniedDescription
 zh-cn:commands.paletteDescription
 zh-cn:commands.toggleAIChat
 zh-cn:comments.applyOpenWithAI
-zh-cn:comments.applyWithAI
 zh-cn:credentials.apiKey
 zh-cn:credentials.getAPIKey
 zh-cn:credentials.rememberDevice

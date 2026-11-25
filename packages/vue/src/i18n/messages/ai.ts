@@ -234,6 +234,11 @@ export const aiMessageDefaults = {
     'Apply the feedback in these comment threads, then reply to each with what you changed and resolve it.',
   commentPromptThread: params('Thread {id}'),
   commentPromptThreadOnLayer: params('Thread {id} on {layer}'),
+  /** Under a thread's heading when the person circled an area instead of just clicking. */
+  commentPromptRegion: params(
+    'Marked area: x {minX} to {maxX}, y {minY} to {maxY} on the page; an image of it is attached. Change only what is inside it.'
+  ),
+  commentPromptRegionLayers: params('Layers inside the marked area: {layers}'),
   canvasPrompt: 'Prompt on the canvas',
   canvasPromptHint:
     'Show a prompt at the bottom of the canvas while the chat is closed. What you write there goes to the chat.',

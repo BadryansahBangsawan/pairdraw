@@ -108,6 +108,8 @@
   "commentPromptApplyAll": "Wprowadź uwagi z tych wątków, a potem odpowiedz w każdym, co zmieniono, i oznacz go jako rozwiązany.",
   "commentPromptThread": "Wątek {id}",
   "commentPromptThreadOnLayer": "Wątek {id} na {layer}",
+  "commentPromptRegion": "Zaznaczony obszar: x od {minX} do {maxX}, y od {minY} do {maxY} na stronie; dołączono jego obraz. Zmieniaj tylko to, co jest w środku.",
+  "commentPromptRegionLayers": "Warstwy w zaznaczonym obszarze: {layers}",
   "canvasPrompt": "Polecenie na obszarze roboczym",
   "canvasPromptHint": "Pokazuje polecenie u dołu obszaru roboczego, gdy czat jest zamknięty. To, co tam napiszesz, trafia do czatu.",
   "animateEdits": "Animuj zmiany AI",

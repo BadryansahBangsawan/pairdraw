@@ -108,6 +108,8 @@
   "commentPromptApplyAll": "Applica il feedback di queste discussioni, poi rispondi a ciascuna indicando cosa hai cambiato e risolvila.",
   "commentPromptThread": "Discussione {id}",
   "commentPromptThreadOnLayer": "Discussione {id} su {layer}",
+  "commentPromptRegion": "Area contrassegnata: x {minX}–{maxX}, y {minY}–{maxY} nella pagina; è allegata un’immagine. Modifica solo ciò che è al suo interno.",
+  "commentPromptRegionLayers": "Livelli nell’area contrassegnata: {layers}",
   "canvasPrompt": "Prompt nell’area di lavoro",
   "canvasPromptHint": "Mostra un prompt in fondo all’area di lavoro mentre la chat è chiusa. Quello che scrivi lì va alla chat.",
   "animateEdits": "Anima le modifiche dell’IA",

@@ -108,6 +108,8 @@
   "commentPromptApplyAll": "请按这些讨论中的反馈进行修改，然后逐条回复说明改了什么，并将其标记为已解决。",
   "commentPromptThread": "讨论 {id}",
   "commentPromptThreadOnLayer": "{layer} 上的讨论 {id}",
+  "commentPromptRegion": "标记区域：页面横向 {minX} 到 {maxX}，纵向 {minY} 到 {maxY}；已附上该区域的图片。只修改区域内的内容。",
+  "commentPromptRegionLayers": "标记区域内的图层：{layers}",
   "canvasPrompt": "画布上的提示",
   "canvasPromptHint": "聊天关闭时，在画布底部显示提示。你在其中输入的内容会发送到聊天。",
   "animateEdits": "为 AI 编辑添加动画",

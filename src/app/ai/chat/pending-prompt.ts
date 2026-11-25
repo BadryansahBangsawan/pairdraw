@@ -1,5 +1,7 @@
 import { shallowRef } from 'vue'
 
+import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
+import type { ImageAttachmentDraft } from '@/app/ai/attachment/image/types'
 import type { ReferencedNode } from '@/app/ai/chat/context'
 import { showDocumentChat } from '@/app/ai/chat/panel'
 import { mentionedNodes } from '@/app/ai/chat/references/nodes'
@@ -21,13 +23,19 @@ const pending = new WeakMap<EditorStore, ChatSubmission>()
  */
 const pendingVersion = shallowRef(0)
 
-/** A text prompt as the chat sends what the composer submits, with the layers it mentions. */
-export function promptSubmission(text: string, nodes: ReferencedNode[] = []): ChatSubmission {
-  return { modelText: text, displayText: text, images: [], nodes }
+/** A text prompt as the chat sends what the composer submits, with any images and mentioned layers. */
+export function promptSubmission(
+  text: string,
+  nodes: ReferencedNode[] = [],
+  images: ImageAttachmentDraft[] = []
+): ChatSubmission {
+  return { modelText: text, displayText: text, images, nodes }
 }
 
 /** Leaves `submission` for the chat of `store`'s document, replacing one still waiting there. */
 export function setPendingPrompt(store: EditorStore, submission: ChatSubmission): void {
+  // A replaced prompt's images would otherwise keep their blobs alive for the whole session.
+  for (const image of pending.get(store)?.images ?? []) revokeImagePreviewURL(image.previewURL)
   pending.set(store, submission)
   pendingVersion.value++
 }
@@ -48,10 +56,18 @@ export function takePendingPrompt(store: EditorStore): ChatSubmission | null {
 }
 
 /**
- * Sends `text` from outside the chat to `store`'s document's chat, and shows that chat. Layers it
- * references (`[Hero](pairdraw://node/1:2)`) go with it as previews, as from the composer.
+ * Sends `text` from outside the chat to `store`'s document's chat, with any images it carries, and
+ * shows that chat. Layers it references (`[Hero](pairdraw://node/1:2)`) go with it as previews, as
+ * from the composer.
  */
-export function sendPromptToDocument(store: EditorStore, text: string): void {
-  setPendingPrompt(store, promptSubmission(text, mentionedNodes(store.graph, text)))
+export function sendPromptToDocument(
+  store: EditorStore,
+  text: string,
+  options: { images?: ImageAttachmentDraft[] } = {}
+): void {
+  setPendingPrompt(
+    store,
+    promptSubmission(text, mentionedNodes(store.graph, text), options.images ?? [])
+  )
   showDocumentChat(store)
 }

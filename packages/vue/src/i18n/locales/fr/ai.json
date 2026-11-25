@@ -108,6 +108,8 @@
   "commentPromptApplyAll": "Appliquez les retours de ces fils de commentaires, puis répondez à chacun en indiquant ce que vous avez modifié, et résolvez-le.",
   "commentPromptThread": "Fil {id}",
   "commentPromptThreadOnLayer": "Fil {id} sur {layer}",
+  "commentPromptRegion": "Zone marquée : x {minX} à {maxX}, y {minY} à {maxY} sur la page ; une image est jointe. Ne modifie que ce qui s’y trouve.",
+  "commentPromptRegionLayers": "Calques dans la zone marquée : {layers}",
   "canvasPrompt": "Consigne sur le canevas",
   "canvasPromptHint": "Affiche une consigne en bas du canevas tant que le chat est fermé. Ce que vous y écrivez est envoyé au chat.",
   "animateEdits": "Animer les modifications de l’IA",

@@ -108,6 +108,8 @@
   "commentPromptApplyAll": "Внесите правки из этих обсуждений, затем ответьте в каждом, что изменено, и отметьте его решённым.",
   "commentPromptThread": "Обсуждение {id}",
   "commentPromptThreadOnLayer": "Обсуждение {id} на слое {layer}",
+  "commentPromptRegion": "Отмеченная область: x от {minX} до {maxX}, y от {minY} до {maxY} на странице; приложено её изображение. Меняйте только то, что внутри.",
+  "commentPromptRegionLayers": "Слои внутри отмеченной области: {layers}",
   "canvasPrompt": "Запрос на холсте",
   "canvasPromptHint": "Показывает запрос внизу холста, пока чат закрыт. То, что вы там напишете, попадёт в чат.",
   "animateEdits": "Анимировать правки ИИ",

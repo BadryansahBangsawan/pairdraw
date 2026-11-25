@@ -12,7 +12,7 @@
   "deleteCommentDescription": "Le commentaire et toutes ses réponses seront supprimés pour tout le monde.",
   "deleteReply": "Supprimer la réponse",
   "copyText": "Copier le texte",
-  "applyWithAI": "Appliquer avec l’IA",
+  "fixWithAgent": "Corriger avec l’agent",
   "applyOpenWithAI": "Appliquer les commentaires ouverts avec l’IA",
   "goToComment": "Aller au commentaire",
   "moreActions": "Plus d’actions",

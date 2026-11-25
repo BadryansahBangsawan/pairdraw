@@ -12,7 +12,7 @@
   "deleteCommentDescription": "Damit werden der Kommentar und alle Antworten für alle entfernt.",
   "deleteReply": "Antwort löschen",
   "copyText": "Text kopieren",
-  "applyWithAI": "Mit KI umsetzen",
+  "fixWithAgent": "Mit Agent beheben",
   "applyOpenWithAI": "Offene Kommentare mit KI umsetzen",
   "goToComment": "Zum Kommentar",
   "moreActions": "Weitere Aktionen",

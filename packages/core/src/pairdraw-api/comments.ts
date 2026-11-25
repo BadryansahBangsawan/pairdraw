@@ -111,6 +111,11 @@ export class CommentHandle {
     return commentPosition(this.graph, this.thread)
   }
 
+  /** The area the person circled, in canvas units relative to the pin; null for a clicked pin. */
+  get region(): CommentThread['region'] {
+    return this.thread.region ?? null
+  }
+
   get replies(): { id: string; author: string; text: string; createdAt: string }[] {
     return liveReplies(this.thread).map(({ id, author, text, createdAt }) => ({
       id,
@@ -151,6 +156,7 @@ export class CommentHandle {
       page: this.page,
       node: this.node,
       position: this.position,
+      region: this.region,
       replies: this.replies
     }
   }

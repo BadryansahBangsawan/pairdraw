@@ -16,8 +16,8 @@ export const commentMessageDefaults = {
   deleteCommentDescription: 'This removes the comment and all of its replies for everyone.',
   deleteReply: 'Delete reply',
   copyText: 'Copy text',
-  /** Sends a thread to the document's AI chat to act on, reply to, and resolve. */
-  applyWithAI: 'Apply with AI',
+  /** Sends a thread to the active agent, which fixes its area, replies to it, and resolves it. */
+  fixWithAgent: 'Fix with agent',
   applyOpenWithAI: 'Apply open comments with AI',
   goToComment: 'Go to comment',
   moreActions: 'More actions',

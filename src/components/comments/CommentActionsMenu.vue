@@ -11,8 +11,8 @@ import { computed } from 'vue'
 import type { CommentThread } from '@pairdraw/scene-graph'
 import { useCommentMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
-import { commentThreadsPrompt } from '@/app/ai/chat/entry/comments'
-import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
+import { acceptsDocumentPrompts } from '@/app/ai/chat/entry/run'
+import { fixThreadWithAgent } from '@/app/comments/fix'
 import { useComments } from '@/app/comments/use'
 import { useEditorStore } from '@/app/editor/active-store'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
@@ -47,14 +47,13 @@ const Separator = computed(() =>
   kind === 'context' ? ContextMenuSeparator : DropdownMenuSeparator
 )
 
-/** An open thread can go to the AI chat, which applies it, replies, and resolves it. */
+/** An open thread can go to the agent, which fixes its area, replies, and resolves it. */
 const appliesWithAI = computed(
   () => !thread.resolved && !thread.deleted && acceptsDocumentPrompts(store)
 )
 
-async function applyWithAI() {
-  const prompt = commentThreadsPrompt(store.graph, [thread])
-  if (prompt) await runPromptInDocument(store, prompt)
+async function fixWithAgent() {
+  await fixThreadWithAgent(store, thread)
 }
 
 async function copyText() {
@@ -79,10 +78,10 @@ async function copyText() {
     v-if="appliesWithAI"
     :class="menuCls.item"
     data-command="comment-apply-with-ai"
-    @select="applyWithAI"
+    @select="fixWithAgent"
   >
     <icon-lucide-sparkles :class="menuCls.icon" />
-    <span>{{ messages.applyWithAI }}</span>
+    <span>{{ messages.fixWithAgent }}</span>
   </component>
   <component
     :is="Item"

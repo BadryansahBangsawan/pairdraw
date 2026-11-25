@@ -88,4 +88,38 @@ describe('comment threads as prompts', () => {
     expect(commentThreadsPrompt(graph, [thread({ id: 'done', resolved: true })])).toBeNull()
     expect(commentThreadsPrompt(graph, [])).toBeNull()
   })
+
+  test('a drawn region names its area on the page and the layers inside it', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const button = graph.createNode('RECTANGLE', page.id, { name: 'Button' })
+    graph.updateNode(button.id, { x: 105, y: 205, width: 20, height: 10 })
+    const prompt =
+      commentThreadsPrompt(graph, [
+        thread({
+          id: 'c-3',
+          pageId: page.id,
+          x: 100,
+          y: 200,
+          region: {
+            points: [
+              [0, 0],
+              [40, 20]
+            ],
+            width: 2,
+            bounds: { minX: 0, minY: 0, maxX: 40, maxY: 20 }
+          }
+        })
+      ]) ?? ''
+
+    expect(prompt).toContain('Marked area: x 100 to 140, y 200 to 220 on the page')
+    expect(prompt).toContain('Layers inside the marked area: [Button](pairdraw://node/')
+    expect(findReferences(prompt).map(({ reference }) => reference.id)).toEqual([button.id])
+  })
+
+  test('a thread without a region says nothing about one', () => {
+    const graph = new SceneGraph()
+    const prompt = commentThreadsPrompt(graph, [thread({ id: 'c-4' })]) ?? ''
+    expect(prompt).not.toContain('Marked area')
+  })
 })

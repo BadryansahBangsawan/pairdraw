@@ -16,9 +16,10 @@ export const getComments = defineTool({
   name: 'get_comments',
   description:
     'Read the comments people left on the canvas, oldest first: each thread with its text, ' +
-    'author, page, the layer it is pinned to, its position, replies, and whether it is ' +
-    'resolved. Open threads only unless includeResolved is set. Use it to find review ' +
-    'feedback to act on, then reply_to_comment and resolve_comment.',
+    'author, page, the layer it is pinned to, its position, the marked area it was drawn ' +
+    'around when it has one, replies, and whether it is resolved. Open threads only unless ' +
+    'includeResolved is set. Use it to find review feedback to act on, then reply_to_comment ' +
+    'and resolve_comment.',
   execution: { kind: 'sync', mutation: 'none' },
   input: v.strictObject({
     includeResolved: v.optional(v.pipe(v.boolean(), v.description('Also list resolved threads'))),

@@ -103,6 +103,26 @@ const stroke = ref<{
   startScreen: Vector
 } | null>(null)
 
+/**
+ * Listeners that only matter between a press and its release. Their target is the canvas while a
+ * stroke is in progress and nothing otherwise, so an idle Comment tool keeps no pointer or key
+ * handler; VueUse adds and removes them as the target changes.
+ */
+const strokeTarget = computed<HTMLCanvasElement | null>(() => (stroke.value ? canvasEl : null))
+const strokeWindow = computed<Window | null>(() => (stroke.value ? window : null))
+
+function onStrokeEscape(event: KeyboardEvent) {
+  if (event.key !== 'Escape' || !stroke.value) return
+  event.stopImmediatePropagation()
+  cancelStroke()
+}
+
+useEventListener(strokeTarget, 'pointermove', moveStroke)
+useEventListener(strokeTarget, 'pointerup', releaseStroke)
+useEventListener(strokeTarget, 'pointercancel', cancelStroke)
+useEventListener(strokeTarget, 'contextmenu', cancelStroke)
+useEventListener(strokeWindow, 'keydown', onStrokeEscape, { capture: true })
+
 // Pins show unless View → Comments hid them; the Comment tool always shows them, as in Figma.
 const pins = computed(() => {
   // Layers move without the comment changing; re-place pins on every scene change.
@@ -249,21 +269,6 @@ function strokeStyle(box: StrokeBox) {
 
 // The canvas places drafts itself, so its other buttons keep panning and opening the layer menu.
 useEventListener(() => canvasEl, 'pointerdown', placeDraft)
-useEventListener(() => canvasEl, 'pointermove', moveStroke)
-useEventListener(() => canvasEl, 'pointerup', releaseStroke)
-useEventListener(() => canvasEl, 'pointercancel', cancelStroke)
-// Escape takes back the stroke first, before the card or the tool.
-useEventListener(
-  window,
-  'keydown',
-  (event: KeyboardEvent) => {
-    if (event.key !== 'Escape' || !stroke.value) return
-    event.stopImmediatePropagation()
-    cancelStroke()
-  },
-  { capture: true }
-)
-useEventListener(() => canvasEl, 'contextmenu', cancelStroke)
 
 // Scrolling and zooming keep working over pins and while placing comments, as in Figma.
 function forwardWheel(event: WheelEvent) {

@@ -1,5 +1,4 @@
 import { useRafFn, watchThrottled } from '@vueuse/core'
-import type { createRendererFromJSON } from 'shaders/core'
 import { onScopeDispose, watch } from 'vue'
 
 import {
@@ -39,9 +38,6 @@ const RESIZE_FACTOR = 1.5
  */
 const MAX_PLAYERS = 16
 
-/** Whether this is a development build, read without tying the package to Vite's types. */
-const DEVELOPMENT = (Reflect.get(import.meta, 'env') as { DEV?: boolean } | undefined)?.DEV === true
-
 /** What a canvas is playing, for tests and diagnostics that read it from the page. */
 export interface ShaderPlaybackStats {
   /** Players that exist: one per shader image, on screen or kept for when it scrolls back. */
@@ -61,12 +57,47 @@ export function shaderPlaybackStats(editor: Editor): ShaderPlaybackStats | null 
   return playbackStats.get(editor) ?? null
 }
 
+/** The part of a library renderer a player uses: drawing a frame, and letting go of it. */
+export interface ShaderPlayerRenderer {
+  renderFrame(options: { deltaSeconds: number; waitForGpu: boolean }): Promise<void>
+  dispose(): void
+}
+
+/** The library's motion metadata, by effect name, read from its registry. */
+async function libraryMotions(): Promise<Map<string, ShaderEffectMotion>> {
+  const { getAllShaders } = await import('shaders/registry')
+  const known = new Map<string, ShaderEffectMotion>()
+  for (const entry of getAllShaders()) {
+    const { name, definition } = entry as {
+      name?: unknown
+      definition?: { animatedTime?: unknown; props?: Record<string, unknown> }
+    }
+    if (typeof name !== 'string') continue
+    known.set(name, {
+      animates: definition?.animatedTime !== undefined,
+      speed: definition?.props?.speed !== undefined
+    })
+  }
+  return known
+}
+
+/** Starts the library's renderer for `preset` on `canvas`, ready to draw frames. */
+async function libraryPlayer(
+  preset: ShaderPreset,
+  canvas: HTMLCanvasElement
+): Promise<ShaderPlayerRenderer> {
+  const { createRendererFromJSON } = await import('shaders/core')
+  const renderer = createRendererFromJSON(structuredClone(preset))
+  await renderer.initialize(canvas)
+  return renderer
+}
+
 /** A shader playing on its own WebGPU canvas, shown wherever its image is painted. */
 interface Player {
   preset: string
   nodeIds: Set<string>
   canvas: HTMLCanvasElement
-  renderer: ReturnType<typeof createRendererFromJSON> | null
+  renderer: ShaderPlayerRenderer | null
   /** Whether it is on screen, the only time it draws. */
   visible: boolean
   disposed: boolean
@@ -87,7 +118,7 @@ interface Player {
  */
 export function useShaderPlayback(options: {
   editor: Editor
-  getRenderer: () => SkiaRenderer | null
+  getRenderer: () => Pick<SkiaRenderer, 'setLiveImage'> | null
   /** The view this canvas draws: its pan, zoom, page, and whether it previews. */
   getView: () => Pick<EditorState, 'panX' | 'panY' | 'zoom' | 'currentPageId'> & EditorProfileInputs
   getViewport: () => { width: number; height: number }
@@ -102,6 +133,17 @@ export function useShaderPlayback(options: {
    * shaders play at that density too. The display's ratio by default.
    */
   getPixelRatio?: () => number
+  /**
+   * Asks for display frames, and stops asking. The browser's animation frames by default; a test
+   * hands its own and runs them by hand.
+   */
+  frames?: (draw: (timestamp: number) => void) => { pause: () => void; resume: () => void }
+  /** Told once when a page already plays the most shaders it may, where a host wants to warn. */
+  warn?: (message: string) => void
+  /** Reads the library's motion metadata; a test hands its own and skips the import. */
+  loadMotionMap?: () => Promise<Map<string, ShaderEffectMotion>>
+  /** Starts a player for a preset on a canvas; the library's unless a test supplies its own. */
+  createPlayer?: (preset: ShaderPreset, canvas: HTMLCanvasElement) => Promise<ShaderPlayerRenderer>
 }) {
   const { editor, getRenderer, getView, getViewport, markDirty } = options
   const pixelRatio = options.getPixelRatio ?? (() => window.devicePixelRatio || 1)
@@ -156,26 +198,18 @@ export function useShaderPlayback(options: {
   function loadMotions() {
     if (motions !== null || loadingMotions) return
     loadingMotions = true
-    void import('shaders/registry')
-      .then(({ getAllShaders }) => {
-        const known = new Map<string, ShaderEffectMotion>()
-        for (const entry of getAllShaders()) {
-          const { name, definition } = entry as {
-            name?: unknown
-            definition?: { animatedTime?: unknown; props?: Record<string, unknown> }
-          }
-          if (typeof name !== 'string') continue
-          known.set(name, {
-            animates: definition?.animatedTime !== undefined,
-            speed: definition?.props?.speed !== undefined
-          })
-        }
+    void (options.loadMotionMap ?? libraryMotions)()
+      .then((known) => {
         motions = known
         sync()
         return undefined
       })
       .catch(() => {
         loadingMotions = false
+        // Without the library's motion metadata, play every preset rather than freeze them all.
+        motions = new Map()
+        sync()
+        return undefined
       })
   }
 
@@ -184,7 +218,6 @@ export function useShaderPlayback(options: {
     if (motions === null) return true
     return presetAnimates(preset, (type) => motions?.get(type))
   }
-
 
   function release() {
     for (const player of retired.splice(0)) {
@@ -238,9 +271,11 @@ export function useShaderPlayback(options: {
         return true
       }
     }
-    if (DEVELOPMENT && !warnedFull) {
+    if (!warnedFull) {
       warnedFull = true
-      console.warn(`A page plays at most ${MAX_PLAYERS} shaders; the rest keep their still frames.`)
+      options.warn?.(
+        `A page plays at most ${MAX_PLAYERS} shaders; the rest keep their still frames.`
+      )
     }
     return false
   }
@@ -275,14 +310,11 @@ export function useShaderPlayback(options: {
     }
     if (replaces) replacing.set(hash, player)
     else players.set(hash, player)
-    // Read through a call: the player may be stopped while the library loads.
+    // Read through a call: the player may be stopped while the renderer starts.
     const stopped = () => player.disposed
-    let renderer: Player['renderer'] = null
+    let renderer: ShaderPlayerRenderer | null = null
     try {
-      const shaders = await import('shaders/core')
-      if (stopped()) return
-      renderer = shaders.createRendererFromJSON(structuredClone(preset))
-      await renderer.initialize(canvas)
+      renderer = await (options.createPlayer ?? libraryPlayer)(preset, canvas)
     } catch (error) {
       // A shader that cannot play keeps its still frame until its preset changes. A newer
       // player that replaced this one while it started is left alone.
@@ -349,7 +381,13 @@ export function useShaderPlayback(options: {
   function wantedShaders(playing: boolean, pageId: string): Map<string, PageShader> {
     if (!playing) return new Map()
     const wanted = shadersOnPage(editor.graph, pageId)
-    if (wanted.size > 0) loadMotions()
+    if (wanted.size === 0) return wanted
+    // What an effect does with time decides whether it needs a player at all, so nothing plays
+    // until the library says: a still shader never starts one, not even for a frame.
+    if (motions === null) {
+      loadMotions()
+      return new Map()
+    }
     for (const [hash, shader] of wanted) {
       // A shader that draws one picture forever keeps its still frame, which is that picture.
       if (!animates(shader.preset)) wanted.delete(hash)
@@ -404,18 +442,20 @@ export function useShaderPlayback(options: {
     report()
   }
 
-  const { pause, resume } = useRafFn(
-    ({ timestamp }) => {
-      if (stepping || (copyFrames && last !== 0 && timestamp - last < COPY_FRAME_MS)) return
-      last = timestamp
-      stepping = true
-      void step(timestamp).finally(() => {
-        stepping = false
-        release()
-      })
-    },
-    { immediate: false }
-  )
+  const requestFrames =
+    options.frames ??
+    ((draw: (timestamp: number) => void) =>
+      useRafFn(({ timestamp }) => draw(timestamp), { immediate: false }))
+
+  const { pause, resume } = requestFrames((timestamp) => {
+    if (stepping || (copyFrames && last !== 0 && timestamp - last < COPY_FRAME_MS)) return
+    last = timestamp
+    stepping = true
+    void step(timestamp).finally(() => {
+      stepping = false
+      release()
+    })
+  })
 
   /**
    * Draws every visible shader and shows its frame. The WebGPU canvas itself is uploaded right
@@ -467,7 +507,11 @@ export function useShaderPlayback(options: {
   }
 
   /** Whether the canvas shows `player`'s WebGPU canvas uploaded as it is. */
-  function uploads(renderer: SkiaRenderer, hash: string, player: Player): boolean {
+  function uploads(
+    renderer: Pick<SkiaRenderer, 'setLiveImage'>,
+    hash: string,
+    player: Player
+  ): boolean {
     try {
       return renderer.setLiveImage(hash, player.canvas, player.nodeIds)
     } catch {
@@ -509,6 +553,8 @@ export function useShaderPlayback(options: {
   function onVisibilityChange() {
     if (document.visibilityState === 'hidden') {
       for (const hash of Array.from(players.keys())) stop(hash)
+      shownPlayers = 0
+      report()
     } else {
       sync()
     }

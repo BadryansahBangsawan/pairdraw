@@ -24,12 +24,7 @@ export interface PlaybackView {
 
 /** Whether `node` and every layer above it are visible, so the canvas draws it. */
 function isShown(node: SceneNode, graph: SceneGraph): boolean {
-  let current: SceneNode | undefined = node
-  while (current) {
-    if (!current.visible) return false
-    current = current.parentId ? graph.getNode(current.parentId) : undefined
-  }
-  return true
+  return graph.closest(node.id, (current) => !current.visible) === undefined
 }
 
 /**

@@ -200,6 +200,7 @@ useCanvas(sceneCanvasRef, store, {
   maxPixelRatio: appRuntimeConfig.maxPixelRatio,
   reducedEffects: appRuntimeConfig.reducedEffects,
   animations: () => animationsEnabled.value,
+  warnShaderLimit: import.meta.env.DEV ? (message: string) => console.warn(message) : undefined,
   onReady: canvasReady,
   onFailed: (error) =>
     store.preparationController.failCanvas(

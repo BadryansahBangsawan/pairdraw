@@ -37,6 +37,11 @@ export interface UseCanvasOptions {
    */
   animations?: () => boolean
   /**
+   * Told once when a preview already plays the most shaders a page may. The app passes a warning
+   * in development builds, so a release stays quiet.
+   */
+  warnShaderLimit?: (message: string) => void
+  /**
    * Forces ruler visibility on or off for this canvas.
    *
    * When omitted, the composable falls back to viewport and URL-param logic.

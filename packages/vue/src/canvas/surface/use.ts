@@ -65,7 +65,8 @@ export function useCanvas(
       getViewport: () => ({ width: viewport.width.value, height: viewport.height.value }),
       markDirty: surface.markDirty,
       getAnimations: options?.animations,
-      getPixelRatio: () => canvasPixelRatio(options?.maxPixelRatio)
+      getPixelRatio: () => canvasPixelRatio(options?.maxPixelRatio),
+      warn: options?.warnShaderLimit
     })
   }
 

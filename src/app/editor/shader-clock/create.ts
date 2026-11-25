@@ -39,12 +39,7 @@ type ClockSource = Pick<Editor, 'graph' | 'state'> & {
 
 /** Whether `node` and every layer above it are visible, as the canvas decides what to draw. */
 function isShown(node: SceneNode, graph: SceneGraph): boolean {
-  let current: SceneNode | undefined = node
-  while (current) {
-    if (!current.visible) return false
-    current = current.parentId ? graph.getNode(current.parentId) : undefined
-  }
-  return true
+  return graph.closest(node.id, (current) => !current.visible) === undefined
 }
 
 /** Whether any part of `bounds` is inside the view, at its pan and zoom. */

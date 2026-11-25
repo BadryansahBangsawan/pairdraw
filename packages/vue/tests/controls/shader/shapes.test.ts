@@ -1,11 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
+import { SHAPE3D_DEFAULTS, SHAPE3D_TYPES } from 'shaders/core'
+
 import { SHADER_SHAPES, shaderShapeType, withShapeType } from '@pairdraw/vue/controls/shader'
 
 describe('shaderShapeType', () => {
   test('reads the type out of a shape written as JSON', () => {
     expect(shaderShapeType('{"type":"sphere3D","radius":0.35}')).toBe('sphere3D')
-    expect(shaderShapeType('{"type":"dot"}')).toBe('dot')
+    expect(shaderShapeType('{"type":"cube3D"}')).toBe('cube3D')
   })
 
   test('is empty for a value that is not a shape', () => {
@@ -17,17 +19,23 @@ describe('shaderShapeType', () => {
 
 describe('withShapeType', () => {
   test('keeps the rest of the shape, so its size survives a type change', () => {
-    expect(withShapeType('{"type":"sphere3D","radius":0.35}', 'dot')).toBe(
-      '{"type":"dot","radius":0.35}'
+    expect(withShapeType('{"type":"sphere3D","radius":0.35}', 'sphere3D')).toBe(
+      '{"type":"sphere3D","radius":0.35}'
     )
   })
 
-  test('starts a shape when the value is not one', () => {
-    expect(withShapeType('', 'bars')).toBe('{"type":"bars"}')
-    expect(withShapeType('not json', 'streak')).toBe('{"type":"streak"}')
+  test('starts a shape with the defaults the library draws it from', () => {
+    expect(JSON.parse(withShapeType('', 'cube3D'))).toEqual({
+      ...SHAPE3D_DEFAULTS.cube3D,
+      type: 'cube3D'
+    })
+    expect(JSON.parse(withShapeType('not json', 'gyroscope3D'))).toEqual({
+      ...SHAPE3D_DEFAULTS.gyroscope3D,
+      type: 'gyroscope3D'
+    })
   })
 
-  test('offers the types the library draws', () => {
-    expect(SHADER_SHAPES).toEqual(['sphere3D', 'dot', 'bars', 'streak'])
+  test('offers exactly the shapes the library accepts', () => {
+    expect([...SHADER_SHAPES]).toEqual([...SHAPE3D_TYPES])
   })
 })

@@ -75,6 +75,21 @@ describe('presetAnimates', () => {
     ).toBe(true)
   })
 
+  test('a parent at speed 0 still follows an animated child', () => {
+    expect(
+      presetAnimates(
+        preset({ type: 'Boids', props: { speed: 0 }, children: [{ type: 'Aurora' }] }),
+        animated
+      )
+    ).toBe(true)
+    expect(
+      presetAnimates(
+        preset({ type: 'Boids', props: { speed: 0 }, children: [{ type: 'Halftone' }] }),
+        animated
+      )
+    ).toBe(false)
+  })
+
   test('an effect the registry does not know yet is assumed to animate', () => {
     expect(presetAnimates(preset({ type: 'MadeUpEffect' }), animated)).toBe(true)
   })

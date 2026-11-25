@@ -20,9 +20,12 @@ export type ShaderMotion = (type: string) => ShaderEffectMotion | undefined
 function componentAnimates(component: ShaderComponent, motion: ShaderMotion): boolean {
   const props = component.props ?? {}
   if (props.animated === true) return true
-  if (typeof props.speed === 'number') return props.speed !== 0
   const known = motion(component.type)
-  if (known === undefined || known.animates || known.speed) return true
+  const moves =
+    typeof props.speed === 'number'
+      ? props.speed !== 0
+      : known === undefined || known.animates || known.speed
+  if (moves) return true
   return (component.children ?? []).some((child) => componentAnimates(child, motion))
 }
 

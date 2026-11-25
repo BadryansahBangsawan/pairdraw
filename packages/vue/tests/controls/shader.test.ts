@@ -12,6 +12,7 @@ import {
   parseShaderPreset,
   removeShaderEffect,
   SHADER_GALLERY,
+  SHADER_SHAPES,
   shaderGalleryEntryOf,
   shaderPresetColors,
   setShaderEffectProp,
@@ -80,7 +81,7 @@ describe('shader catalog', () => {
     })
     expect(liquidMetal?.props.find((prop) => prop.key === 'shape')).toMatchObject({
       kind: 'shape',
-      options: ['sphere3D', 'dot', 'bars', 'streak']
+      options: [...SHADER_SHAPES]
     })
   })
 })

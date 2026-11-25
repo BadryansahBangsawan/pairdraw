@@ -63,10 +63,12 @@ export type StatusWorkflowPreset = keyof typeof STATUS_WORKFLOW_PRESETS
  * Ready for dev and Completed read as statuses without setup.
  */
 export function readStatusWorkflow(graph: SceneGraph): StatusWorkflow {
-  return (
-    readPluginData(graph.getNode(graph.rootId)?.pluginData, statuses) ??
-    STATUS_WORKFLOW_PRESETS.handoff
-  )
+  return readStoredStatusWorkflow(graph) ?? STATUS_WORKFLOW_PRESETS.handoff
+}
+
+/** The workflow the document stored, or `undefined` when it never chose one. */
+export function readStoredStatusWorkflow(graph: SceneGraph): StatusWorkflow | undefined {
+  return readPluginData(graph.getNode(graph.rootId)?.pluginData, statuses)
 }
 
 /** Stores the workflow on the document node, as an undoable document change. */

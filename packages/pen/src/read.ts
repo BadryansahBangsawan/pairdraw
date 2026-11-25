@@ -3,6 +3,7 @@ import * as v from 'valibot'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { writeDesignMemory } from '@pairdraw/scene-graph/design-memory'
 import type { FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
+import { writeStatusWorkflow } from '@pairdraw/scene-graph/statuses'
 import { rekeyTokenSources, tokenSourcesPluginData } from '@pairdraw/scene-graph/token-sources'
 
 import { lineNetwork, pathNetwork } from './geometry'
@@ -161,6 +162,7 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
   }
   // After the links, which replace the document node's plugin data: the memory is stored beside them.
   if (doc.designMemory) writeDesignMemory(graph, doc.designMemory)
+  if (doc.statuses) writeStatusWorkflow(graph, doc.statuses)
 
   return graph
 }

@@ -23,6 +23,7 @@ import { applyGradientTransform, invertGradientTransform } from '@pairdraw/scene
 import { imageMimeType } from '@pairdraw/scene-graph/images'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
+import { readStoredStatusWorkflow } from '@pairdraw/scene-graph/statuses'
 import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-sources'
 
 import { networkToSVGPath } from './geometry'
@@ -623,6 +624,7 @@ function writeNode(state: PenWriteState, node: SceneNode): PenNode {
   if (node.overflowDirection !== 'NONE') state.drops.scroll++
   if (node.fontFeatures.length > 0) state.drops.fontFeatures++
   const result: PenNode = { id: node.id, type: nodeType(node) }
+  if (node.status !== null) result.status = node.status
   basicNodeFields(state, node, result)
   if (semanticNodeFields(state, node, result)) return result
   // Written after the preserved pen fields, so a regenerated path wins over the source text.
@@ -725,6 +727,9 @@ export function penDocumentFromGraph(
   if (tokenSources.length > 0) document.tokenSources = tokenSources
   const designMemory = readDesignMemory(graph)
   if (designMemory) document.designMemory = designMemory
+  // Only a document that chose its statuses writes them: the default falls back on read.
+  const statuses = readStoredStatusWorkflow(graph)
+  if (statuses) document.statuses = statuses
   if (pages.length > 1) {
     const name = document.name ?? 'Page 1'
     state.warnings.push(

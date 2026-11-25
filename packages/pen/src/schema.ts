@@ -3,6 +3,11 @@ import * as v from 'valibot'
 import { CODE_SYNTAX_PLATFORMS } from '@pairdraw/scene-graph'
 import { designMemorySchema, type DesignMemory } from '@pairdraw/scene-graph/design-memory'
 import { finiteNumberSchema } from '@pairdraw/scene-graph/primitives'
+import {
+  nodeStatusSchema,
+  statusWorkflowSchema,
+  type StatusWorkflow
+} from '@pairdraw/scene-graph/statuses'
 import { tokenSourcesSchema } from '@pairdraw/scene-graph/token-sources'
 
 import { stripJSONComments } from './jsonc'
@@ -148,10 +153,27 @@ const paddingSchema = v.union([
 ])
 const cornerRadiusSchema = v.union([numSchema, v.array(numSchema)])
 
+/**
+ * A layer's status, or none when the value is not an id this reader can use: a document stays
+ * readable because of one unreadable field.
+ */
+const penNodeStatusSchema = v.pipe(
+  v.unknown(),
+  v.transform((value): string | undefined => {
+    const parsed = v.safeParse(nodeStatusSchema, value)
+    return parsed.success ? parsed.output : undefined
+  })
+)
+
 /** Every property a node, or an override of one, can carry. */
 const nodeFields = {
   name: v.optional(strSchema),
   context: v.optional(strSchema),
+  /**
+   * The layer's status, an id in the document's status workflow, as Core keeps it on the layer.
+   * Pencil has no field for it, so it is an extension other Pencil clients ignore.
+   */
+  status: v.optional(penNodeStatusSchema),
   /**
    * What a layer is, for agents: pen.dev writes a `type` and any fields of its own. It is only kept
    * as plugin data, so any value is read as it is rather than rejecting the document.
@@ -315,6 +337,18 @@ const penDesignMemorySchema = v.pipe(
   })
 )
 
+/**
+ * The status workflow the file holds, or none when an older client wrote something this reader
+ * cannot use: a document stays readable because of one unreadable field.
+ */
+const penStatusWorkflowSchema = v.pipe(
+  v.unknown(),
+  v.transform((value): StatusWorkflow | undefined => {
+    const parsed = v.safeParse(statusWorkflowSchema, value)
+    return parsed.success ? parsed.output : undefined
+  })
+)
+
 const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
   // The page's name. The format is single-page, so it belongs to the document.
@@ -337,6 +371,12 @@ const penDocumentSchema = v.looseObject({
    * Pencil clients ignore; without it a reopened document loses its rules.
    */
   designMemory: v.optional(penDesignMemorySchema),
+  /**
+   * The states the document's layers can be in, as Core keeps them on the document node. Pencil
+   * has no field for it, so it is an extension other Pencil clients ignore; without it a reopened
+   * document falls back to Figma's own two statuses.
+   */
+  statuses: v.optional(penStatusWorkflowSchema),
   children: v.array(nodeSchema)
 })
 

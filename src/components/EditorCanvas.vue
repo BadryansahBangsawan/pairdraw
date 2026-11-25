@@ -54,7 +54,7 @@ import { canvasChromeInsets } from '@/app/editor/canvas/chrome-insets'
 import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaboration-awareness'
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
 import { reportCanvasDrawFailure } from '@/app/editor/canvas/draw-failure'
-import { readCanvasOrigin, writeCanvasOrigin } from '@/app/editor/panes/origin'
+import { readCanvasOrigin, trackCanvasOrigin, writeCanvasOrigin } from '@/app/editor/panes/origin'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
@@ -152,16 +152,17 @@ function carryCanvasOrigin() {
   const element = sceneCanvasRef.value
   if (!element) return
   const box = element.getBoundingClientRect()
-  const previous = readCanvasOrigin(originKey())
-  writeCanvasOrigin(originKey(), { x: box.left, y: box.top })
-  if (!previous) return
-  const dx = previous.x - box.left
-  const dy = previous.y - box.top
-  if (dx !== 0 || dy !== 0) store.shiftPane(activePane(), dx, dy)
+  const shift = trackCanvasOrigin(
+    originKey(),
+    { x: box.left, y: box.top },
+    store.getPresentation() !== null
+  )
+  if (shift) store.shiftPane(activePane(), shift.dx, shift.dy)
 }
 
 // The layout moved the canvas on screen: pan the other way so the drawing stays where it was.
 const onViewportMove = (dx: number, dy: number) => {
+  // A preview or presentation fits its own view, so its stage moves do not pan the pane's drawing.
   if (paneProfile.value.live) return
   const previous = readCanvasOrigin(originKey())
   if (previous) writeCanvasOrigin(originKey(), { x: previous.x + dx, y: previous.y + dy })

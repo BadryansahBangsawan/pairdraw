@@ -36,7 +36,7 @@
   "onlineFontProviders": "Penyedia font online",
   "downloadMissingWebFonts": "Unduh web font yang hilang melalui penyedia yang aktif.",
   "fallbackPacks": "Pak fallback",
-  "downloadFallbackPacksDescription": "Unduh fallback CJK dan Arab sebelum membuka file yang membutuhkannya.",
+  "downloadFallbackPacksDescription": "Unduh fallback CJK dan Arab sebelum membuka berkas yang membutuhkannya.",
   "localFontAccessEnabled": "Akses font lokal aktif.",
   "localFontAccessNotGranted": "Akses font lokal tidak diizinkan.",
   "onlineFontProvidersEnabled": "Penyedia font online aktif.",

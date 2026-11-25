@@ -7,12 +7,12 @@
   "useThis": "Pakai ini",
   "useThisHint": "Ganti {name} dengan versi ini",
   "selectVersion": "Pilih versi untuk memakainya",
-  "goToOriginal": "Ke original",
+  "goToOriginal": "Ke aslinya",
   "discardAll": "Buang semua",
-  "originalChanged": "Original berubah sejak versi-versi ini dibuat.",
-  "originalMissing": "Original hilang, jadi tidak ada versi yang bisa menggantikannya.",
-  "originalInInstance": "Original berada di dalam instance, jadi tidak ada versi yang bisa menggantikannya.",
-  "originalLocked": "Original terkunci. Buka kuncinya untuk memakai sebuah versi.",
-  "originalNotEditable": "Original milik library, jadi tidak ada versi yang bisa menggantikannya di sini.",
+  "originalChanged": "Asli berubah sejak versi-versi ini dibuat.",
+  "originalMissing": "Asli hilang, jadi tidak ada versi yang bisa menggantikannya.",
+  "originalInInstance": "Asli berada di dalam instance, jadi tidak ada versi yang bisa menggantikannya.",
+  "originalLocked": "Asli terkunci. Buka kuncinya untuk memakai sebuah versi.",
+  "originalNotEditable": "Asli milik library, jadi tidak ada versi yang bisa menggantikannya di sini.",
   "versionTypeDiffers": "Versi ini adalah jenis layer yang berbeda dari original, jadi tidak bisa menggantikannya."
 }

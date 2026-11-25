@@ -24,7 +24,7 @@
   "deleteDraftFailed": "Tidak dapat menghapus draf “{name}”. Coba lagi.",
   "draftUnavailable": "Draf ini tidak lagi tersedia.",
   "recoveredChangesTitle": "Perubahan yang dipulihkan",
-  "recoveredChangesDescription": "“{name}” memiliki perubahan dari {time} yang tidak pernah disimpan ke file. Simpan ke file, simpan sebagai file baru, atau buang.",
+  "recoveredChangesDescription": "“{name}” memiliki perubahan dari {time} yang tidak pernah disimpan ke berkas. Simpan ke berkas, simpan sebagai berkas baru, atau buang.",
   "saveRecovered": "Simpan",
   "saveRecoveredAs": "Simpan Sebagai…",
   "discardRecovered": "Jangan Simpan",

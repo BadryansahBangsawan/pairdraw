@@ -1,6 +1,6 @@
 {
-  "file": "File",
-  "edit": "Edit",
+  "file": "Berkas",
+  "edit": "Ubah",
   "view": "Tampilan",
   "object": "Objek",
   "arrange": "Susun",
@@ -21,7 +21,7 @@
   "exportSelectionAsPPTX": "Ekspor seleksi sebagai PPTX",
   "exportSelectionAsDrawIO": "Ekspor seleksi sebagai draw.io",
   "exportSelectionAsFig": "Ekspor seleksi sebagai .fig",
-  "autosave": "Simpan otomatis ke file lokal",
+  "autosave": "Simpan otomatis ke berkas lokal",
   "closeTab": "Tutup tab",
   "selectPreviousTab": "Pilih tab sebelumnya",
   "selectNextTab": "Pilih tab berikutnya",

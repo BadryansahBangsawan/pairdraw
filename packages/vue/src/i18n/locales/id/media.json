@@ -2,14 +2,14 @@
   "vectorization": "Vektorisasi gambar",
   "vectorizationDescription": "Kirim layer gambar ke Recraft, fal.ai, atau QuiverAI untuk dikembalikan sebagai vector yang dapat diedit. Mungkin dikenakan biaya penyedia.",
   "vectorizeProvider": "Layanan vektorisasi",
-  "photoKeyWorks": "{service} menerima key ini.",
-  "photoKeyRejected": "{service} menolak key ini. Pastikan Anda menyalinnya lengkap.",
-  "unsplashKeyRejected": "Unsplash menolak key ini. Tempel Access Key aplikasi Anda, bukan Secret key-nya.",
-  "photoKeyRateLimited": "Key ini telah menggunakan seluruh kuota permintaan {service} untuk jam ini. Coba lagi nanti.",
+  "photoKeyWorks": "{service} menerima kunci ini.",
+  "photoKeyRejected": "{service} menolak kunci ini. Pastikan Anda menyalinnya lengkap.",
+  "unsplashKeyRejected": "Unsplash menolak kunci ini. Tempel Kunci akses aplikasi Anda, bukan kunci rahasianya.",
+  "photoKeyRateLimited": "Kunci ini telah menggunakan seluruh kuota permintaan {service} untuk jam ini. Coba lagi nanti.",
   "photoKeyUnreachable": "Tidak dapat menghubungi {service}. Periksa koneksi jaringan Anda.",
   "photoKeyCheckFailed": "{service} tidak menanggapi pengujian. Coba lagi nanti.",
   "imageAI": "Gambar AI",
-  "imageAIDescription": "Buat gambar, serta hapus atau ganti latarnya, dengan OpenAI atau layanan kompatibel OpenAI dan key Anda sendiri. Mungkin dikenakan biaya penyedia.",
+  "imageAIDescription": "Buat gambar, serta hapus atau ganti latarnya, dengan OpenAI atau layanan kompatibel OpenAI dan kunci Anda sendiri. Mungkin dikenakan biaya penyedia.",
   "imageAIProvider": "Layanan gambar",
   "imageAIProviderCompatible": "Kompatibel OpenAI",
   "imageAIBaseURL": "Base URL",
@@ -43,5 +43,5 @@
   "transparentBackground": "Latar transparan",
   "generate": "Buat",
   "replace": "Ganti",
-  "imageAIPromptNote": "Prompt Anda dikirim ke {service} dengan key Anda sendiri."
+  "imageAIPromptNote": "Prompt Anda dikirim ke {service} dengan kunci Anda sendiri."
 }

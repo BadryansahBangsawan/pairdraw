@@ -7,7 +7,7 @@
   "usageInput": "Input",
   "usageCachedInput": "Input cache",
   "usageOutput": "Output",
-  "usageReasoning": "Reasoning",
+  "usageReasoning": "Penalaran",
   "usageCost": "Estimasi biaya",
   "usageTurns": "{count} balasan",
   "usageHint": "Dihitung dari token yang dilaporkan setiap balasan. Biaya adalah estimasi pada harga resmi model.",

@@ -341,7 +341,7 @@ export function openRoomSession({
   // Nothing reads the connection clock once the tab holds the document: the room status that uses
   // it is live or alone from then on, so the poll stops rather than wake the tab twice a second.
   const connectionTimer = useIntervalFn(() => checkConnection(), tickMs, { immediate: false })
-  watch(
+  const stopDocumentWatch = watch(
     hasDocument,
     (has) => {
       if (has) connectionTimer.pause()
@@ -408,6 +408,7 @@ export function openRoomSession({
       documentSync.dispose()
       roomImages?.dispose()
       disposed = true
+      stopDocumentWatch()
       connectionTimer.pause()
       stopNameWatch()
       stopZoomWatch()

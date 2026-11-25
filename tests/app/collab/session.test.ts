@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
+import type { Ref } from 'vue'
 import type * as Y from 'yjs'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
@@ -297,6 +298,31 @@ describe('room sessions', () => {
 
         await settle()
         expect(joined.hasDocument.value).toBe(true)
+        expect(armedAt(armed, TICK_MS)).toBe(0)
+      })
+    })
+  })
+
+  test('lets go of the document watch when the session ends', async () => {
+    const TICK_MS = 778
+    await withIntervalArms(async (armed) => {
+      await withRooms(async (open, settle) => {
+        const host = newStore('Shared')
+        open({ roomId: ROOM_A, store: host, origin: 'shared', tickMs: TICK_MS }).shareDocument()
+        const joined = open({
+          roomId: ROOM_A,
+          store: newStore(),
+          origin: 'joined',
+          tickMs: TICK_MS
+        })
+        await settle()
+        expect(armedAt(armed, TICK_MS)).toBe(0)
+
+        joined.dispose()
+        // A session that has ended reacts to nothing: the document flag moving afterwards must not
+        // bring its poll back.
+        ;(joined.hasDocument as Ref<boolean>).value = false
+        await settle()
         expect(armedAt(armed, TICK_MS)).toBe(0)
       })
     })

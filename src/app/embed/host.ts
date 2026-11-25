@@ -20,7 +20,9 @@ export interface EmbedEditorHost {
    */
   load(name: string, data: Uint8Array): Promise<{ name: string }>
   /** The shown document as the format asked for: a `.fig` file unless `pen` names text. */
-  getDocument(format?: EmbedDocumentFormat): Promise<{ name: string; data: Uint8Array }>
+  getDocument(
+    format?: EmbedDocumentFormat
+  ): Promise<{ name: string; data: Uint8Array; warnings?: string[] }>
   getPages(): { pages: EmbedPage[]; currentPageId: string }
   setPage(pageId: string): Promise<void>
   getSelection(): string[]

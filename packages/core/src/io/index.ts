@@ -35,6 +35,7 @@ export type {
   ExportRequest,
   ExportAsset,
   ExportResult,
+  WriteDocumentWarning,
   HTMLExportOptions,
   PDFFormatExportOptions,
   IOContext,

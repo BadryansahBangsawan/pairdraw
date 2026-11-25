@@ -79,6 +79,8 @@ export function createDocumentSourceActions({
     return saved
   }
 
+  // The `.fig` writer reports nothing it cannot hold today. If it ever does, show it through
+  // `reportWriteWarnings` here, after `writeFile` returns true, as an export does.
   function buildFigFile() {
     const renderer = getRenderer()
     return exportFigFile(editor.graph, {

@@ -120,7 +120,9 @@ export function createEmbedEditorHost(): EmbedEditorHost {
         const written = await writableFormats.writeDocument('pen', store.graph)
         const text =
           typeof written.data === 'string' ? written.data : new TextDecoder().decode(written.data)
-        return { name: store.state.documentName, data: new TextEncoder().encode(text) }
+        const result = { name: store.state.documentName, data: new TextEncoder().encode(text) }
+        if (written.warnings) return { ...result, warnings: written.warnings }
+        return result
       }
       const renderer = store.renderer
       const data = await exportFigFile(store.graph, {

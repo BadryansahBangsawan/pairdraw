@@ -1,3 +1,5 @@
+import { uniqBy } from 'es-toolkit/array'
+
 import type { Editor, EditorState } from '@pairdraw/core'
 import type { BuiltinIOFormatId, ExportRequest, IORegistry } from '@pairdraw/core/io'
 
@@ -13,6 +15,7 @@ import {
   type ExportedFile
 } from '@/app/document/export/files'
 import type { ExportOptions } from '@/app/document/export/types'
+import { reportWriteWarnings } from '@/app/document/io/write/warnings'
 
 type DownloadBlob = (data: Uint8Array, filename: string, mime: string) => void
 
@@ -56,7 +59,7 @@ export function createDocumentExportActions(
       editor.renderer ? { canvasKit: editor.renderer.ck, renderer: editor.renderer } : undefined
     )
 
-    return {
+    const file: ExportedFile = {
       bytes: getExportBytes(result.data),
       fileName,
       format: format.label,
@@ -67,6 +70,8 @@ export function createDocumentExportActions(
         bytes: getExportBytes(content)
       }))
     }
+    if (result.warningDetails) file.warnings = result.warningDetails
+    return file
   }
 
   /** The name a zip of `file` and its assets is saved as: the file's, ending in `.zip`. */
@@ -103,7 +108,8 @@ export function createDocumentExportActions(
     formatId: string,
     options?: ExportOptions
   ) {
-    await saveExportFile(await renderExportFile(target, formatId, options))
+    const file = await renderExportFile(target, formatId, options)
+    if (await saveExportFile(file)) reportWriteWarnings(file.warnings ?? [])
   }
 
   // Export a batch of targets. A single file downloads directly; multiple files
@@ -121,16 +127,25 @@ export function createDocumentExportActions(
 
     const baseNames = new Set(requests.map((r) => getExportBaseName(editor.graph, r.target)))
     const zipBaseName = baseNames.size === 1 ? [...baseNames][0] : 'export'
-    if (files.length === 1) await saveExportFile(files[0])
-    else
-      await saveExportedFile(
-        bundleExportFiles(files),
-        `${zipBaseName}.zip`,
-        'ZIP',
-        '.zip',
-        'application/zip',
-        downloadBlob
+    const saved =
+      files.length === 1
+        ? await saveExportFile(files[0])
+        : await saveExportedFile(
+            bundleExportFiles(files),
+            `${zipBaseName}.zip`,
+            'ZIP',
+            '.zip',
+            'application/zip',
+            downloadBlob
+          )
+    if (!saved) return
+    // One toast for the batch, without repeating a loss two files reported alike.
+    reportWriteWarnings(
+      uniqBy(
+        files.flatMap((file) => file.warnings ?? []),
+        (warning) => JSON.stringify(warning)
       )
+    )
   }
 
   async function exportSelection(scale: number, formatId: BuiltinIOFormatId) {

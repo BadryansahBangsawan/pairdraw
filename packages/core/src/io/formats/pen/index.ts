@@ -14,7 +14,12 @@ import {
 } from '@pairdraw/pen'
 
 import { defaultIcons, drawIcon, type IconData, type IconProvider } from '#core/icons'
-import type { IOFormatAdapter, ReadDocumentInput, ReadDocumentWarning } from '#core/io/types'
+import type {
+  ExportResult,
+  IOFormatAdapter,
+  ReadDocumentInput,
+  ReadDocumentWarning
+} from '#core/io/types'
 import { layoutAuthoredNodes } from '#core/layout'
 
 import { loadPenFonts } from './fonts'
@@ -212,13 +217,14 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     const warnings: string[] = []
     const warningDetails: PenWriteWarning[] = []
     const data = writePenDocument(graph, { warnings, warningDetails })
-    return {
+    const written: ExportResult = {
       format: 'pen',
       mimeType: 'application/json',
       extension: 'pen',
       data,
-      encoding: 'utf8',
-      ...(warningDetails.length > 0 ? { warnings, warningDetails } : {})
+      encoding: 'utf8'
     }
+    if (warningDetails.length === 0) return written
+    return { ...written, warnings, warningDetails }
   }
 }

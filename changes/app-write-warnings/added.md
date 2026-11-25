@@ -1,0 +1,1 @@
+- Saving or exporting a file now says what the format could not hold, such as pages merged into the first one in a Pencil.dev file or variables a draw.io file cannot carry, once the save has succeeded.

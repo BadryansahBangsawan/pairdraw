@@ -144,6 +144,14 @@ describe('embed editor host', () => {
     expect(fig.data).not.toEqual(pen.data)
   })
 
+  test('says what a pen save could not hold', async () => {
+    await settle(host.load('card.fig', bytes()))
+    getActiveStore().graph.addPage('Second')
+    const pen = await host.getDocument('pen')
+
+    expect(pen.warnings?.join(' ')).toContain('2 pages were merged')
+  })
+
   test('keeps the shown document and its editability when a load fails', async () => {
     host.setEditable(true)
     const before = getActiveStore()

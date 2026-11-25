@@ -7,7 +7,8 @@ import {
   findPageId,
   type ExportRequest,
   type IOFormatAdapter,
-  type IORegistry
+  type IORegistry,
+  type WriteDocumentWarning
 } from '@pairdraw/core/io'
 import {
   headlessRenderNodes,
@@ -40,6 +41,8 @@ export interface ExportedFile {
   mime: string
   /** Files the main file refers to, saved beside it in a zip. */
   assets?: ExportedAsset[]
+  /** What the format could not hold, for the toast the save shows once it succeeded. */
+  warnings?: WriteDocumentWarning[]
 }
 
 // Layer/page names flow into zip entry keys; flatten them to a single safe

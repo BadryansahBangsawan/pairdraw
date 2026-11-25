@@ -316,15 +316,18 @@ async function writeDrawIO(graph: SceneGraph, target: DrawIOExportTarget): Promi
   const { sceneGraphToDrawIO } = await import('./formats/drawio')
   const { drawioWriteWarnings, drawioWriteWarningText } = await import('./formats/drawio/warnings')
   const warningDetails = drawioWriteWarnings(graph)
-  return {
+  const written: ExportResult = {
     format: 'drawio',
     mimeType: 'application/vnd.jgraph.mxfile',
     extension: 'drawio',
     data: writeDrawIOFile(sceneGraphToDrawIO(graph, target)),
-    encoding: 'utf8',
-    ...(warningDetails.length > 0
-      ? { warnings: warningDetails.map(drawioWriteWarningText), warningDetails }
-      : {})
+    encoding: 'utf8'
+  }
+  if (warningDetails.length === 0) return written
+  return {
+    ...written,
+    warnings: warningDetails.map(drawioWriteWarningText),
+    warningDetails
   }
 }
 

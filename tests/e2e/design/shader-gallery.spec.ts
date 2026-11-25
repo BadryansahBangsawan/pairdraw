@@ -158,3 +158,31 @@ test('WebGPU draws the frame of an applied gallery shader', async () => {
     .toEqual({ preset: galleryPreset('neonGrid'), drawn: true })
   ctx.canvas.assertNoErrors()
 })
+
+/** The presets added after the first nine, by the name the picker shows for each. */
+const NEW_GALLERY: readonly [string, string][] = [
+  ['liquidChrome', 'Liquid chrome'],
+  ['flutedGlass', 'Fluted glass'],
+  ['paperStock', 'Paper stock'],
+  ['godRays', 'God rays'],
+  ['thermal', 'Thermal'],
+  ['voronoiCells', 'Voronoi cells'],
+  ['deepWater', 'Deep water'],
+  ['smokePlume', 'Smoke plume'],
+  ['neonPulse', 'Neon pulse'],
+  ['grainWash', 'Grain wash'],
+  ['obsidian', 'Obsidian'],
+  ['marbleInk', 'Marble ink']
+]
+
+test('every shader added to the gallery applies in one click', async () => {
+  const page = ctx.page
+  const gallery = await openShaderGallery(page)
+  for (const [id, name] of NEW_GALLERY) {
+    await gallery.getByRole('radio', { name }).click()
+    await expect
+      .poll(async () => (await selectedShaders(page))[0]?.preset)
+      .toEqual(galleryPreset(id))
+  }
+  ctx.canvas.assertNoErrors()
+})

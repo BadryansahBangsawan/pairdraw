@@ -4,12 +4,24 @@ import { computed } from 'vue'
 import { colorToHexRaw, parseColor } from '@pairdraw/scene-graph/color'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import type { ShaderComponent } from '@pairdraw/scene-graph/shaders'
-import type { ShaderEffect, ShaderPropControl } from '@pairdraw/vue/controls/shader'
+import {
+  addStop,
+  removeStop,
+  setStopColor,
+  setStopPosition,
+  shaderShapeType,
+  shaderStops,
+  withShapeType,
+  type ShaderEffect,
+  type ShaderPropControl,
+  type ShaderStop
+} from '@pairdraw/vue/controls/shader'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { inputChecked } from '@pairdraw/vue/shared/dom-events'
 
 import ColorInput from '@/components/ColorPicker/ColorInput.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
+import IconButton from '@/components/ui/button/IconButton.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import PanelFieldGroup from '@/components/ui/panel/PanelFieldGroup.vue'
 import PanelGrid from '@/components/ui/panel/PanelGrid.vue'
@@ -69,6 +81,29 @@ function setPosition(prop: ShaderPropControl, axis: 'x' | 'y', percent: number) 
   emit('set', prop.key, { x: x / 100, y: y / 100, [axis]: percent / 100 })
 }
 
+/** The stops a gradient prop holds, as the panel lists them. */
+function stops(prop: ShaderPropControl): ShaderStop[] {
+  return shaderStops(value(prop))
+}
+
+/** The shape types an effect offers, as the library names them. */
+function shapeOptions(prop: ShaderPropControl): { label: string; value: string }[] {
+  if (prop.kind !== 'shape') return []
+  return prop.options.map((type) => ({ label: type, value: type }))
+}
+
+/** `prop`'s gradient with stop `index` repainted or moved, as one edit. */
+function setStop(
+  prop: ShaderPropControl,
+  index: number,
+  patch: { color?: string; position?: number }
+) {
+  let next = stops(prop)
+  if (patch.color !== undefined) next = setStopColor(next, index, patch.color)
+  if (patch.position !== undefined) next = setStopPosition(next, index, patch.position)
+  emit('set', prop.key, next)
+}
+
 function selectValue(prop: ShaderPropControl): string | number {
   const current = value(prop)
   return typeof current === 'string' || typeof current === 'number' ? current : ''
@@ -108,6 +143,56 @@ function selectValue(prop: ShaderPropControl): string | number {
           :data-property="`shader-${block.key}`"
           @update:model-value="emit('set', block.key, $event)"
         />
+      </PanelFieldGroup>
+      <PanelFieldGroup v-else-if="block.kind === 'shape'" :label="block.label">
+        <AppSelect
+          :model-value="shaderShapeType(value(block))"
+          :options="shapeOptions(block)"
+          :label="block.label"
+          :data-property="`shader-${block.key}`"
+          @update:model-value="emit('set', block.key, withShapeType(value(block), $event))"
+        />
+      </PanelFieldGroup>
+      <PanelFieldGroup v-else-if="block.kind === 'stops'" :label="block.label">
+        <div class="flex flex-col gap-1" data-slot="shader-stops">
+          <div
+            v-for="(stop, index) in stops(block)"
+            :key="index"
+            class="flex items-center gap-1.5"
+            data-slot="shader-stop"
+          >
+            <ColorInput
+              :color="parseColor(stop.color)"
+              editable
+              :data-property="`shader-${block.key}-${index}-color`"
+              @update="setStop(block, index, { color: `#${colorToHexRaw($event)}` })"
+            />
+            <NumberField
+              class="w-16 flex-none"
+              suffix="%"
+              :model-value="Math.round(stop.position * 100)"
+              :min="0"
+              :max="100"
+              :data-property="`shader-${block.key}-${index}-position`"
+              @commit="setStop(block, index, { position: $event / 100 })"
+            />
+            <IconButton
+              :label="panels.removeStop"
+              :disabled="stops(block).length <= 2"
+              :data-property="`shader-${block.key}-${index}-remove`"
+              @click="emit('set', block.key, removeStop(stops(block), index))"
+            >
+              <icon-lucide-x class="size-3" />
+            </IconButton>
+          </div>
+          <IconButton
+            :label="panels.addStop"
+            :data-property="`shader-${block.key}-add`"
+            @click="emit('set', block.key, addStop(stops(block)))"
+          >
+            <icon-lucide-plus class="size-3" />
+          </IconButton>
+        </div>
       </PanelFieldGroup>
       <label
         v-else-if="block.kind === 'checkbox'"

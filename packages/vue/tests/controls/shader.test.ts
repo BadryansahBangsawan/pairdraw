@@ -68,6 +68,21 @@ describe('shader catalog', () => {
     })
     expect(aurora?.props.find((prop) => prop.key === 'center')).toMatchObject({ kind: 'position' })
   })
+
+  test('gives a gradient stops editor and a shape picker', async () => {
+    const catalog = await loadShaderCatalog()
+    const heatmap = catalog.find((effect) => effect.name === 'Heatmap')
+    const liquidMetal = catalog.find((effect) => effect.name === 'LiquidMetal')
+
+    expect(heatmap?.props.find((prop) => prop.key === 'stops')).toMatchObject({
+      kind: 'stops',
+      label: 'Colors'
+    })
+    expect(liquidMetal?.props.find((prop) => prop.key === 'shape')).toMatchObject({
+      kind: 'shape',
+      options: ['sphere3D', 'dot', 'bars', 'streak']
+    })
+  })
 })
 
 /** Props every effect takes from the preset renderer itself rather than from its own controls. */

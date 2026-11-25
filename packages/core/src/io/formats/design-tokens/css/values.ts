@@ -120,12 +120,7 @@ function firstFamily(css: string): string | undefined {
 }
 
 /**
- * A custom property's value as a token: a color, a number in a token unit, a quoted string, a
- * font family where the property names fonts, a `var()` reference, a numeric expression, or
- * something no variable holds, such as a shadow.
- */
-/**
- * A CSS colour in the document's profile: hex, `rgb()`, `hsl()` and `hwb()` give their numbers as
+ * A CSS color in the document's profile: hex, `rgb()`, `hsl()` and `hwb()` give their numbers as
  * the document's own, as an imported stylesheet writes them, and a color that names its space,
  * such as `oklch()` or `color(display-p3 …)`, is converted into that profile.
  */
@@ -135,6 +130,11 @@ function readColor(value: string, profile: ColorProfile): Color | null {
   return tryParseColor(value, profile)
 }
 
+/**
+ * A custom property's value as a token: a color, a number in a token unit, a quoted string, a
+ * font family where the property names fonts, a `var()` reference, a numeric expression, or
+ * something no variable holds, such as a shadow.
+ */
 export function readCSSTokenValue(
   css: string,
   { font = false, profile = 'srgb' }: { font?: boolean; profile?: ColorProfile } = {}

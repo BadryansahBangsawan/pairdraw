@@ -33,8 +33,9 @@ export function variableTokenType(variable: Variable): DesignTokenType {
 
 /**
  * A color as DTCG 2025.10 writes it: components in the document's profile, alpha, and the hex
- * code tools display. The hex is the sRGB color it shows, which is the stored color in an sRGB
- * document and the nearest sRGB color in Display P3, where the components can pass 1.
+ * code tools display. The hex is the sRGB code of those components clamped to sRGB, which is the
+ * stored color in an sRGB document and an approximation in Display P3, where components can
+ * pass 1.
  */
 export function colorTokenValue(color: Color, profile: ColorProfile = 'srgb') {
   const shown = profile === 'srgb' ? color : convertColor(color, profile, 'srgb')

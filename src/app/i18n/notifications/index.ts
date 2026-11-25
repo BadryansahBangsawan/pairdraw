@@ -84,8 +84,59 @@ const notificationMessageDefaults = {
   placeImageUnsupported: 'Choose a PNG, JPEG, WebP, GIF, AVIF, or SVG file to place.',
   placeImageFailed: params('Could not place the files: {error}'),
   exportPDFEmpty: 'This page has no frames to export.',
-  exportPDFFailed: params('Could not export the PDF: {error}')
+  exportPDFFailed: params('Could not export the PDF: {error}'),
+  penMergedPages: params(
+    'Pencil.dev files hold one page; {pages} pages were merged into “{name}”.'
+  ),
+  penColorsToSRGB:
+    'Colours are written as sRGB hex, the only form a Pencil.dev file holds; a Display P3 colour outside sRGB is written as the nearest sRGB colour.',
+  penMissingImageFillsOne:
+    'An image fill was left out because its image data is missing; Pencil.dev files cannot hold a paint without its image.',
+  penMissingImageFillsMany: params(
+    '{count} image fills were left out because their image data is missing; Pencil.dev files cannot hold a paint without its image.'
+  ),
+  penDroppedEffectsOne:
+    'A noise or texture effect was left out; Pencil.dev files have no form for it.',
+  penDroppedEffectsMany: params(
+    '{count} noise and texture effects were left out; Pencil.dev files have no form for them.'
+  ),
+  penDroppedFiltersOne:
+    'An image adjustment filter was left out; Pencil.dev files have no form for it.',
+  penDroppedFiltersMany: params(
+    '{count} image adjustment filters were left out; Pencil.dev files have no form for them.'
+  ),
+  penDroppedScrollOne:
+    'A layer’s scroll overflow was left out; Pencil.dev files have no form for it.',
+  penDroppedScrollMany: params(
+    'Scroll overflow was left out on {count} layers; Pencil.dev files have no form for it.'
+  ),
+  penDroppedFontFeaturesOne:
+    'A layer’s OpenType font features were left out; Pencil.dev files have no form for them.',
+  penDroppedFontFeaturesMany: params(
+    'OpenType font features were left out on {count} layers; Pencil.dev files have no form for them.'
+  ),
+  penLibraryDefinitionsOne:
+    'Library components came from one enabled library, whose definitions Pencil.dev files do not hold; re-enable that library after reopening to restore them.',
+  penLibraryDefinitionsMany: params(
+    'Library components came from {count} enabled libraries, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.'
+  ),
+  drawioUnboundVariablesNoLayers: params(
+    'draw.io has no variables: {variables} in {collections} ({names}) not written.'
+  ),
+  drawioUnboundVariablesOneLayer: params(
+    'draw.io has no variables: {variables} in {collections} ({names}) not written, and the layer that uses them lost its binding.'
+  ),
+  drawioUnboundVariablesManyLayers: params(
+    'draw.io has no variables: {variables} in {collections} ({names}) not written, and {layers} layers that use them lost their bindings.'
+  ),
+  oneVariable: '1 variable',
+  manyVariables: params('{count} variables'),
+  oneCollection: '1 collection',
+  manyCollections: params('{count} collections'),
+  writeWarningsMore: params('and {count} more could not be saved.')
 } as const
+
+export { notificationMessageDefaults }
 
 const localeLoaders = {
   de: () => import('./locales/de.json'),

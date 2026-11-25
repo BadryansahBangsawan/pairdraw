@@ -25,19 +25,29 @@ export async function watchTauriFile(
   return () => unwatch()
 }
 
+export interface WatchBrowserFileOptions {
+  /** How often the handle is read; a test passes a shorter span. */
+  pollMs?: number
+}
+
 export async function watchBrowserFile(
   fileHandle: FileSystemFileHandle,
   getActiveFileHandle: () => FileSystemFileHandle | null,
   getLastWriteTime: () => number,
   onDiskChange: () => void,
-  stopWatchingFile: () => void
+  stopWatchingFile: () => void,
+  options: WatchBrowserFileOptions = {}
 ) {
   let lastModified = (await fileHandle.getFile()).lastModified
   const { pause, resume } = useIntervalFn(
     () => {
-      void checkBrowserFileModified(fileHandle)
+      // A hidden tab shows nothing a change on disk would update, and the first tick after it is
+      // shown reads the file anyway, so it is not read in the background at all.
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        void checkBrowserFileModified(fileHandle)
+      }
     },
-    BROWSER_POLL_MS,
+    options.pollMs ?? BROWSER_POLL_MS,
     { immediate: false }
   )
   resume()

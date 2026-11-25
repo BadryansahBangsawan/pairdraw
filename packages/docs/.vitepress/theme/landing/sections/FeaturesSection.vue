@@ -107,6 +107,7 @@ const cursorLayer = useTemplateRef<HTMLElement>('cursorLayer')
 const { width: cursorWidth } = useElementSize(cursorLayer)
 const cursorAt = ref<Vector | null>(null)
 const press = ref(0)
+const hasPressed = ref(false)
 
 function placeCursor(): void {
   const layer = cursorLayer.value
@@ -117,7 +118,7 @@ function placeCursor(): void {
   const box = layer.getBoundingClientRect()
   const tab = trigger.getBoundingClientRect()
   cursorAt.value = {
-    x: tab.left - box.left + tab.width * 0.82,
+    x: tab.left - box.left + tab.width * 0.62,
     y: tab.top - box.top + tab.height / 2 - 10
   }
 }
@@ -130,7 +131,10 @@ watch(
   },
   { immediate: true }
 )
-watch(active, () => press.value++)
+watch(active, () => {
+  hasPressed.value = true
+  press.value++
+})
 </script>
 
 <template>
@@ -174,7 +178,7 @@ watch(active, () => press.value++)
                 <CanvasCursor :name="AGENT" actor="agent">
                   <template #icon><IconSparkles /></template>
                 </CanvasCursor>
-                <span :key="press" class="press" />
+                <span v-if="hasPressed" :key="press" class="press" />
               </span>
             </div>
             <div class="panels">

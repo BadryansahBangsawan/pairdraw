@@ -34,6 +34,8 @@ html:has(.landing-home) {
   --lp-column: min(1200px, 100% - 2 * var(--lp-gutter));
   /* An easing for things that arrive and settle. */
   --lp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* One step between things that arrive together, so they read in order. */
+  --lp-stagger: 50ms;
   /* Shared pieces styled with the docs theme's variables read the landing's palette here. */
   --vp-c-divider: var(--lp-line);
   --vp-c-bg-soft: var(--lp-surface);
@@ -145,6 +147,176 @@ html:has(.landing-home) .VPLocalNav {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/*
+ * A frame on the page is drawn when it comes into view: the editor's selection, with its corner
+ * handles, first, then what the frame holds. Scroll-driven, so it costs no frame loop; where the
+ * browser has no scroll timelines, or the visitor asked for less motion, the frame is simply
+ * there.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-home [data-draw] {
+      position: relative;
+      --lp-draw-radius: 0px;
+      view-timeline-name: --lp-draw;
+      view-timeline-axis: block;
+    }
+
+    .landing-home .tabs[data-draw] {
+      --lp-draw-radius: 20px;
+    }
+
+    .landing-home .terminal[data-draw] {
+      --lp-draw-radius: 18px;
+    }
+
+    /* The box: a corner drag out from the top left, then the frame's own edges. */
+    .landing-home [data-draw]::before {
+      position: absolute;
+      z-index: 2;
+      inset: 5px;
+      border: 1.5px solid var(--lp-agent);
+      border-radius: max(0px, calc(var(--lp-draw-radius) - 5px));
+      content: '';
+      pointer-events: none;
+      animation-name: lp-draw-box;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-draw;
+      animation-range: entry 4% entry 60%;
+    }
+
+    /* Once the frame has arrived, the selection lets go, and stays gone on the way back up. */
+    .landing-home [data-draw][data-drawn]::before {
+      animation-name: lp-draw-box, lp-draw-leave;
+      animation-timeline: --lp-draw, auto;
+      animation-duration: auto, 480ms;
+      animation-delay: 0s, 900ms;
+      animation-fill-mode: both, both;
+      animation-timing-function: var(--lp-ease-out), var(--lp-ease-out);
+    }
+
+    /* The handles sit in an unrounded layer, so the frame's radius never clips them. */
+    .landing-home [data-draw]::after {
+      position: absolute;
+      z-index: 3;
+      inset: 5px;
+      /* White face first, violet border under it: two layers per corner. */
+      background-image:
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent)),
+        linear-gradient(#fff, #fff), linear-gradient(var(--lp-agent), var(--lp-agent));
+      background-repeat: no-repeat;
+      background-size:
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px,
+        5px 5px,
+        8px 8px;
+      background-position:
+        1.5px 1.5px,
+        0 0,
+        calc(100% - 1.5px) 1.5px,
+        100% 0,
+        1.5px calc(100% - 1.5px),
+        0 100%,
+        calc(100% - 1.5px) calc(100% - 1.5px),
+        100% 100%;
+      border-radius: 0;
+      content: '';
+      pointer-events: none;
+      animation-name: lp-handles;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-draw;
+      animation-range: entry 20% entry 60%;
+    }
+
+    .landing-home [data-draw][data-drawn]::after {
+      animation-name: lp-handles, lp-draw-leave;
+      animation-timeline: --lp-draw, auto;
+      animation-duration: auto, 480ms;
+      animation-delay: 0s, 900ms;
+      animation-fill-mode: both, both;
+      animation-timing-function: var(--lp-ease-out), var(--lp-ease-out);
+    }
+
+    /* What the frame holds fills in once, the first time it is seen; the box then lets go. */
+    .lp-draw-ready [data-draw]:not([data-drawn]) > * {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+    }
+
+    .lp-draw-ready [data-draw][data-drawn] > * {
+      animation-name: lp-draw-content;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-duration: 520ms;
+      animation-delay: calc(var(--i, 0) * var(--lp-stagger));
+    }
+
+    .landing-home [data-draw] > :nth-child(2) {
+      --i: 1;
+    }
+
+    .landing-home [data-draw] > :nth-child(3) {
+      --i: 2;
+    }
+
+    .landing-home [data-draw] > :nth-child(n + 4) {
+      --i: 3;
+    }
+  }
+
+  @keyframes lp-draw-box {
+    from {
+      clip-path: inset(0 100% 100% 0);
+      opacity: 0;
+    }
+
+    12% {
+      opacity: 1;
+    }
+
+    to {
+      clip-path: inset(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes lp-handles {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes lp-draw-leave {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lp-draw-content {
+    from {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+    }
+
+    to {
+      clip-path: inset(0);
+      opacity: 1;
+    }
+  }
 }
 
 @media (max-width: 900px) {

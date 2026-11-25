@@ -20,13 +20,9 @@ const messages = useLandingMessages()
 const ROWS = ['frame', 'heading', 'comment', 'lead'] as const
 const active = computed(() => ROWS.indexOf(scene.active.layer))
 
-const headingDetail = computed(() => {
-  const heading = messages.value.hero.layer.heading
-  const texts = { adding: heading.adding, writing: heading.writing }
-  const text =
-    scene.status === 'adding' || scene.status === 'writing' ? texts[scene.status] : heading.detail
-  return fill(text, { agent: AGENT })
-})
+const headingDetail = computed(() =>
+  fill(messages.value.hero.layer.heading.detail, { agent: AGENT })
+)
 </script>
 
 <template>

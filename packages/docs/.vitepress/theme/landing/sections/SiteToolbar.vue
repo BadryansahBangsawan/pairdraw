@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { withBase } from 'vitepress'
 import IconDownload from '~icons/lucide/download'
-import IconGithub from '~icons/lucide/github'
+import IconGithub from '~icons/simple-icons/github'
 
 import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'

@@ -16,10 +16,66 @@ const ICONS = [IconHardDrive, IconKeyRound, IconUsers]
   <section class="lp-section" aria-labelledby="privacy-title">
     <div class="lp-column">
       <span class="lp-frame-title">{{ messages.privacy.frame }}</span>
-      <div class="frame">
+      <div class="frame" data-draw>
         <div class="copy">
           <h2 id="privacy-title">{{ messages.privacy.title }}</h2>
           <p>{{ messages.privacy.lede }}</p>
+          <figure class="wire" aria-hidden="true">
+            <svg viewBox="0 0 300 100" fill="none">
+              <g class="machine">
+                <rect x="8" y="14" width="100" height="68" rx="4" fill="var(--lp-night-2)" />
+                <rect
+                  x="9"
+                  y="15"
+                  width="98"
+                  height="66"
+                  rx="3"
+                  stroke="var(--lp-night-muted)"
+                  stroke-width="2"
+                />
+                <rect x="20" y="24" width="76" height="48" rx="2" fill="#fff" />
+                <path d="M29 35h58M29 45h48M29 55h58" stroke="var(--lp-ink)" stroke-width="2" />
+                <path d="M0 88h116" stroke="var(--lp-night-muted)" stroke-width="3" />
+              </g>
+              <g class="cloud">
+                <path
+                  d="M225 58c-4.4 0-8-3.4-8-7.6 0-4.1 3.5-7.4 7.7-7.6 1-8.1 8.2-14.4 16.8-14.4 7.7 0 14.3 4.9 16.3 11.8 9 .4 16 7.2 16 15.5 0 8.6-7.4 15.5-16.5 15.5H225Z"
+                  fill="#3f404b"
+                  stroke="var(--lp-night-muted)"
+                  stroke-width="2"
+                />
+                <path d="M226 41h26M233 47h18" stroke="var(--lp-night-muted)" stroke-width="2" />
+              </g>
+              <g class="wire-line">
+                <path
+                  d="M110 58h12"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+                <path
+                  class="strand"
+                  d="M122 58h34"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+                <path
+                  class="strand b"
+                  d="M160 55h46"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+                <path
+                  d="M206 55h10"
+                  stroke="var(--lp-agent)"
+                  stroke-width="2.5"
+                  stroke-dasharray="6 6"
+                />
+              </g>
+            </svg>
+          </figure>
           <a :href="localePath(LINKS.privacy, { translated: false })">{{
             messages.privacy.link
           }}</a>
@@ -81,6 +137,56 @@ h2 {
 
 .copy a:focus-visible {
   outline-color: #fff;
+}
+
+/* The document stays on the machine; the line to the cloud breaks as the frame is seen. */
+.wire {
+  width: min(300px, 100%);
+}
+
+.wire svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .wire {
+      view-timeline-name: --lp-wire;
+      view-timeline-axis: block;
+    }
+
+    .strand {
+      animation-name: lp-wire-break;
+      animation-fill-mode: both;
+      animation-timing-function: var(--lp-ease-out);
+      animation-timeline: --lp-wire;
+      animation-range: entry 10% cover 35%;
+    }
+
+    .strand {
+      --wire-shift: -6px;
+    }
+
+    .strand.b {
+      --wire-shift: 6px;
+      animation-delay: var(--lp-stagger);
+    }
+  }
+
+  @keyframes lp-wire-break {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateX(var(--wire-shift, 6px));
+    }
+  }
 }
 
 li {

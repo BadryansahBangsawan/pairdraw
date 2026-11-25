@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import IconDownload from '~icons/lucide/download'
-import IconGithub from '~icons/lucide/github'
-import IconLoader from '~icons/lucide/loader'
 import IconPause from '~icons/lucide/pause'
 import IconPlay from '~icons/lucide/play'
 import IconSparkles from '~icons/lucide/sparkles'
+import IconGithub from '~icons/simple-icons/github'
 
 import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'
-import { fill } from '../content/messages/fill'
 import { AGENT, HUMAN } from '../content/people'
 import type { VisitorSystem } from '../download/visitor'
 import HeroLayers from '../hero/HeroLayers.vue'
 import HeroSelection from '../hero/HeroSelection.vue'
 import HeroThread from '../hero/HeroThread.vue'
-import PersonBadge from '../hero/PersonBadge.vue'
-import { heroScene, typedHeadline, type HeroScene } from '../hero/storyboard'
+import { heroScene, type HeroScene } from '../hero/storyboard'
 import { useHeroLayout } from '../hero/useHeroLayout'
 import { useStoryboard } from '../hero/useStoryboard'
 import CanvasCursor from '../ui/CanvasCursor.vue'
@@ -25,9 +22,9 @@ import { useDownloadLabel } from '../ui/useDownloadLabel'
 import { useSceneActivity } from '../ui/useSceneActivity'
 
 /**
- * The page opens on a frame of the canvas, where a person asks the agent for the headline and
- * the agent draws its box, types it, and answers her comment. The heading is the layer the
- * agent edits; screen readers and search read it whole, whatever the scene shows.
+ * The page opens on a frame of the canvas with its copy already written: the agent draws the
+ * headline's box and answers the person's comment on it. The heading is the layer the agent
+ * edits; screen readers and search read it whole, whatever the scene shows.
  */
 const { system } = defineProps<{ system: VisitorSystem | null }>()
 
@@ -37,7 +34,6 @@ const downloadLabel = useDownloadLabel(() => system)
 
 const frame = useTemplateRef<HTMLElement>('frame')
 const headline = useTemplateRef<HTMLElement>('headline')
-const prompt = useTemplateRef<HTMLElement>('prompt')
 const comment = useTemplateRef<HTMLElement>('comment')
 
 const paused = ref(false)
@@ -47,13 +43,8 @@ const { step, clearing, loops } = useStoryboard(playing, reduced)
 const scene = computed<HeroScene>(() => heroScene(step.value))
 /** After the first loop the request has been made, and what it produced stays on the page. */
 const later = computed(() => loops.value > 0)
-const typed = computed(() => typedHeadline(messages.value.hero.title, scene.value.typed))
-const typing = computed(() => scene.value.typed !== 'none' && scene.value.typed !== 'all')
-const statusText = computed(() =>
-  scene.value.status ? fill(messages.value.hero.status[scene.value.status], { agent: AGENT }) : ''
-)
 
-const layout = useHeroLayout({ frame, headline, prompt, comment })
+const layout = useHeroLayout({ frame, headline, comment })
 
 const agentAt = computed(() => layout.agent[scene.value.agent])
 const humanAt = computed(() => (scene.value.human ? layout.human : layout.enter))
@@ -81,9 +72,7 @@ const humanAt = computed(() => (scene.value.human ? layout.human : layout.enter)
       <div ref="headline" class="headline">
         <h1 id="hero-title" :aria-label="messages.hero.title">
           <span class="ghost">{{ messages.hero.title }}</span>
-          <span class="typed" aria-hidden="true"
-            >{{ typed }}<span v-if="typing" class="caret"
-          /></span>
+          <span class="typed" aria-hidden="true">{{ messages.hero.title }}</span>
         </h1>
         <HeroSelection
           class="selection"
@@ -96,18 +85,6 @@ const humanAt = computed(() => (scene.value.human ? layout.human : layout.enter)
 
       <div class="lead-slot">
         <p class="lead" :data-show="scene.lead || later || undefined">{{ messages.hero.lede }}</p>
-        <div
-          ref="prompt"
-          class="prompt"
-          :data-show="(scene.status !== null && !later) || undefined"
-          aria-hidden="true"
-        >
-          <div class="request">
-            <PersonBadge :name="HUMAN" actor="human" />
-            <p>{{ messages.hero.prompt }}</p>
-          </div>
-          <span class="status"><IconLoader class="spinner" />{{ statusText }}</span>
-        </div>
       </div>
 
       <div class="actions" :data-show="scene.actions || later || undefined">
@@ -253,15 +230,6 @@ h1 {
   visibility: hidden;
 }
 
-.caret {
-  display: inline-block;
-  width: 0.05em;
-  height: 0.78em;
-  margin-left: 0.04em;
-  background: var(--lp-agent);
-  vertical-align: -0.04em;
-}
-
 .lead-slot {
   position: relative;
   margin-top: 64px;
@@ -272,64 +240,6 @@ h1 {
   color: var(--lp-muted);
   font-size: clamp(19px, 1.7vw, 24px);
   line-height: 1.42;
-}
-
-/* The request sits where the lead will be, and gives way to it. */
-.prompt {
-  position: absolute;
-  z-index: 2;
-  top: -20px;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-  width: min(620px, 100%);
-}
-
-.request {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  padding: 18px;
-  border: 1px solid var(--lp-line);
-  border-radius: 16px;
-  background: var(--lp-surface);
-  box-shadow: 0 12px 32px rgb(21 22 26 / 0.08);
-}
-
-.request p {
-  font-size: clamp(17px, 1.4vw, 20px);
-  line-height: 1.4;
-}
-
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 20px;
-  background: var(--lp-agent-soft);
-  color: var(--lp-agent-ink);
-  font-family: var(--lp-mono);
-  font-size: 14px;
-}
-
-.spinner {
-  width: 14px;
-  height: 14px;
-  animation: hero-spin 1.2s linear infinite paused;
-}
-
-.frame[data-playing] .spinner {
-  animation-play-state: running;
-}
-
-@keyframes hero-spin {
-  to {
-    transform: rotate(1turn);
-  }
 }
 
 .actions {
@@ -362,7 +272,6 @@ h1 {
 
 /* What the scene has not reached yet waits out of sight, a few pixels short of its place. */
 .lead,
-.prompt,
 .actions,
 .fine-print,
 .comment {
@@ -374,17 +283,12 @@ h1 {
     transform 450ms var(--lp-ease-out);
 }
 
-.prompt {
-  transform: scale(0.98);
-  transform-origin: 0 100%;
-}
-
 .comment {
   transform: translateY(8px) scale(0.96);
   transform-origin: 0 0;
 }
 
-:is(.lead, .prompt, .actions, .fine-print, .comment)[data-show] {
+:is(.lead, .actions, .fine-print, .comment)[data-show] {
   visibility: visible;
   opacity: 1;
   transform: none;
@@ -478,10 +382,6 @@ h1 {
     margin-top: 24px;
   }
 
-  .request p {
-    font-size: 16px;
-  }
-
   .actions :deep(a) {
     flex: 1 1 auto;
     justify-content: center;
@@ -501,19 +401,7 @@ h1 {
     transform: none;
   }
 
-  .frame .prompt {
-    display: none;
-  }
-
-  .frame .ghost {
-    visibility: visible;
-  }
-
-  .frame .typed {
-    visibility: hidden;
-  }
-
-  .frame :is(.lead, .actions, .fine-print, .comment, .track, .track-y, .spinner) {
+  .frame :is(.lead, .actions, .fine-print, .comment, .track, .track-y) {
     animation: none;
     transition: none;
   }
@@ -527,12 +415,8 @@ h1 {
     transform: none;
   }
 
-  .frame :is(.prompt, .comment, .track) {
+  .frame :is(.comment, .track) {
     display: none;
-  }
-
-  .frame .ghost {
-    visibility: visible;
   }
 }
 </style>

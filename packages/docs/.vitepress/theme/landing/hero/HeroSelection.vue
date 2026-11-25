@@ -16,7 +16,7 @@ const { box, width, height, label } = defineProps<{
 }>()
 
 const edges = computed(() => {
-  const fraction = { none: 0, drawing: DRAW_FRACTION, sized: 1 }[box]
+  const fraction = { drawing: DRAW_FRACTION, sized: 1 }[box]
   return {
     top: `scaleX(${fraction})`,
     left: `scaleY(${fraction})`,
@@ -61,10 +61,6 @@ const HANDLES = ['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'] as const
 .selection[data-box='drawing'] .edge {
   transition-duration: 350ms;
   transition-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
-}
-
-.selection[data-box='none'] .edge {
-  opacity: 0;
 }
 
 .edge.top,

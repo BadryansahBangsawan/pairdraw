@@ -2,7 +2,7 @@
 import { useData } from 'vitepress'
 import { computed } from 'vue'
 import IconArrowDown from '~icons/lucide/arrow-down'
-import IconGithub from '~icons/lucide/github'
+import IconGithub from '~icons/simple-icons/github'
 
 import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'

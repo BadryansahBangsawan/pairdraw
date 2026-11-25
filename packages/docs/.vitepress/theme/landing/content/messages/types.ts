@@ -47,9 +47,6 @@ export interface LandingMessages {
     downloadAny: string
     github: string
     finePrint: string
-    /** What the person asks the agent at the start of the scene. */
-    prompt: string
-    status: { reading: string; adding: string; writing: string }
     comment: string
     reply: string
     /** When the comment was written. */
@@ -60,7 +57,7 @@ export interface LandingMessages {
     layers: string
     layer: {
       frame: LayerRowMessages
-      heading: LayerRowMessages & { adding: string; writing: string }
+      heading: LayerRowMessages
       comment: LayerRowMessages
       lead: LayerRowMessages
     }

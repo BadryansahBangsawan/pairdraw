@@ -23,12 +23,6 @@ export const ru: LandingMessages = {
     github: 'Открыть на GitHub',
     finePrint:
       'Бесплатно для macOS, Windows и Linux. Подключите свою модель или агента для программирования.',
-    prompt: 'Напиши заголовок hero: «Дизайн рядом с вашим агентом.» Уложи его в две строки.',
-    status: {
-      reading: '{agent} читает страницу',
-      adding: '{agent} добавляет H1',
-      writing: '{agent} пишет H1'
-    },
     comment: 'Оставь заголовок в две строки.',
     reply: 'Ширина теперь 890, чтобы перенос был после «рядом».',
     now: 'сейчас',
@@ -38,8 +32,6 @@ export const ru: LandingMessages = {
       frame: { name: 'Фрейм Hero', detail: 'Фрейм, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} добавляет слой',
-        writing: '{agent} пишет текст',
         detail: '{agent} меняет размер'
       },
       comment: { name: 'Комментарий', detail: '{human}, 1 ответ' },

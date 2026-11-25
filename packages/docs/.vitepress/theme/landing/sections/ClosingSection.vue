@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
 import { ref, useTemplateRef } from 'vue'
-import IconApple from '~icons/lucide/apple'
 import IconDownload from '~icons/lucide/download'
-import IconMonitor from '~icons/lucide/monitor'
 import IconSparkles from '~icons/lucide/sparkles'
-import IconTerminal from '~icons/lucide/terminal'
+import IconApple from '~icons/simple-icons/apple'
+import IconLinux from '~icons/simple-icons/linux'
+import IconWindows from '~icons/simple-icons/windows'
 
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
@@ -29,18 +29,41 @@ const { system } = defineProps<{ system: VisitorSystem | null }>()
 const messages = useLandingMessages()
 const localePath = useLocalePath()
 const downloadLabel = useDownloadLabel(() => system)
-const ICONS = { mac: IconApple, windows: IconMonitor, linux: IconTerminal }
+const ICONS = { mac: IconApple, windows: IconWindows, linux: IconLinux }
 
 const frame = useTemplateRef<HTMLElement>('frame')
 const action = useTemplateRef<HTMLElement>('action')
 const reduced = usePrefersReducedMotion()
 /** The visitor's pointer, from the button's corner, while it is in the frame. */
 const you = ref<Vector | null>(null)
+/** The pointer is over copy or a control, where the visitor's name would cover what they use. */
+const hidden = ref(false)
 let pending: Vector | null = null
 let frameRequest = 0
 
+/** Copy and controls the visitor's name must never sit on, while their pointer is over them. */
+const AVOID_CURSOR = 'h2, .action, .platforms'
+
+function clearYou(): void {
+  cancelAnimationFrame(frameRequest)
+  frameRequest = 0
+  pending = null
+  you.value = null
+}
+
+function hideYou(): void {
+  hidden.value = true
+  clearYou()
+}
+
 function follow(event: PointerEvent): void {
   if (event.pointerType !== 'mouse' || reduced.value || !action.value) return
+  const target = event.target
+  if (target instanceof Element && target.closest(AVOID_CURSOR)) {
+    hideYou()
+    return
+  }
+  hidden.value = false
   const box = action.value.getBoundingClientRect()
   pending = { x: event.clientX - box.left + 2, y: event.clientY - box.top + 4 }
   // One update a frame, however often the pointer reports.
@@ -52,9 +75,8 @@ function follow(event: PointerEvent): void {
 
 useEventListener(frame, 'pointermove', follow, { passive: true })
 useEventListener(frame, 'pointerleave', () => {
-  cancelAnimationFrame(frameRequest)
-  frameRequest = 0
-  you.value = null
+  hidden.value = false
+  clearYou()
 })
 </script>
 
@@ -62,7 +84,7 @@ useEventListener(frame, 'pointerleave', () => {
   <section class="lp-section" aria-labelledby="closing-title">
     <div class="lp-column">
       <span class="lp-frame-title">{{ messages.closing.frame }}</span>
-      <div ref="frame" class="frame" :data-following="you ? true : undefined">
+      <div ref="frame" class="frame" data-draw :data-following="you ? true : undefined">
         <div class="copy">
           <h2 id="closing-title">{{ messages.closing.title }}</h2>
           <div ref="action" class="action">
@@ -82,6 +104,7 @@ useEventListener(frame, 'pointerleave', () => {
               </CanvasCursor>
             </span>
             <span
+              v-if="!hidden"
               class="you"
               aria-hidden="true"
               :style="you ? { transform: `translate(${you.x}px, ${you.y}px)` } : undefined"

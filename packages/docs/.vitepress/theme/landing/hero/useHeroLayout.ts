@@ -10,7 +10,6 @@ type Point = Vector
 export interface HeroLayoutElements {
   frame: Ref<HTMLElement | null>
   headline: Ref<HTMLElement | null>
-  prompt: Ref<HTMLElement | null>
   comment: Ref<HTMLElement | null>
 }
 
@@ -47,33 +46,25 @@ const CURSOR_ROOM = 130
  * Measures the layers the hero scene points at, and again whenever the frame or one of them
  * changes size, as the heading does when its typeface arrives.
  */
-export function useHeroLayout({
-  frame,
-  headline,
-  prompt,
-  comment
-}: HeroLayoutElements): HeroLayout {
+export function useHeroLayout({ frame, headline, comment }: HeroLayoutElements): HeroLayout {
   const layout = reactive<HeroLayout>({
     measured: false,
     box: { width: 0, height: 0 },
-    agent: { prompt: ORIGIN(), start: ORIGIN(), drawing: ORIGIN(), end: ORIGIN() },
+    agent: { drawing: ORIGIN(), end: ORIGIN() },
     human: ORIGIN(),
     enter: ORIGIN()
   })
 
   function measure(): void {
     const root = frame.value
-    if (!root || !headline.value || !prompt.value || !comment.value) return
+    if (!root || !headline.value || !comment.value) return
     const box = offsetIn(headline.value, root)
     const { offsetWidth: width, offsetHeight: height } = headline.value
-    const ask = offsetIn(prompt.value, root)
     const note = offsetIn(comment.value, root)
     // A cursor and its name stay inside the frame, which on a phone ends close to the heading.
     const inside = (x: number) => Math.min(x, root.offsetWidth - CURSOR_ROOM)
     layout.box = { width, height }
     layout.agent = {
-      prompt: { x: inside(ask.x + prompt.value.offsetWidth), y: ask.y - 30 },
-      start: { x: box.x + 9, y: box.y + 13 },
       drawing: { x: box.x + width * DRAW_FRACTION, y: box.y + height * DRAW_FRACTION },
       end: { x: inside(box.x + width + 4), y: box.y + height + 2 }
     }

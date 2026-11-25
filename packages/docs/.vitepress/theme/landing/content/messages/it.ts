@@ -23,12 +23,6 @@ export const it: LandingMessages = {
     github: 'Vedi su GitHub',
     finePrint:
       'Gratis per macOS, Windows e Linux. Usa il tuo modello o il tuo agente di programmazione.',
-    prompt: 'Scrivi il titolo dell’hero: «Progetta accanto al tuo agente.» Tienilo su due righe.',
-    status: {
-      reading: '{agent} sta leggendo la pagina',
-      adding: '{agent} sta aggiungendo H1',
-      writing: '{agent} sta scrivendo H1'
-    },
     comment: 'Tieni il titolo su due righe.',
     reply: 'Impostato a 890 di larghezza, così va a capo dopo «accanto».',
     now: 'ora',
@@ -38,8 +32,6 @@ export const it: LandingMessages = {
       frame: { name: 'Cornice Hero', detail: 'Cornice, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} lo sta aggiungendo',
-        writing: '{agent} lo sta scrivendo',
         detail: '{agent} lo sta ridimensionando'
       },
       comment: { name: 'Commento', detail: '{human}, 1 risposta' },

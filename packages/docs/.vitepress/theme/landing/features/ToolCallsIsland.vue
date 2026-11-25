@@ -100,4 +100,22 @@ watch(
   font-size: 13px;
   line-height: normal;
 }
+
+/* Each call lands as the scene adds it, so the chat reads as a log rather than a card stack. */
+.tool-calls :deep([data-slot='chat-tool-call']) {
+  animation: call-in 380ms var(--lp-ease-out) both;
+}
+
+@keyframes call-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-calls :deep([data-slot='chat-tool-call']) {
+    animation: none;
+  }
+}
 </style>

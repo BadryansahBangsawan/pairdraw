@@ -13,6 +13,7 @@ import SiteFooter from './sections/SiteFooter.vue'
 import SiteToolbar from './sections/SiteToolbar.vue'
 import { provideDownloadDialog } from './ui/download-dialog'
 import DownloadDialog from './ui/DownloadDialog.vue'
+import { useDrawOnce } from './ui/useDrawOnce'
 
 import '@fontsource-variable/bricolage-grotesque/opsz.css'
 import '@fontsource-variable/geist-mono/wght.css'
@@ -26,6 +27,8 @@ const { messages } = defineProps<{ messages: LandingMessages }>()
 provideLandingMessages(messages)
 const downloads = provideDownloadDialog()
 const system = useVisitorSystem()
+
+useDrawOnce()
 </script>
 
 <template>

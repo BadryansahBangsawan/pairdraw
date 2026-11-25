@@ -5,6 +5,7 @@ import { CommittedGraphEventError, type SceneNode } from '@pairdraw/scene-graph'
 import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import { getAxisAlignedBoundsInParent, getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { cycleSafeParent, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
+import { ownInstanceOverrides } from '@pairdraw/scene-graph/instances/overrides'
 import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
@@ -420,10 +421,11 @@ export function createClipboardActions(ctx: EditorContext) {
         const node = ctx.graph.getNode(id)
         if (!node) continue
         const componentId = node.componentId ? copiedIds.get(node.componentId) : undefined
+        const owned = ownInstanceOverrides(node)
         const instanceOverrides = {
-          self: node.instanceOverrides.self,
+          self: owned.self,
           descendants: new Map(
-            [...node.instanceOverrides.descendants].map(([target, fields]) => [
+            [...owned.descendants].map(([target, fields]) => [
               copiedIds.get(target) ?? target,
               fields
             ])

@@ -6,6 +6,9 @@ import type { UndoneCalls } from '@/app/ai/chat/context'
 import { undoOf, type ReplyUndo } from '@/app/ai/chat/metadata'
 import type { RunUndoCall } from '@/app/ai/reply/run'
 import { currentRun } from '@/app/ai/tools'
+import { takeTurnFrames } from '@/app/ai/tools/changes/frames'
+import { queueTurnRenders } from '@/app/ai/tools/changes/turn-renders'
+import { freeTurnRenders } from '@/app/ai/tools/changes/turn-store'
 import type { EditorStore } from '@/app/editor/active-store'
 
 interface TurnRecord {
@@ -60,6 +63,7 @@ function noticeUndoneCalls(store: EditorStore): void {
     const undone = undoneNow(turn)
     if (isEqual(undone, turn.undone)) continue
     turns.set(messageId, { ...turn, undone })
+    if (undone.size > 0 && undone.size === turn.calls.length) freeTurnRenders(messageId)
     for (const listener of undoListeners) listener(messageId, [...undone])
   }
 }
@@ -100,6 +104,7 @@ export async function recordReplyTurn(
   recordTurn(messageId, store, run.undoCalls)
   const turn = turns.get(messageId)
   if (!turn) return null
+  queueTurnRenders(store, messageId, takeTurnFrames(store, run))
   return {
     edits: turn.calls.map(({ tool, toolCallId }) => ({ tool, toolCallId })),
     undone: [...turn.undone],

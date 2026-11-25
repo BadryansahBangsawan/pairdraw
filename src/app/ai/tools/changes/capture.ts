@@ -14,6 +14,7 @@ import { changePreviewSize } from '@/app/ai/chat/preferences'
 import type { EditorStore } from '@/app/editor/active-store'
 import type { ChangePreviewSize } from '@/app/settings/preferences/store'
 
+import { noteTurnFrame } from './frames'
 import { changeBounds, layersInBounds } from './images'
 import { queueChangePreview } from './previews'
 import { setToolChange } from './store'
@@ -123,6 +124,9 @@ export function recordToolChange(
   if (!shown) return null
   const { pageId, layers } = shown
   const nodeIds = layers.map((layer) => layer.id)
+  for (const nodeId of nodeIds) {
+    noteTurnFrame(store, pageId, graphs.before, graphs.after, nodeId)
+  }
   const [jsxBefore, jsxAfter] = clipChangedJSX(
     joinJSX(layers.map((layer) => layer.before)),
     joinJSX(layers.map((layer) => layer.after))

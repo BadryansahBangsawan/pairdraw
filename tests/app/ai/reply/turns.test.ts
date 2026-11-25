@@ -14,6 +14,7 @@ import type { ChatInstance } from '@/app/ai/chat/submission/types'
 import { useChatSubmission } from '@/app/ai/chat/submission/use'
 import { clearTurns, revertTurn, turnEdits, undoToReport } from '@/app/ai/reply/turns'
 import { createAITools, endRun, startRun } from '@/app/ai/tools'
+import { readTurnRenders, setTurnRenders } from '@/app/ai/tools/changes/turn-store'
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -178,6 +179,20 @@ test('a turn that ends with a view change, such as zoom to fit, stays revertable
   expect(turnEdits('reply-1')?.revertable).toBe(true)
   expect(revertTurn('reply-1')).toBe(true)
   expect(width(card.id)).toBe(100)
+})
+
+test('undoing every edit frees the reply’s changed-frame renders', async () => {
+  const { actions } = setup()
+  await actions.submit({ modelText: 'Wider', displayText: 'Wider', images: [], nodes: [] })
+  setTurnRenders(store, 'reply-1', {
+    status: 'cleared',
+    changed: 1,
+    frames: [{ frameId: '12:1', pageId: store.state.currentPageId, name: 'Card' }]
+  })
+  expect(readTurnRenders('reply-1')).not.toBeNull()
+
+  expect(revertTurn('reply-1')).toBe(true)
+  expect(readTurnRenders('reply-1')).toBeNull()
 })
 
 test('an edit made after the turn closes the revert, so it never undoes other work', async () => {

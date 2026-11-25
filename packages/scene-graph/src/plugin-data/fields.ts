@@ -18,12 +18,10 @@ import { tokenSourcesSchema } from '../token-sources/schema'
 import {
   MODE_ATTRIBUTE_PATTERN,
   TOKEN_UNITS,
-  type EnabledLibraryBinding,
   type ExportSetting,
   type LayoutDirection,
   type LibraryAssetSource,
   type PluginDataEntry,
-  type SourceLibraryPublication,
   type TextDirection,
   type TokenUnit
 } from '../types'
@@ -34,7 +32,7 @@ import {
   withoutPluginData,
   type PluginDataKey
 } from './field'
-import { webCitationSchema } from './schema'
+import { enabledLibrariesSchema, sourceLibraryPublicationSchema, webCitationSchema } from './schema'
 
 const DIRECTIONS = ['AUTO', 'LTR', 'RTL'] as const satisfies readonly (
   | TextDirection
@@ -95,25 +93,6 @@ const librarySourceSchema: v.GenericSchema<unknown, LibraryAssetSource> = v.pipe
     sourceNodeId: typeof sourceNodeId === 'string' ? sourceNodeId : null,
     readOnly: readOnly === true
   }))
-)
-
-const enabledLibrarySchema = v.object({
-  libraryId: v.string(),
-  revisionId: v.string(),
-  enabled: v.optional(v.unknown())
-})
-
-/** Invalid entries are skipped one by one, so one bad binding keeps the others. */
-const enabledLibrariesSchema: v.GenericSchema<unknown, EnabledLibraryBinding[]> = v.pipe(
-  v.array(v.unknown()),
-  v.transform((items) =>
-    items.flatMap((item) => {
-      const parsed = v.safeParse(enabledLibrarySchema, item)
-      if (!parsed.success) return []
-      const { libraryId, revisionId, enabled } = parsed.output
-      return [{ libraryId, revisionId, enabled: enabled === true }]
-    })
-  )
 )
 
 // Shape only. Whether a string is valid CSS is checked where it is written into a stylesheet.
@@ -201,15 +180,6 @@ const meshFillsSchema: v.GenericSchema<unknown, StoredMeshFill[]> = v.pipe(
   )
 )
 
-const sourceLibraryPublicationSchema: v.GenericSchema<unknown, SourceLibraryPublication> = v.object(
-  {
-    libraryId: v.string(),
-    revisionId: v.string(),
-    name: v.string(),
-    catalogSource: v.optional(v.string())
-  }
-)
-
 /**
  * Every plugin-data entry Pairdraw writes under {@link PAIRDRAW_PLUGIN_ID}: state Figma's
  * format has no field for. Add a key here, never as a string elsewhere, so reading and writing
@@ -258,6 +228,11 @@ export const PAIRDRAW_PLUGIN_DATA = {
     'bookkeeping',
     sourceLibraryPublicationSchema
   ),
+  /**
+   * The `.pen` documents this document imports, by alias and relative path, on the DOCUMENT node.
+   * A `.pen` file names them in its own `imports`, so a save writes them back from here.
+   */
+  penImports: jsonPluginDataField('penImports', 'bookkeeping', v.record(v.string(), v.string())),
   /** Canvas comment threads, deleted ones included, on the DOCUMENT node. */
   comments: jsonPluginDataField('comments', 'bookkeeping', commentThreadsSchema),
   /** The statuses layers can be in, on the DOCUMENT node. */

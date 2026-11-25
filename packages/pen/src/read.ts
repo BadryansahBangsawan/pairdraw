@@ -12,6 +12,7 @@ import { createImageStore } from './images'
 import { withImports, type PenImports } from './imports'
 import { inAncestorThemes, populateInstances } from './instances'
 import { createLibraryRoots, markLibraryRoots } from './library'
+import { writeLibraryLinks } from './document-libraries'
 import { createSceneNode, redrawIconAtLaidOutSize, type Build, type PenIconSource } from './nodes'
 import { placeLayers } from './placement'
 import { penFileSchema, type PenDocument, type PenNode } from './schema'
@@ -163,6 +164,7 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
   // After the links, which replace the document node's plugin data: the memory is stored beside them.
   if (doc.designMemory) writeDesignMemory(graph, doc.designMemory)
   if (doc.statuses) writeStatusWorkflow(graph, doc.statuses)
+  writeLibraryLinks(graph, doc)
 
   return graph
 }

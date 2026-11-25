@@ -1,4 +1,4 @@
-import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { libraryDefinitionsPage } from '@pairdraw/scene-graph/components'
 
 import { withImports, type PenImports } from './imports'
@@ -150,4 +150,27 @@ export function markLibraryRoots(graph: SceneGraph, roots: readonly LibraryRoot[
     }
     root.locked = true
   }
+}
+
+/**
+ * The components whose `ref`s a file can resolve: the library definitions its own imports give it,
+ * matched to the alias and path each import names. Writing their ids as refs keeps the instances
+ * linked on a reopen; the definitions themselves stay out of the file.
+ */
+export function importedComponentIds(
+  graph: SceneGraph,
+  imports: Readonly<Record<string, string>>
+): Set<string> {
+  const ids = new Set<string>()
+  const aliases = Object.entries(imports)
+  if (aliases.length === 0) return ids
+  const paths = new Map(aliases.map(([alias, path]) => [penLibraryId(alias), path]))
+  const visit = (node: SceneNode): void => {
+    const identity = node.librarySource?.identity
+    if (identity && paths.get(identity.libraryId) === identity.revisionId) ids.add(node.id)
+    for (const child of graph.getChildren(node.id)) visit(child)
+  }
+  for (const page of graph.getPages(true))
+    for (const node of graph.getChildren(page.id)) visit(node)
+  return ids
 }

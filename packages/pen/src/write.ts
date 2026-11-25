@@ -1,3 +1,4 @@
+import { isEqual } from 'es-toolkit'
 import { fromUint8Array } from 'js-base64'
 
 import type {
@@ -28,10 +29,13 @@ import { readTokenSources, type TokenSource } from '@pairdraw/scene-graph/token-
 
 import { networkToSVGPath } from './geometry'
 import { penCropTransform } from './images'
+import { importedComponentIds } from './library'
+import { readPenImports, readSourceLibraryPublication } from './document-libraries'
 import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 import type {
   PenDocument,
   PenEffect,
+  PenOverride,
   PenImagePaint,
   PenNode,
   PenNumber,
@@ -594,6 +598,78 @@ function themeFields(state: PenWriteState, node: SceneNode): Record<string, stri
   return Object.keys(theme).length > 0 ? theme : undefined
 }
 
+/**
+ * The pen fields an instance override writes: what it changes on a layer, not the placement and
+ * layout a reopen recalculates from the component and the boxes around it.
+ */
+const OVERRIDABLE_FIELDS: ReadonlySet<string> = new Set([
+  'content',
+  'fill',
+  'stroke',
+  'strokeWidth',
+  'cornerRadius',
+  'effect',
+  'opacity',
+  'enabled',
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'fontStyle',
+  'textAlign',
+  'textAlignVertical',
+  'lineHeight',
+  'letterSpacing',
+  'href'
+])
+
+/**
+ * The path a copy sits at in its component, from the instance down: the ids of the layers it
+ * copies, as pen names a `descendants` override.
+ */
+function overridePath(graph: SceneGraph, instanceId: string, copyId: string): string | null {
+  const parts: string[] = []
+  let current = graph.getNode(copyId)
+  while (current && current.id !== instanceId) {
+    if (!current.componentId) return null
+    parts.unshift(current.componentId)
+    current = current.parentId ? graph.getNode(current.parentId) : undefined
+  }
+  return current ? parts.join('/') : null
+}
+
+/**
+ * The fields an instance changes on its component's layers, as the `ref` it writes carries them:
+ * each overridden layer the copy's values that differ from it. Without them a reopen would draw
+ * every instance as the component has it, dropping what the user overrode.
+ */
+function instanceDescendants(
+  state: PenWriteState,
+  node: SceneNode
+): Record<string, PenOverride> | undefined {
+  const overridden = [...node.instanceOverrides.descendants.keys()]
+  if (overridden.length === 0) return undefined
+  // Comparing writes fields the moment a document writes them, but their drops are counted once.
+  const probe: PenWriteState = {
+    ...state,
+    drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
+  }
+  const descendants: Record<string, PenOverride> = {}
+  for (const copyId of overridden) {
+    const path = overridePath(state.graph, node.id, copyId)
+    const copy = state.graph.getNode(copyId)
+    const master = copy?.componentId ? state.graph.getNode(copy.componentId) : undefined
+    if (!path || !copy || !master) continue
+    const own = writeNode(probe, copy)
+    const base = writeNode(probe, master)
+    const override: PenOverride = {}
+    for (const field of OVERRIDABLE_FIELDS) {
+      if (!isEqual(own[field], base[field])) override[field] = own[field]
+    }
+    if (Object.keys(override).length > 0) descendants[path] = override
+  }
+  return Object.keys(descendants).length > 0 ? descendants : undefined
+}
+
 function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNode): boolean {
   if (
     node.type === 'TEXT' &&
@@ -616,6 +692,8 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
   if (node.type === 'INSTANCE' && node.componentId && state.writtenIds.has(node.componentId)) {
     result.type = 'ref'
     result.ref = node.componentId
+    const descendants = instanceDescendants(state, node)
+    if (descendants) result.descendants = descendants
     return true
   }
   return false
@@ -678,11 +756,13 @@ export function penDocumentFromGraph(
   for (const variable of graph.getLiveVariables()) variables.set(variable.id, variable)
   const collections = new Map<string, VariableCollection>()
   for (const collection of graph.getLiveCollections()) collections.set(collection.id, collection)
+  // The file declares its imports, so a ref to a component one of them defines resolves on reopen.
+  const imports = readPenImports(graph)
   const state: PenWriteState = {
     graph,
     variables,
     collections,
-    writtenIds: writtenNodeIds(graph),
+    writtenIds: new Set([...writtenNodeIds(graph), ...importedComponentIds(graph, imports ?? {})]),
     warnings: options.warnings ?? [],
     drops: { images: 0, effects: 0, filters: 0, scroll: 0, fontFeatures: 0 }
   }
@@ -730,6 +810,20 @@ export function penDocumentFromGraph(
   // Only a document that chose its statuses writes them: the default falls back on read.
   const statuses = readStoredStatusWorkflow(graph)
   if (statuses) document.statuses = statuses
+  if (imports) document.imports = imports
+  const enabledLibraries = [...graph.enabledLibraries.values()]
+  if (enabledLibraries.length > 0) {
+    document.enabledLibraries = enabledLibraries
+    // The definitions live on the hidden page, which a Pencil.dev file cannot hold, so the file
+    // records the bindings but the components it was built from come back as placeholders.
+    const enabled = enabledLibraries.filter((binding) => binding.enabled).length
+    if (enabled > 0)
+      state.warnings.push(
+        `Library components came from ${enabled} enabled ${enabled === 1 ? 'library' : 'libraries'}, whose definitions Pencil.dev files do not hold; re-enable those libraries after reopening to restore them.`
+      )
+  }
+  const publication = readSourceLibraryPublication(graph)
+  if (publication) document.sourceLibraryPublication = publication
   if (pages.length > 1) {
     const name = document.name ?? 'Page 1'
     state.warnings.push(

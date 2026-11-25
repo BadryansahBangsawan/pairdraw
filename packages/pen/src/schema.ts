@@ -1,7 +1,12 @@
 import * as v from 'valibot'
 
 import { CODE_SYNTAX_PLATFORMS } from '@pairdraw/scene-graph'
+import type { EnabledLibraryBinding, SourceLibraryPublication } from '@pairdraw/scene-graph'
 import { designMemorySchema, type DesignMemory } from '@pairdraw/scene-graph/design-memory'
+import {
+  enabledLibrariesSchema,
+  sourceLibraryPublicationSchema
+} from '@pairdraw/scene-graph/plugin-data'
 import { finiteNumberSchema } from '@pairdraw/scene-graph/primitives'
 import {
   nodeStatusSchema,
@@ -349,6 +354,30 @@ const penStatusWorkflowSchema = v.pipe(
   })
 )
 
+/**
+ * The libraries the file switched on, or none when an older client wrote something this reader
+ * cannot use: a document stays readable because of one unreadable field.
+ */
+const penEnabledLibrariesSchema = v.pipe(
+  v.unknown(),
+  v.transform((value): EnabledLibraryBinding[] | undefined => {
+    const parsed = v.safeParse(enabledLibrariesSchema, value)
+    return parsed.success && parsed.output.length > 0 ? parsed.output : undefined
+  })
+)
+
+/**
+ * The library the file publishes as, or none when an older client wrote something this reader
+ * cannot use: a document stays readable because of one unreadable field.
+ */
+const penSourceLibraryPublicationSchema = v.pipe(
+  v.unknown(),
+  v.transform((value): SourceLibraryPublication | undefined => {
+    const parsed = v.safeParse(sourceLibraryPublicationSchema, value)
+    return parsed.success ? parsed.output : undefined
+  })
+)
+
 const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
   // The page's name. The format is single-page, so it belongs to the document.
@@ -377,6 +406,18 @@ const penDocumentSchema = v.looseObject({
    * document falls back to Figma's own two statuses.
    */
   statuses: v.optional(penStatusWorkflowSchema),
+  /**
+   * The libraries the document switched on, as Core keeps them on the document node: the revision
+   * each library's components were inserted from. Pencil has no field for it, so it is an
+   * extension other Pencil clients ignore; without it a reopened document forgets the bindings.
+   */
+  enabledLibraries: v.optional(penEnabledLibrariesSchema),
+  /**
+   * The library this document publishes as, as Core keeps it on the document node. Pencil has no
+   * field for it, so it is an extension other Pencil clients ignore; without it the next publish
+   * starts a new library rather than a revision of this one.
+   */
+  sourceLibraryPublication: v.optional(penSourceLibraryPublicationSchema),
   children: v.array(nodeSchema)
 })
 

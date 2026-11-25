@@ -20,6 +20,6 @@
   "context": "Konteks",
   "contextPlaceholder": "Apa yang perlu agent ketahui? Misalnya: membuka dialog pendaftaran",
   "prompt": "Prompt",
-  "promptPlaceholder": "Permintaan tentang layer ini, dikirim saat Anda menjalankannya",
+  "promptPlaceholder": "Permintaan tentang layer ini, dikirim saat dijalankan",
   "runPrompt": "Jalankan prompt"
 }

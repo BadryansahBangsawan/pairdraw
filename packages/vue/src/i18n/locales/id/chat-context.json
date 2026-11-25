@@ -16,7 +16,7 @@
   "contextNearlyFull": "Percakapan ini hampir memenuhi konteks model. Mulai chat baru agar balasan tetap andal.",
   "pinnedContext": "Disematkan ke chat ini",
   "pinnedContextCount": "Disematkan ke chat ini ({count})",
-  "pinnedContextDescription": "AI mengikuti apa yang Anda sematkan di sini di setiap pesan chat ini.",
+  "pinnedContextDescription": "AI mengikuti apa yang disematkan di sini di setiap pesan chat ini.",
   "pinnedContextReadOnly": "Chat ini milik dokumen lain, sehingga sematannya tidak dapat diubah.",
   "styleKit": "Kit gaya",
   "addStyleKit": "Tambah kit gaya",

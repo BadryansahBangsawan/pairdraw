@@ -15,7 +15,7 @@
     "message": "Salin halaman"
   },
   "copyPageHint": {
-    "message": "Seluruh halaman, seperti yang Anda lihat"
+    "message": "Seluruh halaman, seperti yang terlihat"
   },
   "pickElement": {
     "message": "Pilih elemen"
@@ -27,7 +27,7 @@
     "message": "Sertakan gambar dari situs lain"
   },
   "includeImagesHint": {
-    "message": "Meminta izin membaca gambar dari situs mana pun selama Anda menangkap."
+    "message": "Meminta izin membaca gambar dari situs mana pun saat menangkap."
   },
   "statusCopying": {
     "message": "Menyalin…"

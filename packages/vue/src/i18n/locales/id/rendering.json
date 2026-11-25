@@ -2,12 +2,12 @@
   "settingsTitle": "Rendering",
   "settingsDescription": "Pilih cara Pairdraw menampilkan canvas berukuran besar.",
   "progressiveTiled": "Rendering progresif",
-  "progressiveTiledDescription": "Memperbarui canvas besar dalam tile yang lebih kecil saat Anda menavigasi.",
+  "progressiveTiledDescription": "Memperbarui canvas besar dalam tile yang lebih kecil saat menavigasi.",
   "progressiveTiledByUltralight": "Selalu aktif selagi mode Ultralight aktif.",
   "experimental": "Eksperimental",
   "ultralight": "Mode Ultralight",
   "ultralightDescription": "Menghemat daya dan memori pada komputer yang lebih lambat: mematikan animasi, merender dalam tile pada resolusi standar, dan menyederhanakan blur, noise, dan shadow.",
   "reloadRequired": "Muat ulang Pairdraw untuk menerapkan perubahan ini.",
   "wideGamutUnavailable": "Layar atau browser ini tidak dapat menampilkan warna Display-P3, sehingga canvas menampilkan pratinjaunya dalam sRGB. Ruang warna dokumen tetap dipertahankan.",
-  "urlOverride": "Renderer sesi saat ini dikendalikan oleh override URL. Preferensi tersimpan Anda berlaku kembali saat override dihapus."
+  "urlOverride": "Renderer sesi saat ini dikendalikan oleh override URL. Preferensi tersimpan berlaku kembali saat override dihapus."
 }

@@ -6,7 +6,7 @@
   "projectFolder": "Folder proyek",
   "projectFolderNone": "Tidak ada folder proyek",
   "projectFolderIn": "{agent} bekerja di {folder}",
-  "projectFolderOutside": "{agent} bekerja di folder milik Pairdraw sendiri, di luar proyek Anda.",
+  "projectFolderOutside": "{agent} bekerja di folder milik Pairdraw sendiri, di luar proyek.",
   "projectFolderChoose": "Pilih folder proyek…",
   "projectFolderClear": "Berhenti menggunakan folder ini",
   "projectFolderConfirmTitle": "Izinkan {agent} bekerja di {folder}?",

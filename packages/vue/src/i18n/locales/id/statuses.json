@@ -30,6 +30,6 @@
   "restore": "Pulihkan",
   "chooseWhere": "Pilih ke mana layer di setiap status yang dihapus akan dipindahkan",
   "discardTitle": "Buang perubahan status?",
-  "discardDescription": "Perubahan yang Anda buat di sini belum diterapkan.",
+  "discardDescription": "Perubahan di sini belum diterapkan.",
   "discard": "Buang"
 }

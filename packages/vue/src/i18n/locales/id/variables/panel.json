@@ -143,7 +143,7 @@
   "syncToReview": "{count} untuk ditinjau",
   "syncReview": "Tinjau perubahan",
   "syncReviewTitle": "Tinjau perubahan dari {file}",
-  "syncReviewDescription": "Nilai yang hanya berubah di berkas akan masuk saat Anda menerapkan. Pilih nilai mana yang dipertahankan untuk sisanya.",
+  "syncReviewDescription": "Nilai yang hanya berubah di berkas akan masuk saat diterapkan. Pilih nilai mana yang dipertahankan untuk sisanya.",
   "syncChangedInCode": "Berubah di kode",
   "syncChangedOnCanvas": "Berubah di canvas",
   "syncChangedInBoth": "Berubah di keduanya",

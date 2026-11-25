@@ -3,7 +3,7 @@
   "windowTitle": "Pembaruan Perangkat Lunak",
   "checking": "Memeriksa pembaruan…",
   "available": "Pairdraw {version} tersedia",
-  "currentVersion": "Anda memiliki versi {version}.",
+  "currentVersion": "Versi terpasang {version}.",
   "whatsNew": "Yang baru",
   "noNotes": "Rilis ini tidak memiliki catatan rilis.",
   "fullReleaseNotes": "Catatan rilis lengkap",

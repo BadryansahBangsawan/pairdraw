@@ -1,0 +1,1 @@
+- Draw a ring around an area in the Comment tool instead of clicking, write a note, and **Fix with agent** sends that area, the layers inside it and a crop of it to the agent, which fixes what is circled, replies and resolves the comment.

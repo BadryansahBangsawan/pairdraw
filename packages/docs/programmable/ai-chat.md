@@ -18,7 +18,7 @@ Both prompts list example chips — **Landing page**, **Sign-in screen**, **Dash
 ## Send work from the canvas
 
 - **Run sticky as prompt** in the canvas [context menu](../user-guide/context-menu#run-sticky-as-prompt) sends the text of the selected sticky notes, with a reference to each note.
-- **Apply with AI** in a comment thread's menu asks the assistant to apply that thread's feedback, reply saying what changed, and resolve it. The prompt quotes the comment and its replies and links the layer the thread is pinned to. **Apply open comments with AI** in the comments list does the same for every open thread it shows; resolved threads are left out.
+- **Fix with agent** in a comment thread's menu asks the active agent to fix that thread, reply saying what changed, and resolve it. The prompt quotes the comment and its replies and links the layer the thread is pinned to. A comment drawn with the Comment tool — drag a ring over the area instead of clicking — also carries that area: the prompt names its bounds and the layers inside it, and a crop of the area is attached as an image, so the agent changes only what was circled. **Apply open comments with AI** in the comments list does the same for every open thread it shows, text only; resolved threads are left out.
 
 Both send into the document's chat, are offered only in documents you can edit, and set up a model first the way the Home prompt does when none is configured. Layers a prompt links to go with it as references, as they do when you mention them in the chat field.
 

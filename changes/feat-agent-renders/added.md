@@ -1,0 +1,1 @@
+- A reply that changes frames shows them under its text as small before and after renders, with narrower renders for frames that reflow; each one opens its frame on the page.

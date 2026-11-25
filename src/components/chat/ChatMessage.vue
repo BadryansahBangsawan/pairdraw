@@ -20,8 +20,10 @@ import ChatMarkdown from '@/components/chat/ChatMarkdown.vue'
 import ChatReasoning from '@/components/chat/ChatReasoning.vue'
 import ChatReferenceText from '@/components/chat/reference/ChatReferenceText.vue'
 import ChatToolCallGroup from '@/components/chat/tool/ChatToolCallGroup.vue'
+import { showNodeOnCanvas } from '@/components/chat/tool/show-node'
 import ChatMessageEditor from '@/components/chat/turn/ChatMessageEditor.vue'
 import ChatTurnActions from '@/components/chat/turn/ChatTurnActions.vue'
+import ChatTurnRenders from '@/components/chat/turn/ChatTurnRenders.vue'
 import { chatMessageTheme } from '@/components/chat/ui'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -135,6 +137,7 @@ function groupKey(group: MessagePartGroup): string {
             </div>
           </template>
         </div>
+        <ChatTurnRenders :message-id="message.id" @reveal="void showNodeOnCanvas($event)" />
         <ChatTurnActions
           :message-id="message.id"
           :text="assistantText"

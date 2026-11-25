@@ -1,10 +1,9 @@
 import { computed, inject, ref } from 'vue'
 
-import { getActiveEditorStoreOrNull, useActiveEditorStoreRef } from '@/app/editor/active-store'
-import { focusNodesOnTheirPage } from '@/app/editor/selection/focus'
-import { notificationMessages } from '@/app/i18n/notifications'
-import { toast } from '@/app/shell/ui'
+import { useActiveEditorStoreRef } from '@/app/editor/active-store'
 import { CHAT_NODES_LIVE } from '@/components/chat/tool/context'
+
+import { showNodeOnCanvas } from './show-node'
 
 const MAX_NODES = 8
 
@@ -41,19 +40,8 @@ export function useToolNodes(ids: () => string[]) {
   })
 
   async function show(id: string): Promise<void> {
-    const store = getActiveEditorStoreOrNull()
-    if (!store || !live.value) return
-    try {
-      await focusNodesOnTheirPage(store, [id])
-    } catch (error) {
-      // A newer page switch supersedes this one.
-      if (error instanceof Error && error.name === 'AbortError') return
-      toast.error(
-        notificationMessages.get().operationFailed({
-          error: error instanceof Error ? error.message : String(error)
-        })
-      )
-    }
+    if (!live.value) return
+    await showNodeOnCanvas(id)
   }
 
   return { nodes, show }

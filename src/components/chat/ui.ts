@@ -12,6 +12,7 @@ import reviewTheme from '@/theme/chat/review'
 import skillPickerTheme from '@/theme/chat/skill-picker'
 import thinkingTheme from '@/theme/chat/thinking'
 import transcriptTheme from '@/theme/chat/transcript'
+import turnRendersTheme from '@/theme/chat/turn-renders'
 import usageMeterTheme from '@/theme/chat/usage-meter'
 
 export const chatAgentTheme = tv(agentTheme)
@@ -27,4 +28,5 @@ export type ChatReferenceTone = NonNullable<VariantProps<typeof chatReferenceThe
 export const chatSkillPickerTheme = tv(skillPickerTheme)
 export const chatThinkingTheme = tv(thinkingTheme)
 export const chatTranscriptTheme = tv(transcriptTheme)
+export const chatTurnRendersTheme = tv(turnRendersTheme)
 export const chatUsageMeterTheme = tv(usageMeterTheme)

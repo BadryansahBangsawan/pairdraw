@@ -351,7 +351,14 @@ export const svgFormat: IOFormatAdapter<'svg'> = {
       request.graph,
       target.pageId,
       target.nodeIds,
-      { ...options, booleanPath },
+      {
+        ...options,
+        // An export writes the profile the document is stored in, so a Display P3 color keeps its
+        // gamut; a caller may still ask for sRGB. PDF and thumbnails render SVG themselves and
+        // stay sRGB, as their formats expect.
+        colorSpace: options?.colorSpace ?? request.graph.documentColorSpace,
+        booleanPath
+      },
       context?.canvasKit,
       context?.renderer
     )

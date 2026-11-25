@@ -16,8 +16,9 @@ const OFFICIAL_CLOUD_ORIGIN = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).o
 /**
  * The styling sandbox is an iframe without `allow-scripts`, so a script that reaches it never runs.
  * Chromium and WebKit still report the blocked attempt as a console error, which fails a spec that
- * asserts no errors for markup the app never wrote; what reaches that frame is asserted where it is
- * built, in `packages/dom-css/tests/runtime/sandbox.test.ts`.
+ * asserts no errors for markup the app never wrote. The compensating control is
+ * `packages/dom-css/tests/runtime/sandbox.test.ts`, which parses with the headless runtime only; a
+ * change to the browser parser alone would need that test widened to catch it.
  */
 const BLOCKED_SANDBOX_SCRIPT = /^Blocked script execution in .* frame is sandboxed/
 

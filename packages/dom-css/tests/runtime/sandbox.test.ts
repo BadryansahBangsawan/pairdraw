@@ -14,6 +14,8 @@ const HOSTILE_HTML = [
   '<div onclick="alert(1)" class="card">',
   '<img src="x" onerror="alert(2)" width="10" height="10">',
   '<a href="javascript:alert(3)">link</a>',
+  '<a href="java&#9;script:alert(7)">tabbed</a>',
+  '<a href="java&#10;script:alert(8)">lined</a>',
   '<script>alert(4)</script>',
   '<iframe srcdoc="<script>alert(5)</script>"></iframe>',
   '<object data="javascript:alert(6)"></object>',
@@ -21,7 +23,22 @@ const HOSTILE_HTML = [
   '</div>'
 ].join('')
 
-const EXECUTABLE = /<script|\son\w+\s*=|javascript:|data:text\/html|srcdoc/i
+const EXECUTABLE = /<script|\son\w+\s*=|javascript:|vbscript:|data:text\/html|srcdoc/i
+
+/**
+ * The markup without the characters a browser ignores inside a URL scheme, so `java&#9;script:`
+ * reads as `javascript:`.
+ */
+function withoutSchemeNoise(markup: string): string {
+  let plain = ''
+  for (const char of markup) if (char.charCodeAt(0) > 0x20) plain += char
+  return plain
+}
+
+/** Whether the markup holds anything the browser would run. */
+function executableMarkup(markup: string): boolean {
+  return EXECUTABLE.test(withoutSchemeNoise(markup))
+}
 
 /** What the styling frame would insert for this markup, as the runtime sandboxes it. */
 function frameMarkup(html: string): string {
@@ -31,8 +48,8 @@ function frameMarkup(html: string): string {
 
 describe('the markup a styling sandbox inserts', () => {
   it('holds nothing executable for the payloads the app imports and pastes', () => {
-    expect(EXECUTABLE.test(frameMarkup(AGENT_HTML))).toBe(false)
-    expect(EXECUTABLE.test(frameMarkup(PASTE_HTML))).toBe(false)
+    expect(executableMarkup(frameMarkup(AGENT_HTML))).toBe(false)
+    expect(executableMarkup(frameMarkup(PASTE_HTML))).toBe(false)
   })
 
   it('keeps the layout fields of an ordinary element', () => {
@@ -43,7 +60,8 @@ describe('the markup a styling sandbox inserts', () => {
 
   it('removes handlers, script documents, and executable URLs from imported markup', () => {
     const markup = frameMarkup(HOSTILE_HTML)
-    expect(EXECUTABLE.test(markup)).toBe(false)
+    expect(executableMarkup(markup)).toBe(false)
+    expect(markup).not.toContain('href')
     expect(markup).toContain('class="card"')
     expect(markup).toContain('src="https://example.org/picture.png"')
     expect(markup).toContain('alt="kept"')

@@ -1,1 +1,1 @@
-- Imported HTML reaches the styling sandbox without event handlers, script documents, or executable links, so markup an agent or a webpage supplies cannot run while its styles are measured.
+- Markup imported from a webpage or written by an agent reaches the styling sandbox without event handlers, embedded documents, or executable links, so nothing it carries can run while its styles are measured.

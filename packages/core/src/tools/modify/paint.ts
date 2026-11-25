@@ -6,7 +6,6 @@ import { gradientTransformRows, linearGradientTransform } from '@pairdraw/scene-
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { FigmaAPI } from '#core/figma-api'
-
 import { storeImage } from '#core/figma-api/images'
 import { PairdrawAPI } from '#core/pairdraw-api'
 import {
@@ -27,7 +26,7 @@ const STRETCH_IMAGE_TRANSFORM: [[number, number, number], [number, number, numbe
 ]
 
 /** `var(--color/brand)` or `var(--color/brand, #4F46E5)`: a token by name, as `get_css` writes it. */
-const COLOR_TOKEN = /^var\(\s*--([^),\s]+)\s*(?:,[^)]*)?\)$/
+const COLOR_TOKEN = /^var\(\s*--([^,()]+?)\s*(?:,[^)]*)?\)$/
 
 function colorVariablesNamed(figma: FigmaAPI, name: string): Variable[] {
   const matches: Variable[] = []
@@ -39,9 +38,7 @@ function colorVariablesNamed(figma: FigmaAPI, name: string): Variable[] {
 
 /** A colour, as opposed to a token alias or an expression a variable may hold instead. */
 function isColor(value: VariableValue | undefined): value is Color {
-  return (
-    typeof value === 'object' && 'r' in value && 'g' in value && 'b' in value && 'a' in value
-  )
+  return typeof value === 'object' && 'r' in value && 'g' in value && 'b' in value && 'a' in value
 }
 
 /** The colour a token holds in its default mode, and its collection, for a fill to take. */
@@ -61,7 +58,7 @@ export const setFill = defineTool({
   name: 'set_fill',
 
   description:
-    'Set fill on a node. Solid: color="#ff0000". A token by name: color="var(--color/brand)" paints its colour and binds the fill. Linear gradient: gradient="top-bottom" or "left-right" with color (start) and color_end (end).',
+    'Set fill on a node. Solid: color="#ff0000". A token by name: color="var(--color/brand)" paints its colour and binds the fill. Linear gradient: gradient="top-bottom" or "left-right" with color (start) and color_end (end); gradient stops take hex colours, not tokens.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
@@ -82,6 +79,19 @@ export const setFill = defineTool({
 
     // A token name paints the colour it holds and binds the fill, so the layer follows the token.
     const token = COLOR_TOKEN.exec(color)
+    const endToken = color_end === undefined ? null : COLOR_TOKEN.exec(color_end)
+    // Gradient stops carry no variable binding, so a token there would paint the wrong thing.
+    if (gradient && (token !== null || endToken !== null)) {
+      const named = [
+        token === null ? undefined : `"${token[1]}"`,
+        endToken === null ? undefined : `"${endToken[1]}"`
+      ]
+        .filter((entry) => entry !== undefined)
+        .join(' and ')
+      return {
+        error: `A gradient cannot take the token ${named}: gradient stops have no variable binding. Pass hex colours for a gradient, or a token only for a solid fill.`
+      }
+    }
     const name = token === null ? null : token[1]
     if (name !== null) {
       const matches = colorVariablesNamed(figma, name)
@@ -94,7 +104,8 @@ export const setFill = defineTool({
         const where = matches
           .map(
             (variable) =>
-              figma.graph.variableCollections.get(variable.collectionId)?.name ?? variable.collectionId
+              figma.graph.variableCollections.get(variable.collectionId)?.name ??
+              variable.collectionId
           )
           .join(', ')
         return {

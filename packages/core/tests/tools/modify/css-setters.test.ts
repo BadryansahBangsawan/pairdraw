@@ -104,6 +104,56 @@ describe('set_fill takes a token name', () => {
     expect(expectDefined(graph.getNode(box.id), 'box').fills).toEqual(before)
   })
 
+  test('a token shared with a gradient is refused, never painted solid', () => {
+    const { graph, figma, box } = tokenDoc()
+    const before = expectDefined(graph.getNode(box.id), 'box').fills
+
+    const result = setFill.execute(
+      figma,
+      v.parse(setFill.input, {
+        id: box.id,
+        gradient: 'top-bottom',
+        color: 'var(--color/brand)',
+        color_end: '#FFFFFF'
+      })
+    ) as { error?: string }
+
+    expect(result.error).toContain('gradient')
+    expect(expectDefined(graph.getNode(box.id), 'box').fills).toEqual(before)
+  })
+
+  test('a token as the gradient end is refused, never painted solid', () => {
+    const { graph, figma, box } = tokenDoc('color/end')
+    const before = expectDefined(graph.getNode(box.id), 'box').fills
+
+    const result = setFill.execute(
+      figma,
+      v.parse(setFill.input, {
+        id: box.id,
+        gradient: 'left-right',
+        color: '#4F46E5',
+        color_end: 'var(--color/end)'
+      })
+    ) as { error?: string }
+
+    expect(result.error).toContain('gradient')
+    expect(expectDefined(graph.getNode(box.id), 'box').fills).toEqual(before)
+  })
+
+  test('a token name with a space binds, as get_css writes it', () => {
+    const { graph, figma, box, variable } = tokenDoc('Brand Primary')
+
+    const result = setFill.execute(
+      figma,
+      v.parse(setFill.input, { id: box.id, color: 'var(--Brand Primary, #4F46E5)' })
+    )
+
+    expect(result).toMatchObject({ bound: 'Brand Primary' })
+    expect(expectDefined(graph.getNode(box.id), 'box').boundVariables['fills/0/color']).toBe(
+      variable.id
+    )
+  })
+
   test('a hex colour still paints as before', () => {
     const { graph, figma, box } = doc()
 

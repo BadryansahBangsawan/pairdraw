@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-### Added
-
-- `get_css` reads a node subtree as compact CSS-like lines — `flex:row;gap:12px;padding:16px 24px;bg:var(--color/brand, #4F46E5);radius:8px`, text as `font:600 14px/20px Inter` — with lengths in px and a `max_bytes` budget, so an agent reads only what a task needs: on the same five agent tasks it costs 51% fewer bytes than `get_jsx` and 81% fewer than `describe`/`get_node`.
-- `set_layout` takes `padding` and `gap` as CSS shorthand (`"16px 24px"`, `"12px 4px"`), `set_radius` takes `"12px 12px 4px 0"`, and `set_fill` takes a token name (`"var(--color/brand)"`), painting its value and binding the fill; a name two variables share is refused with both, never guessed.
-
 ## 0.20.0 — 2026-11-24
 
 This release makes Pairdraw a place where you and an agent design together under the same rules: a design memory the agent must follow, variations it can cook up for you to pick from, prompts and reviews you shape yourself, and a token meter that shows what each reply costs. Prototypes grow up — interactive components with hover/press/delay triggers, Smart animate, scrolling frames with fixed and sticky layers, and video export to MP4/GIF/WebM — and the everyday canvas gets the tools Figma users reach for: an eyedropper, document colors, on-canvas auto layout handles, image adjustments, noise and texture effects, OpenType features, replace-fonts, and push-to-main. Figma grid auto layout and draw.io connector routes survive a round trip. Under the hood, a large `.fig` opens faster, prepares each page once, and keeps fewer copies of each layer.

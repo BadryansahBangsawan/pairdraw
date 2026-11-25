@@ -257,7 +257,7 @@ function effectFields(
   const own = v.safeParse(ownEffectsSchema, token.extensions[PAIRDRAW_EXTENSION])
   // Extension effects that do not read fall back to the token's own shadows.
   const exact = own.success ? tryParseFigmaEffects(own.output.effects) : null
-  if (exact && isEqual(token.value, shadowTokenValue(exact))) return { effects: exact }
+  if (exact && isEqual(token.value, shadowTokenValue(exact, profile))) return { effects: exact }
   const shadows = shadowList(token.value, resolve, profile)
   if (!shadows) return null
   return { effects: exact ? replaceShadows(exact, shadows) : shadows }

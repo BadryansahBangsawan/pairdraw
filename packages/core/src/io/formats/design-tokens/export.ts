@@ -103,7 +103,7 @@ function variableToken(
     formula = printFormula(value.value, (id) => tokenReference(context.references.get(id) ?? []), {
       type: (id) => context.graph.variables.get(id)?.type
     })
-    $value = literalTokenValue(variable, resolved)
+    $value = literalTokenValue(variable, resolved, context.graph.documentColorSpace)
   } else if (typeof value === 'object' && 'expression' in value) {
     context.issues.push({ kind: 'unsupported-expression', ...where })
     return undefined
@@ -122,7 +122,7 @@ function variableToken(
         targetVariableSetName: targetCollection.name
       }
   } else {
-    $value = literalTokenValue(variable, value)
+    $value = literalTokenValue(variable, value, context.graph.documentColorSpace)
   }
   if (variable.type === 'BOOLEAN') figma['com.figma.type'] = 'boolean'
   const $extensions = { ...figma, ...pairdrawFields(variable, mode.modeId, formula) }

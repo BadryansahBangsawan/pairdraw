@@ -16,6 +16,7 @@ import {
 } from '@pairdraw/dom-css/export'
 import {
   isLibraryCollection,
+  type ColorProfile,
   type SceneGraph,
   type TokenUnit,
   type Variable,
@@ -39,6 +40,8 @@ import { namesFont, readCSSTokenValue, type CSSTokenValue } from './values'
 export interface CSSTokenReadOptions {
   /** The stylesheet's file name, for issues. */
   file?: string
+  /** The document's profile: a color that names its space converts into it. */
+  profile?: ColorProfile
   /**
    * What a numeric CSS expression such as `clamp(1rem, 4vw, 1.5rem)` comes to in `unit`, with
    * the custom properties in scope by name (`--space`). A browser computes it; without one, an
@@ -245,7 +248,7 @@ class CSSTokenReader {
       const property = cssTokenProperty(token)
       const value = property && scope.get(property)
       if (!value) continue
-      const read = readCSSTokenValue(value)
+      const read = readCSSTokenValue(value, { profile: this.options.profile })
       if (read.kind === 'number') return read.unit
       if (read.kind === 'expression' && read.unit) return read.unit
     }
@@ -282,10 +285,17 @@ class CSSTokenReader {
   ): ReadToken {
     const existing = this.existingVariable(name, group)
     const tokenName = this.tokenName(name, group)
-    const value = readCSSTokenValue(css, { font: namesFont(name) })
+    const value = readCSSTokenValue(css, {
+      font: namesFont(name),
+      profile: this.options.profile
+    })
     let fields: TokenFields
     if (value.kind === 'reference') fields = this.alias(value.name)
-    else if (value.kind === 'color') fields = { type: 'color', value: colorTokenValue(value.color) }
+    else if (value.kind === 'color')
+      fields = {
+        type: 'color',
+        value: colorTokenValue(value.color, this.options.profile)
+      }
     else if (value.kind === 'number')
       fields = { ...numberToken(value.value, value.unit), unit: value.unit }
     else if (value.kind === 'string') fields = { type: 'string', value: value.value }
@@ -389,7 +399,10 @@ export function readCSSDesignTokens(
   } catch {
     return { collections: [], composites: [], issues: [{ kind: 'invalid-file', file }] }
   }
-  const reader = new CSSTokenReader(graph, knownTokens(graph), file, options)
+  const reader = new CSSTokenReader(graph, knownTokens(graph), file, {
+    ...options,
+    profile: options.profile ?? graph.documentColorSpace
+  })
   reader.read(sheet)
   const issues: DesignTokenReadIssue[] = [
     ...sheet.skipped.map((rule): DesignTokenReadIssue => ({ kind: 'unsupported-css', file, rule })),

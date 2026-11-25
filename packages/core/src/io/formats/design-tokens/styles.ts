@@ -2,6 +2,7 @@ import { countBy } from 'es-toolkit/array'
 import { isEmptyObject, isPlainObject } from 'es-toolkit/predicate'
 
 import type {
+  ColorProfile,
   Effect,
   SceneGraph,
   SceneNode,
@@ -129,9 +130,9 @@ export function isShadow(effect: Effect): effect is ShadowEffect {
   return effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'
 }
 
-function shadowValue(effect: ShadowEffect) {
+function shadowValue(effect: ShadowEffect, profile: ColorProfile) {
   return {
-    color: colorTokenValue(effect.color),
+    color: colorTokenValue(effect.color, profile),
     offsetX: dimensionTokenValue(effect.offset.x),
     offsetY: dimensionTokenValue(effect.offset.y),
     blur: dimensionTokenValue(effect.radius),
@@ -141,10 +142,10 @@ function shadowValue(effect: ShadowEffect) {
 }
 
 /** A shadow token's `$value`: the visible shadows of `effects`, or undefined when there are none. */
-export function shadowTokenValue(effects: readonly Effect[]) {
+export function shadowTokenValue(effects: readonly Effect[], profile: ColorProfile = 'srgb') {
   const values = effects
     .filter((effect): effect is ShadowEffect => isShadow(effect) && effect.visible)
-    .map(shadowValue)
+    .map((effect) => shadowValue(effect, profile))
   if (values.length === 0) return undefined
   return values.length === 1 ? values[0] : values
 }
@@ -154,8 +155,8 @@ export function shadowTokenValue(effects: readonly Effect[]) {
  * blurs or hidden shadows, ride along whole in Pairdraw's extension, in the plugin API's shape;
  * a style with no visible shadow has no token.
  */
-function shadowToken(node: SceneNode): DesignToken | undefined {
-  const $value = shadowTokenValue(node.effects)
+function shadowToken(node: SceneNode, profile: ColorProfile): DesignToken | undefined {
+  const $value = shadowTokenValue(node.effects, profile)
   if ($value === undefined) return undefined
   const exact = node.effects.every(
     (effect) =>
@@ -207,7 +208,9 @@ export function styleTokens(
   )
   const candidates = styles.flatMap((node) => {
     const token =
-      node.sharedStyleType === 'TEXT' ? typographyToken(graph, node, references) : shadowToken(node)
+      node.sharedStyleType === 'TEXT'
+        ? typographyToken(graph, node, references)
+        : shadowToken(node, graph.documentColorSpace)
     if (!token) {
       issues.push({ kind: 'unsupported-effect', style: node.name })
       return []

@@ -1,8 +1,13 @@
-import { converter, formatHex, formatHex8 } from 'culori'
+import { converter, formatHex, formatHex8, parse } from 'culori'
 
 import { cssTokenProperty, cssValueTokens } from '@pairdraw/dom-css/export'
-import type { TokenUnit } from '@pairdraw/scene-graph'
-import { colorToCSS, parseDisplayableColor } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, TokenUnit } from '@pairdraw/scene-graph'
+import {
+  colorToCSS,
+  parseDisplayableColor,
+  SRGB_SYNTAX_MODES,
+  tryParseColor
+} from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { tokenNumberFromUnit, tokenNumberInUnit } from '@pairdraw/scene-graph/variables'
 
@@ -119,7 +124,21 @@ function firstFamily(css: string): string | undefined {
  * font family where the property names fonts, a `var()` reference, a numeric expression, or
  * something no variable holds, such as a shadow.
  */
-export function readCSSTokenValue(css: string, { font = false } = {}): CSSTokenValue {
+/**
+ * A CSS colour in the document's profile: hex, `rgb()`, `hsl()` and `hwb()` give their numbers as
+ * the document's own, as an imported stylesheet writes them, and a color that names its space,
+ * such as `oklch()` or `color(display-p3 …)`, is converted into that profile.
+ */
+function readColor(value: string, profile: ColorProfile): Color | null {
+  const parsed = parse(value)
+  if (!parsed || SRGB_SYNTAX_MODES.has(parsed.mode)) return parseDisplayableColor(value)
+  return tryParseColor(value, profile)
+}
+
+export function readCSSTokenValue(
+  css: string,
+  { font = false, profile = 'srgb' }: { font?: boolean; profile?: ColorProfile } = {}
+): CSSTokenValue {
   const value = css.trim()
   const tokens = cssValueTokens(value)
   const [only] = tokens
@@ -137,7 +156,7 @@ export function readCSSTokenValue(css: string, { font = false } = {}): CSSTokenV
     )
     if (color) return { kind: 'color', color, notation: 'hsl-channels' }
   }
-  const color = parseDisplayableColor(value)
+  const color = readColor(value, profile)
   if (color) return { kind: 'color', color, notation: notationOf(value) }
   const expression = readExpression(value)
   if (expression) return expression
@@ -211,8 +230,16 @@ const toOklab = converter('oklab')
 const toOklch = converter('oklch')
 
 /** A color written in a notation: `oklch(0.7 0.19 41)`, `#ff5b2e`, `16 100% 59%`. */
-export function formatCSSColor(color: Color, notation: ColorNotation): string {
-  const rgb = { mode: 'rgb' as const, r: color.r, g: color.g, b: color.b, alpha: color.a }
+export function formatCSSColor(
+  color: Color,
+  notation: ColorNotation,
+  profile: ColorProfile = 'srgb'
+): string {
+  // The components sit in the document's profile, so the notation is derived from that space.
+  const rgb =
+    profile === 'display-p3'
+      ? { mode: 'p3' as const, r: color.r, g: color.g, b: color.b, alpha: color.a }
+      : { mode: 'rgb' as const, r: color.r, g: color.g, b: color.b, alpha: color.a }
   const a = alphaSuffix(color.a)
   switch (notation) {
     case 'rgb':
@@ -255,10 +282,11 @@ export function formatCSSColor(color: Color, notation: ColorNotation): string {
 export function rewriteCSSTokenValue(
   previous: CSSTokenValue,
   next: CSSTokenValue,
-  nextCSS: string
+  nextCSS: string,
+  profile: ColorProfile = 'srgb'
 ): string {
   if (previous.kind === 'color' && next.kind === 'color' && previous.notation !== 'other')
-    return formatCSSColor(next.color, previous.notation)
+    return formatCSSColor(next.color, previous.notation, profile)
   if (
     previous.kind === 'number' &&
     next.kind === 'number' &&

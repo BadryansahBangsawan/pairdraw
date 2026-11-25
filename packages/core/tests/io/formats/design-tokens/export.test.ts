@@ -227,3 +227,21 @@ describe('design token export', () => {
     })
   })
 })
+
+describe('design token export in a Display P3 document', () => {
+  test('labels a color token with the space its components are in', () => {
+    const graph = designSystem()
+    graph.documentColorSpace = 'display-p3'
+    const primitives = file(graph, 'Primitives/Mode 1.tokens.json')
+    expect(primitives.Blue['500']).toMatchObject({
+      $value: { colorSpace: 'display-p3', components: [0, 0.4, 0.8], alpha: 1 }
+    })
+  })
+
+  test('keeps writing srgb for an sRGB document', () => {
+    const primitives = file(designSystem(), 'Primitives/Mode 1.tokens.json')
+    expect(primitives.Blue['500']).toMatchObject({
+      $value: { colorSpace: 'srgb', components: [0, 0.4, 0.8], alpha: 1, hex: '#0066cc' }
+    })
+  })
+})

@@ -1,6 +1,6 @@
 import { variableUnit } from '@pairdraw/dom-css/export'
-import type { TokenUnit, Variable } from '@pairdraw/scene-graph'
-import { colorToHex } from '@pairdraw/scene-graph/color'
+import type { ColorProfile, TokenUnit, Variable } from '@pairdraw/scene-graph'
+import { colorToHex, convertColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { DesignTokenType } from './types'
@@ -31,13 +31,18 @@ export function variableTokenType(variable: Variable): DesignTokenType {
   return 'number'
 }
 
-/** A color as DTCG 2025.10 writes it: sRGB components, alpha, and the hex code tools display. */
-export function colorTokenValue(color: Color) {
+/**
+ * A color as DTCG 2025.10 writes it: components in the document's profile, alpha, and the hex
+ * code tools display. The hex is the sRGB color it shows, which is the stored color in an sRGB
+ * document and the nearest sRGB color in Display P3, where the components can pass 1.
+ */
+export function colorTokenValue(color: Color, profile: ColorProfile = 'srgb') {
+  const shown = profile === 'srgb' ? color : convertColor(color, profile, 'srgb')
   return {
-    colorSpace: 'srgb',
+    colorSpace: profile,
     components: [trimNumber(color.r), trimNumber(color.g), trimNumber(color.b)],
     alpha: trimNumber(color.a),
-    hex: colorToHex(color).toLowerCase()
+    hex: colorToHex(shown).toLowerCase()
   }
 }
 
@@ -54,9 +59,10 @@ function durationTokenValue(value: number, unit: TokenUnit) {
 /** A variable's own value in the shape its token type takes. */
 export function literalTokenValue(
   variable: Variable,
-  value: Color | number | string | boolean
+  value: Color | number | string | boolean,
+  profile: ColorProfile = 'srgb'
 ): unknown {
-  if (typeof value === 'object') return colorTokenValue(value)
+  if (typeof value === 'object') return colorTokenValue(value, profile)
   if (typeof value === 'boolean') return value ? 1 : 0
   if (typeof value === 'string') return value
   const type = variableTokenType(variable)

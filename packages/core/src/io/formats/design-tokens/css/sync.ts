@@ -107,6 +107,8 @@ export function patchTokenStylesheet(
   const wanted = wantedScopes(generated)
   const base = wanted.get('')?.values ?? new Map<string, string>()
   const known = knownTokens(graph)
+  // A color that names its own space converts into the profile, and a written one comes from it.
+  const profile = graph.documentColorSpace
 
   /**
    * What a scope should declare for a property. A mode writes only what differs from its default,
@@ -136,13 +138,13 @@ export function patchTokenStylesheet(
       const want = expected(key, declaration.name)
       if (want === undefined) continue
       const font = namesFont(declaration.name)
-      const previous = readCSSTokenValue(declaration.value, { font })
-      const next = readCSSTokenValue(want, { font })
+      const previous = readCSSTokenValue(declaration.value, { font, profile })
+      const next = readCSSTokenValue(want, { font, profile })
       if (sameCSSTokenValue(previous, next)) continue
       edits.push({
         start: declaration.start,
         end: declaration.end,
-        text: rewriteCSSTokenValue(previous, next, want)
+        text: rewriteCSSTokenValue(previous, next, want, profile)
       })
       updated++
     }
@@ -160,7 +162,10 @@ export function patchTokenStylesheet(
     const from = key === '' ? undefined : inherited.get(name)
     if (from === undefined) return false
     const font = namesFont(name)
-    return sameCSSTokenValue(readCSSTokenValue(from, { font }), readCSSTokenValue(value, { font }))
+    return sameCSSTokenValue(
+      readCSSTokenValue(from, { font, profile }),
+      readCSSTokenValue(value, { font, profile })
+    )
   }
 
   let added = 0

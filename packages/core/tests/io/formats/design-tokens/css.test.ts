@@ -465,3 +465,40 @@ describe('writing variables into a stylesheet', () => {
     )
   })
 })
+
+describe('color tokens in a Display P3 document', () => {
+  function stored(graph: SceneGraph, css: string) {
+    importCSS(graph, `:root { ${css} }`)
+    const variable = variableNamed(graph, 'brand')
+    const collection = graph.variableCollections.get(variable.collectionId)
+    if (!collection) throw new Error('no collection')
+    const value = variable.valuesByMode[collection.defaultModeId]
+    if (typeof value !== 'object' || !('r' in value)) throw new Error('no color value')
+    return value
+  }
+
+  test('keeps an oklch color as the color it names', () => {
+    const graph = new SceneGraph()
+    graph.documentColorSpace = 'display-p3'
+    const value = stored(graph, '--brand: oklch(70% 0.25 145);')
+    expect(value.r).toBeCloseTo(0.2749, 3)
+    expect(value.g).toBeCloseTo(0.7513, 3)
+    expect(value.b).toBeCloseTo(0.2254, 3)
+  })
+
+  test('maps it into sRGB in an sRGB document, as before', () => {
+    const value = stored(new SceneGraph(), '--brand: oklch(70% 0.25 145);')
+    expect(value.r).toBeCloseTo(0, 3)
+    expect(value.g).toBeCloseTo(0.7637, 3)
+    expect(value.b).toBeCloseTo(0.0424, 3)
+  })
+
+  test('keeps a color(display-p3) value whole', () => {
+    const graph = new SceneGraph()
+    graph.documentColorSpace = 'display-p3'
+    const value = stored(graph, '--brand: color(display-p3 1 0 0);')
+    expect(value.r).toBeCloseTo(1, 6)
+    expect(value.g).toBeCloseTo(0, 6)
+    expect(value.b).toBeCloseTo(0, 6)
+  })
+})

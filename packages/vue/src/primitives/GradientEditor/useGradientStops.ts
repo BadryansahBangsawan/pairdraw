@@ -1,7 +1,7 @@
-import { computed, ref, type MaybeRefOrGetter, type Ref } from 'vue'
+import { computed, ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 
 import type { ColorProfile, Fill, GradientStop, GradientTransform } from '@pairdraw/scene-graph'
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import { DEFAULT_GRADIENT_TRANSFORM } from '@pairdraw/scene-graph/gradient'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -41,11 +41,14 @@ export function useGradientStops(
     return s[Math.min(activeStopIndex.value, s.length - 1)].color
   })
 
-  const barBackground = computed(() =>
-    stops.value.length
-      ? `linear-gradient(to right, ${stops.value.map((s) => `${colorToCSS(s.color)} ${s.position * 100}%`).join(', ')})`
-      : ''
-  )
+  const barBackground = computed(() => {
+    if (!stops.value.length) return ''
+    const profile = toValue(options.colorProfile ?? 'srgb')
+    const paints = stops.value.map(
+      (s) => `${colorToDocumentCSS(s.color, profile)} ${s.position * 100}%`
+    )
+    return `linear-gradient(to right, ${paints.join(', ')})`
+  })
 
   function emitStops(newStops: GradientStop[]) {
     onUpdate({ ...fill.value, gradientStops: newStops })

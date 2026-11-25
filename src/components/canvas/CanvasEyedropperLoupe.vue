@@ -7,7 +7,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, useTemplateRef, watchEffect } from 'vue'
 
-import { colorToDocumentCSS, colorToHexRaw } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS, colorToHexRaw, convertColor } from '@pairdraw/scene-graph/color'
 import type { EyedropperLoupe } from '@pairdraw/vue/canvas/eyedropper'
 
 import { useEditorStore } from '@/app/editor/active-store'
@@ -20,6 +20,11 @@ const store = useEditorStore()
 const swatch = computed(() => {
   const color = loupe.color.value
   return color ? colorToDocumentCSS(color, store.graph.documentColorSpace) : undefined
+})
+// A hex code names an sRGB color, so the value reads the color the swatch and canvas draw.
+const hex = computed(() => {
+  const color = loupe.color.value
+  return color ? colorToHexRaw(convertColor(color, store.graph.documentColorSpace, 'srgb')) : ''
 })
 
 /** From the card's corner to the centre pixel's centre: 0.375rem padding and 4.5 pixels of 0.5rem. */
@@ -56,7 +61,7 @@ watchEffect(() => {
       </div>
       <div :class="styles.value()">
         <span :class="styles.swatch()" :style="{ background: swatch }" />
-        <span data-test-id="eyedropper-loupe-value">{{ colorToHexRaw(loupe.color.value) }}</span>
+        <span data-test-id="eyedropper-loupe-value">{{ hex }}</span>
       </div>
     </div>
   </Teleport>

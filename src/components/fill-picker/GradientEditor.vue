@@ -157,6 +157,7 @@ function listStopClass(active: boolean) {
 
       <ColorPickerPanel
         :color="root.activeColor"
+        :color-profile="store.graph.documentColorSpace"
         eyedropper
         @update="root.actions.updateActiveColor"
       />

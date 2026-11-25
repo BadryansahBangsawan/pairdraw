@@ -156,3 +156,29 @@ test('closing the picker while it samples leaves the eyedropper', async () => {
   await expect.poll(() => eyedropper.selectedId()).not.toBe(target)
   expect(await eyedropper.topPaint(target, 'fills')).toEqual({ color: TARGET })
 })
+
+/** sRGB red, stored in a Display P3 document: its P3 components are not its sRGB ones. */
+const SRGB_RED_IN_P3 = {
+  r: 0.9174875573251657,
+  g: 0.20028680774084662,
+  b: 0.13856059121111408,
+  a: 1
+}
+
+test('the loupe reads a Display P3 document pixel as the sRGB hex it draws', async () => {
+  const { page, canvas } = editor
+  await canvas.drawRect(100, 120, 100, 100)
+  const sampled = await eyedropper.selectedId()
+  if (!sampled) throw new Error('Drawing the rectangle selected nothing')
+  await eyedropper.setFill(sampled, SRGB_RED_IN_P3)
+  await page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    store.setDocumentColorSpace('display-p3')
+  })
+  await canvas.waitForRender()
+
+  await canvas.pressKey('i')
+  await canvas.hover(150, 170)
+  await expect(page.getByTestId('eyedropper-loupe-value')).toHaveText('FF0000')
+})

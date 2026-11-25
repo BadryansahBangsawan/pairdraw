@@ -4,7 +4,6 @@ import type { Editor } from '@pairdraw/core'
 import type { IORegistry } from '@pairdraw/core/io'
 import { createSelectedNodeState } from '@pairdraw/vue/editor/selection-state'
 
-import { exposeShaderPlayback } from '@/app/browser/bridge'
 import { createDocumentExportActions } from '@/app/document/export'
 import { createDocumentIOActions } from '@/app/document/io'
 import type { ViewportInsets, ViewportSize } from '@/app/document/io/types'
@@ -78,7 +77,6 @@ export function createEditorStoreModules(
   const profiler = createProfilerActions(editor)
   const designCheck = createDesignCheck(editor, state)
   const shaderClock = createShaderClock(editor, () => viewportSize)
-  exposeShaderPlayback(editor)
   const { onDispose, notifyDispose } = createDisposeListeners()
 
   return {

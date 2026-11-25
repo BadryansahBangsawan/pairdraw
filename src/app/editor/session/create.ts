@@ -6,6 +6,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 import { createShaderRasterizer } from '@pairdraw/vue/canvas/surface'
 
 import { stopAIEditMotion } from '@/app/ai/motion'
+import { exposeShaderPlayback } from '@/app/browser/bridge'
 import { useCollabIdentity } from '@/app/collab/identity'
 import { isEditorStoreInFront } from '@/app/editor/active-store'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
@@ -209,6 +210,9 @@ function buildEditorStore(initialGraph?: SceneGraph) {
   }
 
   defineEditorStoreAccessors(store, editor)
+  // The canvases draw with this store, not the editor it wraps, so its playback stats are filed
+  // under the store: a hook keyed by the editor would read a canvas that never reports.
+  exposeShaderPlayback(store)
   followLinkedTokenCSS(store)
 
   return store

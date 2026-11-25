@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Salin halaman web atau salah satu elemennya dan tempel ke Pairdraw sebagai layer yang bisa diedit dan sudah bergaya."
+  },
+  "actionTitle": {
+    "message": "Salin ke Pairdraw"
+  },
+  "popupTitle": {
+    "message": "Salin ke Pairdraw"
+  },
+  "copyPage": {
+    "message": "Salin halaman"
+  },
+  "copyPageHint": {
+    "message": "Seluruh halaman, seperti yang Anda lihat"
+  },
+  "pickElement": {
+    "message": "Pilih elemen"
+  },
+  "pickElementHint": {
+    "message": "Klik bagian mana saja di halaman"
+  },
+  "includeImages": {
+    "message": "Sertakan gambar dari situs lain"
+  },
+  "includeImagesHint": {
+    "message": "Meminta izin membaca gambar dari situs mana pun selama Anda menangkap."
+  },
+  "statusCopying": {
+    "message": "Menyalin…"
+  },
+  "statusCopied": {
+    "message": "Disalin. Tempel ke canvas Pairdraw."
+  },
+  "statusUnavailable": {
+    "message": "Halaman ini tidak bisa ditangkap. Coba halaman web biasa."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Menyalin butuh halaman yang disajikan lewat HTTPS."
+  },
+  "statusFailed": {
+    "message": "Tidak bisa menyalin tangkapan: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Klik elemen atau tekan Enter untuk menyalinnya · ↑ ↓ pindah ke induk atau anaknya · Esc membatalkan"
+  }
+}

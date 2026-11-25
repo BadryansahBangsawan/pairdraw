@@ -27,7 +27,7 @@ async function readJSON<TSchema extends v.GenericSchema>(path: string, schema: T
 }
 
 /** The app's locales, in the folder names Chrome gives them. */
-const LOCALES = ['en', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'ru', 'zh_CN']
+const LOCALES = ['en', 'de', 'es', 'fr', 'id', 'it', 'ja', 'pl', 'ru', 'zh_CN']
 /** Messages the manifest itself uses, besides those the scripts and popup use. */
 const MANIFEST_KEYS = ['extensionName', 'extensionDescription', 'actionTitle']
 

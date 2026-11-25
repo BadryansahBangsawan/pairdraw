@@ -91,6 +91,7 @@ const localeLoaders = {
   de: () => import('./locales/de.json'),
   es: () => import('./locales/es.json'),
   fr: () => import('./locales/fr.json'),
+  id: () => import('./locales/id.json'),
   it: () => import('./locales/it.json'),
   ja: () => import('./locales/ja.json'),
   pl: () => import('./locales/pl.json'),

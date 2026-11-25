@@ -1,7 +1,18 @@
 import { localeFrom } from '@nanostores/i18n'
 import { atom, onStart } from 'nanostores'
 
-export const AVAILABLE_LOCALES = ['en', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'ru', 'zh-CN'] as const
+export const AVAILABLE_LOCALES = [
+  'en',
+  'de',
+  'es',
+  'fr',
+  'id',
+  'it',
+  'ja',
+  'pl',
+  'ru',
+  'zh-CN'
+] as const
 export type Locale = (typeof AVAILABLE_LOCALES)[number]
 export type TranslatedLocale = Exclude<Locale, 'en'>
 
@@ -9,6 +20,7 @@ export const TRANSLATED_LOCALES = [
   'de',
   'es',
   'fr',
+  'id',
   'it',
   'ja',
   'pl',
@@ -20,6 +32,7 @@ export const LOCALE_DIR_NAMES = {
   de: 'de',
   es: 'es',
   fr: 'fr',
+  id: 'id',
   it: 'it',
   ja: 'ja',
   pl: 'pl',
@@ -32,6 +45,7 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   de: 'Deutsch',
   es: 'Español',
   fr: 'Français',
+  id: 'Bahasa Indonesia',
   it: 'Italiano',
   ja: '日本語',
   pl: 'Polski',

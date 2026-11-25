@@ -14,6 +14,11 @@ describe('browser locale matching', () => {
   test('prefers exact supported regional locales', () => {
     expect(resolveBrowserLocale(['zh-CN', 'en-US'])).toBe('zh-CN')
     expect(resolveBrowserLocale(['ZH-cn', 'en-US'])).toBe('zh-CN')
+    expect(resolveBrowserLocale(['id-ID', 'en-US'])).toBe('id')
+  })
+
+  test('reads Indonesian under its legacy language code', () => {
+    expect(resolveBrowserLocale(['in-ID'])).toBe('id')
   })
 
   test('reads a language in the script the locale is written in', () => {

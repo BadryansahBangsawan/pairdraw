@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 
 import { serializeHTML } from '#dom-css/export/html'
-
 import { sandboxedDesignDocument } from '#dom-css/runtime/browser/sandbox'
 import { createHeadlessCSSRuntime } from '#dom-css/runtime/headless/runtime'
 
-const AGENT_HTML = '<div class="flex gap-2 p-4 bg-red-500"><div class="w-5 h-5 bg-blue-500"></div></div>'
+const AGENT_HTML =
+  '<div class="flex gap-2 p-4 bg-red-500"><div class="w-5 h-5 bg-blue-500"></div></div>'
 
 const PASTE_HTML =
   '<meta charset="utf-8"><div style="display: flex; gap: 8px; padding: 12px; width: 200px; background-color: rgb(16, 185, 129)"><span style="color: white">Sale</span><b>-20%</b></div>'

@@ -20,6 +20,18 @@ export type ShaderGalleryId =
   | 'marble'
   | 'neonGrid'
   | 'velvet'
+  | 'liquidChrome'
+  | 'flutedGlass'
+  | 'paperStock'
+  | 'godRays'
+  | 'thermal'
+  | 'voronoiCells'
+  | 'deepWater'
+  | 'smokePlume'
+  | 'neonPulse'
+  | 'grainWash'
+  | 'obsidian'
+  | 'marbleInk'
 
 export interface ShaderGalleryEntry {
   id: ShaderGalleryId
@@ -138,6 +150,294 @@ export const SHADER_GALLERY: readonly ShaderGalleryEntry[] = [
         { type: 'Satin', props: { color: '#7f1d3a', highlightColor: '#e8798f' } },
         { type: 'LightLeak', props: { intensity: 0.25 } },
         { type: 'FilmGrain', props: { strength: 0.2 } }
+      ]
+    }
+  },
+  {
+    id: 'liquidChrome',
+    preset: {
+      components: [
+        {
+          type: 'LiquidMetal',
+          props: {
+            lightColor: '#f5f7fa',
+            darkColor: '#1c1f26',
+            turbulence: 0.55,
+            ripple: 1.2,
+            sharpness: 0.8,
+            dispersion: 0.25,
+            speed: 0.35
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.08, bias: 0.04 } }
+      ]
+    }
+  },
+  {
+    id: 'flutedGlass',
+    preset: {
+      components: [
+        {
+          type: 'FlowingGradient',
+          props: {
+            colorA: '#0f1b2d',
+            colorB: '#1f4b6e',
+            colorC: '#8fd3ff',
+            colorD: '#f5f9ff',
+            distortion: 0.7,
+            speed: 0.2
+          }
+        },
+        {
+          type: 'FlutedGlass',
+          props: {
+            frequency: 18,
+            refraction: 0.6,
+            aberration: 0.3,
+            highlight: 0.5,
+            edges: 'mirror',
+            speed: 0.2
+          }
+        }
+      ]
+    }
+  },
+  {
+    id: 'paperStock',
+    preset: {
+      components: [
+        {
+          type: 'FlowingGradient',
+          props: { colorA: '#efe7d8', colorB: '#e2d6c2', distortion: 0.2, speed: 0 }
+        },
+        {
+          type: 'Paper',
+          props: { roughness: 0.65, grainScale: 0.8, displacement: 0.25, seed: 7 }
+        }
+      ]
+    }
+  },
+  {
+    id: 'godRays',
+    preset: {
+      components: [
+        {
+          type: 'Godrays',
+          props: {
+            rayColor: '#ffe9b0',
+            backgroundColor: '#0b0a12',
+            density: 0.7,
+            intensity: 0.9,
+            spotty: 0.3,
+            speed: 0.15
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.12 } }
+      ]
+    }
+  },
+  {
+    id: 'thermal',
+    preset: {
+      components: [
+        {
+          type: 'Heatmap',
+          props: {
+            colorA: '#08131f',
+            colorB: '#f7f3cf',
+            stops: [
+              { color: '#08131f', position: 0 },
+              { color: '#1d6fb8', position: 0.3 },
+              { color: '#f2d21a', position: 0.55 },
+              { color: '#f08a24', position: 0.78 },
+              { color: '#e0212f', position: 1 }
+            ],
+            innerGlow: 0.6,
+            outerGlow: 0.4,
+            contour: 0.2,
+            speed: 0.3
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.06 } }
+      ]
+    }
+  },
+  {
+    id: 'voronoiCells',
+    preset: {
+      components: [
+        {
+          type: 'Voronoi',
+          props: {
+            colorA: '#101820',
+            colorB: '#3fb6a8',
+            colorBorder: '#e8fff9',
+            scale: 9,
+            edgeIntensity: 0.7,
+            edgeSoftness: 0.15,
+            seed: 21,
+            speed: 0.1
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.08 } }
+      ]
+    }
+  },
+  {
+    id: 'deepWater',
+    preset: {
+      components: [
+        {
+          type: 'Water',
+          props: {
+            waterColor: '#0a2a43',
+            clarity: 0.55,
+            depth: 0.8,
+            shallows: 0.35,
+            caustics: 0.6,
+            causticScale: 2.4,
+            choppiness: 0.35,
+            waveScale: 1.2,
+            reflection: 0.4,
+            foam: 0.15,
+            speed: 0.25
+          }
+        },
+        {
+          type: 'LightLeak',
+          props: {
+            colorHot: '#9fe2ff',
+            colorMid: '#1f4b6e',
+            intensity: 0.25,
+            spread: 0.6,
+            speed: 0.15
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.06 } }
+      ]
+    }
+  },
+  {
+    id: 'smokePlume',
+    preset: {
+      components: [
+        {
+          type: 'SmokeFill',
+          props: {
+            colorA: '#ffffff',
+            colorB: '#6d6a75',
+            direction: 90,
+            speed: 0.25,
+            spread: 0.5,
+            emitRadius: 0.2,
+            intensity: 0.8,
+            dissipation: 0.55,
+            detail: 0.6,
+            gravity: 0.05,
+            colorDecay: 0.4
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.05 } }
+      ]
+    }
+  },
+  {
+    id: 'neonPulse',
+    preset: {
+      components: [
+        {
+          type: 'LightEdge',
+          props: {
+            colorA: '#ff2fb3',
+            colorB: '#22d3ee',
+            stops: [
+              { color: '#ff2fb3', position: 0 },
+              { color: '#22d3ee', position: 1 }
+            ],
+            thickness: 0.35,
+            softness: 0.5,
+            intensity: 0.9,
+            bloom: 0.7,
+            spots: 3,
+            pulse: 0.6,
+            smoke: 0.2,
+            speed: 0.5
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.06 } }
+      ]
+    }
+  },
+  {
+    id: 'grainWash',
+    preset: {
+      components: [
+        {
+          type: 'FlowingGradient',
+          props: {
+            colorA: '#0b1026',
+            colorB: '#243b80',
+            colorC: '#7c5cff',
+            colorD: '#ffb86b',
+            distortion: 0.7,
+            speed: 0.25
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.18, bias: 0.05 } }
+      ]
+    }
+  },
+  {
+    id: 'obsidian',
+    preset: {
+      components: [
+        {
+          type: 'Obsidian',
+          props: {
+            bodyColor: '#0a0b0f',
+            colorA: '#3b0f52',
+            colorB: '#0f6b6b',
+            iridescence: 0.5,
+            rimWidth: 0.25,
+            rimSoftness: 0.3,
+            flowScale: 1.6,
+            gloss: 0.7,
+            bevelWidth: 0.2,
+            speed: 0.2
+          }
+        },
+        { type: 'FilmGrain', props: { strength: 0.06 } }
+      ]
+    }
+  },
+  {
+    id: 'marbleInk',
+    preset: {
+      components: [
+        {
+          type: 'Marble',
+          props: {
+            colorA: '#f7f4ee',
+            colorB: '#20232b',
+            colorC: '#8a8f9a',
+            turbulence: 8,
+            scale: 1.4,
+            speed: 0.05
+          }
+        },
+        {
+          type: 'Halftone',
+          props: {
+            style: 'cmyk',
+            frequency: 70,
+            paperColor: '#f7f4ee',
+            cyanColor: '#00a6c9',
+            magentaColor: '#e0218a',
+            yellowColor: '#f2d21a',
+            blackColor: '#111111',
+            misprint: 0.005
+          }
+        }
       ]
     }
   }

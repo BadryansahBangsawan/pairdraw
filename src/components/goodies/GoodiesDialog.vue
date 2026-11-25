@@ -73,7 +73,19 @@ const shaderNames = computed<Record<ShaderGalleryId, string>>(() => ({
   glassOrb: panels.value.shaderGalleryGlassOrb,
   marble: panels.value.shaderGalleryMarble,
   neonGrid: panels.value.shaderGalleryNeonGrid,
-  velvet: panels.value.shaderGalleryVelvet
+  velvet: panels.value.shaderGalleryVelvet,
+  liquidChrome: panels.value.shaderGalleryLiquidChrome,
+  flutedGlass: panels.value.shaderGalleryFlutedGlass,
+  paperStock: panels.value.shaderGalleryPaperStock,
+  godRays: panels.value.shaderGalleryGodRays,
+  thermal: panels.value.shaderGalleryThermal,
+  voronoiCells: panels.value.shaderGalleryVoronoiCells,
+  deepWater: panels.value.shaderGalleryDeepWater,
+  smokePlume: panels.value.shaderGallerySmokePlume,
+  neonPulse: panels.value.shaderGalleryNeonPulse,
+  grainWash: panels.value.shaderGalleryGrainWash,
+  obsidian: panels.value.shaderGalleryObsidian,
+  marbleInk: panels.value.shaderGalleryMarbleInk
 }))
 
 /** The sections a tab shows: Featured shows the first few of each kind, a kind's tab all of it. */

@@ -113,6 +113,25 @@ describe('vectorize_image', () => {
     expect(page.childIds).toEqual(before)
   })
 
+  test('reads a color that names its space into the document profile', async () => {
+    const { graph, figma, node } = setup()
+    graph.documentColorSpace = 'display-p3'
+    const oklch =
+      '<svg viewBox="0 0 100 100"><path d="M0 0 H100 V100 H0 Z" fill="oklch(70% 0.25 145)"/></svg>'
+    registerImageVectorizer(graph, { vectorize: async () => oklch })
+
+    const result = await tool.execute(figma, { id: node.id })
+    if (!result || !('id' in result)) throw new Error('no frame')
+    const frame = getNodeOrThrow(graph, result.id)
+    const vector = frame.childIds.map((id) => getNodeOrThrow(graph, id))[0]
+    const fill = vector?.fills.find((paint) => paint.type === 'SOLID')
+    if (!fill) throw new Error('no fill')
+    // Display P3 holds part of this chroma that sRGB cannot: its red stays above zero.
+    expect(fill.color.r).toBeCloseTo(0.2749, 3)
+    expect(fill.color.g).toBeCloseTo(0.7513, 3)
+    expect(fill.color.b).toBeCloseTo(0.2254, 3)
+  })
+
   test('adds nothing when the image changed while the service worked', async () => {
     const { graph, figma, page, node } = setup()
     registerImageVectorizer(graph, {

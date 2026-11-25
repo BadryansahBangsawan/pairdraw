@@ -75,7 +75,11 @@ export const vectorizeImage = defineTool({
     if (!current || vectorizableImageFill(current)?.imageHash !== fill.imageHash) {
       return { error: `The image of "${node.name}" changed before vectorizing finished` }
     }
-    const vectorized = svgToVectorPaths(svg, { width: current.width, height: current.height })
+    const vectorized = svgToVectorPaths(
+      svg,
+      { width: current.width, height: current.height },
+      { profile: graph.documentColorSpace }
+    )
     if (!vectorized?.paths.length) return { error: 'The vectorize service returned no paths' }
     const frameId = createVectorFrameBeside(graph, id, vectorized)
     const frame = frameId ? graph.getNode(frameId) : undefined

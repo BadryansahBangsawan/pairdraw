@@ -236,8 +236,10 @@ export const aiMessageDefaults = {
   commentPromptThreadOnLayer: params('Thread {id} on {layer}'),
   /** Under a thread's heading when the person circled an area instead of just clicking. */
   commentPromptRegion: params(
-    'Marked area: x {minX} to {maxX}, y {minY} to {maxY} on the page; an image of it is attached. Change only what is inside it.'
+    'Marked area: x {minX} to {maxX}, y {minY} to {maxY} on the page. Change only what is inside it.'
   ),
+  /** Added only when a crop of that area travels with the prompt. */
+  commentPromptRegionImage: 'An image of the marked area is attached as a crop.',
   commentPromptRegionLayers: params('Layers inside the marked area: {layers}'),
   canvasPrompt: 'Prompt on the canvas',
   canvasPromptHint:

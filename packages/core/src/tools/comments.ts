@@ -46,7 +46,8 @@ export const addComment = defineTool({
   name: 'add_comment',
   description:
     'Leave a comment on the canvas, as a person does with the Comment tool: pinned on a layer ' +
-    'by ID, which it then follows, or at x, y on a page. Text may use Markdown: **bold**, ' +
+    'by ID, which it then follows, or at x, y on a page. A comment may carry a stroke the person ' +
+    'drew around the area to change. Text may use Markdown: **bold**, ' +
     '*italic*, ~~strikethrough~~, [links](https://…), and - or 1. lists.',
   execution: { kind: 'sync', mutation: 'document' },
   input: v.strictObject({

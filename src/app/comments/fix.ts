@@ -4,7 +4,7 @@ import { commentPosition } from '@pairdraw/scene-graph/comments'
 import type { VisualBounds } from '@pairdraw/scene-graph/geometry'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
-import { createImagePreviewURL } from '@/app/ai/attachment/image/prepare'
+import { createImagePreviewURL, revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import type { ImageAttachmentDraft } from '@/app/ai/attachment/image/types'
 import { commentThreadsPrompt } from '@/app/ai/chat/entry/comments'
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
@@ -18,7 +18,11 @@ export const REGION_CROP_MARGIN = 16
 /** Longest edge of the crop sent with the prompt, in pixels; enough to judge contrast and spacing. */
 export const REGION_CROP_MAX_EDGE = 768
 
-/** The part of the page a drawn thread's crop shows, and the scale it is rendered at. */
+/**
+ * The part of the page a drawn thread's crop shows, and the scale it is rendered at. A page is an
+ * unbounded canvas (its `CANVAS` node has no width or height), so there is no page rect to clip
+ * the crop to; a ring drawn past the visible content still renders, with the page colour behind.
+ */
 export function regionCrop(
   region: NonNullable<CommentThread['region']>,
   at: Vector
@@ -37,16 +41,30 @@ export function regionCrop(
   }
 }
 
+/** What one Fix click needs from outside: the crop renderer and the chat's door. */
+export interface FixAgentDeps {
+  renderRegion: typeof renderRegionToImage
+  accepts: typeof acceptsDocumentPrompts
+  send: typeof runPromptInDocument
+}
+
+const liveDeps: FixAgentDeps = {
+  renderRegion: renderRegionToImage,
+  accepts: acceptsDocumentPrompts,
+  send: runPromptInDocument
+}
+
 /** One PNG of the marked area, or none when this tab cannot render it. */
 async function regionImage(
   store: EditorStore,
-  thread: CommentThread
+  thread: CommentThread,
+  renderRegion: typeof renderRegionToImage
 ): Promise<ImageAttachmentDraft | null> {
   const renderer = store.renderer
   if (!renderer || !thread.region) return null
   const crop = regionCrop(thread.region, commentPosition(store.graph, thread))
   if (crop.scale <= 0) return null
-  const bytes = await renderRegionToImage(
+  const bytes = await renderRegion(
     renderer.ck,
     store.graph,
     thread.pageId,
@@ -69,11 +87,18 @@ async function regionImage(
  */
 export async function fixThreadWithAgent(
   store: EditorStore,
-  thread: CommentThread
+  thread: CommentThread,
+  deps: FixAgentDeps = liveDeps
 ): Promise<boolean> {
-  if (!acceptsDocumentPrompts(store)) return false
-  const prompt = commentThreadsPrompt(store.graph, [thread])
-  if (!prompt) return false
-  const image = await regionImage(store, thread)
-  return runPromptInDocument(store, prompt, { images: image ? [image] : [] })
+  if (!deps.accepts(store)) return false
+  const image = await regionImage(store, thread, deps.renderRegion)
+  const prompt = commentThreadsPrompt(store.graph, [thread], { regionImages: image !== null })
+  if (!prompt) {
+    if (image) revokeImagePreviewURL(image.previewURL)
+    return false
+  }
+  const sent = await deps.send(store, prompt, { images: image ? [image] : [] })
+  // The chat can refuse the prompt after setup is dismissed; the blob would then outlive its use.
+  if (!sent && image) revokeImagePreviewURL(image.previewURL)
+  return sent
 }

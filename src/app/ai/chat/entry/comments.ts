@@ -13,8 +13,16 @@ type CommentPromptMessages = Pick<
   | 'commentPromptThread'
   | 'commentPromptThreadOnLayer'
   | 'commentPromptRegion'
+  | 'commentPromptRegionImage'
   | 'commentPromptRegionLayers'
 >
+
+/** How a prompt is built for one click: its copy, and whether a crop travels with it. */
+export interface CommentPromptOptions {
+  messages?: CommentPromptMessages
+  /** A crop of each marked area is attached to this submission, so the prompt may say so. */
+  regionImages?: boolean
+}
 
 /** Layers named under a region; a page's whole stack would say less than the ones that matter. */
 const REGION_LAYER_LIMIT = 12
@@ -37,7 +45,8 @@ function quote(author: string, text: string): string {
 function regionSection(
   graph: SceneGraph,
   thread: CommentThread,
-  messages: CommentPromptMessages
+  messages: CommentPromptMessages,
+  regionImages: boolean
 ): string[] {
   const region = thread.region
   if (!region) return []
@@ -50,6 +59,7 @@ function regionSection(
       maxY: Math.round(bounds.maxY)
     })
   ]
+  if (regionImages) lines.push(messages.commentPromptRegionImage)
   const layers = layersInBounds(graph, thread.pageId, bounds, new Set())
     .slice(0, REGION_LAYER_LIMIT)
     .flatMap((id) => {
@@ -70,7 +80,8 @@ function regionSection(
 function threadSection(
   graph: SceneGraph,
   thread: CommentThread,
-  messages: CommentPromptMessages
+  messages: CommentPromptMessages,
+  regionImages: boolean
 ): string {
   const node = thread.nodeId ? graph.getNode(thread.nodeId) : undefined
   const heading = node
@@ -82,9 +93,11 @@ function threadSection(
   const messagesInThread = [thread, ...liveReplies(thread)].map((entry) =>
     quote(entry.author, entry.text)
   )
-  return [heading, ...regionSection(graph, thread, messages), messagesInThread.join('\n>\n')].join(
-    '\n'
-  )
+  return [
+    heading,
+    ...regionSection(graph, thread, messages, regionImages),
+    messagesInThread.join('\n>\n')
+  ].join('\n')
 }
 
 /**
@@ -95,10 +108,14 @@ function threadSection(
 export function commentThreadsPrompt(
   graph: SceneGraph,
   threads: readonly CommentThread[],
-  messages: CommentPromptMessages = aiMessages.get()
+  options: CommentPromptOptions = {}
 ): string | null {
+  const messages = options.messages ?? aiMessages.get()
+  const regionImages = options.regionImages ?? false
   const open = openCommentThreads(threads).toSorted(byCreatedAt)
   if (open.length === 0) return null
   const ask = open.length === 1 ? messages.commentPromptApply : messages.commentPromptApplyAll
-  return [ask, ...open.map((thread) => threadSection(graph, thread, messages))].join('\n\n')
+  return [ask, ...open.map((thread) => threadSection(graph, thread, messages, regionImages))].join(
+    '\n\n'
+  )
 }

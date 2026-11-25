@@ -115,6 +115,34 @@ describe('comment threads as prompts', () => {
     expect(prompt).toContain('Marked area: x 100 to 140, y 200 to 220 on the page')
     expect(prompt).toContain('Layers inside the marked area: [Button](pairdraw://node/')
     expect(findReferences(prompt).map(({ reference }) => reference.id)).toEqual([button.id])
+    // No crop travels with a bulk prompt, so it must not claim one.
+    expect(prompt).not.toContain('An image of the marked area is attached as a crop.')
+  })
+
+  test('a prompt that carries a crop of the marked area says so', () => {
+    const graph = new SceneGraph()
+    const prompt =
+      commentThreadsPrompt(
+        graph,
+        [
+          thread({
+            id: 'c-5',
+            x: 100,
+            y: 200,
+            region: {
+              points: [
+                [0, 0],
+                [40, 20]
+              ],
+              width: 2,
+              bounds: { minX: 0, minY: 0, maxX: 40, maxY: 20 }
+            }
+          })
+        ],
+        { regionImages: true }
+      ) ?? ''
+
+    expect(prompt).toContain('An image of the marked area is attached as a crop.')
   })
 
   test('a thread without a region says nothing about one', () => {

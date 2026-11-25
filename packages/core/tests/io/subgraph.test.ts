@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { bindVariable } from '@pairdraw/scene-graph/variables'
 
 import { extractPageContext } from '#core/io/subgraph'
 
@@ -39,5 +40,33 @@ describe('extracting page context', () => {
     const shared = extractPageContext(graph, pageId, [card.id], { shareTables: true })
     expect(shared.variables).toBe(graph.variables)
     expect(shared.images).toBe(graph.images)
+  })
+
+  test('copies a deleted variable a layer still binds without listing it again', () => {
+    const { graph, pageId, card } = cardWithSwitch()
+    const collection = graph.createCollection('Colors')
+    const accent = graph.createVariable('Accent', 'COLOR', collection.id, {
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 1
+    })
+    const retired = graph.createVariable('Retired', 'COLOR', collection.id, {
+      r: 0,
+      g: 0,
+      b: 1,
+      a: 1
+    })
+    graph.addVariable({ ...retired, deleted: true })
+    const layer = graph.createNode('FRAME', card.id, {
+      name: 'Tinted',
+      fills: [{ type: 'SOLID', color: { r: 0, g: 0, b: 1, a: 1 }, opacity: 1, visible: true }]
+    })
+    bindVariable(graph, layer.id, 'fills/0/color', retired.id)
+
+    const copy = extractPageContext(graph, pageId, [card.id])
+    expect(copy.variables.get(retired.id)?.deleted).toBe(true)
+    expect(copy.variables.has(accent.id)).toBe(false)
+    expect(copy.variableCollections.get(collection.id)?.variableIds).toEqual([])
   })
 })

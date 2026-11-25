@@ -32,7 +32,8 @@ function assertResourceOwnership(
   }
   for (const variable of variables) {
     const collection = sets.get(variable.collectionId)
-    if (!collection?.variableIds.includes(variable.id))
+    // A collection lists its live variables: a deleted one is kept out of the list (addVariable).
+    if (!collection || (!variable.deleted && !collection.variableIds.includes(variable.id)))
       throw new Error(`Missing collection membership for ${variable.id}`)
     const modes = new Set(collection.modes.map((mode) => mode.modeId))
     for (const mode of Object.keys(variable.valuesByMode)) {

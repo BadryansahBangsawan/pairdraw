@@ -59,6 +59,27 @@ test('variable transfer remaps resource membership, modes, and aliases with isol
   expect({ variables, collections }).toEqual(before)
 })
 
+test('variable transfer accepts a deleted variable its collection no longer lists', () => {
+  const withDeleted = structuredClone(variables)
+  withDeleted.push({
+    id: 'retired',
+    collectionId: 'set',
+    name: 'retired',
+    type: 'FLOAT',
+    description: '',
+    hiddenFromPublishing: false,
+    valuesByMode: { mode: 4 },
+    deleted: true
+  })
+  const deletedReferences = references()
+  deletedReferences.variables.set('retired', 'new-retired')
+
+  const prepared = prepareVariableTransfer(withDeleted, collections, deletedReferences)
+
+  expect(prepared.collections[0].variableIds).toEqual(['new-color', 'new-alias'])
+  expect(prepared.variables[2]).toMatchObject({ id: 'new-retired', deleted: true })
+})
+
 test('variable transfer rejects missing references and target collisions before mutation', () => {
   const invalidMode = structuredClone(variables)
   invalidMode[0].valuesByMode = { other: 12 }

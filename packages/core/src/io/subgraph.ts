@@ -138,7 +138,10 @@ function copyReferencedTables(source: SceneGraph, graph: SceneGraph): void {
         variableIds: []
       })
     }
-    graph.variableCollections.get(collection.id)?.variableIds.push(variableId)
+    // A collection lists its live variables; a deleted one is copied out of the list (addVariable).
+    if (!variable.deleted) {
+      graph.variableCollections.get(collection.id)?.variableIds.push(variableId)
+    }
   }
 }
 

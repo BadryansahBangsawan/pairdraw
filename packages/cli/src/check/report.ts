@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
 import type { CheckRun, FileCheck } from '#cli/check/run'
+import { driftLine } from '#cli/check/tokens'
 
 /** The marker the Action finds its own comment by; first line of the Markdown report. */
 export const COMMENT_MARKER = '<!-- pairdraw-check -->'
@@ -211,12 +212,7 @@ function tokenLines(file: FileCheck, perFile: number): string[] {
   if (!check || check.inSync) return []
   const lines = ['**Token drift**', '']
   for (const drift of check.drift.slice(0, perFile)) {
-    const where = `${drift.collection} / ${drift.variable}${drift.mode ? ` (${drift.mode})` : ''}`
-    const values = [
-      drift.code === undefined ? undefined : `code ${drift.code}`,
-      drift.canvas === undefined ? undefined : `canvas ${drift.canvas}`
-    ].filter((part) => part !== undefined)
-    lines.push(`- ${where}: ${drift.kind}${values.length > 0 ? `, ${values.join(', ')}` : ''}`)
+    lines.push(`- ${driftLine(drift)}`)
   }
   const rest = check.drift.length - perFile
   if (rest > 0) lines.push(`- … ${plural(rest, 'more token')} in \`report.json\``)

@@ -12,6 +12,7 @@ import { presenceOf } from '@/app/presence/registry'
 
 import { expectDefined, getNodeOrThrow } from '#tests/helpers/assert'
 import { createMemoryRooms } from '#tests/helpers/collab/memory-transport'
+import { armedAt, withIntervalArms } from '#tests/helpers/interval-arms'
 
 const ROOM_A = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const ROOM_B = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
@@ -276,6 +277,28 @@ describe('room sessions', () => {
       expect(guest.graph.getNode('peer')).toBeDefined()
       expect(guest.graph.getNode('agent')).toBeDefined()
       expect(guest.undo.undoLabel).toBe('Agent: eval')
+    })
+  })
+
+  test('stops rechecking the connection once the document is loaded', async () => {
+    const TICK_MS = 777
+    await withIntervalArms(async (armed) => {
+      await withRooms(async (open, settle) => {
+        const host = newStore('Shared')
+        open({ roomId: ROOM_A, store: host, origin: 'shared', tickMs: TICK_MS }).shareDocument()
+        const joined = open({
+          roomId: ROOM_A,
+          store: newStore(),
+          origin: 'joined',
+          tickMs: TICK_MS
+        })
+        // While the tab waits for the file, both sides look at the connection twice a second.
+        expect(armedAt(armed, TICK_MS)).toBe(2)
+
+        await settle()
+        expect(joined.hasDocument.value).toBe(true)
+        expect(armedAt(armed, TICK_MS)).toBe(0)
+      })
     })
   })
 })

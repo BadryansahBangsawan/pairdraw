@@ -338,9 +338,17 @@ export function openRoomSession({
     else connectedSince.value ??= now.value
   }
   checkConnection()
-  const connectionTimer = useIntervalFn(() => {
-    if (!hasDocument.value) checkConnection()
-  }, tickMs)
+  // Nothing reads the connection clock once the tab holds the document: the room status that uses
+  // it is live or alone from then on, so the poll stops rather than wake the tab twice a second.
+  const connectionTimer = useIntervalFn(() => checkConnection(), tickMs, { immediate: false })
+  watch(
+    hasDocument,
+    (has) => {
+      if (has) connectionTimer.pause()
+      else connectionTimer.resume()
+    },
+    { immediate: true }
+  )
 
   const stopNameWatch = watch(identity.name, broadcastIdentity)
   const stopZoomWatch = store.onEditorEvent('viewport:changed', (viewport) => {

@@ -1,0 +1,1 @@
+- A collaboration room stops rechecking its connection twice a second once its document has loaded.

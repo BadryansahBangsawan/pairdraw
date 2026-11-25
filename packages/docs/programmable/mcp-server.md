@@ -19,7 +19,7 @@ Restart the MCP server, then reconnect stdio clients, to apply changes. For an e
 
 ## Share only the selection {#selection-scope}
 
-Turn on **Share only the selection** in **Settings → MCP → Local server** to let MCP clients read only the layers you select. Clients then get `get_selection`, `get_node`, `get_page_tree`, `describe`, and `export_image`, and no tools that edit, open files, list documents, or change settings. Every node a call names must be a selected layer or inside one; `describe` and `export_image` read the selection when given no IDs, and `get_page_tree` needs a `root_id` from the selection. `export_image` returns the image but cannot write it to a file. With nothing selected, calls fail and ask the user to select layers.
+Turn on **Share only the selection** in **Settings → MCP → Local server** to let MCP clients read only the layers you select. Clients then get `get_selection`, `get_node`, `get_css`, `get_page_tree`, `describe`, and `export_image`, and no tools that edit, open files, list documents, or change settings. Every node a call names must be a selected layer or inside one; `describe`, `get_css`, and `export_image` read the selection when given no IDs, and `get_page_tree` needs a `root_id` from the selection. `export_image` returns the image but cannot write it to a file. With nothing selected, calls fail and ask the user to select layers.
 
 The server enforces this on every call it sends to the app, including `POST /rpc` and stdio clients, so a client cannot widen it. Restart the MCP server to apply the change. For a server you start yourself, set `PAIRDRAW_MCP_SCOPE=selection`; a stdio client can also set it to limit itself while the server shares the whole document.
 
@@ -242,7 +242,7 @@ Endpoints are available over both active transports:
 
 1. **Discover targets** — call `list_documents` first when more than one document or page may be open. It returns stable `document_id` and page IDs.
 2. **Open** — `open_file` to load an existing `.fig`, or `new_document` for a blank canvas. `list_recent_files` lists recently opened files inside the MCP root to reopen. These return target metadata for the opened or created document.
-3. **Read** — `get_page_tree`, `find_nodes`, `get_node`, `list_pages`
+3. **Read** — `get_page_tree`, `find_nodes`, `get_node`, `get_css`, `list_pages`
 4. **Create** — `create_shape`, `render` (JSX)
 5. **Modify** — `set_fill`, `set_stroke`, `set_layout`, `update_node`, `set_effects`, `set_reactions`
 6. **Structure** — `reparent_node`, `group_nodes`, `clone_node`, `delete_node`
@@ -320,6 +320,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `get_page_tree`        | Get the full node tree of the current page                                                                                                                                                                          |
 | `get_current_page`     | Get the current page name and ID                                                                                                                                                                                    |
 | `get_node`             | Get detailed properties of a node by ID                                                                                                                                                                             |
+| `get_css`              | Read a node subtree as compact CSS lines: flex/gap/padding/size constraints/colour tokens (`var(--token, #hex)`)/text, with a byte budget; the setters take the same shorthand                                      |
 | `find_nodes`           | Find nodes by name pattern and/or type                                                                                                                                                                              |
 | `get_components`       | List the document's components and those of enabled libraries; a component with slots lists each slot's preferred components and whether it takes only those                                                        |
 | `list_pages`           | List all pages                                                                                                                                                                                                      |

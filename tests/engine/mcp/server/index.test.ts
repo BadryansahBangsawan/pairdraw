@@ -443,6 +443,7 @@ describe('MCP server sharing only the selection', () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual([
       'describe',
       'export_image',
+      'get_css',
       'get_node',
       'get_page_tree',
       'get_selection'

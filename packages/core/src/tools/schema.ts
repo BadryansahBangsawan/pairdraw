@@ -386,3 +386,8 @@ export function toolNumber(schema: v.GenericSchema<number, number> = v.number())
     )
   ])
 }
+
+/** `ids`: several node IDs in one call; the description names what they point at. */
+export function nodeIdsField(description: string) {
+  return v.optional(v.pipe(v.array(v.string()), v.minLength(1), v.description(description)))
+}

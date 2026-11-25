@@ -12,6 +12,7 @@ export type MCPToolScope = (typeof MCP_TOOL_SCOPES)[number]
 export const SELECTION_SCOPE_TOOLS: Readonly<Record<string, readonly string[]>> = {
   get_selection: [],
   get_node: ['id'],
+  get_css: ['id', 'ids'],
   get_page_tree: ['root_id'],
   describe: ['id', 'ids'],
   export_image: ['ids']

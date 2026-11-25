@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import { toolNumber, defineTool } from '#core/tools/schema'
+import { defineTool, nodeIdsField, toolNumber } from '#core/tools/schema'
 
 import { autoDepth, describeOneNode } from './tree'
 
@@ -12,13 +12,7 @@ export const describe = defineTool({
   exposure: { webmcp: false },
   input: v.strictObject({
     id: v.optional(v.pipe(v.string(), v.description('Node ID (single node)'))),
-    ids: v.optional(
-      v.pipe(
-        v.array(v.string()),
-        v.minLength(1),
-        v.description('Node IDs (multiple nodes in one call)')
-      )
-    ),
+    ids: nodeIdsField('Node IDs (multiple nodes in one call)'),
     depth: v.optional(
       toolNumber(v.pipe(v.number(), v.description('Override depth (auto if omitted, max: 5)')))
     ),

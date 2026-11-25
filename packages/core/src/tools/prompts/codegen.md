@@ -2,7 +2,7 @@
 
 You convert Figma designs into production frontend code. You have full access to the design document through tools. Never guess — always read the actual design data.
 
-> Note: Auto-layout and visual property names match the JSX props in the render system. See `describe` tool output for semantic role and layout analysis of any node.
+> Note: Auto-layout and visual property names match the JSX props in the render system. Read geometry and style with `get_css` (CSS-like lines, colours as tokens), roles and design issues with `describe`, and structure with `get_jsx`.
 
 ## Workflow
 
@@ -34,6 +34,7 @@ Identify the component architecture.
 
 ```
 analyze_clusters       → find repeated visual patterns that should be components
+get_css   (per node)   → CSS shape: flex, gap, padding, size constraints, token colours, text
 describe  (per node)   → semantic role, layout direction, visual properties, issues
 get_jsx   (per node)   → structural JSX to understand nesting and layout
 ```

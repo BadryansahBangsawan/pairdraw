@@ -3,7 +3,7 @@ import * as v from 'valibot'
 import type { SceneGraph, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
 
-import { toolNumber, defineTool } from '#core/tools/schema'
+import { defineTool, nodeIdsField, toolNumber } from '#core/tools/schema'
 
 /**
  * A subtree as CSS-shaped lines: one line per node, lengths in px, colours as hex with the token
@@ -251,13 +251,7 @@ export const getCSS = defineTool({
   execution: { kind: 'sync', mutation: 'none' },
   input: v.strictObject({
     id: v.optional(v.pipe(v.string(), v.description('Node ID (single node)'))),
-    ids: v.optional(
-      v.pipe(
-        v.array(v.string()),
-        v.minLength(1),
-        v.description('Node IDs (several nodes in one call)')
-      )
-    ),
+    ids: nodeIdsField('Node IDs (several nodes in one call)'),
     depth: v.optional(
       toolNumber(
         v.pipe(v.number(), v.description('Child levels to include (default: as many as the budget holds)'))

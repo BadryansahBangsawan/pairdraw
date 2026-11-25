@@ -9,6 +9,10 @@ export const guideSidebar = (prefix: string, labels: SidebarLabels): DefaultThem
       { text: labels.features, link: `${prefix}/overview/features` },
       { text: labels.comparison, link: `${prefix}/overview/comparison` },
       // English only until translated; locales link to the canonical page.
+      { text: 'vs Paper', link: '/overview/comparison-paper' },
+      { text: 'vs Figma', link: '/overview/comparison-figma' },
+      { text: 'vs pen.dev', link: '/overview/comparison-pen-dev' },
+      { text: 'Open by design', link: '/overview/open-by-design' },
       { text: labels.privacy, link: '/overview/privacy' },
     ],
   },

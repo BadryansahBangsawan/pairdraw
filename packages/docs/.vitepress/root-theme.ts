@@ -16,6 +16,7 @@ export const rootThemeConfig = (): DefaultTheme.Config => ({
 
   nav: [
     { text: 'Overview', link: '/getting-started' },
+    { text: 'Compare', link: '/overview/comparison-paper' },
     { text: 'User Guide', link: '/user-guide/' },
     { text: 'Automation', link: '/programmable/' },
     { text: 'SDK', link: '/programmable/sdk/' },

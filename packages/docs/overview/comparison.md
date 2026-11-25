@@ -2,6 +2,8 @@
 
 Why compare? Pairdraw exists because closed design platforms control what's possible. Understanding architectural differences shows what an open, local-first alternative can do differently.
 
+Other comparisons, kept to facts checked on 2026-11-25: [Pairdraw vs Paper](/overview/comparison-paper), [vs Figma](/overview/comparison-figma), [vs pen.dev](/overview/comparison-pen-dev). The ground rules behind them are on [Open by design](/overview/open-by-design).
+
 ::: info Penpot's WASM renderer
 Penpot 2.x includes a Rust/Skia WASM renderer (`render-wasm/v1`) that can be enabled via server flags or the `?wasm=true` URL parameter. The old SVG renderer remains the default. This page covers both.
 :::

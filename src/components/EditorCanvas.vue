@@ -36,7 +36,7 @@ import {
   SECTION_TITLE_HEIGHT
 } from '@pairdraw/core/constants'
 import type { ViewportTransform } from '@pairdraw/core/geometry'
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
 import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
 import { useEyedropperLoupe } from '@pairdraw/vue/canvas/eyedropper'
@@ -373,7 +373,9 @@ const cursor = computed(() =>
 )
 
 /** The page's color, which the parts around the played frame take so they read as the page. */
-const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state.pageColor) }))
+const pageBackground = computed(() => ({
+  backgroundColor: colorToDocumentCSS(store.state.pageColor, store.graph.documentColorSpace)
+}))
 </script>
 
 <template>

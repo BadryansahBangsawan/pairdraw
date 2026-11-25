@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { Fill } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill } from '@pairdraw/scene-graph'
 
 import type { FillRootSlots } from './types'
 import { useFill } from './useFill'
 
-const { fill } = defineProps<{ fill: Fill }>()
+const { fill, colorProfile } = defineProps<{ fill: Fill; colorProfile?: DocumentColorSpace }>()
 const emit = defineEmits<{ update: [fill: Fill] }>()
 defineSlots<FillRootSlots>()
 
 const model = useFill(
   computed(() => fill),
-  (updated) => emit('update', updated)
+  (updated) => emit('update', updated),
+  { colorProfile: () => colorProfile }
 )
 </script>
 

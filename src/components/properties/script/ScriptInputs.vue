@@ -6,7 +6,7 @@
  */
 import { ref } from 'vue'
 
-import { colorToHex, parseColor } from '@pairdraw/scene-graph/color'
+import { colorToHex, convertColor, parseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 import type { VariableType } from '@pairdraw/scene-graph/types'
@@ -75,9 +75,18 @@ function variablesFor(declaration: ScriptInputDeclaration): VariablePickerItem[]
   return items
 }
 
+/** A document color as the sRGB hex code its field shows. */
+function documentHex(color: Color): string {
+  return colorToHex(convertColor(color, store.graph.documentColorSpace, 'srgb'))
+}
+
 function writeColor(declaration: ScriptInputDeclaration, event: Event | undefined) {
   const input = event?.target as HTMLInputElement | undefined
-  if (input) write(declaration, parseColor(input.value))
+  if (!input) return
+  // A hex code names an sRGB color, so a typed code is stored as the document's own components.
+  const typed = parseColor(input.value)
+  const profile = store.graph.documentColorSpace
+  write(declaration, profile === 'srgb' ? typed : convertColor(typed, 'srgb', profile))
 }
 
 function detach(declaration: ScriptInputDeclaration) {
@@ -138,7 +147,7 @@ function detach(declaration: ScriptInputDeclaration) {
           v-else-if="declaration.kind === 'color'"
           :model-value="
             typeof valueOf(declaration) === 'object'
-              ? colorToHex(valueOf(declaration) as Color)
+              ? documentHex(valueOf(declaration) as Color)
               : ''
           "
           :aria-label="declaration.name"

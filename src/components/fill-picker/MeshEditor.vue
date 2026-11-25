@@ -111,6 +111,10 @@ function pointStyle(point: MeshGradientPoint): string {
       />
     </div>
 
-    <ColorPickerPanel :color="activeColor" @update="updateActiveColor" />
+    <ColorPickerPanel
+      :color="activeColor"
+      :color-profile="store.graph.documentColorSpace"
+      @update="updateActiveColor"
+    />
   </div>
 </template>

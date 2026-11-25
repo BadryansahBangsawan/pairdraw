@@ -22,6 +22,7 @@ import {
 } from '@pairdraw/vue/primitives/ColorPicker'
 import { FillRoot } from '@pairdraw/vue/primitives/Fill'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import { useEyedropperKeepOpen } from '@/components/color-picker-panel/eyedropper'
 import GradientEditor from '@/components/fill-picker/GradientEditor.vue'
@@ -35,6 +36,8 @@ import fillPickerTheme from '@/theme/fill-picker'
 import { useImageFill } from './useImageFill'
 
 const fillPicker = tv(fillPickerTheme)
+// The picker's panel previews the document's colors, which are stored in its profile.
+const store = useEditorStore()
 
 function tabClass(active: boolean) {
   return fillPicker({ active }).tab()
@@ -229,6 +232,7 @@ function step(next: Fill) {
           <ColorPickerPanel
             v-if="root.category === 'SOLID'"
             :color="root.fill.color"
+            :color-profile="store.graph.documentColorSpace"
             :okhcl="okhcl"
             eyedropper
             @update="change(applySolidFillColor(root.fill, $event))"

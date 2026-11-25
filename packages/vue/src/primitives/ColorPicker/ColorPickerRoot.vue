@@ -2,7 +2,8 @@
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import { computed } from 'vue'
 
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import type { DocumentColorSpace } from '@pairdraw/scene-graph'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useRetainedPopup } from '#vue/lifecycle/retention/popup'
@@ -20,11 +21,17 @@ const {
   label = 'Edit color',
   ui,
   escapeReverts = false,
-  keepOpen
+  keepOpen,
+  colorProfile = 'srgb'
 } = defineProps<{
   color: Color
   label?: string
   ui?: ColorPickerUI
+  /**
+   * The profile the color is stored in; the trigger's swatch then draws the color the canvas draws.
+   * Defaults to sRGB.
+   */
+  colorProfile?: DocumentColorSpace
   /**
    * For a colour with no undo history, such as a preference: Escape closing the picker puts back
    * the colour it opened with. Otherwise Escape keeps the edit, as Figma's picker does.
@@ -47,7 +54,7 @@ const emit = defineEmits<{
   cancel: [cause: PickerCancelCause]
 }>()
 
-const swatchBg = computed(() => colorToCSS(color))
+const swatchBg = computed(() => colorToDocumentCSS(color, colorProfile))
 let pressColor: Color = { ...color }
 const gesture = usePickerGesture({
   open: () => popupOpen.value,

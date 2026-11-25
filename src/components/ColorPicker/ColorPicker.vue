@@ -56,6 +56,7 @@ const keepOpen = eyedropper ? useEyedropperKeepOpen() : undefined
     :label="panels.editColor"
     :escape-reverts="escapeReverts"
     :keep-open="keepOpen"
+    :color-profile="profile"
     :ui="{
       content: cls.content,
       swatch: 'size-5 shrink-0 cursor-pointer rounded border border-border p-0'

@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { VNode } from 'vue'
 
-import type { Fill } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill } from '@pairdraw/scene-graph'
 import type { FillSwatchSlotProps } from '@pairdraw/vue/primitives/Fill'
 
 import type { ComponentUI } from '@/components/ui/types'
@@ -15,6 +15,8 @@ export interface FillSwatchProps {
   ui?: FillSwatchUI
   /** Shows the fill as given inside a bound field; see `FillSwatchProps.ignoreBinding`. */
   ignoreBinding?: boolean
+  /** The profile the fill's color is stored in; the open document's unless one is given. */
+  colorProfile?: DocumentColorSpace
 }
 
 export interface FillSwatchSlots {
@@ -26,12 +28,16 @@ export interface FillSwatchSlots {
 import { tv } from 'tailwind-variants'
 import { computed, normalizeClass, useAttrs } from 'vue'
 
+import { useDocumentColorSpace } from '@pairdraw/vue/controls/document-colors'
 import { FillSwatch as FillSwatchPrimitive } from '@pairdraw/vue/primitives/Fill'
 
 import fillSwatchTheme from '@/theme/paint/fill-swatch'
 
-const { fill, label, ui, ignoreBinding = false } = defineProps<FillSwatchProps>()
+const { fill, label, ui, ignoreBinding = false, colorProfile } = defineProps<FillSwatchProps>()
 const attrs = useAttrs()
+const documentColorSpace = useDocumentColorSpace()
+// A fill's color is stored in the document's profile, so its swatch draws what the canvas draws.
+const profile = computed(() => colorProfile ?? documentColorSpace.value)
 const styles = computed(() => tv(fillSwatchTheme)())
 const forwardedAttrs = computed(() => {
   const { class: _class, ...rest } = attrs
@@ -48,6 +54,7 @@ defineOptions({ inheritAttrs: false })
     :fill="fill"
     :label="label"
     :ignore-binding="ignoreBinding"
+    :color-profile="profile"
     :class="styles.root({ class: [ui?.root, normalizeClass(attrs.class)] })"
   >
     <slot v-bind="swatch">

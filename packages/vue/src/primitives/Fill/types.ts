@@ -1,6 +1,6 @@
 import type { PrimitiveProps } from 'reka-ui'
 
-import type { Fill } from '@pairdraw/scene-graph'
+import type { DocumentColorSpace, Fill } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { BindingState } from '#vue/controls/binding-provider/types'
@@ -37,6 +37,11 @@ export interface FillSwatchProps extends PrimitiveProps {
    * own variable rather than the one the field is bound to.
    */
   ignoreBinding?: boolean
+  /**
+   * The profile the fill's color is stored in; a Display P3 document's swatch then draws the color
+   * in its own profile, the one the canvas draws. Defaults to sRGB.
+   */
+  colorProfile?: DocumentColorSpace
 }
 
 export interface FillSwatchSlotProps {

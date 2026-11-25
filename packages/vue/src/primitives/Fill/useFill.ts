@@ -1,8 +1,8 @@
-import { computed } from 'vue'
-import type { Ref } from 'vue'
+import { computed, toValue } from 'vue'
+import type { MaybeRefOrGetter, Ref } from 'vue'
 
-import type { Fill, GradientStop } from '@pairdraw/scene-graph'
-import { colorToCSS } from '@pairdraw/scene-graph/color'
+import type { DocumentColorSpace, Fill, GradientStop } from '@pairdraw/scene-graph'
+import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
 import { BLACK, TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import {
   DEFAULT_GRADIENT_TRANSFORM,
@@ -35,9 +35,12 @@ function effectiveColor(color: Color, opacity: number): Color {
   return { ...color, a: color.a * opacity }
 }
 
-function gradientCSS(stops: GradientStop[], opacity: number): string {
+function gradientCSS(stops: GradientStop[], opacity: number, profile: DocumentColorSpace): string {
   return stops
-    .map((stop) => `${colorToCSS(effectiveColor(stop.color, opacity))} ${stop.position * 100}%`)
+    .map(
+      (stop) =>
+        `${colorToDocumentCSS(effectiveColor(stop.color, opacity), profile)} ${stop.position * 100}%`
+    )
     .join(', ')
 }
 
@@ -56,26 +59,36 @@ export function fillIsTransparent(fill: Fill): boolean {
   return fillColor(fill, TRANSPARENT).a < 1
 }
 
-export function fillSwatchBackground(fill: Fill): string {
+/**
+ * A fill's swatch as CSS in `profile`: a Display P3 document's stored components are written in
+ * its own profile, so the swatch shows the color the canvas draws.
+ */
+export function fillSwatchBackground(fill: Fill, profile: DocumentColorSpace = 'srgb'): string {
   if (fillCategory(fill) === 'GRADIENT' && fill.gradientStops?.length) {
-    return `linear-gradient(to right, ${gradientCSS(fill.gradientStops, fill.opacity)})`
+    return `linear-gradient(to right, ${gradientCSS(fill.gradientStops, fill.opacity, profile)})`
   }
   if (fillCategory(fill) === 'MESH' && fill.meshPoints?.length) {
     const stops = fill.meshPoints
       .map(
         (point, index) =>
-          `${colorToCSS(effectiveColor(point.color, fill.opacity))} ${(index / (fill.meshPoints?.length ?? 1)) * 100}%`
+          `${colorToDocumentCSS(effectiveColor(point.color, fill.opacity), profile)} ${(index / (fill.meshPoints?.length ?? 1)) * 100}%`
       )
       .join(', ')
     return `linear-gradient(to right, ${stops})`
   }
-  return colorToCSS(effectiveColor(fillColor(fill, TRANSPARENT), fill.opacity))
+  return colorToDocumentCSS(effectiveColor(fillColor(fill, TRANSPARENT), fill.opacity), profile)
 }
 
 /** Fill category state and immutable conversion actions without picker or popover behavior. */
-export function useFill(fill: Ref<Fill>, onUpdate: (fill: Fill) => void) {
+export function useFill(
+  fill: Ref<Fill>,
+  onUpdate: (fill: Fill) => void,
+  options: { colorProfile?: MaybeRefOrGetter<DocumentColorSpace | undefined> } = {}
+) {
   const category = computed(() => fillCategory(fill.value))
-  const swatchBackground = computed(() => fillSwatchBackground(fill.value))
+  const swatchBackground = computed(() =>
+    fillSwatchBackground(fill.value, toValue(options.colorProfile) ?? 'srgb')
+  )
   const transparent = computed(() => fillIsTransparent(fill.value))
 
   function toSolid() {

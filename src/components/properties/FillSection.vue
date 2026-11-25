@@ -230,7 +230,15 @@ function updateSolidColor(
                   "
                 />
                 <span v-else class="min-w-0 flex-1 truncate font-mono text-xs text-surface">
-                  {{ fillLabel(fill, undefined, fillShader(activeNode, fill), panels.shaderCode) }}
+                  {{
+                    fillLabel(
+                      fill,
+                      undefined,
+                      fillShader(activeNode, fill),
+                      panels.shaderCode,
+                      store.graph.documentColorSpace
+                    )
+                  }}
                 </span>
               </template>
 

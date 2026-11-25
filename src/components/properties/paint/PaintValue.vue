@@ -1,27 +1,44 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import type { DocumentColorSpace } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { useColorModel } from '@pairdraw/vue/controls/color-model'
+import { useDocumentColorSpace } from '@pairdraw/vue/controls/document-colors'
 import { inputValue } from '@pairdraw/vue/shared/dom-events'
 
 import { BindingPill } from '@/components/ui/binding'
 
-const { color, resolvedColor, variableName, unavailableLabel, label, deleted, deletedLabel } =
-  defineProps<{
-    color: Color
-    resolvedColor?: Color
-    unavailableLabel?: string
-    variableName?: string
-    label: string
-    deleted?: boolean
-    deletedLabel?: string
-  }>()
+const {
+  color,
+  resolvedColor,
+  variableName,
+  unavailableLabel,
+  label,
+  deleted,
+  deletedLabel,
+  colorProfile
+} = defineProps<{
+  color: Color
+  resolvedColor?: Color
+  unavailableLabel?: string
+  variableName?: string
+  label: string
+  deleted?: boolean
+  deletedLabel?: string
+  /** The profile the color is stored in; the open document's unless one is given. */
+  colorProfile?: DocumentColorSpace
+}>()
 const emit = defineEmits<{ update: [color: Color] }>()
 
 const displayColor = computed(() => resolvedColor ?? color)
+const documentColorSpace = useDocumentColorSpace()
+// A design's colors are stored in its document's profile, so the hex reads as sRGB and typing
+// stores sRGB back into that profile.
+const profile = computed(() => colorProfile ?? documentColorSpace.value)
 const model = useColorModel({
   color: displayColor,
+  colorProfile: () => profile.value,
   onUpdate: (updated) => emit('update', updated)
 })
 const tooltip = computed(() => (variableName ? `${variableName} · #${model.hex.value}` : undefined))

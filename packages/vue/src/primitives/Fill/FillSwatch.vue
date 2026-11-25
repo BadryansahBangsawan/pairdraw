@@ -14,7 +14,8 @@ const {
   label,
   as = 'span',
   asChild = false,
-  ignoreBinding = false
+  ignoreBinding = false,
+  colorProfile = 'srgb'
 } = defineProps<FillSwatchProps>()
 defineSlots<FillSwatchSlots>()
 defineOptions({ inheritAttrs: false })
@@ -27,7 +28,7 @@ const effectiveFill = computed(() =>
   fill.type === 'SOLID' && boundColor.value ? { ...fill, color: boundColor.value } : fill
 )
 const category = computed(() => fillCategory(effectiveFill.value))
-const background = computed(() => fillSwatchBackground(effectiveFill.value))
+const background = computed(() => fillSwatchBackground(effectiveFill.value, colorProfile))
 const transparent = computed(() => fillIsTransparent(effectiveFill.value))
 const accessibleLabel = computed(() => label ?? `${category.value.toLowerCase()} fill`)
 const stateAttrs = computed(() => binding?.stateAttrs.value)

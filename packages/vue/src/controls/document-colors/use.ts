@@ -2,6 +2,7 @@ import { computed, inject } from 'vue'
 import type { ComputedRef } from 'vue'
 
 import { documentColors, type DocumentColor, type Editor } from '@pairdraw/core'
+import type { DocumentColorSpace } from '@pairdraw/scene-graph'
 
 import { EDITOR_KEY } from '#vue/editor/context'
 
@@ -19,6 +20,15 @@ export function useDocumentColors(): ComputedRef<DocumentColor[]> {
     void editor.state.sceneVersion
     return documentColors(editor.graph, editor.state.currentPageId)
   })
+}
+
+/**
+ * The profile the document stores its colors in, so a preview can draw the color the canvas draws.
+ * Follows the injected editor's document and falls back to sRGB outside an editor subtree.
+ */
+export function useDocumentColorSpace(): ComputedRef<DocumentColorSpace> {
+  const editor = injectEditor()
+  return computed(() => editor?.graph.documentColorSpace ?? 'srgb')
 }
 
 /** The injected editor, or null when the holder is not an editor subtree. */

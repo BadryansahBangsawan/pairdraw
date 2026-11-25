@@ -1,1 +1,1 @@
-export { useDocumentColors } from './use'
+export { useDocumentColorSpace, useDocumentColors } from './use'

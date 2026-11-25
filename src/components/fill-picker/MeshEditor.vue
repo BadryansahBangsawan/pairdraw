@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 import { computed, ref, watch } from 'vue'
 
 import type { Fill, MeshGradientPoint } from '@pairdraw/scene-graph'
-import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import { colorToPreviewCSS } from '@pairdraw/scene-graph/color'
 import { isMeshFill, resampleMeshPoints } from '@pairdraw/scene-graph/gradient'
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -71,7 +71,7 @@ const store = useEditorStore()
 
 function pointStyle(point: MeshGradientPoint): string {
   const color = { ...point.color, a: point.color.a * fill.opacity }
-  return colorToDocumentCSS(color, store.graph.documentColorSpace)
+  return colorToPreviewCSS(color, store.graph.documentColorSpace)
 }
 </script>
 

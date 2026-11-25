@@ -35,8 +35,11 @@ describe('a swatch in the document profile', () => {
     )
   })
 
-  test('an sRGB document draws the same color as its sRGB hex', () => {
-    expect(fillSwatchBackground(solid(SRGB_RED_IN_P3), 'srgb')).toBe('#EA3323')
+  test('an sRGB document draws exactly what colorToCSS wrote before', () => {
+    expect(fillSwatchBackground(solid(SRGB_RED_IN_P3), 'srgb')).toBe('rgb(234, 51, 35)')
+    expect(fillSwatchBackground(solid({ r: 1, g: 1, b: 1, a: 1 }), 'srgb')).toBe(
+      'rgb(255, 255, 255)'
+    )
   })
 
   test('gradient stops convert too, keeping their alpha', () => {
@@ -51,6 +54,21 @@ describe('a swatch in the document profile', () => {
     } as Fill
     expect(fillSwatchBackground(gradient, 'display-p3')).toBe(
       'linear-gradient(to right, color(display-p3 0.9174875573251657 0.20028680774084662 0.13856059121111408) 0%, color(display-p3 0.9174875573251657 0.20028680774084662 0.13856059121111408 / 0.5) 100%)'
+    )
+  })
+
+  test('an sRGB document keeps its gradient stops as rgb()', () => {
+    const gradient: Fill = {
+      type: 'GRADIENT_LINEAR',
+      opacity: 1,
+      visible: true,
+      gradientStops: [
+        { color: SRGB_RED_IN_P3, position: 0 },
+        { color: { ...SRGB_RED_IN_P3, a: 0.5 }, position: 1 }
+      ]
+    } as Fill
+    expect(fillSwatchBackground(gradient, 'srgb')).toBe(
+      'linear-gradient(to right, rgb(234, 51, 35) 0%, rgba(234, 51, 35, 0.5) 100%)'
     )
   })
 })

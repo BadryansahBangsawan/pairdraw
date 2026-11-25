@@ -12,6 +12,7 @@ import type { Color } from '../primitives'
 import type { DocumentColorSpace } from '../types'
 import { fitIntoProfile, SRGB_SYNTAX_MODES } from './management'
 import { normalizeColor } from './normalize'
+import { colorToProfileCSS } from './profile'
 
 const toRGB = converter('rgb')
 
@@ -71,6 +72,25 @@ export function colorToCSSCompact(color: Color): string {
   const a = Number(color.a.toFixed(3))
   if (a >= 1) return `rgb(${r},${g},${b})`
   return `rgba(${r},${g},${b},${a})`
+}
+
+/**
+ * A stored color as CSS in its document's profile: opaque ones as hex and translucent ones as
+ * `rgba()`, which Tailwind matches to its palette, or `color(display-p3 …)` in Display P3, where
+ * hex has no room for a component past 1. Colors already in the profile are written as stored.
+ */
+export function colorToDocumentCSS(color: Color, profile: DocumentColorSpace = 'srgb'): string {
+  if (profile === 'srgb') return color.a >= 1 ? colorToHex(color) : colorToCSS(color)
+  return colorToProfileCSS(color, profile, 'display-p3')
+}
+
+/**
+ * A stored color as CSS for a preview of it, such as a swatch or a slider thumb: exactly
+ * `colorToCSS` in an sRGB document, so nothing a document already showed changes, and in its own
+ * profile otherwise, where `rgb()` cannot show a component past 1.
+ */
+export function colorToPreviewCSS(color: Color, profile: DocumentColorSpace = 'srgb'): string {
+  return profile === 'srgb' ? colorToCSS(color) : colorToDocumentCSS(color, profile)
 }
 
 export function rgba255ToColor(r: number, g: number, b: number, a = 1): Color {

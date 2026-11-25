@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 
 import type { Fill } from '@pairdraw/scene-graph'
-import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import { colorToPreviewCSS } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { useI18n } from '@pairdraw/vue/i18n'
 import {
@@ -27,7 +27,7 @@ const { panels, editor } = useI18n()
 const fillPicker = tv(fillPickerTheme)
 const store = useEditorStore()
 // A stop is stored in the document's profile, so its swatch shows the color the canvas draws.
-const stopCSS = (color: Color) => colorToDocumentCSS(color, store.graph.documentColorSpace)
+const stopCSS = (color: Color) => colorToPreviewCSS(color, store.graph.documentColorSpace)
 
 function barStopClass(active: boolean, dragging: boolean) {
   return fillPicker({ active, dragging }).barStop()

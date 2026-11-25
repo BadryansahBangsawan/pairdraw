@@ -1,7 +1,7 @@
 import { computed, ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 
 import type { ColorProfile, Fill, GradientStop, GradientTransform } from '@pairdraw/scene-graph'
-import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import { colorToPreviewCSS } from '@pairdraw/scene-graph/color'
 import { DEFAULT_GRADIENT_TRANSFORM } from '@pairdraw/scene-graph/gradient'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -45,7 +45,7 @@ export function useGradientStops(
     if (!stops.value.length) return ''
     const profile = toValue(options.colorProfile ?? 'srgb')
     const paints = stops.value.map(
-      (s) => `${colorToDocumentCSS(s.color, profile)} ${s.position * 100}%`
+      (s) => `${colorToPreviewCSS(s.color, profile)} ${s.position * 100}%`
     )
     return `linear-gradient(to right, ${paints.join(', ')})`
   })

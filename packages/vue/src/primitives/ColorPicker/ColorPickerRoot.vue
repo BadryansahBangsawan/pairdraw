@@ -3,7 +3,7 @@ import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka
 import { computed } from 'vue'
 
 import type { DocumentColorSpace } from '@pairdraw/scene-graph'
-import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import { colorToPreviewCSS } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useRetainedPopup } from '#vue/lifecycle/retention/popup'
@@ -54,7 +54,7 @@ const emit = defineEmits<{
   cancel: [cause: PickerCancelCause]
 }>()
 
-const swatchBg = computed(() => colorToDocumentCSS(color, colorProfile))
+const swatchBg = computed(() => colorToPreviewCSS(color, colorProfile))
 let pressColor: Color = { ...color }
 const gesture = usePickerGesture({
   open: () => popupOpen.value,

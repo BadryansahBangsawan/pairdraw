@@ -7,7 +7,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, useTemplateRef, watchEffect } from 'vue'
 
-import { colorToDocumentCSS, colorToHexRaw, convertColor } from '@pairdraw/scene-graph/color'
+import { colorToHexRaw, colorToPreviewCSS, convertColor } from '@pairdraw/scene-graph/color'
 import type { EyedropperLoupe } from '@pairdraw/vue/canvas/eyedropper'
 
 import { useEditorStore } from '@/app/editor/active-store'
@@ -19,7 +19,7 @@ const loupeTheme = tv(theme)
 const store = useEditorStore()
 const swatch = computed(() => {
   const color = loupe.color.value
-  return color ? colorToDocumentCSS(color, store.graph.documentColorSpace) : undefined
+  return color ? colorToPreviewCSS(color, store.graph.documentColorSpace) : undefined
 })
 // A hex code names an sRGB color, so the value reads the color the swatch and canvas draw.
 const hex = computed(() => {

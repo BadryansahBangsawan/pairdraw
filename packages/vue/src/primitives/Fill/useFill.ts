@@ -2,7 +2,7 @@ import { computed, toValue } from 'vue'
 import type { MaybeRefOrGetter, Ref } from 'vue'
 
 import type { DocumentColorSpace, Fill, GradientStop } from '@pairdraw/scene-graph'
-import { colorToDocumentCSS } from '@pairdraw/scene-graph/color'
+import { colorToPreviewCSS } from '@pairdraw/scene-graph/color'
 import { BLACK, TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import {
   DEFAULT_GRADIENT_TRANSFORM,
@@ -39,7 +39,7 @@ function gradientCSS(stops: GradientStop[], opacity: number, profile: DocumentCo
   return stops
     .map(
       (stop) =>
-        `${colorToDocumentCSS(effectiveColor(stop.color, opacity), profile)} ${stop.position * 100}%`
+        `${colorToPreviewCSS(effectiveColor(stop.color, opacity), profile)} ${stop.position * 100}%`
     )
     .join(', ')
 }
@@ -71,12 +71,12 @@ export function fillSwatchBackground(fill: Fill, profile: DocumentColorSpace = '
     const stops = fill.meshPoints
       .map(
         (point, index) =>
-          `${colorToDocumentCSS(effectiveColor(point.color, fill.opacity), profile)} ${(index / (fill.meshPoints?.length ?? 1)) * 100}%`
+          `${colorToPreviewCSS(effectiveColor(point.color, fill.opacity), profile)} ${(index / (fill.meshPoints?.length ?? 1)) * 100}%`
       )
       .join(', ')
     return `linear-gradient(to right, ${stops})`
   }
-  return colorToDocumentCSS(effectiveColor(fillColor(fill, TRANSPARENT), fill.opacity), profile)
+  return colorToPreviewCSS(effectiveColor(fillColor(fill, TRANSPARENT), fill.opacity), profile)
 }
 
 /** Fill category state and immutable conversion actions without picker or popover behavior. */

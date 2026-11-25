@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 
-import { colorToProfileCSS, convertColor, toExtendedSRGB } from '@pairdraw/scene-graph/color'
+import {
+  colorToCSS,
+  colorToPreviewCSS,
+  colorToProfileCSS,
+  convertColor,
+  toExtendedSRGB
+} from '@pairdraw/scene-graph/color'
 
 const P3_RED = { r: 1, g: 0, b: 0, a: 1 }
 
@@ -46,6 +52,21 @@ describe('toExtendedSRGB', () => {
     expect(extended.g).toBeCloseTo(converted.g, 9)
     expect(extended.b).toBeCloseTo(converted.b, 9)
     expect(extended.a).toBe(1)
+  })
+})
+
+describe('colorToPreviewCSS', () => {
+  test('an sRGB document previews exactly what colorToCSS wrote before', () => {
+    const translucent = { r: 0.2, g: 0.4, b: 0.6, a: 0.5 }
+    expect(colorToPreviewCSS(translucent, 'srgb')).toBe('rgba(51, 102, 153, 0.5)')
+    expect(colorToPreviewCSS(translucent, 'srgb')).toBe(colorToCSS(translucent))
+    expect(colorToPreviewCSS({ r: 1, g: 1, b: 1, a: 1 }, 'srgb')).toBe('rgb(255, 255, 255)')
+  })
+
+  test('a Display P3 document previews its stored components in its own profile', () => {
+    expect(colorToPreviewCSS(P3_RED, 'display-p3')).toEqual(
+      expect.stringMatching(/^color\(display-p3 1 0 0/)
+    )
   })
 })
 

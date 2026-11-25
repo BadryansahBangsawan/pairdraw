@@ -92,6 +92,6 @@ jobs:
 The action installs the CLI, finds the pull request's changed `.fig` and `.pen` files, reads the merge base's copies
 from git, runs the command, uploads the report and renders as an artifact, and posts or updates one comment. A pull
 request that changes no design file updates the existing comment instead of opening a new one; the comment is cut to
-GitHub's 65,536-byte limit and `report.json` keeps every finding. Pin the action to a release tag so it installs the CLI
-of the same release. The action's README covers inputs, permissions, fork pull requests, and what the comment
-contains.
+fit GitHub's 65,536-byte limit with the artifact line included, and `report.json` keeps every finding. Pin the action to
+a release tag so it installs the CLI of the same release. The action's README covers inputs, permissions, fork pull
+requests, and what the comment contains.

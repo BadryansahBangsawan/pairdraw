@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import type { CheckRun, FileCheck } from '#cli/check/run'
-import { COMMENT_MARKER, reportMarkdown } from '#cli/check/report'
+import { COMMENT_MARKER, COMMENT_SUFFIX_RESERVE_BYTES, reportMarkdown } from '#cli/check/report'
 
 const GITHUB_COMMENT_LIMIT = 65_536
 
@@ -98,5 +98,22 @@ describe('the comment the action posts', () => {
   test('the marker stays the first line even when the body is cut', () => {
     const markdown = reportMarkdown(run([drifting(1_100)]))
     expect(markdown.split('\n')[0]).toBe(COMMENT_MARKER)
+  })
+
+  test('report.md leaves room for the artifact line the action appends', () => {
+    // 634 short rows land just under the old 65,536-byte cap, inside the window the action's line overflows.
+    const files = Array.from({ length: 634 }, (_, index) =>
+      file({
+        path: `${`designs/${'d'.repeat(50)}-${index}`.padEnd(70, 'x')}.pen`,
+        tokens: { checked: false, skipped: null, check: null }
+      })
+    )
+    const suffix = `\n[Report and renders](${'u'.repeat(900)}) are kept as an artifact of this run.\n`
+
+    const markdown = reportMarkdown(run(files))
+
+    expect(Buffer.byteLength(suffix)).toBeLessThanOrEqual(COMMENT_SUFFIX_RESERVE_BYTES)
+    expect(Buffer.byteLength(markdown) + Buffer.byteLength(suffix)).toBeLessThanOrEqual(GITHUB_COMMENT_LIMIT)
+    expect(markdown).toContain('Truncated to fit')
   })
 })

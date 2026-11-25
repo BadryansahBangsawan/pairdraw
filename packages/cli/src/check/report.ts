@@ -13,6 +13,9 @@ const MAX_FINDINGS_PER_FILE = 20
 /** GitHub refuses a comment body past this many bytes; the report is cut to fit. */
 export const MAX_COMMENT_BYTES = 65_536
 
+/** Room left for the line the action appends after `report.md`, so the posted body still fits. */
+export const COMMENT_SUFFIX_RESERVE_BYTES = 1_024
+
 /** Detail the writer gives up, in order, so an oversized report still posts. */
 const FINDING_LIMITS = [MAX_FINDINGS_PER_FILE, 10, 5, 2, 1, 0]
 const FILE_LIMITS = [Number.POSITIVE_INFINITY, 100, 50, 20, 10, 5, 0]
@@ -55,16 +58,18 @@ export async function writeReport(
 
 /** The report as the pull-request comment: the verdict, a table, then one section per file. */
 export function reportMarkdown(run: CheckRun, options: { imageBase?: string } = {}): string {
+  // The action posts this body with its artifact line after it; both must fit GitHub's limit.
+  const budget = MAX_COMMENT_BYTES - COMMENT_SUFFIX_RESERVE_BYTES
   let markdown = renderComment(run, options, {
     findingsPerFile: MAX_FINDINGS_PER_FILE,
     files: Number.POSITIVE_INFINITY
   })
-  if (size(markdown) <= MAX_COMMENT_BYTES) return markdown
+  if (size(markdown) <= budget) return markdown
   // Give up detail until the body fits, then files, so the comment is always posted.
   for (const findingsPerFile of FINDING_LIMITS) {
     for (const files of FILE_LIMITS) {
       markdown = renderComment(run, options, { findingsPerFile, files })
-      if (size(markdown) <= MAX_COMMENT_BYTES) return markdown
+      if (size(markdown) <= budget) return markdown
     }
   }
   return markdown

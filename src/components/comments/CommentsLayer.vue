@@ -15,6 +15,13 @@ import type { ViewportTransform } from '@pairdraw/core/geometry'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { useCommentMessages } from '@pairdraw/vue/i18n'
 
+import {
+  liveStrokeBox,
+  regionStrokeBox,
+  strokeMaskURL,
+  strokeToComment,
+  type StrokeBox
+} from '@/app/comments/region'
 import { useComments } from '@/app/comments/use'
 import { useEditorStore } from '@/app/editor/active-store'
 import { useMenuUI } from '@/components/ui/menu/menu'
@@ -59,7 +66,10 @@ const threadCard = useTemplateRef<{ focus: () => void }>('threadCard')
 
 // Picking another tool drops a comment that was never sent, as in Figma.
 watch(commenting, (on) => {
-  if (!on) draft.value = null
+  if (!on) {
+    draft.value = null
+    stroke.value = null
+  }
 })
 
 const placement = computed<ViewportTransform>(() => drawn ?? store.state)
@@ -80,6 +90,19 @@ const pinDrag = usePinDrag({
   onClick: comments.toggleThread
 })
 
+/** How far a press must travel, in screen pixels, before it draws a region instead of dropping a pin. */
+const DRAG_THRESHOLD = 4
+/** Screen pixels between the points kept while drawing; a pointer sends far more than a stroke needs. */
+const SAMPLE_DISTANCE = 1.5
+
+/** The stroke being drawn: its canvas points, and where the press started, in screen pixels. */
+const stroke = ref<{
+  pointerId: number
+  points: Vector[]
+  start: Vector
+  startScreen: Vector
+} | null>(null)
+
 // Pins show unless View → Comments hid them; the Comment tool always shows them, as in Figma.
 const pins = computed(() => {
   // Layers move without the comment changing; re-place pins on every scene change.
@@ -94,9 +117,15 @@ const pins = computed(() => {
     .map((thread) => {
       const dragged = pinDrag.draggedTo(thread.id)
       const at = dragged ?? comments.pinPosition(thread)
-      return { thread, at, dragging: dragged !== null, ...toLayer(at) }
+      const mark = thread.region ? regionStrokeBox(thread.region, at, placement.value.zoom) : null
+      return { thread, at, dragging: dragged !== null, mark, ...toLayer(at) }
     })
 })
+
+/** The strokes of the threads on screen, drawn under the pins at the drawn frame's pan and zoom. */
+const strokes = computed(() =>
+  pins.value.flatMap((pin) => (pin.mark ? [{ id: pin.thread.id, box: pin.mark }] : []))
+)
 
 const activePin = computed(() => pins.value.find((pin) => pin.thread.id === activeThreadId.value))
 const draftAt = computed(() =>
@@ -125,19 +154,116 @@ const cardReference = computed(() => {
   }
 })
 
+/** Where the pointer is, in the canvas's own pixels. */
+function screenAt(event: PointerEvent): Vector | null {
+  if (!canvasEl) return null
+  const rect = canvasEl.getBoundingClientRect()
+  return { x: event.clientX - rect.left, y: event.clientY - rect.top }
+}
+
 function placeDraft(event: PointerEvent) {
   if (!commenting.value || event.button !== 0 || !canvasEl) return
   event.preventDefault()
   // With a card open, a click on the canvas only closes it, as in Figma.
   if (comments.closeCard()) return
-  const rect = canvasEl.getBoundingClientRect()
-  const at = store.screenToCanvas(event.clientX - rect.left, event.clientY - rect.top)
-  comments.startDraft({ pageId: store.state.currentPageId, ...at })
+  const screen = screenAt(event)
+  if (!screen) return
+  const at = store.screenToCanvas(screen.x, screen.y)
+  // A press becomes a pin on release; moving it draws the area to comment on instead.
+  canvasEl.setPointerCapture(event.pointerId)
+  stroke.value = { pointerId: event.pointerId, points: [at], start: at, startScreen: screen }
+}
+
+/** Grows the stroke with the pointer, keeping only points a person would see the shape through. */
+function moveStroke(event: PointerEvent) {
+  const current = stroke.value
+  if (!current || current.pointerId !== event.pointerId) return
+  const screen = screenAt(event)
+  if (!screen) return
+  const travel = Math.hypot(screen.x - current.startScreen.x, screen.y - current.startScreen.y)
+  if (current.points.length === 1 && travel < DRAG_THRESHOLD) return
+  const at = store.screenToCanvas(screen.x, screen.y)
+  const last = current.points[current.points.length - 1]
+  if (!last) return
+  if (Math.hypot(at.x - last.x, at.y - last.y) * placement.value.zoom < SAMPLE_DISTANCE) return
+  // Mutating the array in place keeps a mouse move from rebuilding the path more than once.
+  current.points.push(at)
+}
+
+/** Ends the gesture: a stroke becomes the thread's region, a press a plain pin. */
+function releaseStroke(event: PointerEvent) {
+  const current = stroke.value
+  if (!current || current.pointerId !== event.pointerId) return
+  cancelStroke()
+  const pageId = store.state.currentPageId
+  const drawn =
+    current.points.length > 1 ? strokeToComment(current.points, placement.value.zoom) : null
+  comments.startDraft(
+    drawn ? { pageId, ...drawn.at, region: drawn.region } : { pageId, ...current.start }
+  )
   draftText.value = ''
+}
+
+/** Drops an unfinished stroke: nothing reaches the document, and the tool stays. */
+function cancelStroke() {
+  const current = stroke.value
+  stroke.value = null
+  if (current && canvasEl?.hasPointerCapture(current.pointerId)) {
+    canvasEl.releasePointerCapture(current.pointerId)
+  }
+}
+
+const draftStroke = computed(() => {
+  const at = draftAt.value
+  return at?.region ? regionStrokeBox(at.region, at, placement.value.zoom) : null
+})
+
+const liveStroke = computed(() => {
+  const current = stroke.value
+  return current && current.points.length > 1
+    ? liveStrokeBox(current.points, placement.value.zoom)
+    : null
+})
+
+const maskCache = new Map<string, string>()
+
+/** A stroke's box and mask, encoded once per shape rather than on every frame it pans with. */
+function strokeStyle(box: StrokeBox) {
+  const key = `${box.width}x${box.height}:${box.stroke}:${box.d}`
+  let mask = maskCache.get(key)
+  if (!mask) {
+    if (maskCache.size >= 256) maskCache.clear()
+    mask = strokeMaskURL(box)
+    maskCache.set(key, mask)
+  }
+  return {
+    left: `${box.left}px`,
+    top: `${box.top}px`,
+    width: `${box.width}px`,
+    height: `${box.height}px`,
+    maskImage: mask,
+    maskSize: '100% 100%',
+    maskRepeat: 'no-repeat'
+  }
 }
 
 // The canvas places drafts itself, so its other buttons keep panning and opening the layer menu.
 useEventListener(() => canvasEl, 'pointerdown', placeDraft)
+useEventListener(() => canvasEl, 'pointermove', moveStroke)
+useEventListener(() => canvasEl, 'pointerup', releaseStroke)
+useEventListener(() => canvasEl, 'pointercancel', cancelStroke)
+// Escape takes back the stroke first, before the card or the tool.
+useEventListener(
+  window,
+  'keydown',
+  (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || !stroke.value) return
+    event.stopImmediatePropagation()
+    cancelStroke()
+  },
+  { capture: true }
+)
+useEventListener(() => canvasEl, 'contextmenu', cancelStroke)
 
 // Scrolling and zooming keep working over pins and while placing comments, as in Figma.
 function forwardWheel(event: WheelEvent) {
@@ -183,6 +309,28 @@ function closeCard() {
       :class="ui.pins()"
       :style="{ transform: `translate(${placement.panX}px, ${placement.panY}px)` }"
     >
+      <!-- The strokes people circled with, drawn in the accent color under the pins. -->
+      <span
+        v-for="entry in strokes"
+        :key="entry.id"
+        :class="ui.stroke()"
+        :style="strokeStyle(entry.box)"
+        data-slot="comment-region"
+      />
+      <span
+        v-if="draftStroke"
+        :class="ui.stroke()"
+        :style="strokeStyle(draftStroke)"
+        data-slot="comment-region"
+        data-draft
+      />
+      <span
+        v-if="liveStroke"
+        :class="ui.stroke()"
+        :style="strokeStyle(liveStroke)"
+        data-slot="comment-region"
+        data-draft
+      />
       <ContextMenuRoot v-for="pin in pins" :key="pin.thread.id" :modal="false">
         <ContextMenuTrigger as-child>
           <CommentPin

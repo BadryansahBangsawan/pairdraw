@@ -16,7 +16,6 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { useCollabIdentity } from '@/app/collab/identity'
 import { roomForStore } from '@/app/collab/rooms'
 import { useActiveEditorStoreRef } from '@/app/editor/active-store'
-import type { PagePoint } from '@/app/editor/pages/point'
 import { setCommentsOnCanvas } from '@/app/settings/preferences/apply'
 import {
   appPreferences,
@@ -25,6 +24,7 @@ import {
 } from '@/app/settings/preferences/store'
 
 import { followDocumentComments } from './document'
+import type { CommentDraft } from './draft'
 
 /** A comment preference the list and menus read and change in place. */
 function preference<K extends keyof CommentPreferences>(
@@ -49,7 +49,7 @@ export const useComments = createGlobalState(() => {
   const storeRef = useActiveEditorStoreRef()
 
   const activeThreadId = ref<string | null>(null)
-  const draft = ref<PagePoint | null>(null)
+  const draft = ref<CommentDraft | null>(null)
   /** Deleting asks first; the confirmation dialog listens for which thread. */
   const deleteRequested = createEventHook<string>()
   const listQuery = ref('')
@@ -86,7 +86,7 @@ export const useComments = createGlobalState(() => {
     return restrictions?.readOnly === true && restrictions.comments === true
   })
 
-  function startDraft(at: PagePoint) {
+  function startDraft(at: CommentDraft) {
     activeThreadId.value = null
     draft.value = at
   }
@@ -112,6 +112,7 @@ export const useComments = createGlobalState(() => {
     const thread = createCommentThread(store.graph, {
       pageId: place.pageId,
       at: place,
+      region: place.region,
       author: me.value,
       text: body,
       now: now()

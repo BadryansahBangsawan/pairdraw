@@ -92,6 +92,35 @@ test('commenting marks the document changed without adding an undo step', () => 
   expect(store.undo.canUndo).toBe(canUndo)
 })
 
+test('a drawn region stays with its comment through an undo of a layer edit', async () => {
+  const store = openDocument()
+  const pageId = store.state.currentPageId
+  const rect = store.graph.createNode('RECTANGLE', pageId, { x: 100, y: 50, width: 80, height: 40 })
+  const region = {
+    points: [
+      [10, 10],
+      [90, 10],
+      [90, 50]
+    ] as [number, number][],
+    width: 2,
+    bounds: { minX: 0, minY: 0, maxX: 92, maxY: 52 }
+  }
+  const comments = useComments()
+  comments.startDraft({ pageId, x: 90, y: 40, region })
+  comments.addThread('contrast around the button')
+
+  await executeWithDocumentUndo(store, pageId, 'Resize the button', () =>
+    Promise.resolve(store.graph.updateNode(rect.id, { width: 200 }))
+  )
+  store.undo.undo()
+  await Promise.resolve()
+
+  const drawn = readComments(store.graph)[0]
+  expect(drawn?.text).toBe('contrast around the button')
+  expect(drawn?.region).toEqual(region)
+  expect(comments.threads.value[0]?.region).toEqual(region)
+})
+
 test('comments written to the document from elsewhere show up', async () => {
   const store = openDocument()
   writeComments(store.graph, [thread('x', store.state.currentPageId)])

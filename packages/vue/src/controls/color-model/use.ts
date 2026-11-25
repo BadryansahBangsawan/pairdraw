@@ -1,6 +1,6 @@
 import { computed, ref, toValue } from 'vue'
 
-import { colorToHexRaw, okhclToRGBA, parseColor } from '@pairdraw/scene-graph/color'
+import { colorToHexRaw, convertColor, okhclToRGBA, parseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import {
@@ -43,7 +43,11 @@ export function useColorModel(options: UseColorModelOptions) {
   const sourceOkHCL = computed(() => toValue(options.okhcl))
   const value = computed(() => createColorModelValue(color.value, sourceOkHCL.value))
   const format = computed(() => toValue(options.format) ?? localFormat.value)
-  const hex = computed(() => colorToHexRaw(color.value))
+  // A hex code names an sRGB color, so a Display P3 document's stored components are converted
+  // into sRGB for the readout, as the swatch beside it shows the color the canvas draws.
+  const hex = computed(() =>
+    colorToHexRaw(convertColor(color.value, toValue(options.colorProfile ?? 'srgb'), 'srgb'))
+  )
   const sliderPreview = computed(() => createSliderPreviewModel(value.value))
   const sliderGradient = computed(() => createSliderGradientModel(value.value))
   const okhclSliderPreview = computed(() => createOkHCLSliderPreviewModel(value.value.okhcl))

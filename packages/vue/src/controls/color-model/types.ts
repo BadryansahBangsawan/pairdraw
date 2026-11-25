@@ -1,6 +1,7 @@
 import type { Color as RekaColor } from 'reka-ui'
 import type { MaybeRefOrGetter } from 'vue'
 
+import type { ColorProfile } from '@pairdraw/scene-graph'
 import type { OkHCLColor, RenderColorSpace } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -29,6 +30,11 @@ export interface OkHCLControls {
 
 export interface UseColorModelOptions {
   color: MaybeRefOrGetter<Color>
+  /**
+   * The profile the color is stored in; the hex readout converts it into sRGB, the space a hex
+   * code names, so it shows the color a Display P3 document draws. Defaults to sRGB.
+   */
+  colorProfile?: MaybeRefOrGetter<ColorProfile>
   okhcl?: MaybeRefOrGetter<OkHCLColor | null | undefined>
   format?: MaybeRefOrGetter<ColorFieldFormat | undefined>
   defaultFormat?: ColorFieldFormat

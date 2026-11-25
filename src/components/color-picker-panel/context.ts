@@ -22,8 +22,11 @@ function createColorPickerPanelContext(props: ColorPanelProps, emit: ColorPanelE
   const { panels } = useI18n()
   const color = computed(() => props.color)
   const okhcl = computed(() => props.okhcl ?? null)
+  const colorProfile = computed(() => props.colorProfile ?? 'srgb')
   const colorModel = useColorModel({
     color,
+    // The hex readout converts the stored color into sRGB, the space a hex code names.
+    colorProfile,
     okhcl: () => okhcl.value?.okhcl,
     format: () => okhcl.value?.fieldFormat,
     onUpdate: (nextColor) => emit('update', nextColor),
@@ -39,7 +42,6 @@ function createColorPickerPanelContext(props: ColorPanelProps, emit: ColorPanelE
       ]
   )
   const isOkHCLFormat = computed(() => colorModel.format.value === 'okhcl' && okhcl.value)
-  const colorProfile = computed(() => props.colorProfile ?? 'srgb')
   /** A stored color as CSS in the document's profile, for swatches and slider thumbs. */
   const cssColor = (color: Color) => colorToDocumentCSS(color, colorProfile.value)
 

@@ -83,6 +83,9 @@ function normalizedMaxOutputTokens(value: unknown): number {
 
 const capabilitySchema = v.picklist(['tools', 'vision'])
 
+/** The English label older builds wrote into the migrated default profile. */
+const LEGACY_DEFAULT_PROFILE_NAME = 'Design model'
+
 const profileSchema = v.object({
   id: v.custom<AIModelProfileId>((id) => typeof id === 'string' && id.startsWith('model-')),
   name: v.fallback(v.string(), 'Model'),
@@ -116,6 +119,9 @@ function parseProfile(value: unknown, connectionIds: Set<string>): AIModelProfil
   const { harnessThinkingLevel, reasoningEffort, ...profile } = parsed.output
   return {
     ...profile,
+    // Older builds wrote the migrated default's English label into the profile; drop it so the
+    // label follows the interface language until a model is configured.
+    name: profile.name === LEGACY_DEFAULT_PROFILE_NAME ? '' : profile.name,
     thinkingLevel: migrateThinkingLevel({ ...profile, harnessThinkingLevel, reasoningEffort })
   }
 }

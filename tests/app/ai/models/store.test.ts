@@ -113,4 +113,16 @@ describe('parseAIModelSettings', () => {
       vision: null
     })
   })
+
+  test('leaves the default name to the interface language', () => {
+    const parsed = parseAIModelSettings(
+      settings({ models: [{ ...profile, name: 'Design model' }] })
+    )
+    expect(parsed?.models[0].name).toBe('')
+  })
+
+  test('keeps a name the person gave a profile', () => {
+    const parsed = parseAIModelSettings(settings())
+    expect(parsed?.models[0].name).toBe('Design')
+  })
 })

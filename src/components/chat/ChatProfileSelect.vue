@@ -106,7 +106,12 @@ const selectedProfileId = computed({
     const profile = profiles.value.find((candidate) => candidate.id === profileId)
     const loss = profile ? contextLoss(profileChoice(profile)) : 'none'
     if (profile && loss !== 'none') {
-      pendingSwitch.value = { loss, kind: 'profile', id: profile.id, name: profile.name }
+      pendingSwitch.value = {
+        loss,
+        kind: 'profile',
+        id: profile.id,
+        name: profile.name || ai.value.designModelName
+      }
       return
     }
     setModelRoleAssignment('design', profileId)

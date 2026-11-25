@@ -8,7 +8,7 @@ import { useModelRoleAssignments } from '@/app/ai/models/settings/assignments'
 test('assignment adapter round-trips disabled and inherited roles', () => {
   const previous = structuredClone({ ...aiModelSettings.value.assignments })
   const assignments = useModelRoleAssignments(
-    ref({ modelRoleUseDesign: 'Use design', noModel: 'None' })
+    ref({ modelRoleUseDesign: 'Use design', noModel: 'None', designModelName: 'Design model' })
   )
   try {
     assignments.updateAssignment('review', '__none__')

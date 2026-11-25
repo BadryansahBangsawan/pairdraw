@@ -14,7 +14,8 @@ export function useRoleLabels() {
     if (choice === null) return ai.value.noModel
     const provider = modelProviderName(choice.providerID)
     if (isOnboardingAgent(choice.providerID)) return `${provider} · ${ai.value.aiSetupAgentModel}`
-    return choice.modelID && choice.name !== provider ? `${choice.name} · ${provider}` : provider
+    const name = choice.name || ai.value.designModelName
+    return choice.modelID && name !== provider ? `${name} · ${provider}` : provider
   }
 
   return { choiceLabel, roleLabel }

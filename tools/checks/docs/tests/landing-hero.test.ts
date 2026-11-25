@@ -11,24 +11,21 @@ import {
 const at = (name: (typeof HERO_STEPS)[number]) => HERO_STEPS.indexOf(name)
 
 describe('the hero storyboard', () => {
-  test('holds every frame, the finished scene longest and the opening over a typed word', () => {
+  test('holds every frame, the finished scene longest, and reaches the comment quickly', () => {
     const holds = HERO_STEPS.map((step) => STEP_HOLD[step])
     expect(holds.every((hold) => hold > 0)).toBe(true)
     expect(STEP_HOLD.done).toBe(Math.max(...holds))
-    expect(STEP_HOLD.prompt).toBeGreaterThan(STEP_HOLD.type1)
+    expect(STEP_HOLD.draw + STEP_HOLD.size + STEP_HOLD.comment).toBeLessThan(3)
   })
 
-  test('types the headline a few letters, a word, then word by word', () => {
-    const title = 'Design next to your agent.'
-    const typed = HERO_STEPS.map((_, index) => typedHeadline(title, heroScene(index).typed))
-    expect(typed.slice(at('type1'), at('headline') + 1)).toEqual([
-      'Des',
-      'Design',
-      'Design next to',
-      'Design next to your',
-      title
-    ])
-    expect(typed[at('prompt')]).toBe('')
+  test('shows the whole copy before the agent acts', () => {
+    const first = heroScene(0)
+    expect(first.typed).toBe('all')
+    expect(first.lead && first.actions).toBe(true)
+    expect(first.layers).toEqual({ heading: true, comment: false, lead: true })
+    expect(typedHeadline('Design next to your agent.', first.typed)).toBe(
+      'Design next to your agent.'
+    )
   })
 
   test('types a one-word headline without repeating or losing it', () => {
@@ -36,15 +33,17 @@ describe('the hero storyboard', () => {
     expect(typedHeadline('Hola.', 'nearly')).toBe('Hola.')
   })
 
-  test('draws the box before typing into it and sizes it before the first letter', () => {
-    expect(heroScene(at('pick')).box).toBe('none')
+  test('draws the box first, then sizes it around the copy', () => {
     expect(heroScene(at('draw')).box).toBe('drawing')
-    expect(heroScene(at('type1')).box).toBe('sized')
+    expect(heroScene(at('size')).box).toBe('sized')
+    expect(heroScene(at('draw')).agent).toBe('drawing')
+    expect(heroScene(at('size')).agent).toBe('end')
   })
 
-  test('lets the person comment before the agent replies, then shows the buttons', () => {
+  test('lets the person comment before the agent replies, with the buttons always there', () => {
     const comment = heroScene(at('comment'))
-    expect(comment.human && comment.comment && !comment.reply && !comment.actions).toBe(true)
+    expect(comment.human && comment.comment && !comment.reply).toBe(true)
+    expect(comment.actions).toBe(true)
     expect(comment.active).toEqual({ layer: 'comment', actor: 'human' })
     const done = heroScene(LAST_STEP)
     expect(done.reply && done.actions && done.status === null).toBe(true)

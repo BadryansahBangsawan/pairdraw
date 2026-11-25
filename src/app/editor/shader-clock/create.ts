@@ -1,10 +1,13 @@
 import { watch } from 'vue'
 
 import type { Editor } from '@pairdraw/core'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
   isShaderSourcePaint,
   parseShaderUniforms,
-  readShaderPaints
+  shaderOfPaint,
+  type ShaderSourcePaint
 } from '@pairdraw/scene-graph/shaders'
 
 import { animationsEnabled } from '@/app/shell/motion'
@@ -29,6 +32,61 @@ function sourceCountsTime(source: string): boolean {
   return counts
 }
 
+/** What the clock reads of the editor: the document, the view, and the canvas it draws into. */
+type ClockSource = Pick<Editor, 'graph' | 'state' | 'getViewportSize'>
+
+/** Whether `node` and every layer above it are visible, as the canvas decides what to draw. */
+function isShown(node: SceneNode, graph: SceneGraph): boolean {
+  let current: SceneNode | undefined = node
+  while (current) {
+    if (!current.visible) return false
+    current = current.parentId ? graph.getNode(current.parentId) : undefined
+  }
+  return true
+}
+
+/** Whether any part of `bounds` is inside the view, at its pan and zoom. */
+function inView(
+  bounds: Rect,
+  view: ClockSource['state'],
+  size: { width: number; height: number }
+): boolean {
+  const left = bounds.x * view.zoom + view.panX
+  const top = bounds.y * view.zoom + view.panY
+  return (
+    left < size.width &&
+    left + bounds.width * view.zoom > 0 &&
+    top < size.height &&
+    top + bounds.height * view.zoom > 0
+  )
+}
+
+/**
+ * Whether the canvas must repaint for the clock: a shader the person wrote that reads `@time` is
+ * on the current page, on screen, and drawn. A shader on another page, hidden, or scrolled away
+ * changes nothing visible, so it costs nothing.
+ */
+export function repaintsForTime(source: ClockSource): boolean {
+  const { graph, state } = source
+  const size = source.getViewportSize()
+  for (const node of graph.nodes.values()) {
+    if (!graph.isDescendant(node.id, state.currentPageId)) continue
+    if (!isShown(node, graph)) continue
+    let timed: ShaderSourcePaint | null = null
+    for (const paint of [...node.fills, ...node.strokes]) {
+      if (!paint.visible) continue
+      const shader = shaderOfPaint(node, paint)
+      if (shader && isShaderSourcePaint(shader) && sourceCountsTime(shader.source)) {
+        timed = shader
+        break
+      }
+    }
+    if (!timed) continue
+    if (inView(graph.getAbsoluteBounds(node.id), state, size)) return true
+  }
+  return false
+}
+
 export function createShaderClock(editor: Editor) {
   let needsRepaint = false
   let scanDue = true
@@ -46,17 +104,10 @@ export function createShaderClock(editor: Editor) {
     editor.onEditorEvent('node:updated', changed),
     editor.onEditorEvent('node:deleted', changed),
     editor.onEditorEvent('graph:replaced', changed),
-    editor.onEditorEvent('history:changed', changed)
+    editor.onEditorEvent('history:changed', changed),
+    // Panning onto a shader that counts time starts it, and panning away stops it.
+    editor.onEditorEvent('viewport:changed', changed)
   ]
-
-  function documentCountsTime(): boolean {
-    for (const node of editor.graph.nodes.values()) {
-      for (const shader of readShaderPaints(node)) {
-        if (isShaderSourcePaint(shader) && sourceCountsTime(shader.source)) return true
-      }
-    }
-    return false
-  }
 
   function tick(now: number) {
     frame = 0
@@ -64,7 +115,7 @@ export function createShaderClock(editor: Editor) {
     if (scanDue && now - lastScan >= SCAN_INTERVAL_MS) {
       lastScan = now
       scanDue = false
-      needsRepaint = animationsEnabled.value && documentCountsTime()
+      needsRepaint = animationsEnabled.value && repaintsForTime(editor)
     }
     if (!needsRepaint) return
     editor.requestRepaint()

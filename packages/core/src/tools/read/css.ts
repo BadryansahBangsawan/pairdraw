@@ -83,9 +83,7 @@ function paintOf(node: SceneNode, graph: SceneGraph, field: string, hex: string)
 }
 
 function background(node: SceneNode, graph: SceneGraph): string | null {
-  const index = node.fills.findIndex(
-    (candidate) => candidate.type === 'SOLID' && candidate.visible
-  )
+  const index = node.fills.findIndex((candidate) => candidate.type === 'SOLID' && candidate.visible)
   const solid = index === -1 ? undefined : node.fills[index]
   if (solid) {
     const hex = colorToHex({ ...solid.color, a: solid.opacity })
@@ -185,7 +183,9 @@ function lineHeightOf(node: SceneNode): string {
 }
 
 function textDecls(node: SceneNode, graph: SceneGraph): string[] {
-  const out = [`font:${node.fontWeight} ${px(node.fontSize)}/${lineHeightOf(node)} ${node.fontFamily}`]
+  const out = [
+    `font:${node.fontWeight} ${px(node.fontSize)}/${lineHeightOf(node)} ${node.fontFamily}`
+  ]
   const bg = background(node, graph)
   if (bg) out.push(`color:${bg}`)
   if (node.textAlignHorizontal !== 'LEFT') {
@@ -227,9 +227,8 @@ function truncationTail(omitted: number): string {
 }
 
 /**
- * Depth-first lines until the budget is spent. `firstLineAlways` keeps the subtree's first node
- * even when it alone overflows a tight budget (a single-node read); a block in an `ids` reply
- * instead gives up whole when nothing fits, so the reply's shared budget holds.
+ * Depth-first lines until the budget is spent. A line that does not fit ends the walk; the kept
+ * lines never exceed the limit on their own, so the reply can always stay within `max_bytes`.
  */
 function collect(
   graph: SceneGraph,
@@ -237,16 +236,14 @@ function collect(
   depth: number,
   indent: string,
   lines: string[],
-  budget: Budget,
-  firstLineAlways: boolean
+  budget: Budget
 ): void {
   const node = graph.getNode(nodeId)
   if (!node || !node.visible) return
   if (budget.truncated) return
   const line = `${indent}${lineOf(node, graph)}`
-  const firstLine = lines.length === 0
   const fits = budget.bytes + utf8Length(line) + 1 <= budget.limit
-  if (!fits && !(firstLine && firstLineAlways)) {
+  if (!fits) {
     budget.truncated = true
     return
   }
@@ -254,32 +251,31 @@ function collect(
   lines.push(line)
   if (depth > 0) {
     for (const childId of node.childIds) {
-      collect(graph, childId, depth - 1, `${indent}  `, lines, budget, firstLineAlways)
+      collect(graph, childId, depth - 1, `${indent}  `, lines, budget)
     }
   }
 }
 
 /**
- * A subtree within `maxBytes`. The truncation tail is charged to the same budget, so trailing
- * lines give way until head and tail fit; only a single line that alone overflows a budget
- * smaller than it (a single-node read) may land over.
+ * A subtree within `maxBytes`. The truncation tail is charged to the same budget: trailing lines
+ * give way first, then the tail is left out when only the kept lines fit. A block whose first line
+ * does not fit returns no CSS at all; the reply's `truncated`/`omitted` fields report the cut.
  */
 function blockFor(
   graph: SceneGraph,
   nodeId: string,
   depth: number,
-  maxBytes: number,
-  firstLineAlways = true
+  maxBytes: number
 ): { css: string; truncated?: true; omitted?: number } {
   const lines: string[] = []
   const budget: Budget = { bytes: 0, limit: maxBytes, truncated: false }
-  collect(graph, nodeId, depth, '', lines, budget, firstLineAlways)
+  collect(graph, nodeId, depth, '', lines, budget)
   if (!budget.truncated) return { css: lines.join('\n') }
   // Every visible node either has a line or is left out, so the omitted count follows from the
   // node total. Each dropped line's byte count includes the newline collect charged for it.
   let omitted = countVisible(graph, nodeId) - lines.length
   while (
-    lines.length > (firstLineAlways ? 1 : 0) &&
+    lines.length > 1 &&
     budget.bytes + 1 + utf8Length(truncationTail(omitted)) > budget.limit
   ) {
     const last = lines.pop()
@@ -290,7 +286,11 @@ function blockFor(
   if (lines.length === 0) {
     return { css: '', truncated: true, omitted: countVisible(graph, nodeId) }
   }
-  return { css: [...lines, truncationTail(omitted)].join('\n'), truncated: true, omitted }
+  const head = lines.join('\n')
+  if (budget.bytes + 1 + utf8Length(truncationTail(omitted)) > budget.limit) {
+    return { css: head, truncated: true, omitted }
+  }
+  return { css: `${head}\n${truncationTail(omitted)}`, truncated: true, omitted }
 }
 
 export const getCSS = defineTool({
@@ -305,11 +305,16 @@ export const getCSS = defineTool({
     ids: nodeIdsField('Node IDs (several nodes in one call)'),
     depth: v.optional(
       toolNumber(
-        v.pipe(v.number(), v.description('Child levels to include (default: as many as the budget holds)'))
+        v.pipe(
+          v.number(),
+          v.description('Child levels to include (default: as many as the budget holds)')
+        )
       )
     ),
     max_bytes: v.optional(
-      toolNumber(v.pipe(v.number(), v.description('Byte budget for the reply (default 6000, max 20000)')))
+      toolNumber(
+        v.pipe(v.number(), v.description('Byte budget for the reply (default 6000, max 20000)'))
+      )
     )
   }),
   execute: (figma, args) => {
@@ -324,7 +329,7 @@ export const getCSS = defineTool({
       for (const nodeId of args.ids) {
         if (!figma.graph.getNode(nodeId)) return { error: `Node "${nodeId}" not found` }
         const separator = blocks.length === 0 ? 0 : 1
-        const block = blockFor(figma.graph, nodeId, depth, maxBytes - used - separator, false)
+        const block = blockFor(figma.graph, nodeId, depth, maxBytes - used - separator)
         if (block.css === '') {
           omitted += block.omitted ?? 0
           truncated = truncated || block.truncated === true

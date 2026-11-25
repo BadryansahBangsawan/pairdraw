@@ -144,12 +144,14 @@ describe('get_css', () => {
       omitted?: number
     }
 
-    const [head, tail = ''] = result.css.split('\n')
+    const [head] = result.css.split('\n')
     expect(result.truncated).toBe(true)
     expect(result.omitted).toBe(1)
-    expect(result.css.split('\n')).toHaveLength(2)
+    // The child does not fit. Head plus tail would not either, so the tail gives way and the
+    // structured `omitted` reports the cut; the CSS itself never exceeds the budget.
+    expect(result.css.split('\n')).toHaveLength(1)
     expect(head).toMatch(new RegExp(`^Card#${frame.id}`))
-    expect(tail).toMatch(/^… \+1 node/)
+    expect(Buffer.byteLength(result.css, 'utf8')).toBeLessThanOrEqual(100)
   })
 
   test('refuses a node that is not there', () => {
@@ -242,6 +244,40 @@ describe('get_css', () => {
     expect(result.truncated).toBe(true)
     expect(result.css).toContain('… +')
     expect(Buffer.byteLength(result.css, 'utf8')).toBeLessThanOrEqual(200)
+  })
+
+  test('a single-node read never exceeds a budget the tail does not fit in', () => {
+    const { figma, frame } = card()
+    for (let index = 0; index < 4; index++) {
+      const child = figma.createRectangle()
+      child.name = `Row ${index}`
+      child.resize(10, 10)
+      frame.appendChild(child)
+    }
+
+    for (const maxBytes of [60, 80, 100, 120]) {
+      const result = getCSS.execute(figma, { id: frame.id, max_bytes: maxBytes }) as {
+        css: string
+        truncated?: boolean
+        omitted?: number
+      }
+
+      expect(Buffer.byteLength(result.css, 'utf8')).toBeLessThanOrEqual(maxBytes)
+      expect(result.truncated).toBe(true)
+    }
+  })
+
+  test('a budget smaller than the first line returns no CSS, not an oversized line', () => {
+    const { figma, frame } = card()
+    const result = getCSS.execute(figma, { id: frame.id, max_bytes: 20 }) as {
+      css: string
+      truncated?: boolean
+      omitted?: number
+    }
+
+    expect(result.css).toBe('')
+    expect(result.truncated).toBe(true)
+    expect(result.omitted).toBeGreaterThan(0)
   })
 
   test('ids share one max_bytes budget across the reply', () => {

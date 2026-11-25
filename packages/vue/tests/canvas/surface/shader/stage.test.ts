@@ -146,6 +146,8 @@ function fakeBackend(supported = true) {
   return {
     backend,
     starts,
+    /** Whether the loop runs, as a browser would stop asking for frames while paused. */
+    running: () => running,
     /** Runs one display frame `ms` after the last, if the loop runs. */
     tick(ms = 16) {
       now += ms
@@ -310,6 +312,43 @@ describe('Shader Mode stage', () => {
     view.stage.pause()
     view.tick(100)
     expect(view.stage.clock.value.time).toBeCloseTo(0.1)
+    view.stop()
+  })
+})
+
+describe('Shader Mode frame loop', () => {
+  test('stops drawing frames while the clock is paused, and wakes for a seek or play', async () => {
+    const view = mountStage({ autoplay: false })
+    const renderer = fakeRenderer('only')
+    view.starts[0]?.finish(renderer)
+    await settle()
+    // The still is drawn once, then nothing changes, so the loop rests.
+    view.tick()
+    await settle()
+    expect(view.shown.at(-1)).toBe('only')
+    expect(view.running()).toBe(false)
+
+    const rested = renderer.steps.length
+    view.tick()
+    await settle()
+    expect(renderer.steps).toHaveLength(rested)
+
+    view.stage.seek(1)
+    expect(view.running()).toBe(true)
+    view.tick()
+    await settle()
+    expect(renderer.steps.at(-1)).toBeCloseTo(1)
+    expect(view.running()).toBe(false)
+
+    view.stage.play()
+    expect(view.running()).toBe(true)
+    view.tick()
+    await settle()
+    expect(view.running()).toBe(true)
+
+    view.stage.pause()
+    await settle()
+    expect(view.running()).toBe(false)
     view.stop()
   })
 })

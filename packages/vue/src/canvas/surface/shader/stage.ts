@@ -173,6 +173,8 @@ export function createShaderStage<Source>(
   /** Renderers to let go of once the frame being drawn is done with them. */
   const retired: ShaderStageRenderer<Source>[] = []
   let last = 0
+  /** Whether the backend is asked for display frames, which it is only while something draws. */
+  let running = false
 
   function release() {
     for (const old of retired.splice(0)) old.dispose()
@@ -192,6 +194,30 @@ export function createShaderStage<Source>(
     retire(player)
     player = null
     status.value = 'failed'
+  }
+
+  /**
+   * Asks for display frames. A paused stage with nothing stale draws no frames, so it asks for
+   * none: the browser then skips the shader's whole frame path until something changes.
+   */
+  function wake() {
+    if (!supported || isDisposed() || running) return
+    running = true
+    // The first frame after a rest starts from where the clock is, not from the gap.
+    last = 0
+    loop.resume()
+  }
+
+  /** Stops asking for display frames, which a playing clock or a stale frame starts again. */
+  function rest() {
+    if (!running) return
+    running = false
+    loop.pause()
+  }
+
+  /** Rests the loop when nothing will change the frame: the clock is paused and nothing is stale. */
+  function settleLoop() {
+    if (!clock.value.playing && !stale && !drawing && !starting) rest()
   }
 
   /** Read through calls: a start in flight may be overtaken, or the stage closed, meanwhile. */
@@ -228,6 +254,7 @@ export function createShaderStage<Source>(
         stale = true
         retire(previous)
         status.value = 'ready'
+        wake()
       }
     } finally {
       starting = false
@@ -251,6 +278,7 @@ export function createShaderStage<Source>(
       return
     }
     if (!player) status.value = 'starting'
+    wake()
     void reconcile()
   }
 
@@ -266,6 +294,7 @@ export function createShaderStage<Source>(
     canvas.width = deviceWidth
     canvas.height = deviceHeight
     stale = true
+    wake()
   }
 
   /**
@@ -293,27 +322,36 @@ export function createShaderStage<Source>(
   const loop = backend.frames((timestamp) => {
     const seconds = last === 0 ? 0 : Math.min((timestamp - last) / 1000, MAX_FRAME_SECONDS)
     last = timestamp
-    clock.value = advanceShaderClock(clock.value, seconds)
+    if (clock.value.playing) clock.value = advanceShaderClock(clock.value, seconds)
     const target = options.target.value
     const active = player
-    if (drawing || !target || !active) return
+    if (drawing || !target || !active) {
+      settleLoop()
+      return
+    }
     sizeTarget(target)
-    if (!stale && active.rendered === clock.value.time) return
+    if (!stale && active.rendered === clock.value.time) {
+      settleLoop()
+      return
+    }
     drawing = true
     void draw(active, target)
       .catch((error: unknown) => console.warn('Could not draw a shader frame', error))
       .finally(() => {
         drawing = false
         release()
+        settleLoop()
       })
   })
 
   function play() {
     clock.value = playShaderClock(clock.value, true)
+    wake()
   }
 
   function pause() {
     clock.value = playShaderClock(clock.value, false)
+    settleLoop()
   }
 
   function toggle() {
@@ -323,6 +361,7 @@ export function createShaderStage<Source>(
   /** Shows the shader `time` seconds into its loop, playing on from there if it was playing. */
   function seek(time: number) {
     clock.value = seekShaderClock(clock.value, time)
+    wake()
   }
 
   function restart() {
@@ -347,10 +386,12 @@ export function createShaderStage<Source>(
     debounce: RESIZE_SETTLE_MS
   })
   watch(options.target, (canvas) => {
-    if (canvas) stale = true
+    if (!canvas) return
+    stale = true
+    wake()
   })
 
-  if (supported) loop.resume()
+  if (supported) wake()
 
   onScopeDispose(() => {
     disposed = true

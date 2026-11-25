@@ -1,17 +1,26 @@
 <script setup lang="ts">
-import { useDebounceFn, useElementVisibility, useEventListener, useMediaQuery } from '@vueuse/core'
+import {
+  useDebounceFn,
+  useElementSize,
+  useElementVisibility,
+  useEventListener,
+  useMediaQuery
+} from '@vueuse/core'
 import { MotionConfig, motion, useMotionValueEvent, useScroll } from 'motion-v'
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
-import { computed, ref, useTemplateRef, watch, type Component } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch, type Component } from 'vue'
 import IconGlobe from '~icons/lucide/globe'
 import IconLayoutGrid from '~icons/lucide/layout-grid'
 import IconPlay from '~icons/lucide/play'
 import IconSparkles from '~icons/lucide/sparkles'
 import IconToggleRight from '~icons/lucide/toggle-right'
 
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+
 import { FEATURE_TABS, type FeatureTab } from '../content/features'
 import { useLandingMessages } from '../content/messages'
 import { fill } from '../content/messages/fill'
+import { AGENT } from '../content/people'
 import { data as stats } from '../content/stats.data'
 import AiPanel from '../features/AiPanel.vue'
 import BrowserPanel from '../features/BrowserPanel.vue'
@@ -19,6 +28,7 @@ import ControlsPanel from '../features/ControlsPanel.vue'
 import LayoutPanel from '../features/LayoutPanel.vue'
 import PrototypesPanel from '../features/PrototypesPanel.vue'
 import { useTabScene } from '../features/useTabScene'
+import CanvasCursor from '../ui/CanvasCursor.vue'
 import { useSceneActivity } from '../ui/useSceneActivity'
 
 /**
@@ -39,7 +49,7 @@ const ICONS: Record<FeatureTab, Component> = {
 const active = ref<FeatureTab>('ai')
 const track = useTemplateRef<HTMLElement>('track')
 const panel = useTemplateRef<HTMLElement>('panel')
-const { reduced, running } = useSceneActivity(panel)
+const { reduced, running, seen } = useSceneActivity(panel)
 
 // The app's components the panels mount load a screen before the section arrives, not with
 // the page.
@@ -91,6 +101,36 @@ const scenes = {
 const detail = (tab: FeatureTab) =>
   fill(messages.value.features.tabs[tab].detail, { count: stats.mcpTools })
 const tabCount = computed(() => FEATURE_TABS.length)
+
+/** The agent's pointer, at the tab it just switched to; the same cursor the hero leaves behind. */
+const cursorLayer = useTemplateRef<HTMLElement>('cursorLayer')
+const { width: cursorWidth } = useElementSize(cursorLayer)
+const cursorAt = ref<Vector | null>(null)
+const press = ref(0)
+
+function placeCursor(): void {
+  const layer = cursorLayer.value
+  if (!layer) return
+  const trigger =
+    layer.querySelectorAll<HTMLElement>('.trigger')[FEATURE_TABS.indexOf(active.value)]
+  if (!trigger) return
+  const box = layer.getBoundingClientRect()
+  const tab = trigger.getBoundingClientRect()
+  cursorAt.value = {
+    x: tab.left - box.left + tab.width * 0.82,
+    y: tab.top - box.top + tab.height / 2 - 10
+  }
+}
+
+watch(
+  [active, cursorWidth, seen],
+  async () => {
+    await nextTick()
+    placeCursor()
+  },
+  { immediate: true }
+)
+watch(active, () => press.value++)
 </script>
 
 <template>
@@ -112,7 +152,7 @@ const tabCount = computed(() => FEATURE_TABS.length)
             data-draw
             @update:model-value="choose"
           >
-            <div class="list">
+            <div ref="cursorLayer" class="list">
               <span class="list-title">{{ messages.features.list }}</span>
               <TabsList class="triggers" :aria-label="messages.features.list">
                 <TabsTrigger v-for="tab in FEATURE_TABS" :key="tab" :value="tab" class="trigger">
@@ -126,6 +166,16 @@ const tabCount = computed(() => FEATURE_TABS.length)
                   <span class="name">{{ messages.features.tabs[tab].label }}</span>
                 </TabsTrigger>
               </TabsList>
+              <span
+                v-if="seen && cursorAt"
+                class="agent-cursor"
+                :style="{ transform: `translate(${cursorAt.x}px, ${cursorAt.y}px)` }"
+              >
+                <CanvasCursor :name="AGENT" actor="agent">
+                  <template #icon><IconSparkles /></template>
+                </CanvasCursor>
+                <span :key="press" class="press" />
+              </span>
             </div>
             <div class="panels">
               <TabsContent v-for="tab in FEATURE_TABS" :key="tab" :value="tab" class="panel">
@@ -183,11 +233,46 @@ const tabCount = computed(() => FEATURE_TABS.length)
 }
 
 .list {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 20px;
   border-right: 1px solid var(--lp-night-line);
+}
+
+/* The hero's agent comes back to switch tabs, travelling by transform only. */
+.agent-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 520ms var(--lp-ease-out);
+}
+
+.press {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  margin: -13px;
+  border: 1.5px solid var(--lp-agent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: cursor-press 420ms ease-out;
+}
+
+@keyframes cursor-press {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.25);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
 }
 
 .list-title {
@@ -364,6 +449,11 @@ h3 {
     padding: 20px;
   }
 
+  /* The trigger row scrolls sideways on a phone; a cursor over it would cover the labels. */
+  .agent-cursor {
+    display: none;
+  }
+
   h3 {
     font-size: 22px;
   }
@@ -376,6 +466,15 @@ h3 {
 
 @media (prefers-reduced-motion: reduce) {
   .panel[data-state] {
+    animation: none;
+  }
+
+  .agent-cursor {
+    transition: none;
+  }
+
+  .press {
+    display: none;
     animation: none;
   }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineClientComponent } from 'vitepress'
+import { onMounted } from 'vue'
 
 import { useLandingMessages } from '../content/messages'
 
@@ -18,6 +19,12 @@ const ToolCallsIsland = defineClientComponent(() =>
     ? Promise.reject(new Error('The tool calls render only in the browser'))
     : import('./ToolCallsIsland.vue')
 )
+
+// Load the cards while the page is still at the hero, so the section does not reach its last
+// line before the first one has mounted.
+onMounted(() => {
+  if (!import.meta.env.SSR) void import('./ToolCallsIsland.vue')
+})
 
 const ROWS = ['alerts', 'summary', 'signIn'] as const
 </script>

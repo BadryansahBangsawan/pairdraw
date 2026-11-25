@@ -17,6 +17,7 @@ import type {
 import { SceneGraph as SceneGraphValue } from '@pairdraw/scene-graph'
 import { colorToHex, colorToHex8 } from '@pairdraw/scene-graph/color'
 import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
+import { readDesignMemory } from '@pairdraw/scene-graph/design-memory'
 import { stickySublayers } from '@pairdraw/scene-graph/generated'
 import { applyGradientTransform, invertGradientTransform } from '@pairdraw/scene-graph/gradient'
 import { imageMimeType } from '@pairdraw/scene-graph/images'
@@ -722,6 +723,8 @@ export function penDocumentFromGraph(
     return refreshed
   })
   if (tokenSources.length > 0) document.tokenSources = tokenSources
+  const designMemory = readDesignMemory(graph)
+  if (designMemory) document.designMemory = designMemory
   if (pages.length > 1) {
     const name = document.name ?? 'Page 1'
     state.warnings.push(

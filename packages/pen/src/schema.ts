@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 import { CODE_SYNTAX_PLATFORMS } from '@pairdraw/scene-graph'
+import { designMemorySchema, type DesignMemory } from '@pairdraw/scene-graph/design-memory'
 import { finiteNumberSchema } from '@pairdraw/scene-graph/primitives'
 import { tokenSourcesSchema } from '@pairdraw/scene-graph/token-sources'
 
@@ -302,6 +303,18 @@ const penTokenSourcesSchema = v.pipe(
   v.transform((value) => v.parse(tokenSourcesSchema, Array.isArray(value) ? value : []))
 )
 
+/**
+ * The memory a file holds, or none when an older client wrote something this reader cannot use:
+ * a document stays readable because of one unreadable field.
+ */
+const penDesignMemorySchema = v.pipe(
+  v.unknown(),
+  v.transform((value): DesignMemory | undefined => {
+    const parsed = v.safeParse(designMemorySchema, value)
+    return parsed.success ? parsed.output : undefined
+  })
+)
+
 const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
   // The page's name. The format is single-page, so it belongs to the document.
@@ -318,6 +331,12 @@ const penDocumentSchema = v.looseObject({
   variables: v.optional(v.record(strSchema, variableSchema)),
   /** The code the document's variables are linked to, as Core keeps it on the document node. */
   tokenSources: v.optional(penTokenSourcesSchema),
+  /**
+   * The design memory agents follow, as Core keeps it on the document node: allowed values,
+   * decisions, and pinned examples. Pencil has no field for it, so it is an extension other
+   * Pencil clients ignore; without it a reopened document loses its rules.
+   */
+  designMemory: v.optional(penDesignMemorySchema),
   children: v.array(nodeSchema)
 })
 

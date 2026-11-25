@@ -43,11 +43,10 @@ export function useColorModel(options: UseColorModelOptions) {
   const sourceOkHCL = computed(() => toValue(options.okhcl))
   const value = computed(() => createColorModelValue(color.value, sourceOkHCL.value))
   const format = computed(() => toValue(options.format) ?? localFormat.value)
+  const colorProfile = computed(() => toValue(options.colorProfile ?? 'srgb'))
   // A hex code names an sRGB color, so a Display P3 document's stored components are converted
   // into sRGB for the readout, as the swatch beside it shows the color the canvas draws.
-  const hex = computed(() =>
-    colorToHexRaw(convertColor(color.value, toValue(options.colorProfile ?? 'srgb'), 'srgb'))
-  )
+  const hex = computed(() => colorToHexRaw(convertColor(color.value, colorProfile.value, 'srgb')))
   const sliderPreview = computed(() => createSliderPreviewModel(value.value))
   const sliderGradient = computed(() => createSliderGradientModel(value.value))
   const okhclSliderPreview = computed(() => createOkHCLSliderPreviewModel(value.value.okhcl))
@@ -60,7 +59,11 @@ export function useColorModel(options: UseColorModelOptions) {
 
   function updateHex(input: string) {
     const parsed = parseColor(input.startsWith('#') ? input : `#${input}`)
-    return emitColor({ ...parsed, a: color.value.a })
+    // The field shows a hex code's sRGB color, so a typed code is converted back into the
+    // document's own components; the field then reads the code that was typed.
+    const stored =
+      colorProfile.value === 'srgb' ? parsed : convertColor(parsed, 'srgb', colorProfile.value)
+    return emitColor({ ...stored, a: color.value.a })
   }
 
   function setFormat(nextFormat: ColorFieldFormat) {

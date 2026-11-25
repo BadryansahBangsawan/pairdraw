@@ -2,7 +2,7 @@
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 
-import { colorToCSS, colorToHexRaw } from '@pairdraw/scene-graph/color'
+import { colorToCSS, colorToHexRaw, convertColor } from '@pairdraw/scene-graph/color'
 
 import type {
   GradientEditorStopActions,
@@ -20,7 +20,8 @@ const {
   positionStep = 1,
   label,
   as = 'div',
-  asChild = false
+  asChild = false,
+  colorProfile = 'srgb'
 } = defineProps<GradientEditorStopProps>()
 
 const emit = defineEmits<{
@@ -36,7 +37,7 @@ defineOptions({ inheritAttrs: false })
 
 const positionPercent = computed(() => Math.round(stop.position * 100))
 const opacityPercent = computed(() => Math.round(stop.color.a * 100))
-const hex = computed(() => colorToHexRaw(stop.color))
+const hex = computed(() => colorToHexRaw(convertColor(stop.color, colorProfile, 'srgb')))
 const css = computed(() => colorToCSS(stop.color))
 const accessibleLabel = computed(() => label ?? `Gradient stop ${index + 1}`)
 const actions: GradientEditorStopActions = {

@@ -42,6 +42,7 @@ function listStopClass(active: boolean) {
   <GradientEditorRoot
     v-model:active-stop-index="activeStop"
     :fill="fill"
+    :color-profile="store.graph.documentColorSpace"
     @update="emit('update', $event)"
     v-slot="root"
   >
@@ -72,6 +73,7 @@ function listStopClass(active: boolean) {
           :active="idx === bar.activeStopIndex"
           :dragging="idx === bar.draggingIndex"
           :removable="bar.stops.length > 2"
+          :color-profile="store.graph.documentColorSpace"
           :class="barStopClass(idx === bar.activeStopIndex, idx === bar.draggingIndex)"
           :style="{ left: `${stop.position * 100}%`, background: stopCSS(stop.color) }"
           @select="root.actions.selectStop"
@@ -100,6 +102,7 @@ function listStopClass(active: boolean) {
           :active="idx === root.activeStopIndex"
           :removable="root.stops.length > 2"
           :interactive="false"
+          :color-profile="store.graph.documentColorSpace"
           :class="listStopClass(idx === root.activeStopIndex)"
           @select="root.actions.selectStop"
           @update-position="root.actions.updateStopPosition"

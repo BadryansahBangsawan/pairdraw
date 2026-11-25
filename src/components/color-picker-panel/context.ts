@@ -25,8 +25,6 @@ function createColorPickerPanelContext(props: ColorPanelProps, emit: ColorPanelE
   const colorProfile = computed(() => props.colorProfile ?? 'srgb')
   const colorModel = useColorModel({
     color,
-    // The hex readout converts the stored color into sRGB, the space a hex code names.
-    colorProfile,
     okhcl: () => okhcl.value?.okhcl,
     format: () => okhcl.value?.fieldFormat,
     onUpdate: (nextColor) => emit('update', nextColor),

@@ -1,6 +1,6 @@
-import { computed, ref, type Ref } from 'vue'
+import { computed, ref, type MaybeRefOrGetter, type Ref } from 'vue'
 
-import type { Fill, GradientStop, GradientTransform } from '@pairdraw/scene-graph'
+import type { ColorProfile, Fill, GradientStop, GradientTransform } from '@pairdraw/scene-graph'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { DEFAULT_GRADIENT_TRANSFORM } from '@pairdraw/scene-graph/gradient'
 import type { Color } from '@pairdraw/scene-graph/primitives'
@@ -26,7 +26,11 @@ const SUBTYPES: { value: GradientSubtype; label: string }[] = [
  * Use this composable for gradient editors that need subtype switching,
  * active-stop selection, stop dragging, and stop color/opacity editing.
  */
-export function useGradientStops(fill: Ref<Fill>, onUpdate: (fill: Fill) => void) {
+export function useGradientStops(
+  fill: Ref<Fill>,
+  onUpdate: (fill: Fill) => void,
+  options: { colorProfile?: MaybeRefOrGetter<ColorProfile> } = {}
+) {
   const activeStopIndex = ref(0)
   const stops = computed(() => fill.value.gradientStops ?? [])
   const subtype = computed(() => fill.value.type as GradientSubtype)
@@ -104,6 +108,7 @@ export function useGradientStops(fill: Ref<Fill>, onUpdate: (fill: Fill) => void
 
   const colorModel = useColorModel({
     color: activeColor,
+    colorProfile: options.colorProfile,
     onUpdate: updateActiveColor
   })
 

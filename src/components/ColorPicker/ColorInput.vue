@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { useAttrs } from 'vue'
+import { computed, useAttrs } from 'vue'
 
+import type { ColorProfile } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import type { OkHCLControls } from '@pairdraw/vue/controls/color-model'
 import { ColorInputRoot } from '@pairdraw/vue/primitives/ColorPicker'
 import { inputValue } from '@pairdraw/vue/shared/dom-events'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorPicker from '@/components/ColorPicker/ColorPicker.vue'
 
 defineOptions({ inheritAttrs: false })
@@ -15,13 +17,19 @@ const attrs = useAttrs()
 const {
   editable = false,
   color,
-  okhcl = null
+  okhcl = null,
+  colorProfile
 } = defineProps<{
   color: Color
   editable?: boolean
   okhcl?: OkHCLControls | null
+  /** The profile the color is stored in; the open document's unless one is given. */
+  colorProfile?: ColorProfile
 }>()
 const emit = defineEmits<{ update: [color: Color]; openChange: [open: boolean] }>()
+// A design's colors are stored in its document's profile, so its hex reads as sRGB.
+const store = useEditorStore()
+const profile = computed(() => colorProfile ?? store.graph.documentColorSpace)
 </script>
 
 <template>
@@ -29,6 +37,7 @@ const emit = defineEmits<{ update: [color: Color]; openChange: [open: boolean] }
     :color="color"
     :editable="editable"
     :okhcl="okhcl"
+    :color-profile="profile"
     @update="emit('update', $event)"
   >
     <template #default="{ editable: isEditable, hex, actions, okhcl: okhclControls }">
@@ -36,6 +45,7 @@ const emit = defineEmits<{ update: [color: Color]; openChange: [open: boolean] }
         <ColorPicker
           :color="color"
           :okhcl="okhclControls"
+          :color-profile="profile"
           @update="actions.updateColor($event)"
           @open-change="emit('openChange', $event)"
         />

@@ -1,6 +1,6 @@
 import type { PrimitiveProps } from 'reka-ui'
 
-import type { GradientStop } from '@pairdraw/scene-graph'
+import type { ColorProfile, GradientStop } from '@pairdraw/scene-graph'
 
 export interface GradientEditorStopProps extends PrimitiveProps {
   stop: GradientStop
@@ -11,6 +11,8 @@ export interface GradientEditorStopProps extends PrimitiveProps {
   removable?: boolean
   positionStep?: number
   label?: string
+  /** The profile the stop's color is stored in; the hex reads it as the sRGB color drawn. */
+  colorProfile?: ColorProfile
 }
 
 export interface GradientEditorStopActions {

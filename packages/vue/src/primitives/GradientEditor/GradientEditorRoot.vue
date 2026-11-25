@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 
-import type { Fill } from '@pairdraw/scene-graph'
+import type { ColorProfile, Fill } from '@pairdraw/scene-graph'
 
 import { useGradientStops } from '#vue/primitives/GradientEditor/useGradientStops'
 
-const { fill } = defineProps<{ fill: Fill }>()
+const { fill, colorProfile } = defineProps<{ fill: Fill; colorProfile?: ColorProfile }>()
 const emit = defineEmits<{ update: [fill: Fill] }>()
 /** The selected stop, which the canvas handles can also change. */
 const selectedStop = defineModel<number>('activeStopIndex')
@@ -28,7 +28,8 @@ const {
   dragStop
 } = useGradientStops(
   computed(() => fill),
-  (updated) => emit('update', updated)
+  (updated) => emit('update', updated),
+  { colorProfile: () => colorProfile ?? 'srgb' }
 )
 
 watch(

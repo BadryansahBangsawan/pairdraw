@@ -14,7 +14,7 @@ import {
 
 import { defaultCheckConfig, type CheckConfig } from '#cli/check/config'
 import { reportJSON, reportMarkdown, writeReport } from '#cli/check/report'
-import { runCheck } from '#cli/check/run'
+import { readResponsiveResult, runCheck } from '#cli/check/run'
 import { writeDocumentFile } from '#cli/headless'
 
 setDefaultTimeout(120_000)
@@ -80,6 +80,33 @@ async function saveAt(graph: SceneGraph, dir: string, name: string): Promise<str
   return path
 }
 
+describe('pairdraw check — what the render tool may answer', () => {
+  const warning = (severity: string) => ({
+    widths: [
+      {
+        width: 375,
+        height: 812,
+        base64: '',
+        warnings: [
+          { kind: 'sibling-overlap', severity, node_id: 'b', node_name: 'B', message: 'B overlaps A' }
+        ]
+      }
+    ]
+  })
+
+  test('an overlap severity the tool reports becomes a warning, never a parse failure', () => {
+    for (const severity of ['critical', 'major', 'minor']) {
+      const result = readResponsiveResult(warning(severity))
+      expect(result?.widths[0].warnings[0].severity).toBe('warning')
+    }
+    expect(readResponsiveResult(warning('info'))?.widths[0].warnings[0].severity).toBe('info')
+  })
+
+  test('an answer that is not the tool contract is refused instead of guessed', () => {
+    expect(readResponsiveResult({ widths: 'not an array' })).toBeNull()
+  })
+})
+
 describe('pairdraw check — design memory and the base revision', () => {
   test('without a base every finding is new and fails at the error level', async () => {
     const path = await saveAt(
@@ -117,9 +144,29 @@ describe('pairdraw check — design memory and the base revision', () => {
           .map((violation) => violation.nodeName)
       ).toEqual(['Card'])
       expect(run.report.exitCode).toBe(1)
+      // The verdict counts what this change introduced, not the older finding beside it.
+      expect(run.report.totals.errors).toBe(1)
+      expect(run.report.totals.newViolations).toBe(1)
     } finally {
       process.chdir(WORKSPACE)
     }
+  })
+
+  test('a file with every check off is skipped, not checked', async () => {
+    const path = await saveAt(
+      documentWithCard('off'),
+      await mkdtemp(join(tmpdir(), 'pairdraw-check-skipped-')),
+      'design.fig'
+    )
+
+    const run = await runCheck({
+      files: [path],
+      config: config({ checks: { responsive: false, tokens: false, designMemory: false } })
+    })
+
+    expect(run.report.files[0].status).toBe('skipped')
+    expect(run.report.totals.checked).toBe(0)
+    expect(run.report.exitCode).toBe(0)
   })
 
   test('the same two copies with the head fixed pass, and failOn never always passes', async () => {
@@ -142,6 +189,74 @@ describe('pairdraw check — design memory and the base revision', () => {
     } finally {
       process.chdir(WORKSPACE)
     }
+  })
+})
+
+describe('pairdraw check — render names', () => {
+  async function pen(path: string, frames: { name: string; fill: string }[]): Promise<string> {
+    await mkdir(join(path, '..'), { recursive: true })
+    await Bun.write(
+      path,
+      JSON.stringify({
+        version: '2.14',
+        children: frames.map((frame, index) => ({
+          id: `frame-${index}`,
+          type: 'frame',
+          name: frame.name,
+          x: index * 120,
+          y: 0,
+          width: 100,
+          height: 100,
+          fill: frame.fill
+        }))
+      })
+    )
+    return path
+  }
+
+  const renders = (run: Awaited<ReturnType<typeof runCheck>>) =>
+    run.report.files[0].responsive.map((frame) => frame.renders[0].file)
+
+  test('two frames of the same name keep one render each', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-check-dupe-'))
+    const path = await pen(join(dir, 'designs', 'dupe.pen'), [
+      { name: 'Screen', fill: '#FF0000' },
+      { name: 'Screen', fill: '#00FF00' }
+    ])
+
+    const run = await runCheck({
+      files: [path],
+      config: config({
+        checks: { responsive: true, tokens: false, designMemory: false },
+        responsive: { ...defaultCheckConfig.responsive, widths: [375] }
+      })
+    })
+
+    expect(renders(run)).toEqual([
+      'renders/dupe-pen/screen__screen__375.png',
+      'renders/dupe-pen/screen__screen__375-2.png'
+    ])
+    expect(run.renders.size).toBe(2)
+  })
+
+  test('two documents of the same name keep their own render folder', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-check-samename-'))
+    const first = await pen(join(dir, 'a', 'home.pen'), [{ name: 'Screen', fill: '#FF0000' }])
+    const second = await pen(join(dir, 'b', 'home.pen'), [{ name: 'Screen', fill: '#00FF00' }])
+
+    const run = await runCheck({
+      files: [first, second],
+      config: config({
+        checks: { responsive: true, tokens: false, designMemory: false },
+        responsive: { ...defaultCheckConfig.responsive, widths: [375] }
+      })
+    })
+
+    const folders = [run.report.files[0], run.report.files[1]].map(
+      (file) => file.responsive[0].renders[0].file.split('/')[1]
+    )
+    expect(folders).toEqual(['home-pen', 'home-pen-2'])
+    expect(run.renders.size).toBe(2)
   })
 })
 

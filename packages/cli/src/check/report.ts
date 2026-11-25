@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
@@ -8,6 +9,19 @@ export const COMMENT_MARKER = '<!-- pairdraw-check -->'
 
 /** Names in the Markdown writer stay readable; findings and renders are capped as GitHub caps a comment. */
 const MAX_FINDINGS_PER_FILE = 20
+
+/** GitHub refuses a comment body past this many bytes; the report is cut to fit. */
+export const MAX_COMMENT_BYTES = 65_536
+
+/** Detail the writer gives up, in order, so an oversized report still posts. */
+const FINDING_LIMITS = [MAX_FINDINGS_PER_FILE, 10, 5, 2, 1, 0]
+const FILE_LIMITS = [Number.POSITIVE_INFINITY, 100, 50, 20, 10, 5, 0]
+
+/** How much of the report a single Markdown rendering shows. */
+interface CommentLimits {
+  findingsPerFile: number
+  files: number
+}
 
 /** The report as JSON: renders keep where their PNG is, never the bytes. */
 export function reportJSON(run: CheckRun): unknown {
@@ -41,7 +55,34 @@ export async function writeReport(
 
 /** The report as the pull-request comment: the verdict, a table, then one section per file. */
 export function reportMarkdown(run: CheckRun, options: { imageBase?: string } = {}): string {
+  let markdown = renderComment(run, options, {
+    findingsPerFile: MAX_FINDINGS_PER_FILE,
+    files: Number.POSITIVE_INFINITY
+  })
+  if (size(markdown) <= MAX_COMMENT_BYTES) return markdown
+  // Give up detail until the body fits, then files, so the comment is always posted.
+  for (const findingsPerFile of FINDING_LIMITS) {
+    for (const files of FILE_LIMITS) {
+      markdown = renderComment(run, options, { findingsPerFile, files })
+      if (size(markdown) <= MAX_COMMENT_BYTES) return markdown
+    }
+  }
+  return markdown
+}
+
+function size(text: string): number {
+  return Buffer.byteLength(text)
+}
+
+function renderComment(
+  run: CheckRun,
+  options: { imageBase?: string },
+  limits: CommentLimits
+): string {
   const { totals, files } = run.report
+  const shown = files.slice(0, limits.files)
+  const dropped = files.length - shown.length
+  const hidden = hiddenFindings(shown, limits.findingsPerFile)
   const lines = [COMMENT_MARKER, '']
   lines.push(
     `## Pairdraw design check — ${verdict(run)}, ${count(totals.errors, 'error')}, ${count(totals.warnings, 'warning')}`
@@ -54,17 +95,40 @@ export function reportMarkdown(run: CheckRun, options: { imageBase?: string } = 
     lines.push('')
     lines.push('| File | Design memory | Tokens | Responsive |')
     lines.push('| --- | --- | --- | --- |')
-    for (const file of files)
+    for (const file of shown)
       lines.push(
         `| ${escapeCell(file.path)} | ${memoryCell(file)} | ${tokensCell(file)} | ${responsiveCell(file)} |`
       )
+    if (dropped > 0)
+      lines.push(
+        '',
+        `… ${dropped === 1 ? '1 more file is' : `${dropped} more files are`} in \`report.json\`.`
+      )
   }
-  for (const file of files) lines.push(...fileSection(file, options))
+  for (const file of shown) lines.push(...fileSection(file, options, limits.findingsPerFile))
+  if (dropped > 0 || hidden > 0) {
+    lines.push('')
+    lines.push(
+      `Truncated to fit GitHub’s ${MAX_COMMENT_BYTES.toLocaleString('en-US')}-byte comment limit; \`report.json\` holds every finding.`
+    )
+  }
   if (run.report.exitCode === 2) {
     lines.push('')
     lines.push('The check could not finish, so this run is not a pass.')
   }
   return `${lines.join('\n')}\n`
+}
+
+/** Findings the limits leave out, so the truncation note only appears when something is hidden. */
+function hiddenFindings(files: FileCheck[], perFile: number): number {
+  let hidden = 0
+  for (const file of files) {
+    hidden += Math.max(0, (file.designMemory?.violations.length ?? 0) - perFile)
+    hidden += Math.max(0, (file.tokens.check?.drift.length ?? 0) - perFile)
+    for (const frame of file.responsive)
+      for (const render of frame.renders) hidden += Math.max(0, render.warnings.length - perFile)
+  }
+  return hidden
 }
 
 function verdict(run: CheckRun): string {
@@ -107,21 +171,21 @@ function responsiveCell(file: FileCheck): string {
   return `${plural(file.responsive.length, 'frame')}, ${plural(warnings, 'warning')}${skipped}`
 }
 
-function fileSection(file: FileCheck, options: { imageBase?: string }): string[] {
+function fileSection(file: FileCheck, options: { imageBase?: string }, perFile: number): string[] {
   const body: string[] = []
   if (file.error) body.push(`**Error:** ${file.error}`, '')
-  body.push(...memoryLines(file))
-  body.push(...tokenLines(file))
-  body.push(...responsiveLines(file, options))
+  body.push(...memoryLines(file, perFile))
+  body.push(...tokenLines(file, perFile))
+  body.push(...responsiveLines(file, options, perFile))
   if (body.length === 0) return []
   return ['', `<details><summary>${file.path}</summary>`, '', ...body, '</details>']
 }
 
-function memoryLines(file: FileCheck): string[] {
+function memoryLines(file: FileCheck, perFile: number): string[] {
   const memory = file.designMemory
   if (!memory || memory.missing || memory.violations.length === 0) return []
   const lines = ['**Design memory**', '']
-  for (const violation of memory.violations.slice(0, MAX_FINDINGS_PER_FILE)) {
+  for (const violation of memory.violations.slice(0, perFile)) {
     const where = violation.nodePath.join(' / ')
     const nearest =
       violation.nearest === null
@@ -131,17 +195,17 @@ function memoryLines(file: FileCheck): string[] {
       `- ${violation.severity} · ${violation.group} · ${where} · \`${violation.value}\`${nearest}${violation.new ? '' : ' (older)'}`
     )
   }
-  const rest = memory.violations.length - MAX_FINDINGS_PER_FILE
+  const rest = memory.violations.length - perFile
   if (rest > 0) lines.push(`- … ${plural(rest, 'more finding')} in \`report.json\``)
   lines.push('')
   return lines
 }
 
-function tokenLines(file: FileCheck): string[] {
+function tokenLines(file: FileCheck, perFile: number): string[] {
   const check = file.tokens.check
   if (!check || check.inSync) return []
   const lines = ['**Token drift**', '']
-  for (const drift of check.drift) {
+  for (const drift of check.drift.slice(0, perFile)) {
     const where = `${drift.collection} / ${drift.variable}${drift.mode ? ` (${drift.mode})` : ''}`
     const values = [
       drift.code === undefined ? undefined : `code ${drift.code}`,
@@ -149,11 +213,17 @@ function tokenLines(file: FileCheck): string[] {
     ].filter((part) => part !== undefined)
     lines.push(`- ${where}: ${drift.kind}${values.length > 0 ? `, ${values.join(', ')}` : ''}`)
   }
+  const rest = check.drift.length - perFile
+  if (rest > 0) lines.push(`- … ${plural(rest, 'more token')} in \`report.json\``)
   lines.push('')
   return lines
 }
 
-function responsiveLines(file: FileCheck, options: { imageBase?: string }): string[] {
+function responsiveLines(
+  file: FileCheck,
+  options: { imageBase?: string },
+  perFile: number
+): string[] {
   const lines: string[] = []
   for (const frame of file.responsive) {
     if (frame.error) {
@@ -171,11 +241,16 @@ function responsiveLines(file: FileCheck, options: { imageBase?: string }): stri
       lines.push('')
     }
     for (const render of frame.renders) {
-      for (const warning of render.warnings.slice(0, MAX_FINDINGS_PER_FILE)) {
+      for (const warning of render.warnings.slice(0, perFile)) {
         lines.push(`- ${render.width}px · ${warning.severity} · ${warning.message}`)
       }
     }
-    if (warnings > 0) lines.push('')
+    const hidden = frame.renders.reduce(
+      (sum, render) => sum + Math.max(0, render.warnings.length - perFile),
+      0
+    )
+    if (hidden > 0) lines.push(`- … ${plural(hidden, 'more warning')} in \`report.json\``)
+    if (warnings > 0 || hidden > 0) lines.push('')
   }
   return lines
 }

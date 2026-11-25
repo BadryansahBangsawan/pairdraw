@@ -47,7 +47,7 @@ runs:
   using: composite
   steps:
     - name: Set up Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node-version }}
 
@@ -90,9 +90,12 @@ runs:
           exit 0
         fi
 
-        # Design files kept in Git LFS arrive as pointers; pull the ones being checked.
+        # Design files kept in Git LFS arrive as pointers; pull the ones being checked, one path
+        # at a time so a path holding a comma or a space still names itself.
         if command -v git-lfs >/dev/null 2>&1; then
-          git lfs pull --include="$(paste -sd, "$out/files.txt")" >/dev/null 2>&1 || true
+          while IFS= read -r path; do
+            git lfs pull --include="$path" >/dev/null 2>&1 || true
+          done < "$out/files.txt"
         fi
 
         while IFS= read -r path; do
@@ -102,10 +105,12 @@ runs:
           fi
         done < "$out/files.txt"
 
+        # A pull request names its own files, so the delimiter must not be guessable.
+        delimiter="PAIRDRAW_FILES_${RANDOM}${RANDOM}${RANDOM}"
         {
-          echo "files<<PAIRDRAW_FILES"
+          echo "files<<$delimiter"
           cat "$out/files.txt"
-          echo "PAIRDRAW_FILES"
+          echo "$delimiter"
           echo "base=$base_dir"
         } >> "$GITHUB_OUTPUT"
 
@@ -144,7 +149,7 @@ runs:
 
     - name: Upload the report and the renders
       if: ${{ steps.check.outputs.report != '' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: pairdraw-check-${{ github.event.pull_request.number || github.ref_name }}
         path: ${{ steps.check.outputs.dir }}
@@ -168,14 +173,6 @@ runs:
         body_file="$out/comment.md"
         marker='<!-- pairdraw-check -->'
 
-        if [ -z "${FILES//[[:space:]]/}" ]; then
-          printf '%s\n\nNo design files changed in this pull request.\n' "$marker" > "$body_file"
-        elif [ -f "$out/report.md" ]; then
-          { cat "$out/report.md"; printf '\n[Report and renders](%s) are kept as an artifact of this run.\n' "$RUN_URL"; } > "$body_file"
-        else
-          printf '%s\n\nThe design check did not finish; see the job log.\n' "$marker" > "$body_file"
-        fi
-
         if [ "${IS_FORK}" = "true" ]; then
           echo "::warning::A pull request from a fork has a read-only token, so the comment is skipped."
           exit 0
@@ -183,6 +180,20 @@ runs:
 
         existing="$(gh api --paginate "repos/${REPO}/issues/${PR}/comments?per_page=100" \
           --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" 2>/dev/null | head -n 1)"
+
+        if [ -z "${FILES//[[:space:]]/}" ]; then
+          # Nothing changed: clear a stale gate, but never open a comment on a clean pull request.
+          if [ -z "$existing" ]; then
+            echo "No design files changed, and no Pairdraw comment to update."
+            exit 0
+          fi
+          printf '%s\n\nNo design files changed in this pull request.\n' "$marker" > "$body_file"
+        elif [ -f "$out/report.md" ]; then
+          { cat "$out/report.md"; printf '\n[Report and renders](%s) are kept as an artifact of this run.\n' "$RUN_URL"; } > "$body_file"
+        else
+          printf '%s\n\nThe design check did not finish; see the job log.\n' "$marker" > "$body_file"
+        fi
+
         payload="$(jq -Rs '{body: .}' < "$body_file")"
         if [ -n "$existing" ]; then
           printf '%s' "$payload" | gh api --method PATCH "repos/${REPO}/issues/comments/${existing}" --input - >/dev/null

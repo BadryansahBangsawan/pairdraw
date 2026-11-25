@@ -24,7 +24,7 @@ const FRAME_TYPES: Partial<Record<SceneNode['type'], true>> = { FRAME: true, COM
  */
 export function framesToCheck(graph: SceneGraph, maxFrames: number): FrameSelection {
   const candidates: SceneNode[] = []
-  for (const page of graph.getPages(true)) {
+  for (const page of graph.getPages()) {
     for (const child of graph.getChildren(page.id)) {
       if (child.internalOnly) continue
       if (child.type === 'SECTION') {

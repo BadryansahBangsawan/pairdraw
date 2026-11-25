@@ -70,6 +70,9 @@ describe('pairdraw check CLI', () => {
       '--json'
     ])
     expect(JSON.parse(json.stdout).totals.drift).toBe(1)
+    // The report is machine output; the human lines stay on stderr.
+    expect(json.stderr).toContain('Report written to report3')
+    expect(json.stdout).not.toContain('Report written to')
   })
 
   test('a file that is not a design document exits 2 and says which file', async () => {

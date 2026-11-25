@@ -26,7 +26,7 @@ jobs:
   pairdraw:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: BadryansahBangsawan/pairdraw/.github/actions/pairdraw-check@v0.20.0
@@ -100,4 +100,7 @@ PNGs are. Publishing the renders to a branch so they can be embedded inline is a
   says "no memory in this file" rather than passing silently.
 - Responsive rendering fetches web fonts on the runner; a network failure falls back and can change a text-overflow
   warning.
-- The comment is capped: findings past the first 20 per file are counted in `report.json`, which is always complete.
+- The comment is cut to GitHub's 65,536-byte limit: the writer lists as many findings as fit, then says so, and
+  `report.json` always holds every finding.
+- A pull request that changes no design files gets no new comment; an existing Pairdraw comment is replaced with
+  "No design files changed" so a stale red gate does not survive.

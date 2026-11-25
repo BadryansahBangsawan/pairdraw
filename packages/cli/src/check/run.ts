@@ -106,6 +106,35 @@ export interface CheckInput {
   onNote?: (note: string) => void
 }
 
+/** One width the render tool answered. */
+export interface ResponsiveResult {
+  widths: {
+    width: number
+    height: number
+    base64: string
+    warnings: {
+      kind: string
+      severity: 'error' | 'warning' | 'info'
+      node_id: string
+      node_name: string
+      message: string
+    }[]
+    dropped_warnings?: number
+  }[]
+}
+
+/**
+ * The tool's overlap levels — `critical`, `major`, `minor` — are warnings here: a layer that overlaps
+ * another is something to fix, not a check that could not run. Only `info` stays information.
+ */
+type ToolSeverity = 'error' | 'warning' | 'info' | 'critical' | 'major' | 'minor'
+
+function responsiveSeverity(value: ToolSeverity): 'error' | 'warning' | 'info' {
+  if (value === 'error') return 'error'
+  if (value === 'info') return 'info'
+  return 'warning'
+}
+
 const responsiveResultSchema = v.object({
   widths: v.array(
     v.object({
@@ -115,7 +144,10 @@ const responsiveResultSchema = v.object({
       warnings: v.array(
         v.object({
           kind: v.string(),
-          severity: v.picklist(['error', 'warning', 'info']),
+          severity: v.pipe(
+            v.picklist(['error', 'warning', 'info', 'critical', 'major', 'minor']),
+            v.transform(responsiveSeverity)
+          ),
           node_id: v.string(),
           node_name: v.string(),
           message: v.string()
@@ -125,6 +157,12 @@ const responsiveResultSchema = v.object({
     })
   )
 })
+
+/** The render tool's answer, with its severities in the report's vocabulary; null when it broke the contract. */
+export function readResponsiveResult(result: unknown): ResponsiveResult | null {
+  const parsed = v.safeParse(responsiveResultSchema, result)
+  return parsed.success ? parsed.output : null
+}
 
 /** The names a report file goes by: lower-case words with single dashes, and never empty. */
 export function slug(text: string): string {
@@ -143,8 +181,9 @@ export function slug(text: string): string {
 export async function runCheck(input: CheckInput): Promise<CheckRun> {
   const files: FileCheck[] = []
   const renders = new Map<string, Uint8Array>()
+  const folders = new Map<string, number>()
   for (const path of input.files) {
-    files.push(await checkFile(path, input, renders, input.onNote))
+    files.push(await checkFile(path, input, renders, folders, input.onNote))
   }
   const report: CheckReport = {
     version: 1,
@@ -159,6 +198,7 @@ async function checkFile(
   path: string,
   input: CheckInput,
   renders: Map<string, Uint8Array>,
+  folders: Map<string, number>,
   note: ((text: string) => void) | undefined
 ): Promise<FileCheck> {
   const base = await baseFindings(path, input.baseDir)
@@ -180,16 +220,24 @@ async function checkFile(
   }
   const { graph } = headless
 
+  const { checks } = input.config
+  if (!checks.designMemory && !checks.tokens && !checks.responsive) {
+    return { ...empty, status: 'skipped' }
+  }
   const file: FileCheck = { ...empty, status: 'checked' }
-  if (input.config.checks.designMemory) file.designMemory = memoryFindings(graph, base)
-  if (input.config.checks.tokens) file.tokens = await tokensOf(graph, input.config, path)
-  if (input.config.checks.responsive) {
+  if (checks.designMemory) file.designMemory = memoryFindings(graph, base)
+  if (checks.tokens) file.tokens = await tokensOf(graph, input.config, path)
+  if (checks.responsive) {
     const selection = framesToCheck(graph, input.config.responsive.maxFrames)
     file.skippedFrames = selection.skipped
     if (selection.skipped > 0)
       note?.(`${path}: ${selection.skipped} more frames were not rendered (responsive.maxFrames)`)
+    const folder = `renders/${uniqueFolder(folders, slug(basename(path)))}`
+    const used = new Map<string, number>()
     for (const frame of selection.frames) {
-      file.responsive.push(await renderFrame(headless, frame.id, path, input.config, renders))
+      file.responsive.push(
+        await renderFrame(headless, frame.id, folder, used, input.config, renders)
+      )
     }
   }
   const failed = file.responsive.some((frame) => frame.error)
@@ -265,7 +313,7 @@ function nodePath(graph: SceneGraph, nodeId: string): string[] {
   const names: string[] = []
   let node = graph.getNode(nodeId)
   while (node) {
-    if (node.type !== 'DOCUMENT') names.unshift(node.name)
+    names.unshift(node.name)
     node = node.parentId ? graph.getNode(node.parentId) : undefined
   }
   return names
@@ -287,7 +335,8 @@ async function tokensOf(
 async function renderFrame(
   headless: HeadlessToolDocument,
   frameId: string,
-  filePath: string,
+  folder: string,
+  used: Map<string, number>,
   config: CheckConfig,
   renders: Map<string, Uint8Array>
 ): Promise<FrameCheck> {
@@ -303,19 +352,17 @@ async function renderFrame(
     scale: responsive.scale,
     maxEdge: responsive.maxEdge
   })
-  const parsed = v.safeParse(responsiveResultSchema, result)
-  if (!parsed.success)
+  const parsed = readResponsiveResult(result)
+  if (!parsed)
     return {
       frameId,
       frameName,
       page: pageName,
       renders: [],
-      error: `check_responsive answered ${v.summarize(parsed.issues)}`
+      error: 'check_responsive did not answer the render contract'
     }
-  const folder = `renders/${slug(basename(filePath))}`
   const base = `${slug(pageName)}__${slug(frameName)}`
-  const used = new Map<string, number>()
-  const entries = parsed.output.widths.map((width) => {
+  const entries = parsed.widths.map((width) => {
     const name = uniqueName(used, base, width.width)
     const file = `${folder}/${name}.png`
     const png = toUint8Array(width.base64)
@@ -344,6 +391,13 @@ function uniqueName(used: Map<string, number>, base: string, width: number): str
   const count = used.get(stem) ?? 0
   used.set(stem, count + 1)
   return count === 0 ? stem : `${stem}-${count + 1}`
+}
+
+/** `home-pen`, with a count when a run checks two documents of the same name. */
+function uniqueFolder(used: Map<string, number>, base: string): string {
+  const count = used.get(base) ?? 0
+  used.set(base, count + 1)
+  return count === 0 ? base : `${base}-${count + 1}`
 }
 
 /** Whether a finding fails at this level: `error` is errors only, `warning` both, `never` none. */
@@ -381,6 +435,8 @@ function totalsOf(files: FileCheck[]): CheckTotals {
     newViolations += file.designMemory?.newCount ?? 0
     drift += file.tokens.check?.drift.length ?? 0
     for (const violation of file.designMemory?.violations ?? []) {
+      // The verdict is about what this change did; older findings stay in the table.
+      if (!violation.new) continue
       if (violation.severity === 'error') errors++
       if (violation.severity === 'warning') warnings++
     }

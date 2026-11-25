@@ -54,4 +54,14 @@ describe('which frames a check renders', () => {
     expect(isDesignFile('designs/home.drawio')).toBe(false)
     expect(isDesignFile('README.md')).toBe(false)
   })
+
+  test('a page the editor marks internal is not checked', () => {
+    const graph = document()
+    const internal = graph.addPage('Internal')
+    graph.updateNode(internal.id, { internalOnly: true })
+    graph.createNode('FRAME', internal.id, { name: 'Component sheet', width: 100, height: 100 })
+
+    const { frames } = framesToCheck(graph, 8)
+    expect(frames.map((frame) => frame.name)).not.toContain('Component sheet')
+  })
 })

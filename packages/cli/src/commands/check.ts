@@ -70,14 +70,16 @@ export default defineCommand({
         onNote: (note) => console.error(warn(note))
       })
       await writeReport(out, run, { imageBase: args['image-base'] || undefined })
+      const { totals, exitCode } = run.report
+      const summary = `${totals.checked} of ${totals.files} files checked: ${totals.errors} errors, ${totals.warnings} warnings, ${totals.newViolations} new design-memory findings, ${totals.drift} drifted tokens`
       if (args.json) {
+        // The report is the stdout payload; everything a person reads stays on stderr.
         await printJSON(reportJSON(run))
+        console.error(exitCode === 0 ? ok(summary) : fail(summary))
       } else {
-        const { totals, exitCode } = run.report
-        const summary = `${totals.checked} of ${totals.files} files checked: ${totals.errors} errors, ${totals.warnings} warnings, ${totals.newViolations} new design-memory findings, ${totals.drift} drifted tokens`
         console.log(exitCode === 0 ? ok(summary) : fail(summary))
-        console.error(`Report written to ${bold(out)}`)
       }
+      console.error(`Report written to ${bold(out)}`)
       // A process that exits at once can cut off what a pipe has not taken yet.
       process.exitCode = run.report.exitCode
     } catch (error) {

@@ -22,12 +22,6 @@ export const es: LandingMessages = {
     downloadAny: 'Descargar Pairdraw',
     github: 'Ver en GitHub',
     finePrint: 'Gratis para macOS, Windows y Linux. Usa tu propio modelo o agente de programación.',
-    prompt: 'Escribe el titular del hero: «Diseña junto a tu agente.» Mantenlo en dos líneas.',
-    status: {
-      reading: '{agent} está leyendo la página',
-      adding: '{agent} está añadiendo H1',
-      writing: '{agent} está escribiendo H1'
-    },
     comment: 'Mantén el titular en dos líneas.',
     reply: 'Lo puse a 890 de ancho para que salte de línea después de «a».',
     now: 'ahora',
@@ -37,8 +31,6 @@ export const es: LandingMessages = {
       frame: { name: 'Marco Hero', detail: 'Marco, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} lo está añadiendo',
-        writing: '{agent} lo está escribiendo',
         detail: '{agent} le está cambiando el tamaño'
       },
       comment: { name: 'Comentario', detail: '{human}, 1 respuesta' },

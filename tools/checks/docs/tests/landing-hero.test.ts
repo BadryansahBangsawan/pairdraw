@@ -4,8 +4,7 @@ import {
   HERO_STEPS,
   heroScene,
   LAST_STEP,
-  STEP_HOLD,
-  typedHeadline
+  STEP_HOLD
 } from '#docs-config/theme/landing/hero/storyboard'
 
 const at = (name: (typeof HERO_STEPS)[number]) => HERO_STEPS.indexOf(name)
@@ -20,17 +19,8 @@ describe('the hero storyboard', () => {
 
   test('shows the whole copy before the agent acts', () => {
     const first = heroScene(0)
-    expect(first.typed).toBe('all')
     expect(first.lead && first.actions).toBe(true)
     expect(first.layers).toEqual({ heading: true, comment: false, lead: true })
-    expect(typedHeadline('Design next to your agent.', first.typed)).toBe(
-      'Design next to your agent.'
-    )
-  })
-
-  test('types a one-word headline without repeating or losing it', () => {
-    expect(typedHeadline('Hola.', 'most')).toBe('Hola.')
-    expect(typedHeadline('Hola.', 'nearly')).toBe('Hola.')
   })
 
   test('draws the box first, then sizes it around the copy', () => {
@@ -46,7 +36,7 @@ describe('the hero storyboard', () => {
     expect(comment.actions).toBe(true)
     expect(comment.active).toEqual({ layer: 'comment', actor: 'human' })
     const done = heroScene(LAST_STEP)
-    expect(done.reply && done.actions && done.status === null).toBe(true)
+    expect(done.reply && done.actions).toBe(true)
     expect(done.active).toEqual({ layer: 'comment', actor: 'agent' })
   })
 

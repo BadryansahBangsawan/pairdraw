@@ -23,13 +23,6 @@ export const de: LandingMessages = {
     github: 'Auf GitHub ansehen',
     finePrint:
       'Kostenlos für macOS, Windows und Linux. Mit deinem eigenen Modell oder Coding-Agenten.',
-    prompt:
-      'Schreib die Hero-Überschrift: „Design neben deinem Agenten.“ Halte sie auf zwei Zeilen.',
-    status: {
-      reading: '{agent} liest die Seite',
-      adding: '{agent} fügt H1 hinzu',
-      writing: '{agent} schreibt H1'
-    },
     comment: 'Die Überschrift bitte auf zwei Zeilen lassen.',
     reply: 'Auf 890 Breite gesetzt, damit sie nach „neben“ umbricht.',
     now: 'jetzt',
@@ -39,8 +32,6 @@ export const de: LandingMessages = {
       frame: { name: 'Hero-Rahmen', detail: 'Rahmen, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} fügt sie hinzu',
-        writing: '{agent} schreibt sie',
         detail: '{agent} ändert ihre Größe'
       },
       comment: { name: 'Kommentar', detail: '{human}, 1 Antwort' },

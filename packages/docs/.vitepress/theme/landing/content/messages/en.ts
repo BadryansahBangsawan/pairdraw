@@ -22,12 +22,6 @@ export const en: LandingMessages = {
     downloadAny: 'Download Pairdraw',
     github: 'View on GitHub',
     finePrint: 'Free for macOS, Windows, and Linux. Bring your own model or coding agent.',
-    prompt: 'Write the hero headline: “Design next to your agent.” Keep it on two lines.',
-    status: {
-      reading: '{agent} is reading the page',
-      adding: '{agent} is adding H1',
-      writing: '{agent} is writing H1'
-    },
     comment: 'Keep the headline on two lines.',
     reply: 'Set it to 890 wide, so it breaks after “to”.',
     now: 'now',
@@ -37,8 +31,6 @@ export const en: LandingMessages = {
       frame: { name: 'Hero frame', detail: 'Frame, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} is adding it',
-        writing: '{agent} is writing it',
         detail: '{agent} is resizing it'
       },
       comment: { name: 'Comment', detail: '{human}, 1 reply' },

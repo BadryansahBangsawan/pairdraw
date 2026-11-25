@@ -22,12 +22,6 @@ export const pl: LandingMessages = {
     downloadAny: 'Pobierz Pairdraw',
     github: 'Zobacz na GitHubie',
     finePrint: 'Za darmo na macOS, Windows i Linux. Użyj własnego modelu lub agenta kodującego.',
-    prompt: 'Napisz nagłówek hero: „Projektuj obok swojego agenta.” Zmieść go w dwóch liniach.',
-    status: {
-      reading: '{agent} czyta stronę',
-      adding: '{agent} dodaje H1',
-      writing: '{agent} pisze H1'
-    },
     comment: 'Zostaw nagłówek w dwóch liniach.',
     reply: 'Szerokość ustawiona na 890, więc tekst łamie się po „obok”.',
     now: 'teraz',
@@ -37,8 +31,6 @@ export const pl: LandingMessages = {
       frame: { name: 'Ramka Hero', detail: 'Ramka, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} dodaje warstwę',
-        writing: '{agent} pisze tekst',
         detail: '{agent} zmienia rozmiar'
       },
       comment: { name: 'Komentarz', detail: '{human}, 1 odpowiedź' },

@@ -23,12 +23,6 @@ export const fr: LandingMessages = {
     github: 'Voir sur GitHub',
     finePrint:
       'Gratuit pour macOS, Windows et Linux. Utilisez votre propre modèle ou agent de code.',
-    prompt: 'Écris le titre du hero : « Concevez avec votre agent. » Garde-le sur deux lignes.',
-    status: {
-      reading: '{agent} lit la page',
-      adding: '{agent} ajoute H1',
-      writing: '{agent} écrit H1'
-    },
     comment: 'Garde le titre sur deux lignes.',
     reply: 'Réglé sur 890 de large, pour qu’il passe à la ligne après « avec ».',
     now: 'à l’instant',
@@ -38,8 +32,6 @@ export const fr: LandingMessages = {
       frame: { name: 'Cadre Hero', detail: 'Cadre, 1200 × 980' },
       heading: {
         name: 'H1',
-        adding: '{agent} l’ajoute',
-        writing: '{agent} l’écrit',
         detail: '{agent} le redimensionne'
       },
       comment: { name: 'Commentaire', detail: '{human}, 1 réponse' },

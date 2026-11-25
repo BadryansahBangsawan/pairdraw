@@ -147,6 +147,8 @@ const activePane = () => paneId ?? store.activePaneId.value
 
 /** Pans the view by how far the canvas element moved since it last drew, as on a remount. */
 function carryCanvasOrigin() {
+  // A preview or presentation fits its own view; the editor's place returns when it ends.
+  if (paneProfile.value.live) return
   const element = sceneCanvasRef.value
   if (!element) return
   const box = element.getBoundingClientRect()
@@ -160,6 +162,7 @@ function carryCanvasOrigin() {
 
 // The layout moved the canvas on screen: pan the other way so the drawing stays where it was.
 const onViewportMove = (dx: number, dy: number) => {
+  if (paneProfile.value.live) return
   const previous = readCanvasOrigin(originKey())
   if (previous) writeCanvasOrigin(originKey(), { x: previous.x + dx, y: previous.y + dy })
   store.shiftPane(activePane(), -dx, -dy)
@@ -425,7 +428,7 @@ const pageBackground = computed(() => ({
           :key="index"
           data-test-id="prototype-letterbox"
           aria-hidden="true"
-          class="absolute z-20"
+          class="pointer-events-none absolute z-20"
           :style="{
             ...pageBackground,
             left: `${rect.left}px`,

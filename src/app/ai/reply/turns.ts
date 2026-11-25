@@ -104,7 +104,10 @@ export async function recordReplyTurn(
   recordTurn(messageId, store, run.undoCalls)
   const turn = turns.get(messageId)
   if (!turn) return null
-  queueTurnRenders(store, messageId, takeTurnFrames(store, run))
+  const capture = takeTurnFrames(store, run)
+  // Edits undone before the turn was recorded would render a change that no longer applies.
+  if (turn.undone.size === turn.calls.length) freeTurnRenders(messageId)
+  else queueTurnRenders(store, messageId, capture)
   return {
     edits: turn.calls.map(({ tool, toolCallId }) => ({ tool, toolCallId })),
     undone: [...turn.undone],

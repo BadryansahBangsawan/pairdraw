@@ -26,6 +26,13 @@ export const TURN_RENDER_PAUSE_MS = 150
 /** Longest stored edge of a turn render, in pixels. */
 const TURN_RENDER_MAX_EDGE = 320
 
+/**
+ * Width renders one turn may still draw. A turn shows at most 3 frames, whose before/after
+ * images already spend 6 of the spec's 10-render budget; the remaining 4 are two widths for
+ * two responsive frames, and later frames keep their thumbnails only.
+ */
+const MAX_WIDTH_RENDERS_PER_TURN = 4
+
 interface FrozenFrame extends TurnFrame {
   /** The frame's subtree at turn end; null when the turn deleted it. */
   after: SceneGraph | null
@@ -98,24 +105,32 @@ async function renderNode(
 async function renderFrame(
   store: EditorStore,
   frame: FrozenFrame,
-  cancelled: () => boolean
+  cancelled: () => boolean,
+  widthBudget: { left: number }
 ): Promise<TurnFrameRenders | null> {
   const beforeNode = frame.before?.getNode(frame.frameId)
   const afterNode = frame.after?.getNode(frame.frameId)
   const figma = makeFigmaFromStore(store, frame.pageId)
   const before = await renderNode(figma, frame.before, frame.pageId, beforeNode, frame.frameId)
+  await promiseTimeout(0)
   if (cancelled()) return null
   const after = await renderNode(figma, frame.after, frame.pageId, afterNode, frame.frameId)
+  await promiseTimeout(0)
   if (cancelled()) return null
   const widths: TurnFrameWidth[] = []
-  if (frame.after && afterNode && afterNode.layoutMode !== 'NONE') {
+  if (widthBudget.left > 0 && frame.after && afterNode && afterNode.layoutMode !== 'NONE') {
     for (const width of widthVariants(afterNode.width)) {
+      if (widthBudget.left === 0) break
       const laid = layoutFrameAtWidth(frame.after, frame.pageId, frame.frameId, width)
       // A width the frame's own min or max held away is dropped, not mislabelled.
       if (!laid || laid.clamped) continue
       const blob = await renderNode(figma, laid.graph, laid.pageId, laid.frame, frame.frameId)
+      await promiseTimeout(0)
       if (cancelled()) return null
-      if (blob) widths.push({ width, blob })
+      if (blob) {
+        widths.push({ width, blob })
+        widthBudget.left--
+      }
     }
   }
   return {
@@ -145,16 +160,21 @@ async function drain(store: EditorStore, queue: TurnQueue): Promise<void> {
       if (closed(queue)) return
       const job = queue.jobs.shift()
       if (!job) return
-      if (cancelled(job)) continue
+      if (cancelled(job)) {
+        activeJobs.delete(job.messageId)
+        continue
+      }
       try {
         const frames: TurnFrameRenders[] = []
-        for (const frame of job.frames) {
+        const widthBudget = { left: MAX_WIDTH_RENDERS_PER_TURN }
+        for (let index = 0; index < job.frames.length; index++) {
           if (cancelled(job)) break
-          const rendered = await renderFrame(store, frame, () => cancelled(job))
+          const frame = job.frames[index]
+          const rendered = await renderFrame(store, frame, () => cancelled(job), widthBudget)
           if (!rendered) break
           frames.push(rendered)
-          // Input and drawing go between one image and the next.
-          await promiseTimeout(0)
+          // This frame is done; let its before/after copies go before the next frame draws.
+          job.frames[index] = { ...frame, before: null, after: null }
         }
         if (cancelled(job)) continue
         const expected = frames.some((frame) => !frame.deleted)

@@ -195,6 +195,22 @@ test('undoing every edit frees the reply’s changed-frame renders', async () =>
   expect(readTurnRenders('reply-1')).toBeNull()
 })
 
+test('a turn already undone before it is recorded shows no card', async () => {
+  const { card, actions } = setup(async () => {
+    store.undoAction()
+  })
+  await actions.submit({ modelText: 'Wider', displayText: 'Wider', images: [], nodes: [] })
+
+  expect(width(card.id)).toBe(100)
+  expect(turnEdits('reply-1')).toEqual({
+    count: 1,
+    undone: 1,
+    revertable: false,
+    restorable: true
+  })
+  expect(readTurnRenders('reply-1')).toBeNull()
+})
+
 test('an edit made after the turn closes the revert, so it never undoes other work', async () => {
   const { card, actions } = setup()
   await actions.submit({ modelText: 'Wider', displayText: 'Wider', images: [], nodes: [] })

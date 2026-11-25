@@ -101,6 +101,24 @@ test('drops a width the frame’s min width clamps', async () => {
   expect(rendered).toHaveLength(3)
 })
 
+test('caps a turn at ten renders across three responsive frames', async () => {
+  drawImages()
+  const frames = [hero('One'), hero('Two'), hero('Three')]
+
+  queueTurnRenders(store, 'reply-cap', batch(frames))
+  await turnRendersDrained(store)
+
+  const record = readTurnRenders('reply-cap')
+  if (record?.status !== 'ready') throw new Error('renders did not finish')
+  // Three before/after pairs (6) leave the four width renders the turn budget allows.
+  expect(rendered).toHaveLength(10)
+  expect(record.frames.map((frame) => frame.widths.map((width) => width.width))).toEqual([
+    [375, 768],
+    [375, 768],
+    []
+  ])
+})
+
 test('stops at the next image once the card is freed mid-pass', async () => {
   drawImages()
   factory.mockImplementation((editor: EditorStore) => {

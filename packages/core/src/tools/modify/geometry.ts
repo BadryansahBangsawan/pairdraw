@@ -4,6 +4,7 @@ import { MIN_RESCALE } from '@pairdraw/scene-graph/scaling'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
 import { rescaleNodes, SCALE_ANCHORS } from '#core/editor/scale'
+import { lengthShorthandInput, parseLengthShorthand } from '#core/tools/css/shorthand'
 import {
   toolNumber,
   nodeIdInputSchema,
@@ -51,12 +52,15 @@ export const setOpacity = defineTool({
 export const setRadius = defineTool({
   name: 'set_radius',
 
-  description: 'Set corner radius. Use individual corners for independent values.',
+  description:
+    'Set corner radius. Use individual corners for independent values, or radius as CSS shorthand: "12px", "12px 0 12px 0".',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
     radius: v.optional(
-      toolNumber(v.pipe(v.number(), v.minValue(0), v.description('Corner radius for all corners')))
+      lengthShorthandInput(
+        'Corner radius: one length for every corner, or CSS shorthand "12px 12px 4px 4px" (top-left, top-right, bottom-right, bottom-left)'
+      )
     ),
     top_left: v.optional(
       toolNumber(v.pipe(v.number(), v.minValue(0), v.description('Top-left radius')))
@@ -75,7 +79,16 @@ export const setRadius = defineTool({
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
     if (args.radius !== undefined) {
-      node.cornerRadius = args.radius
+      const corners = parseLengthShorthand(args.radius, 4, 'radius')
+      if ('error' in corners) return corners
+      if (corners.every((value) => value === corners[0])) {
+        node.cornerRadius = corners[0]
+      } else {
+        node.topLeftRadius = corners[0]
+        node.topRightRadius = corners[1]
+        node.bottomRightRadius = corners[2]
+        node.bottomLeftRadius = corners[3]
+      }
     }
     if (args.top_left !== undefined) node.topLeftRadius = args.top_left
     if (args.top_right !== undefined) node.topRightRadius = args.top_right

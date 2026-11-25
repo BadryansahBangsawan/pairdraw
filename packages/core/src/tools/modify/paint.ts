@@ -1,10 +1,14 @@
 import { isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
+import type { Variable, VariableCollection, VariableValue } from '@pairdraw/scene-graph'
 import { gradientTransformRows, linearGradientTransform } from '@pairdraw/scene-graph/gradient'
-import type { Vector } from '@pairdraw/scene-graph/primitives'
+import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
+
+import type { FigmaAPI } from '#core/figma-api'
 
 import { storeImage } from '#core/figma-api/images'
+import { PairdrawAPI } from '#core/pairdraw-api'
 import {
   defineTool,
   nodeIdInputSchema,
@@ -22,11 +26,42 @@ const STRETCH_IMAGE_TRANSFORM: [[number, number, number], [number, number, numbe
   [0, 1, 0]
 ]
 
+/** `var(--color/brand)` or `var(--color/brand, #4F46E5)`: a token by name, as `get_css` writes it. */
+const COLOR_TOKEN = /^var\(\s*--([^),\s]+)\s*(?:,[^)]*)?\)$/
+
+function colorVariablesNamed(figma: FigmaAPI, name: string): Variable[] {
+  const matches: Variable[] = []
+  for (const variable of figma.graph.variables.values()) {
+    if (variable.type === 'COLOR' && variable.name === name) matches.push(variable)
+  }
+  return matches
+}
+
+/** A colour, as opposed to a token alias or an expression a variable may hold instead. */
+function isColor(value: VariableValue | undefined): value is Color {
+  return (
+    typeof value === 'object' && 'r' in value && 'g' in value && 'b' in value && 'a' in value
+  )
+}
+
+/** The colour a token holds in its default mode, and its collection, for a fill to take. */
+function tokenColor(
+  figma: FigmaAPI,
+  variable: Variable
+): { color: Color; collection: VariableCollection | undefined } | { error: string } {
+  const collection = figma.graph.variableCollections.get(variable.collectionId)
+  const value = collection
+    ? variable.valuesByMode[collection.defaultModeId]
+    : Object.values(variable.valuesByMode)[0]
+  if (!isColor(value)) return { error: `Variable "${variable.name}" holds no colour` }
+  return { color: value, collection }
+}
+
 export const setFill = defineTool({
   name: 'set_fill',
 
   description:
-    'Set fill on a node. Solid: color="#ff0000". Linear gradient: gradient="top-bottom" or "left-right" with color (start) and color_end (end).',
+    'Set fill on a node. Solid: color="#ff0000". A token by name: color="var(--color/brand)" paints its colour and binds the fill. Linear gradient: gradient="top-bottom" or "left-right" with color (start) and color_end (end).',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
@@ -44,6 +79,37 @@ export const setFill = defineTool({
   execute: (figma, { id, color, color_end, gradient }) => {
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
+
+    // A token name paints the colour it holds and binds the fill, so the layer follows the token.
+    const token = COLOR_TOKEN.exec(color)
+    const name = token === null ? null : token[1]
+    if (name !== null) {
+      const matches = colorVariablesNamed(figma, name)
+      if (matches.length === 0) {
+        return {
+          error: `No COLOR variable named "${name}". Call find_variables to list the document's tokens.`
+        }
+      }
+      if (matches.length > 1) {
+        const where = matches
+          .map(
+            (variable) =>
+              figma.graph.variableCollections.get(variable.collectionId)?.name ?? variable.collectionId
+          )
+          .join(', ')
+        return {
+          error: `${matches.length} variables named "${name}" (${where}); bind one with bind_variable.`
+        }
+      }
+      for (const variable of matches) {
+        const resolved = tokenColor(figma, variable)
+        if ('error' in resolved) return resolved
+        node.fills = [{ type: 'SOLID', color: resolved.color }]
+        new PairdrawAPI(figma).bindVariable(node.id, 'fills/0/color', variable)
+        return { id, color: resolved.color, bound: name }
+      }
+      return { error: `No COLOR variable named "${name}"` }
+    }
 
     const c = parseToolColor(color, figma.graph.documentColorSpace)
     if ('error' in c) return c

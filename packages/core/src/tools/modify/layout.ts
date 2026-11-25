@@ -1,12 +1,49 @@
 import * as v from 'valibot'
 
+import type { FigmaNodeProxy } from '#core/figma-api'
 import { PairdrawAPI } from '#core/pairdraw-api'
+import { lengthShorthandInput, parseLengthShorthand } from '#core/tools/css/shorthand'
 import { toolNumber, nodeIdInputSchema, defineTool, nodeNotFound } from '#core/tools/schema'
+
+type SpacingArgs = { padding?: number | string; gap?: number | string }
+
+/** Parses the shorthand before the frame changes, so bad input leaves it as it was. */
+function parseSpacing(
+  args: SpacingArgs
+): { padding?: number[]; gap?: number[] } | { error: string } {
+  const parsed: { padding?: number[]; gap?: number[] } = {}
+  if (args.padding !== undefined) {
+    const padding = parseLengthShorthand(args.padding, 4, 'padding')
+    if ('error' in padding) return padding
+    parsed.padding = padding
+  }
+  if (args.gap !== undefined) {
+    const gap = parseLengthShorthand(args.gap, 2, 'gap')
+    if ('error' in gap) return gap
+    parsed.gap = gap
+  }
+  return parsed
+}
+
+function writeSpacing(node: FigmaNodeProxy, spacing: { padding?: number[]; gap?: number[] }): void {
+  if (spacing.padding) {
+    const [top, right, bottom, left] = spacing.padding
+    node.paddingTop = top
+    node.paddingRight = right
+    node.paddingBottom = bottom
+    node.paddingLeft = left
+  }
+  if (spacing.gap) {
+    node.itemSpacing = spacing.gap[0]
+    node.counterAxisSpacing = spacing.gap[1]
+  }
+}
 
 export const setLayout = defineTool({
   name: 'set_layout',
 
-  description: 'Set auto-layout (flexbox) on a frame. Direction, alignment, spacing, padding.',
+  description:
+    'Set auto-layout (flexbox) on a frame. Direction, alignment, spacing, padding, which also take CSS shorthand: padding="16px 24px", gap="12px 4px".',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Frame node ID')),
@@ -26,13 +63,12 @@ export const setLayout = defineTool({
       )
     ),
     padding: v.optional(
-      toolNumber(
-        v.pipe(
-          v.number(),
-          v.minValue(0),
-          v.description('Equal padding on all sides (only changes if provided)')
-        )
+      lengthShorthandInput(
+        'Padding: one length for every side, or CSS shorthand "16px 24px" / "8px 16px 4px 24px"'
       )
+    ),
+    gap: v.optional(
+      lengthShorthandInput('Gap: one length, or "12px 4px" for main-axis and cross-axis spacing')
     ),
     padding_horizontal: v.optional(
       toolNumber(v.pipe(v.number(), v.minValue(0), v.description('Horizontal padding')))
@@ -62,6 +98,9 @@ export const setLayout = defineTool({
     )
   }),
   execute: (figma, args) => {
+    const spacing = parseSpacing(args)
+    if ('error' in spacing) return spacing
+
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
 
@@ -89,12 +128,7 @@ export const setLayout = defineTool({
     if (args.flow_direction !== undefined)
       new PairdrawAPI(figma).setLayoutDirection(node, args.flow_direction)
 
-    if (args.padding !== undefined) {
-      node.paddingTop = args.padding
-      node.paddingRight = args.padding
-      node.paddingBottom = args.padding
-      node.paddingLeft = args.padding
-    }
+    writeSpacing(node, spacing)
     if (args.padding_horizontal !== undefined) {
       node.paddingLeft = args.padding_horizontal
       node.paddingRight = args.padding_horizontal

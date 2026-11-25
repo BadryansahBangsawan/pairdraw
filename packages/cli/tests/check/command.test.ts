@@ -2,6 +2,7 @@ import { describe, expect, setDefaultTimeout, test } from 'bun:test'
 import { mkdtemp, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { stripVTControlCharacters } from 'node:util'
 
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 
@@ -18,7 +19,12 @@ async function cli(cwd: string, args: string[]) {
     new Response(proc.stderr).text(),
     proc.exited
   ])
-  return { stdout, stderr, exitCode }
+  // A CI run sets `CI`, which turns colour on even through a pipe, so compare the text only.
+  return {
+    stdout: stripVTControlCharacters(stdout),
+    stderr: stripVTControlCharacters(stderr),
+    exitCode
+  }
 }
 
 describe('pairdraw check CLI', () => {

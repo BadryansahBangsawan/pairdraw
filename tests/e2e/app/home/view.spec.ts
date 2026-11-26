@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 
+import { waitForHome } from '#tests/helpers/boot'
 import { openChatEditor } from '#tests/helpers/chat/fixture'
 
 for (const width of [390, 1280]) {
@@ -7,7 +8,7 @@ for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 844 })
     await page.goto('/?recent-files')
     const home = page.getByTestId('recent-files-home')
-    await expect(home).toBeVisible()
+    await waitForHome(page)
     const grid = home.getByRole('button', { name: 'Grid view', exact: true })
     const list = home.getByRole('button', { name: 'List view', exact: true })
     await expect(grid).toHaveCount(1)
@@ -70,8 +71,7 @@ test('without a model, a prompt on Home offers AI setup and stays when setup is 
 
 test('Tab on Home moves focus instead of stepping layers', async ({ page }) => {
   await page.goto('/?recent-files')
-  const home = page.getByTestId('recent-files-home')
-  await expect(home).toBeVisible()
+  await waitForHome(page)
   // No editor is open, so nothing should claim Tab for layer selection.
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
   await page.keyboard.press('Tab')

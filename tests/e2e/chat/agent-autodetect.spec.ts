@@ -10,7 +10,9 @@ import {
   type Companion,
   type CompanionOptions
 } from '#tests/helpers/agents/companion'
+import { waitForHome } from '#tests/helpers/boot'
 import { ChatHarness } from '#tests/helpers/chat/harness'
+import { EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
 /**
  * A fresh web app paired with a companion of its own, which looks for coding agents on that
@@ -38,11 +40,11 @@ async function openPaired(page: Page, baseURL: string | undefined, options: Comp
   companions.push({ companion, dir })
   await page.goto(companion.link)
   const dialog = page.getByRole('alertdialog')
-  await expect(dialog).toContainText(companion.fingerprint)
+  await expect(dialog).toContainText(companion.fingerprint, { timeout: EDITOR_SETUP_TIMEOUT_MS })
   await dialog.getByRole('button', { name: 'Connect' }).click()
   await expect(dialog).toBeHidden()
   const home = page.getByTestId('recent-files-home')
-  await expect(home).toBeVisible()
+  await waitForHome(page)
   return { home, prompt: home.getByRole('textbox', { name: 'Describe a design' }) }
 }
 

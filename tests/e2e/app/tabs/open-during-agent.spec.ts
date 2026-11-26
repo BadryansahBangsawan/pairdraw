@@ -15,6 +15,7 @@ import { devMCPDiscoveryPath } from '@/app/automation/bridge/discovery-path'
 import { devAutomationRoute } from '@/app/automation/bridge/portless-route'
 
 import { expect, test } from '#tests/e2e/fixtures'
+import { waitForHome } from '#tests/helpers/boot'
 
 /**
  * Seam: an outside MCP client edits while the person uses Home and the tab bar.
@@ -184,7 +185,7 @@ async function backgroundDocumentId(client: Client): Promise<string> {
 
 async function showDrafts(page: Page) {
   await page.getByRole('tab', { name: 'Home' }).click()
-  await expect(page.getByTestId('recent-files-home')).toBeVisible()
+  await waitForHome(page)
   await page.getByTestId('home-tab-drafts').click()
   return page.getByTestId('home-drafts')
 }
@@ -219,7 +220,7 @@ async function leaveAndReturn(page: Page, layer: string): Promise<void> {
   await expect(tabs).toHaveCount(2)
   const agentTab = tabs.nth(1)
   await page.getByRole('tab', { name: 'Home' }).click()
-  await expect(page.getByTestId('recent-files-home')).toBeVisible()
+  await waitForHome(page)
   await agentTab.click()
   await expectOpenDocument(page, layer)
 
@@ -240,7 +241,7 @@ async function closeClient(client: Client): Promise<void> {
 test.beforeEach(async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/')
-  await expect(page.getByTestId('recent-files-home')).toBeVisible({ timeout: 20_000 })
+  await waitForHome(page)
   await expect.poll(appConnected, { timeout: 20_000 }).toBe(true)
 })
 

@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import type { Page } from '@playwright/test'
 
 import { expect, test } from '#tests/e2e/fixtures'
+import { waitForHome } from '#tests/helpers/boot'
 
 /** Three recent files whose name, last use, and first use each put them in a different order. */
 const RECENT = [
@@ -56,7 +57,7 @@ test.use({
 async function openRecent(page: Page) {
   await page.goto('/?recent-files')
   const home = page.getByTestId('recent-files-home')
-  await expect(home).toBeVisible()
+  await waitForHome(page)
   return home
 }
 
@@ -104,7 +105,7 @@ test('Cmd/Ctrl+click and Shift+click select files that are removed from Recents 
   await expect(bar).toBeVisible()
   await expect(selected(page)).toHaveCount(1)
   // Opening is what a plain click does, so the selection did not open anything.
-  await expect(page.getByTestId('recent-files-home')).toBeVisible()
+  await waitForHome(page)
 
   await catalog.click({ modifiers: ['Shift'] })
   await expect(selected(page)).toHaveCount(3)
@@ -218,6 +219,6 @@ test('Save As downloads a copy of a stored recent file without opening it', asyn
   const path = await saved.path()
   expect([...(await readFile(path))]).toEqual([7, 8, 9])
   // Saving a copy leaves Home as it was.
-  await expect(page.getByTestId('recent-files-home')).toBeVisible()
+  await waitForHome(page)
   expect(await names(page)).toEqual(['Brochure', 'Avatar', 'Catalog'])
 })

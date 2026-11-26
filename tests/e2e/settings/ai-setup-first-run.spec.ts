@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { waitForAppBoot } from '#tests/helpers/boot'
+import { waitForAppBoot, waitForHome } from '#tests/helpers/boot'
 import { waitForDemo } from '#tests/helpers/demo'
 import { EDITOR_BOOT_WAIT_MS, EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
@@ -26,14 +26,13 @@ test('a fresh install opens no setup dialog, then or after a reload', async ({ p
   await page.goto('/')
   await waitForAppBoot(page)
   // The lookup starts with the workspace, so anything it opened shows once Home is there.
-  const home = page.getByTestId('recent-files-home')
-  await expect(home).toBeVisible()
+  await waitForHome(page)
   const setup = page.getByTestId('ai-setup-dialog')
   await expect(setup).toHaveCount(0)
 
   await page.reload()
   await waitForAppBoot(page)
-  await expect(home).toBeVisible()
+  await waitForHome(page)
   await expect(setup).toHaveCount(0)
 })
 
@@ -91,7 +90,7 @@ test.describe('an install with a configured model', () => {
   test('never sees a setup dialog', async ({ page }) => {
     await page.goto('/')
     await waitForAppBoot(page)
-    await expect(page.getByTestId('recent-files-home')).toBeVisible()
+    await waitForHome(page)
     await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
   })
 })

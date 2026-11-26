@@ -8,6 +8,7 @@ import * as v from 'valibot'
 import { startCompanion } from '#tests/helpers/agents/companion'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { ChatHarness } from '#tests/helpers/chat/harness'
+import { EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
 /** A prompt asking the stand-in agent to call these Pairdraw tools before it replies. */
 export function askFor(...calls: { name: string; arguments?: Record<string, unknown> }[]): string {
@@ -31,7 +32,9 @@ export async function chatWithAgent(page: Page, baseURL: string | undefined): Pr
     await page.goto(companion.link)
     await new CanvasHelper(page).waitForInit({ designPanel: false })
     const dialog = page.getByRole('alertdialog')
-    await expect(dialog).toContainText(companion.fingerprint)
+    await expect(dialog).toContainText(companion.fingerprint, {
+      timeout: EDITOR_SETUP_TIMEOUT_MS
+    })
     await dialog.getByRole('button', { name: 'Connect' }).click()
 
     await page.getByTestId('app-settings-trigger').click()

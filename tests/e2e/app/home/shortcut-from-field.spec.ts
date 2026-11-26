@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { waitForHome } from '#tests/helpers/boot'
+
 // App shortcuts that are not the field's own editing run from a plain text field too, as the
 // desktop menu accelerators do.
 test('⌘O asks for a file while Home’s search field has focus', async ({ page }) => {
@@ -10,7 +12,7 @@ test('⌘O asks for a file while Home’s search field has focus', async ({ page
     })
   })
   await page.goto('/?recent-files')
-  await expect(page.getByTestId('recent-files-home')).toBeVisible({ timeout: 90_000 })
+  await waitForHome(page)
 
   const search = page.getByRole('searchbox').first()
   await expect(search).toBeFocused()
@@ -24,7 +26,7 @@ test('⌘O asks for a file while Home’s search field has focus', async ({ page
 
 test('the search field keeps its own editing keys', async ({ page }) => {
   await page.goto('/?recent-files')
-  await expect(page.getByTestId('recent-files-home')).toBeVisible({ timeout: 90_000 })
+  await waitForHome(page)
 
   const search = page.getByRole('searchbox').first()
   await search.fill('pricing')

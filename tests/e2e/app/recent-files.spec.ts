@@ -1,5 +1,6 @@
 import { expect, test } from '#tests/e2e/fixtures'
 import { waitForAppBoot } from '#tests/helpers/boot'
+import { EDITOR_SETUP_TIMEOUT_MS } from '#tests/helpers/timeouts'
 
 // Each test here boots the app itself, and a cold dev server gets thirty seconds for the first
 // load (`waitForAppBoot`); a test needs room for that boot plus its own work.
@@ -43,7 +44,7 @@ test.describe('a populated recent files list', () => {
   }) => {
     await page.goto('/?recent-files')
     await waitForAppBoot(page)
-    await page.getByTestId('recent-files-home').waitFor()
+    await page.getByTestId('recent-files-home').waitFor({ timeout: EDITOR_SETUP_TIMEOUT_MS })
     // Each entry also has a menu button, so count the entries rather than buttons named after them.
     const documents = page
       .getByTestId('recent-files-home')

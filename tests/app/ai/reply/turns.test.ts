@@ -169,6 +169,16 @@ test('reverts a turn while its edits are the newest on the undo stack', async ()
   expect(turnEdits('reply-1')).toEqual({ count: 1, undone: 1, revertable: false, restorable: true })
 })
 
+test('a closed document drops its turns with the store', async () => {
+  const { actions } = setup()
+  await actions.submit({ modelText: 'Wider', displayText: 'Wider', images: [], nodes: [] })
+  expect(turnEdits('reply-1')).not.toBeNull()
+
+  store.dispose()
+
+  expect(turnEdits('reply-1')).toBeNull()
+})
+
 test('a turn that ends with a view change, such as zoom to fit, stays revertable', async () => {
   // The agent often ends a run by framing its work; that edit belongs to the turn too.
   const { card, actions } = setup(async (tools) =>

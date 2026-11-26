@@ -240,6 +240,7 @@ export function queueTurnRenders(
     queues.set(store, created)
     store.onDispose(() => {
       created.disposed = true
+      for (const job of created.jobs) activeJobs.delete(job.messageId)
       created.jobs.length = 0
       freeTurnRendersOf(store)
     })

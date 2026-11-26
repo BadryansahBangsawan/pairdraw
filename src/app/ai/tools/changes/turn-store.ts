@@ -30,9 +30,14 @@ export type TurnRenders =
   | { status: 'ready'; frames: TurnFrameRenders[]; changed: number }
   | { status: 'cleared' | 'unavailable'; frames: TurnFrameSummary[]; changed: number }
 
+/** A document that owns turn cards and can say when it closes; the editor store satisfies it. */
+export interface TurnOwner {
+  onDispose(listener: () => void): () => void
+}
+
 interface TurnRecord {
   /** The document that owns the card, compared by identity when it closes. */
-  owner: object
+  owner: TurnOwner
   renders: TurnRenders
 }
 
@@ -43,15 +48,13 @@ const records = shallowReactive(new Map<string, TurnRecord>())
 const freeListeners = new Set<(messageId: string) => void>()
 
 /** Owners already subscribed to their own dispose, so a closed document frees its cards. */
-const disposeSubscribed = new WeakSet<object>()
+const disposeSubscribed = new WeakSet<TurnOwner>()
 
 /** A card can be set for a document no render queue ever subscribed for, so subscribe here too. */
-function freeCardsOnDispose(owner: object): void {
+function freeCardsOnDispose(owner: TurnOwner): void {
   if (disposeSubscribed.has(owner)) return
-  const onDispose = (owner as { onDispose?: (listener: () => void) => unknown }).onDispose
-  if (typeof onDispose !== 'function') return
   disposeSubscribed.add(owner)
-  onDispose.call(owner, () => freeTurnRendersOf(owner))
+  owner.onDispose(() => freeTurnRendersOf(owner))
 }
 
 /** Reactive in a computed or template: the map tracks reads by key. */
@@ -71,7 +74,7 @@ export function freeTurnRenders(messageId: string): void {
   for (const listener of freeListeners) listener(messageId)
 }
 
-export function setTurnRenders(owner: object, messageId: string, renders: TurnRenders): void {
+export function setTurnRenders(owner: TurnOwner, messageId: string, renders: TurnRenders): void {
   freeCardsOnDispose(owner)
   records.set(messageId, { owner, renders })
   while (records.size > MAX_LIVE_RECORDS) {
@@ -82,7 +85,7 @@ export function setTurnRenders(owner: object, messageId: string, renders: TurnRe
 }
 
 /** Frees every record the document owns, as it closes; another document's cards stay. */
-export function freeTurnRendersOf(owner: object): void {
+export function freeTurnRendersOf(owner: TurnOwner): void {
   for (const [messageId, record] of records) {
     if (record.owner === owner) freeTurnRenders(messageId)
   }

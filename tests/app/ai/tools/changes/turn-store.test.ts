@@ -9,8 +9,8 @@ import {
   type TurnRenders
 } from '@/app/ai/tools/changes/turn-store'
 
-const owner = {}
-const other = {}
+const owner = { onDispose: () => () => {} }
+const other = { onDispose: () => () => {} }
 const id = (index: number) => `reply-${index}`
 
 function cleared(): TurnRenders {

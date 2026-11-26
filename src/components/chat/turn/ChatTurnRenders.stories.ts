@@ -77,7 +77,7 @@ const meta = {
   render: (args) => ({
     components: { ChatTurnRenders },
     setup() {
-      const owner = {}
+      const owner = { onDispose: () => () => {} }
       const messageId = 'story-turn-renders'
       setTurnRenders(owner, messageId, args.renders)
       onUnmounted(() => freeTurnRenders(messageId))

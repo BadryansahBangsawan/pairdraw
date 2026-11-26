@@ -26,6 +26,16 @@ const undoListeners = new Set<(messageId: string, undone: readonly string[]) => 
 /** Bumped on every undo stack change of a store, so turn state reads stay reactive. */
 const historyVersions = new WeakMap<EditorStore, ShallowRef<number>>()
 
+/** Stores already subscribed to their own disposal, so a closed document drops its turns. */
+const disposeSubscribed = new WeakSet<EditorStore>()
+
+/** Drops every turn the closing store owns; another document's turns stay. */
+function clearTurnsOf(store: EditorStore): void {
+  for (const [messageId, turn] of turns) {
+    if (turn.store === store) turns.delete(messageId)
+  }
+}
+
 function historyVersion(store: EditorStore): number {
   let version = historyVersions.get(store)
   if (!version) {
@@ -82,6 +92,10 @@ function recordTurn(messageId: string, store: EditorStore, calls: readonly RunUn
     return
   }
   historyVersion(store)
+  if (!disposeSubscribed.has(store)) {
+    disposeSubscribed.add(store)
+    store.onDispose(() => clearTurnsOf(store))
+  }
   const record: TurnRecord = {
     store,
     calls: [...calls],

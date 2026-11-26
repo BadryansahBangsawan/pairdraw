@@ -4,6 +4,11 @@ import type { CanvasKit } from 'canvaskit-wasm'
 
 import { compileShader, SHADER_CACHE_ENTRIES } from '#core/canvas/shaders/compile'
 
+/** A single widening cast, the pattern package tests use instead of `as unknown as`. */
+function asDouble<T>(double: object): T {
+  return double as T
+}
+
 /** A shader body CanvasKit accepts; the suffix makes each source distinct. */
 const shader = (index: number) =>
   `void main(){ gl_FragColor = vec4(${(index % 9) / 10}, 0.0, 0.0, 1.0); } // ${index}`
@@ -30,7 +35,7 @@ function fakeCanvasKit(): { ck: CanvasKit; handles: FakeHandle[] } {
       }
     }
   }
-  return { ck: ck as unknown as CanvasKit, handles }
+  return { ck: asDouble<CanvasKit>(ck), handles }
 }
 
 describe('shader effect handles', () => {

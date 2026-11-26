@@ -17,6 +17,15 @@ describe('formatShortcut', () => {
     expect(formatShortcut('SHIFT+A', 'linux')).toBe('Shift+A')
   })
 
+  test('names a glyph key off macOS instead of printing the macOS symbol', () => {
+    expect(formatShortcut('⌫', 'mac')).toBe('⌫')
+    expect(formatShortcut('⌫', 'linux')).toBe('Backspace')
+    expect(formatShortcut('⌫', 'windows')).toBe('Backspace')
+    expect(formatShortcut('SHIFT+⇥', 'linux')).toBe('Shift+Tab')
+    expect(formatShortcut('MOD+↩', 'windows')).toBe('Ctrl+Enter')
+    expect(formatShortcut('⇞', 'linux')).toBe('PageUp')
+  })
+
   test('detects platform from user agent', () => {
     expect(shortcutPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)')).toBe('mac')
     expect(shortcutPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)')).toBe('windows')

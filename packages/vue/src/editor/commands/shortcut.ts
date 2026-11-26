@@ -22,6 +22,15 @@ const MODIFIER_DISPLAY: Record<ShortcutPlatform, Record<string, string>> = {
   }
 }
 
+/** The macOS glyphs the command metadata carries, named as the key prints elsewhere. */
+const KEY_DISPLAY: Record<string, string> = {
+  '⌫': 'Backspace',
+  '⇥': 'Tab',
+  '↩': 'Enter',
+  '⇞': 'PageUp',
+  '⇟': 'PageDown'
+}
+
 const MAC_MODIFIER_ORDER = ['CTRL', 'ALT', 'SHIFT', 'MOD']
 const STANDARD_MODIFIER_ORDER = ['MOD', 'CTRL', 'ALT', 'SHIFT']
 
@@ -47,7 +56,9 @@ export function formatShortcut(
     .map((combo) => {
       const parts = compact(combo.split('+'))
       const modifiers = parts.filter((part) => part in MODIFIER_DISPLAY[platform])
-      const keys = parts.filter((part) => !(part in MODIFIER_DISPLAY[platform]))
+      const keys = parts
+        .filter((part) => !(part in MODIFIER_DISPLAY[platform]))
+        .map((part) => (platform === 'mac' ? part : (KEY_DISPLAY[part] ?? part)))
       const formattedModifiers = sortModifiers(modifiers, platform).map(
         (part) => MODIFIER_DISPLAY[platform][part]
       )

@@ -1,0 +1,1 @@
+- Compiled shader effects live in a bounded cache that releases them, so a long session no longer keeps every effect's GPU resource and a paint whose effect was evicted recompiles instead of drawing a deleted effect.

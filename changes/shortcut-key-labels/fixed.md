@@ -1,0 +1,1 @@
+- Shortcut labels off macOS name their key as the platform does — “Backspace”, “Tab”, “Enter”, “PageUp”, “PageDown” — instead of showing the macOS glyph.

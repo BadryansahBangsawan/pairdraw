@@ -1,5 +1,7 @@
 // SceneGraph → HTML and JSX without the CSS runtimes, so browsers can bundle it.
 export {
+  designNodeDraws,
+  paintsSomething,
   sceneGraphToDesignDocument,
   sceneNodeToDesignDocument,
   sceneNodesToDesignDocument,

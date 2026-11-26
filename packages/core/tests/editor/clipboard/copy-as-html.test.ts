@@ -37,3 +37,37 @@ describe('copySelectionAsHTML', () => {
     expect(await editor.copySelectionAsHTML([card.id])).toContain('Hello')
   })
 })
+
+describe('copySelectionAsHTML of a selection that draws nothing', () => {
+  test('copies nothing for a frame with no paint and no children', async () => {
+    const editor = createEditor()
+    const frame = editor.graph.createNode('FRAME', editor.state.currentPageId, {
+      name: 'Empty',
+      width: 100,
+      height: 100
+    })
+    expect(await editor.copySelectionAsHTML([frame.id])).toBeNull()
+  })
+})
+
+test('copies a frame whose only paint is a background blur', async () => {
+  const editor = createEditor()
+  const frame = editor.graph.createNode('FRAME', editor.state.currentPageId, {
+    name: 'Frosted',
+    width: 100,
+    height: 100,
+    effects: [
+      {
+        type: 'BACKGROUND_BLUR',
+        color: { r: 0, g: 0, b: 0, a: 0 },
+        offset: { x: 0, y: 0 },
+        radius: 8,
+        spread: 0,
+        visible: true
+      }
+    ]
+  })
+  const html = await editor.copySelectionAsHTML([frame.id])
+  expect(html).not.toBeNull()
+  expect(html).toContain('backdrop-filter')
+})

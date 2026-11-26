@@ -41,14 +41,14 @@ export function createClipboardExportActions(ctx: EditorContext) {
   async function copySelectionAsHTML(ids: string[]): Promise<string | null> {
     if (ids.length === 0) return null
     const { renderNodesToHTML } = await import('#core/io/formats/html')
-    const { html } = await renderNodesToHTML(
+    const { html, draws } = await renderNodesToHTML(
       ctx.graph,
       ids,
       { html: 'fragment', style: 'inline', assets: 'inline' },
       undefined,
       { canvasKit: ctx.getCk() ?? undefined, renderer: ctx.getRenderer() ?? undefined }
     )
-    return html || null
+    return draws ? html || null : null
   }
 
   return { copySelectionAsText, copySelectionAsSVG, copySelectionAsJSX, copySelectionAsHTML }

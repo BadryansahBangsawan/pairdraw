@@ -25,6 +25,9 @@ export async function copyPendingText(text: Promise<string>, label: string): Pro
     await writeTauriClipboardText(await text)
   } else {
     const blob = text.then((value) => new Blob([value], { type: 'text/plain' }))
+    // A browser that refuses the write before it reads the blob never observes this promise; the
+    // caller reads the failure from the text promise, so sink it rather than leave it unhandled.
+    void blob.catch(() => undefined)
     await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })])
   }
   toast.info(notificationMessages.get().copiedAs({ format: label }))

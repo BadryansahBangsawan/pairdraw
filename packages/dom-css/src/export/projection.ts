@@ -52,8 +52,30 @@ export interface SceneGraphToDesignOptions {
 /** Layers whose shape only paths describe, which CSS boxes cannot draw. */
 const VECTOR_SHAPES = new Set<SceneNode['type']>(['VECTOR', 'BOOLEAN_OPERATION', 'STAR', 'POLYGON'])
 
-/** What a box draws itself, which the SVG of a vector layer draws instead. */
-const BOX_PAINT = /^(background|border|box-shadow|outline|filter)/
+/** Every CSS property that paints a layer, wherever its paint is written. */
+export const PAINT_PROPERTY =
+  /^(background|backdrop-filter|border|box-shadow|outline|filter|color|fill|stroke|text-shadow)/
+
+/** Whether a projected style paints; a radius or a placement property on its own does not. */
+export function paintsSomething(style: DesignStyleDeclaration): boolean {
+  return Object.keys(style).some(
+    (property) => PAINT_PROPERTY.test(property) && !property.endsWith('radius')
+  )
+}
+
+/**
+ * Whether a projected layer paints or writes text. A frame with no paint and no children projects
+ * to a bare element with only its size, so a selection of such layers draws nothing.
+ */
+export function designNodeDraws(node: DesignNode): boolean {
+  if (node.type === 'text') return node.text.trim().length > 0
+  if (node.shader?.frame) return true
+  if (node.tagName === 'svg' || node.tagName === 'img' || node.tagName === 'canvas') return true
+  return (
+    paintsSomething({ ...node.computedStyle, ...node.inlineStyle }) ||
+    node.children.some(designNodeDraws)
+  )
+}
 
 /** A field's CSS: its token reference where one is faithful, otherwise the literal value. */
 type FieldCSS = (field: string, literal: string) => string
@@ -515,7 +537,7 @@ function vectorDesignNode(
   const drawn = context.vectorElement?.(context.graph, node)
   if (!drawn) return null
   const placement = Object.fromEntries(
-    Object.entries(style).filter(([property]) => !BOX_PAINT.test(property))
+    Object.entries(style).filter(([property]) => !PAINT_PROPERTY.test(property))
   )
   return {
     ...drawn,

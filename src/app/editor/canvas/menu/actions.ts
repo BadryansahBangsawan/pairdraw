@@ -11,6 +11,7 @@ import {
   pasteClipboardToReplaceInInstance
 } from '@/app/editor/clipboard/paste/replace'
 import { copyLayersAsPNG } from '@/app/editor/clipboard/png'
+import { reportNothingToCopy } from '@/app/editor/clipboard/notice'
 import {
   copySelectionProperties,
   pasteClipboardProperties
@@ -44,7 +45,11 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
   }
 
   async function clipboardWrite(text: string | null, label: string) {
-    if (text) await copyText(text, label)
+    if (!text) {
+      reportNothingToCopy()
+      return
+    }
+    await copyText(text, label)
   }
 
   async function copyNodeId() {
@@ -83,26 +88,32 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
     const nodeIds = ids()
     if (nodeIds.length === 0) return
     const html = store.copySelectionAsHTML(nodeIds)
+    const markup = html.then((value) => {
+      if (!value) throw new Error('Nothing to copy as HTML')
+      return value
+    })
+    // A browser that refuses the write before it listens leaves this promise unobserved; the
+    // outcome is read from `html` below, so sink its rejection rather than surface it as unhandled.
+    void markup.catch(() => undefined)
     try {
-      await copyPendingText(
-        html.then((markup) => markup ?? Promise.reject(new Error('Nothing to copy as HTML'))),
-        'HTML'
-      )
+      await copyPendingText(markup, 'HTML')
     } catch (error: unknown) {
-      const markup = await html.then(
+      const settled = await html.then(
         (value) => ({ value }),
         (renderError: unknown) => ({ renderError })
       )
       const messages = notificationMessages.get()
-      if ('renderError' in markup) {
-        const { renderError } = markup
+      if ('renderError' in settled) {
+        const { renderError } = settled
         console.warn('Copy as HTML failed', renderError)
         toast.error(
           messages.operationFailed({
             error: renderError instanceof Error ? renderError.message : String(renderError)
           })
         )
-      } else if (markup.value) {
+      } else if (settled.value === null) {
+        reportNothingToCopy()
+      } else {
         console.warn('Copy as HTML failed', error)
         toast.error(messages.clipboardAccessBlocked)
       }

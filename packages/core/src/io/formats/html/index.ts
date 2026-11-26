@@ -1,6 +1,7 @@
 import { filename } from 'pathe/utils'
 
 import {
+  designNodeDraws,
   exportHTMLBundle,
   sceneNodesToDesignDocument,
   type DesignDocument
@@ -44,8 +45,9 @@ export async function renderNodesToHTML(
   options: HTMLExportOptions = {},
   fileName?: string,
   context?: IOContext
-): Promise<{ html: string; assets: ExportAsset[] }> {
-  const bundle = await exportHTMLBundle(await designDocument(graph, nodeIds, options, context), {
+): Promise<{ html: string; assets: ExportAsset[]; draws: boolean }> {
+  const projected = await designDocument(graph, nodeIds, options, context)
+  const bundle = await exportHTMLBundle(projected, {
     html: options.html,
     style: options.style,
     assets: options.assets,
@@ -59,5 +61,9 @@ export async function renderNodesToHTML(
   })
   const page = bundle.files.find((file) => file.path === bundle.entrypoint)
   if (typeof page?.content !== 'string') throw new Error('HTML export produced no page')
-  return { html: page.content, assets: bundle.files.filter((file) => file !== page) }
+  return {
+    html: page.content,
+    assets: bundle.files.filter((file) => file !== page),
+    draws: projected.children.some(designNodeDraws)
+  }
 }

@@ -68,12 +68,21 @@ const appDefaults = {
     testIdAttribute: 'data-test-id',
     viewport: { width: 1280, height: 800 },
     deviceScaleFactor: 2,
-    colorScheme: 'dark',
+    colorScheme: 'dark'
+  }
+} satisfies Pick<PlaywrightTestConfig, 'expect' | 'use'>
+
+// SwiftShader draws WebGL on CI's software GPU. Chromium accepts the flag; WebKit refuses the
+// unknown argument at launch, so only the Chromium projects inherit it.
+const chromiumDefaults = {
+  ...appDefaults,
+  use: {
+    ...appDefaults.use,
     launchOptions: {
       args: ['--enable-unsafe-swiftshader']
     }
   }
-} satisfies Pick<PlaywrightTestConfig, 'expect' | 'use'>
+}
 
 export default defineConfig({
   testDir: './tests',
@@ -83,7 +92,7 @@ export default defineConfig({
   workers: 1,
   projects: [
     {
-      ...appDefaults,
+      ...chromiumDefaults,
       name: 'pairdraw',
       testDir: './tests/e2e',
       testIgnore: ['**/native/**', '**/storybook/**'],
@@ -107,7 +116,7 @@ export default defineConfig({
       }
     },
     {
-      ...appDefaults,
+      ...chromiumDefaults,
       name: 'figma',
       testDir: './tests/figma'
     },

@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 import * as v from 'valibot'
 
+import { waitForAppBoot } from '#tests/helpers/boot'
+
 const pageResultSchema = v.object({
   ok: v.literal(true),
   result: v.object({ id: v.string(), name: v.string() })
@@ -13,6 +15,9 @@ test.use({
 test('native WebMCP discovery, editing, validation and undo', async ({ page, browserName }) => {
   test.skip(browserName !== 'chromium', 'Native WebMCP requires a supporting Chromium build')
   await page.goto('/?test')
+  // The first test of a shard pays the dev server's cold transform; a plain `expect` waits five
+  // seconds, which a cold editor boot exceeds on CI (this test failed at 5.4 s in run 45832841789).
+  await waitForAppBoot(page)
   await expect(page.getByRole('button', { name: 'Add page', exact: true })).toBeVisible()
   test.skip(
     !(await page.evaluate(() => Boolean(document.modelContext))),

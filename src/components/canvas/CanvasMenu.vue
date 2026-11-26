@@ -14,7 +14,6 @@ import IconChevronRight from '~icons/lucide/chevron-right'
 import {
   useEditorCommands,
   editorCommandMetadata,
-  formatShortcut,
   type EditorCommandId
 } from '@pairdraw/vue/editor/commands'
 import { useMenuModel } from '@pairdraw/vue/editor/menu-model'
@@ -25,7 +24,11 @@ import { vTestId } from '@pairdraw/vue/testing'
 import { useEditorStore } from '@/app/editor/active-store'
 import { createCanvasMenuActions } from '@/app/editor/canvas/menu/actions'
 import { useCanvasContextMenu } from '@/app/editor/canvas/menu/context'
-import { canvasMenuItemClass, canvasMenuShortcutClass } from '@/app/editor/canvas/menu/model'
+import {
+  canvasMenuItemClass,
+  canvasMenuShortcutClass,
+  commandShortcutLabel
+} from '@/app/editor/canvas/menu/model'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import AppShortcutText from '@/components/ui/menu/AppShortcutText.vue'
 import { menu, useMenuUI } from '@/components/ui/menu/menu'
@@ -139,9 +142,7 @@ function contextCommandTestId(id: EditorCommandId | undefined): string | undefin
           @select="getCommand('selection.duplicate').run()"
         >
           <span>{{ getCommand('selection.duplicate').label }}</span
-          ><AppShortcutText>{{
-            formatShortcut(editorCommandMetadata('selection.duplicate').shortcut)
-          }}</AppShortcutText>
+          ><AppShortcutText>{{ commandShortcutLabel('selection.duplicate') }}</AppShortcutText>
         </ContextMenuItem>
         <ContextMenuItem
           data-test-id="context-delete"
@@ -150,9 +151,7 @@ function contextCommandTestId(id: EditorCommandId | undefined): string | undefin
           @select="getCommand('selection.delete').run()"
         >
           <span>{{ getCommand('selection.delete').label }}</span
-          ><AppShortcutText>{{
-            editorCommandMetadata('selection.delete').shortcut
-          }}</AppShortcutText>
+          ><AppShortcutText>{{ commandShortcutLabel('selection.delete') }}</AppShortcutText>
         </ContextMenuItem>
 
         <template v-for="(item, i) in contextMenu" :key="`menu-${i}`">

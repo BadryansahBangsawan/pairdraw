@@ -21,6 +21,32 @@ export type CanvasGLHandle = GLHandle
 
 const parkingHandles = new WeakMap<CanvasKit, GLHandle>()
 
+/**
+ * Skia's GPU resource-cache limit per canvas context, in bytes. `undefined` keeps the context's own
+ * default: the post-tag measurement (peak `[anon]` vs pan/zoom frame time, see
+ * `spec-release-render-caches.md`) picks the number.
+ */
+export const RESOURCE_CACHE_LIMIT_BYTES: number | undefined = undefined
+
+/** The part of `GrDirectContext` the limit needs, so a fake context can stand in for a test. */
+type ResourceCacheContext = {
+  getResourceCacheLimitBytes(): number
+  setResourceCacheLimitBytes(bytes: number): void
+}
+
+/**
+ * Applies a resource-cache limit to one canvas context and nothing when no limit is chosen. Reading
+ * first keeps it idempotent: a context that already holds the value is left as it is.
+ */
+export function applyResourceCacheLimit(
+  context: ResourceCacheContext,
+  bytes: number | undefined
+): void {
+  if (bytes === undefined) return
+  if (context.getResourceCacheLimitBytes() === bytes) return
+  context.setResourceCacheLimitBytes(bytes)
+}
+
 /** A 1×1 offscreen WebGL context that stays registered, so another context can become current. */
 function parkingHandle(ck: CanvasKit): GLHandle | null {
   const existing = parkingHandles.get(ck)
@@ -216,6 +242,9 @@ export function makeGLSurface(
     if (handle) ck.deleteContext(handle)
     return { surface: null, glContext: context, glHandle: null, presentation: null }
   }
+  // First creation, resize and the fallback recreation all pass through here; replaceSurface does
+  // not make a context.
+  applyResourceCacheLimit(context, RESOURCE_CACHE_LIMIT_BYTES)
 
   return {
     surface: ck.MakeOnScreenGLSurface(

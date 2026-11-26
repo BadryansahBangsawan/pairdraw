@@ -36,13 +36,16 @@ const action = useTemplateRef<HTMLElement>('action')
 const reduced = usePrefersReducedMotion()
 /** The visitor's pointer, from the button's corner, while it is in the frame. */
 const you = ref<Vector | null>(null)
-/** The pointer is over copy or a control, where the visitor's name would cover what they use. */
+/** The pointer is over the download action, where the visitor's name would cover what they use. */
 const hidden = ref(false)
 let pending: Vector | null = null
 let frameRequest = 0
 
-/** Copy and controls the visitor's name must never sit on, while their pointer is over them. */
-const AVOID_CURSOR = 'h2, .action, .platforms'
+/**
+ * The visitor's name follows them over the whole frame, copy included, as a cursor does on the
+ * canvas; only the download action (the button and the agent's cursor beside it) stays clear.
+ */
+const AVOID_CURSOR = '.action'
 
 function clearYou(): void {
   cancelAnimationFrame(frameRequest)

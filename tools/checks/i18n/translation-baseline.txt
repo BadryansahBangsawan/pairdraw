@@ -673,6 +673,7 @@ id:ai.aiSetupPiCompanion
 id:ai.baseURL
 id:ai.chatSettings
 id:ai.completions
+id:ai.editModel
 id:ai.fileAttachmentDetails
 id:ai.modelAgentConnection
 id:ai.modelCapabilityVisionShort

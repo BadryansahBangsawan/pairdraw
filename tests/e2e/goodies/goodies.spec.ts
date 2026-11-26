@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 
+import { SHADER_GALLERY } from '@pairdraw/vue/controls/shader'
+
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { expect, test } from '#tests/helpers/chat/fixture'
 
@@ -49,7 +51,7 @@ test('Featured shows some of each kind, and each tab all of its own', async ({ p
   await expect(dialog.locator('[data-goodie-script]')).toHaveCount(5)
 
   await page.getByTestId('goodies-tab-shaders').click()
-  await expect(dialog.locator('[data-shader-preset]')).toHaveCount(9)
+  await expect(dialog.locator('[data-shader-preset]')).toHaveCount(SHADER_GALLERY.length)
 
   await page.getByTestId('goodies-tab-design-systems').click()
   const basics = dialog.locator('[data-goodie-library]').filter({ hasText: 'Pairdraw Basics' })

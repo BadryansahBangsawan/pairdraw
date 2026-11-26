@@ -38,7 +38,9 @@ export const codeMessageDefaults = {
   exportHTML: 'Export HTML',
   exportFailed: params('Could not export: {error}'),
   exportNothing: 'Nothing to export',
-  exportSinglePage: 'Export selection must stay on a single page'
+  exportSinglePage: 'Export selection must stay on a single page',
+  copyFailed: params('Could not copy: {error}'),
+  copyNothing: 'Nothing to copy'
 } as const
 
 export const codeMessages = i18n('code', codeMessageDefaults)

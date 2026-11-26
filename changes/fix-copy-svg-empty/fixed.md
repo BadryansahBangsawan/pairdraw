@@ -1,1 +1,1 @@
-- Copy as SVG, PNG, JSX, or HTML now says nothing was copied when the selection draws nothing, in the same notice an export shows, instead of doing nothing.
+- Copy as SVG, PNG, JSX, or HTML now says “Could not copy: Nothing to copy” when the selection draws nothing, instead of doing nothing.

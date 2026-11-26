@@ -8,6 +8,8 @@
   "exportHTML": "HTML をエクスポート",
   "exportNothing": "エクスポートするものがありません",
   "exportSinglePage": "エクスポートする選択範囲は1つのページ内に収める必要があります",
+  "copyFailed": "コピーできませんでした: {error}",
+  "copyNothing": "コピーするものがありません",
   "generatedReadOnly": "生成済み、読み取り専用",
   "iconPackage": "アイコン",
   "jsxUpToDate": "最新です",

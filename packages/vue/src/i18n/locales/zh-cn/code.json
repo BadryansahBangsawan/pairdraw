@@ -8,6 +8,8 @@
   "exportHTML": "导出 HTML",
   "exportNothing": "没有可导出的内容",
   "exportSinglePage": "导出的选区必须位于同一页面",
+  "copyFailed": "无法复制：{error}",
+  "copyNothing": "没有可复制的内容",
   "generatedReadOnly": "已生成，只读",
   "iconPackage": "图标",
   "jsxUpToDate": "已是最新",

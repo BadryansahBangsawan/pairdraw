@@ -34,5 +34,7 @@
   "exportHTML": "Ekspor HTML",
   "exportFailed": "Tidak dapat mengekspor: {error}",
   "exportNothing": "Tidak ada yang bisa diekspor",
-  "exportSinglePage": "Seleksi yang diekspor harus berada di satu halaman"
+  "exportSinglePage": "Seleksi yang diekspor harus berada di satu halaman",
+  "copyFailed": "Tidak dapat menyalin: {error}",
+  "copyNothing": "Tidak ada yang bisa disalin"
 }

@@ -8,6 +8,8 @@
   "exportHTML": "Esporta HTML",
   "exportNothing": "Niente da esportare",
   "exportSinglePage": "La selezione da esportare deve trovarsi in una sola pagina",
+  "copyFailed": "Impossibile copiare: {error}",
+  "copyNothing": "Niente da copiare",
   "generatedReadOnly": "Generato, in sola lettura",
   "iconPackage": "Icone",
   "jsxUpToDate": "Aggiornato",

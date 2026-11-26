@@ -8,6 +8,8 @@
   "exportHTML": "Экспортировать HTML",
   "exportNothing": "Нечего экспортировать",
   "exportSinglePage": "Экспортируемое выделение должно находиться на одной странице",
+  "copyFailed": "Не удалось скопировать: {error}",
+  "copyNothing": "Нечего копировать",
   "generatedReadOnly": "Сгенерировано, только чтение",
   "iconPackage": "Значки",
   "jsxUpToDate": "Актуально",

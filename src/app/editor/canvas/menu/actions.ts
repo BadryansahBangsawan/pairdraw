@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 
 import { nodeToXPath } from '@pairdraw/core/xpath'
+import { codeMessages } from '@pairdraw/vue/i18n'
 
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'
@@ -107,7 +108,7 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
         const { renderError } = settled
         console.warn('Copy as HTML failed', renderError)
         toast.error(
-          messages.operationFailed({
+          codeMessages.get().copyFailed({
             error: renderError instanceof Error ? renderError.message : String(renderError)
           })
         )

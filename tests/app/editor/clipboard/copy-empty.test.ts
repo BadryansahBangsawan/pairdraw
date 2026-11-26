@@ -21,7 +21,7 @@ function shown(): string[] {
   return toast.toasts.value.map((entry) => entry.message)
 }
 
-const NOTHING = 'Could not export: Nothing to export'
+const NOTHING = 'Could not copy: Nothing to copy'
 
 function actions(store: Partial<EditorStore>, ids: string[] = ['node']) {
   return createCanvasMenuActions(store as EditorStore, ref(new Set(ids)))

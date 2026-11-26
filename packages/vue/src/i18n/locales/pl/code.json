@@ -8,6 +8,8 @@
   "exportHTML": "Eksportuj HTML",
   "exportNothing": "Nie ma nic do wyeksportowania",
   "exportSinglePage": "Eksportowane zaznaczenie musi znajdować się na jednej stronie",
+  "copyFailed": "Nie udało się skopiować: {error}",
+  "copyNothing": "Nie ma nic do skopiowania",
   "generatedReadOnly": "Wygenerowany, tylko do odczytu",
   "iconPackage": "Ikony",
   "jsxUpToDate": "Aktualne",

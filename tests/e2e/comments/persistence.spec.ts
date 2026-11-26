@@ -1,5 +1,6 @@
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
+import { waitForAppBoot } from '#tests/helpers/boot'
 import { toolbarToolTestId } from '#tests/helpers/test-ids'
 
 const editor = useEditorSetup()
@@ -79,6 +80,8 @@ test('a recovery keeps resolved threads resolved and deleted ones gone', async (
 
   editor.page.once('dialog', (dialog) => dialog.accept())
   await editor.page.reload()
+  // The dialog is drawn after the app boots, which is slower than a default assertion on a cold CI job.
+  await waitForAppBoot(editor.page)
   await expect(editor.page.getByRole('alertdialog', { name: 'Recover unsaved work' })).toBeVisible()
   await editor.page.getByRole('button', { name: 'Restore' }).click()
   await expect(editor.page.getByText('keep me')).toBeVisible()

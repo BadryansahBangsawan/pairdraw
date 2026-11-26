@@ -1,3 +1,4 @@
+import { waitForAppBoot } from '#tests/helpers/boot'
 import { test, expect } from '#tests/helpers/chat/fixture'
 
 test('recovering an unsaved document restores its selected conversation automatically', async ({
@@ -19,6 +20,8 @@ test('recovering an unsaved document restores its selected conversation automati
     .getByRole('button', { name: 'Conversation belonging to recovered document', exact: true })
     .click()
   await page.reload()
+  // The dialog is drawn after the app boots, which is slower than a default assertion on a cold CI job.
+  await waitForAppBoot(page)
   await expect(page.getByRole('alertdialog', { name: 'Recover unsaved work' })).toBeVisible()
   await page.getByRole('button', { name: 'Restore', exact: true }).click()
   await chat.openChat()

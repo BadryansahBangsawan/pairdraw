@@ -1,4 +1,5 @@
 import { expect, test } from '#tests/e2e/fixtures'
+import { waitForAppBoot } from '#tests/helpers/boot'
 import { CanvasHelper } from '#tests/helpers/canvas'
 
 test('keeps recovery independent from cancelling an unsaved-document close', async ({
@@ -47,6 +48,8 @@ test('keeps recovery independent from cancelling an unsaved-document close', asy
 
   page.once('dialog', (dialog) => dialog.accept())
   await page.reload()
+  // The dialog is drawn after the app boots, which is slower than a default assertion on a cold CI job.
+  await waitForAppBoot(page)
   await expect(page.getByRole('alertdialog', { name: 'Recover unsaved work' })).toBeVisible()
   await page.getByRole('button', { name: 'Restore' }).click()
   await expect(page.getByText('Retained recovery rectangle')).toBeVisible()

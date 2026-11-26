@@ -168,6 +168,10 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     }
   }
 
+  // The shader-playback test hook is a page global that points at this store, so its disposal is
+  // installed once the store exists and runs from `dispose()`.
+  let disposeShaderPlayback: () => void = () => undefined
+
   const store = {
     ...editor,
     state,
@@ -200,6 +204,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     // App-specific overrides and additions
     ...modules,
     dispose() {
+      disposeShaderPlayback()
       stopAIEditMotion(store)
       stopScriptLiveRuns()
       stopColorSpaceSync()
@@ -211,8 +216,9 @@ function buildEditorStore(initialGraph?: SceneGraph) {
 
   defineEditorStoreAccessors(store, editor)
   // The canvases draw with this store, not the editor it wraps, so its playback stats are filed
-  // under the store: a hook keyed by the editor would read a canvas that never reports.
-  exposeShaderPlayback(store)
+  // under the store: a hook keyed by the editor would read a canvas that never reports. Its
+  // disposal runs from the store's `dispose()` above.
+  disposeShaderPlayback = exposeShaderPlayback(store)
   followLinkedTokenCSS(store)
 
   return store

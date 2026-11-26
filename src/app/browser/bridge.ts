@@ -109,13 +109,24 @@ export function exposeChatTransportOverride(
 
 /**
  * Lets an end-to-end test read what a canvas plays, as a preview starts and stops its shaders.
- * Development builds with the test runtime only, like the other hooks beside it.
+ * Development builds with the test runtime only, like the other hooks beside it. The returned
+ * disposer removes this store's hook and only while that store still owns it: a newer store
+ * replaces the page-global hook, and must not lose it when an older store is disposed.
  */
-export function exposeShaderPlayback(editor: Editor) {
-  if (!IS_BROWSER || !import.meta.env.DEV) return
-  if (!appRuntimeConfig.test) return
+export function exposeShaderPlayback(editor: Editor): () => void {
+  if (!IS_BROWSER || !import.meta.env.DEV) return noopDispose
+  if (!appRuntimeConfig.test) return noopDispose
   const testHooks = (windowAPI().test ??= {})
-  testHooks.shaderPlayback = () => shaderPlaybackStats(editor)
+  const readStats = () => shaderPlaybackStats(editor)
+  testHooks.shaderPlayback = readStats
+  return () => {
+    if (testHooks.shaderPlayback === readStats) delete testHooks.shaderPlayback
+  }
+}
+
+/** The disposal of a hook that was never installed; named so no caller writes an empty function. */
+function noopDispose(): undefined {
+  return undefined
 }
 
 export function setPairdrawOpenFileHandler(openFile: (path: string) => Promise<void>) {

@@ -45,10 +45,6 @@ function layerNames(page: Page): Promise<string[]> {
   })
 }
 
-function paletteShortcut() {
-  return process.platform === 'darwin' ? 'Meta+KeyK' : 'Control+KeyK'
-}
-
 test.describe('an enabled plugin', () => {
   test.use({
     storageState: async ({ baseURL }, use) => {
@@ -71,7 +67,7 @@ test.describe('an enabled plugin', () => {
   })
 
   test('offers its command in the palette and draws what it asks for', async ({ page }) => {
-    await page.keyboard.press(paletteShortcut())
+    await page.keyboard.press('ControlOrMeta+KeyK')
     const palette = page.getByRole('dialog', { name: 'Command palette' })
     await palette.getByRole('searchbox', { name: 'Search commands' }).fill('Leave a mark')
     const option = palette.getByRole('option', { name: /Leave a mark/ })
@@ -113,7 +109,7 @@ test.describe('a disabled plugin', () => {
   })
 
   test('has no command', async ({ page }) => {
-    await page.keyboard.press(paletteShortcut())
+    await page.keyboard.press('ControlOrMeta+KeyK')
     const palette = page.getByRole('dialog', { name: 'Command palette' })
     await palette.getByRole('searchbox', { name: 'Search commands' }).fill('Leave a mark')
     await expect(palette.getByRole('option', { name: /Leave a mark/ })).toHaveCount(0)

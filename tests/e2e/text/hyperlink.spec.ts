@@ -34,7 +34,7 @@ function typography() {
 
 async function modifierClick(x: number, y: number) {
   const origin = await editor.canvas.pointerOrigin()
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
+  const modifier = 'ControlOrMeta'
   await editor.page.keyboard.down(modifier)
   await editor.page.mouse.click(origin.x + x, origin.y + y)
   await editor.page.keyboard.up(modifier)
@@ -145,7 +145,7 @@ test('removes the link from the canvas menu and undoes the removal', async () =>
 test('shows a hand over a link only while the modifier is held', async () => {
   const element = editor.page.getByTestId('canvas-element')
   const origin = await editor.canvas.pointerOrigin()
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
+  const modifier = 'ControlOrMeta'
   await editor.page.mouse.move(origin.x + READ.x, origin.y + READ.y)
   await expect(element).not.toHaveCSS('cursor', 'pointer')
 

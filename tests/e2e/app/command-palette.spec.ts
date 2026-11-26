@@ -5,12 +5,8 @@ import { addPages, currentPageName, visitPage } from '#tests/helpers/pages'
 
 const editor = useEditorSetup()
 
-function commandPaletteShortcut() {
-  return process.platform === 'darwin' ? 'Meta+KeyK' : 'Control+KeyK'
-}
-
 test('command palette opens, searches, and closes', async () => {
-  await editor.page.keyboard.press(commandPaletteShortcut())
+  await editor.page.keyboard.press('ControlOrMeta+KeyK')
 
   const palette = editor.page.getByRole('dialog', { name: 'Command palette' })
   await expect(palette).toBeVisible()
@@ -26,7 +22,7 @@ test('command palette opens, searches, and closes', async () => {
 })
 
 test('command palette exposes contextual export labels', async () => {
-  await editor.page.keyboard.press(commandPaletteShortcut())
+  await editor.page.keyboard.press('ControlOrMeta+KeyK')
 
   const palette = editor.page.getByRole('dialog', { name: 'Command palette' })
   await palette.getByRole('searchbox', { name: 'Search commands' }).fill('export')
@@ -47,7 +43,7 @@ test('command palette offers Shader Mode, out of reach without a shader fill', a
 
 function openPalette() {
   return editor.page.keyboard
-    .press(commandPaletteShortcut())
+    .press('ControlOrMeta+KeyK')
     .then(() => editor.page.getByRole('dialog', { name: 'Command palette' }))
 }
 

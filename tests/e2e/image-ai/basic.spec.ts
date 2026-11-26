@@ -4,7 +4,6 @@ import { expectDefined } from '#tests/helpers/assert'
 const editor = useEditorSetupWithClear('/?test')
 const SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="20" fill="#f00"/><circle cx="20" cy="30" r="8" fill="#00f"/></svg>'
-const MOD = process.platform === 'darwin' ? 'Meta' : 'Control'
 
 /** A PNG of one flat colour drawn in the page, as an image service would answer. */
 function solidPNG(color: string): Promise<string> {
@@ -178,7 +177,7 @@ test('Generate image from the command palette places a selected image layer, und
   await editor.page.evaluate(() => window.pairdraw?.getStore?.().select([]))
   const before = await layers()
 
-  await editor.page.keyboard.press(`${MOD}+KeyK`)
+  await editor.page.keyboard.press('ControlOrMeta+KeyK')
   await editor.page.keyboard.type('Generate image')
   await editor.page.keyboard.press('Enter')
   const dialog = editor.page.getByTestId('image-ai-prompt-dialog')
@@ -209,12 +208,12 @@ test('Generate SVG from the command palette places editable layers, undone in on
     })
   const before = await count()
 
-  await editor.page.keyboard.press(`${MOD}+KeyK`)
+  await editor.page.keyboard.press('ControlOrMeta+KeyK')
   await editor.page.keyboard.type('Generate SVG')
   await editor.page.keyboard.press('Enter')
   const dialog = editor.page.getByTestId('image-ai-prompt-dialog')
   await dialog.getByTestId('image-ai-prompt-input').fill('a flag')
-  await editor.page.keyboard.press(`${MOD}+Enter`)
+  await editor.page.keyboard.press('ControlOrMeta+Enter')
 
   // Without a Recraft key, Settings opens; the vectorization row takes one.
   const settings = editor.page.getByTestId('app-settings-dialog')
@@ -226,7 +225,7 @@ test('Generate SVG from the command palette places editable layers, undone in on
   await editor.page.getByTestId('app-settings-done').click()
   await expect(settings).toHaveCount(0)
 
-  await editor.page.keyboard.press(`${MOD}+KeyK`)
+  await editor.page.keyboard.press('ControlOrMeta+KeyK')
   await editor.page.keyboard.type('Generate SVG')
   await editor.page.keyboard.press('Enter')
   await dialog.getByTestId('image-ai-prompt-input').fill('a flag')

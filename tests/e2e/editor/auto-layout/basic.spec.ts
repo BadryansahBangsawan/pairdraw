@@ -37,7 +37,7 @@ test('Shift+A wraps selection in auto-layout frame', async () => {
   await canvas.clearCanvas()
   await canvas.drawRect(100, 100, 60, 60)
   await canvas.drawRect(220, 100, 60, 60)
-  await canvas.pressKey('Meta+a')
+  await canvas.pressKey('ControlOrMeta+a')
   await canvas.waitForRender()
 
   await canvas.pressKey('Shift+A')
@@ -132,9 +132,9 @@ test('gap menu sets space around, keeping the gap and the alignment grid across'
   expect(frame.primaryAxisAlign).toBe('SPACE_AROUND')
   expect(frame.counterAxisAlign).toBe('MAX')
 
-  await canvas.pressKey('Meta+z')
+  await canvas.pressKey('ControlOrMeta+z')
   await canvas.waitForRender()
-  await canvas.pressKey('Meta+z')
+  await canvas.pressKey('ControlOrMeta+z')
   await canvas.waitForRender()
   frame = expectDefined(await getNodeById(page, frameId), 'frame')
   expect(frame.primaryAxisAlign).toBe(before.primaryAxisAlign)
@@ -243,7 +243,7 @@ test('editing a Hug width switches to Fixed in one reversible interaction', asyn
   expect(changed.counterAxisSizing).toBe('FIXED')
   expect(changed.width).toBe(Math.round(before.width + 40))
 
-  await canvas.pressKey('Meta+z')
+  await canvas.pressKey('ControlOrMeta+z')
   await canvas.waitForRender()
   const undone = expectDefined(await getNodeById(page, frameId), 'undone')
   expect(undone.counterAxisSizing).toBe('HUG')
@@ -277,7 +277,7 @@ test('editing a Fill height switches to Fixed in one undo step', async () => {
   expect(fillsHeight(changed)).toBe(false)
   expect(changed.height).toBe(Math.round(before.height + 30))
 
-  await canvas.pressKey('Meta+z')
+  await canvas.pressKey('ControlOrMeta+z')
   await canvas.waitForRender()
   const undone = expectDefined(await getNodeById(page, childId), 'undone')
   expect(fillsHeight(undone)).toBe(true)

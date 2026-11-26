@@ -68,12 +68,11 @@ test('native WebMCP discovery, editing, validation and undo', async ({ page, bro
     await expect(
       page.getByRole('button', { name: 'Browser agent page', exact: true })
     ).toBeVisible()
-    const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
-    await page.keyboard.press(`${modifier}+z`)
+    await page.keyboard.press('ControlOrMeta+z')
     expect(v.parse(pageResultSchema, (await invoke('get_current_page')).output).result.name).toBe(
       original.name
     )
-    await page.keyboard.press(`${modifier}+Shift+z`)
+    await page.keyboard.press('ControlOrMeta+Shift+z')
     expect(v.parse(pageResultSchema, (await invoke('get_current_page')).output).result.name).toBe(
       'Browser agent page'
     )
@@ -89,7 +88,7 @@ test('native WebMCP discovery, editing, validation and undo', async ({ page, bro
     expect((await invoke('update_node', { id: original.id, name: 'Other page edit' })).status).toBe(
       'Completed'
     )
-    await page.keyboard.press(`${modifier}+z`)
+    await page.keyboard.press('ControlOrMeta+z')
     expect(v.parse(pageResultSchema, (await invoke('get_current_page')).output).result.id).toBe(
       secondPage.id
     )

@@ -16,6 +16,7 @@ import { devAutomationRoute } from '@/app/automation/bridge/portless-route'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { waitForHome } from '#tests/helpers/boot'
+import { testMCPPort } from '#tests/helpers/mcp/test-port'
 
 /**
  * Seam: an outside MCP client edits while the person uses Home and the tab bar.
@@ -57,7 +58,7 @@ const listedSchema = v.object({
 type ListedDocument = v.InferOutput<typeof listedSchema>['documents'][number]
 
 function mcpPort(): string {
-  return process.env.PAIRDRAW_TEST_MCP_PORT ?? '7691'
+  return String(testMCPPort())
 }
 
 /** The dev server's discovery file for this test's MCP port, never the owner's. */

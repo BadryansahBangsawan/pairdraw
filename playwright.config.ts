@@ -1,9 +1,10 @@
 import { defineConfig, type PlaywrightTestConfig } from '@playwright/test'
 
+import { testMCPPort } from './tests/helpers/mcp/test-port'
 import { EDITOR_SETUP_TIMEOUT_MS } from './tests/helpers/timeouts'
 
 const appPort = process.env.PAIRDRAW_TEST_PORT ?? '1420'
-const mcpPort = process.env.PAIRDRAW_TEST_MCP_PORT ?? '7600'
+const mcpPort = String(testMCPPort())
 for (const port of [appPort, mcpPort]) {
   if (!/^\d+$/.test(port) || Number(port) < 1024 || Number(port) > 65535) {
     throw new Error('Browser test ports must be integers between 1024 and 65535')

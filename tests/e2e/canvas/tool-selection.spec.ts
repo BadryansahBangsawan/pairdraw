@@ -15,6 +15,7 @@ import { devMCPDiscoveryPath } from '@/app/automation/bridge/discovery-path'
 import { devAutomationRoute } from '@/app/automation/bridge/portless-route'
 
 import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
+import { testMCPPort } from '#tests/helpers/mcp/test-port'
 
 /**
  * Seam: an MCP client selects a layer, then the canvas draws that layer's handles.
@@ -34,7 +35,7 @@ const readSchema = v.object({ selection: v.array(v.object({ id: v.string() })) }
 const editor = useFreshEditor()
 
 function mcpPort(): string {
-  return process.env.PAIRDRAW_TEST_MCP_PORT ?? '7691'
+  return String(testMCPPort())
 }
 
 async function connectClient(): Promise<Client> {

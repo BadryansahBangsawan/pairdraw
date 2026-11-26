@@ -9,8 +9,8 @@ import {
   type TurnRenders
 } from '@/app/ai/tools/changes/turn-store'
 
-const owner = { onDispose: () => () => {} }
-const other = { onDispose: () => () => {} }
+const owner = { onDispose: () => () => undefined }
+const other = { onDispose: () => () => undefined }
 const id = (index: number) => `reply-${index}`
 
 function cleared(): TurnRenders {
@@ -61,7 +61,7 @@ test('frees a closing document’s cards even when no render queue subscribed', 
   const storeLike = {
     onDispose: (listener: () => void) => {
       disposed = listener
-      return () => {}
+      return () => undefined
     }
   }
 

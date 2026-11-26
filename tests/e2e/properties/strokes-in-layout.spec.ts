@@ -18,6 +18,6 @@ test('including strokes in an auto layout moves its content inside the stroke, u
   await expect(toggle).toBeChecked()
   await expect.poll(() => scene.state()).toEqual({ included: true, x: 16, y: 16 })
 
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect.poll(() => scene.state()).toEqual({ included: false, x: 10, y: 10 })
 })

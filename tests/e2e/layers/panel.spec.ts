@@ -171,7 +171,7 @@ test('grouping updates layers', async () => {
   await editor.canvas.drawRect(800, 600, 60, 60)
   await editor.canvas.selectAll()
 
-  await editor.page.keyboard.press('Meta+g')
+  await editor.page.keyboard.press('ControlOrMeta+g')
   await editor.canvas.waitForRender()
 
   // The canvas numbers a group past the highest "Group" number on the page, as Figma does.
@@ -186,7 +186,7 @@ test('grouping updates layers', async () => {
 })
 
 test('ungrouping updates layers', async () => {
-  await editor.page.keyboard.press('Shift+Meta+g')
+  await editor.page.keyboard.press('Shift+ControlOrMeta+g')
   await editor.canvas.waitForRender()
 
   const names = await getLayerNames()

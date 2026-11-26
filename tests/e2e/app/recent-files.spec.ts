@@ -52,7 +52,7 @@ test.describe('a populated recent files list', () => {
       .filter({ hasText: /Recent design/ })
     await expect(documents).toHaveCount(10)
 
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
+    await page.keyboard.press('ControlOrMeta+,')
     const limit = page.getByRole('combobox', { name: 'Number of recent files' })
     await limit.click()
     await page.getByRole('option', { name: '25', exact: true }).click()
@@ -63,7 +63,7 @@ test.describe('a populated recent files list', () => {
 
     await waitForAppBoot(page)
     await expect(documents).toHaveCount(12)
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
+    await page.keyboard.press('ControlOrMeta+,')
     await expect(limit).toHaveText('25')
   })
 })

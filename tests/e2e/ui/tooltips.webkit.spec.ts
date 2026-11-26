@@ -36,7 +36,7 @@ test('tooltips stay hoverable and clickable in WebKit', async () => {
   // ⌘J opens the chat column, whose provider setup leads to Settings.
   await routeModelCatalog(editor.page)
   const chat = new ChatHarness(editor.page)
-  await editor.page.keyboard.press('Meta+J')
+  await editor.page.keyboard.press('ControlOrMeta+J')
   await expect(editor.page.getByTestId('provider-setup')).toBeVisible()
   await chat.configureOpenRouter('sk-or-test-key-12345')
   await expect(editor.page.getByTestId('chat-input')).toBeVisible()

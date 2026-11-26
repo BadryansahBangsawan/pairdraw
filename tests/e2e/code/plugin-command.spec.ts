@@ -82,7 +82,7 @@ test.describe('an enabled plugin', () => {
   })
 
   test('the Plugins settings no longer say plugins cannot run', async ({ page }) => {
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
+    await page.keyboard.press('ControlOrMeta+,')
     const settings = page.getByRole('dialog')
     await settings.getByRole('tab', { name: 'Plugins' }).click()
     await expect(settings.getByText('Plugins run from the command palette')).toBeVisible()

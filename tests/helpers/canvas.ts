@@ -22,8 +22,8 @@ const OFFICIAL_CLOUD_ORIGIN = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).o
  */
 const BLOCKED_SANDBOX_SCRIPT = /^Blocked script execution in .* frame is sandboxed/
 
-/** The app binds `$mod` to Meta on macOS and to Control elsewhere. */
-const PRIMARY_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control'
+/** Playwright's platform command modifier: Meta on macOS and Control elsewhere. */
+const PRIMARY_MODIFIER = 'ControlOrMeta'
 
 export class CanvasHelper {
   readonly page: Page
@@ -197,7 +197,7 @@ export class CanvasHelper {
   }
 
   async pressKey(key: string) {
-    await this.page.keyboard.press(key.replace(/^Meta\+/, `${PRIMARY_MODIFIER}+`))
+    await this.page.keyboard.press(key.replace(/(^|\+)Meta(?=\+|$)/g, `$1${PRIMARY_MODIFIER}`))
   }
 
   async drawRect(x: number, y: number, width: number, height: number) {

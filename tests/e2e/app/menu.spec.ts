@@ -333,7 +333,7 @@ test('Edit and Arrange items wait for a selection that can use them', async () =
   await expectItem('Arrange', 'Auto arrange', true)
 
   await editor.canvas.drawRect(400, 200, 100, 100)
-  await editor.page.keyboard.press('Meta+a')
+  await editor.page.keyboard.press('ControlOrMeta+a')
   await expectItem('Arrange', 'Auto arrange', false)
 
   await editor.page.evaluate(() => {

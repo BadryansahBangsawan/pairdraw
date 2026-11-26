@@ -148,7 +148,7 @@ test('turning changed frames off in Settings shows no card for the next turn', a
   const frameId = await createFrame(page)
   await injectFrameEditTransport(page, frameId)
 
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
+  await page.keyboard.press('ControlOrMeta+,')
   await page.getByTestId('settings-section-ai').click()
   const toggle = page.getByTestId('settings-ai-turn-renders')
   await expect(toggle).toHaveAttribute('aria-checked', 'true')

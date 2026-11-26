@@ -112,7 +112,7 @@ test('multi-selection constraint changes undo in one step', async ({ page }) => 
     )
     .toEqual(['CENTER', 'CENTER'])
 
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect
     .poll(() =>
       page.evaluate(({ firstId, secondId }) => {

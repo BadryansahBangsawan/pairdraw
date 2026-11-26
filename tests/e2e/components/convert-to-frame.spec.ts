@@ -15,18 +15,18 @@ test('the create component keys turn a main component back into a frame once con
   const scene = componentToFrameDriver(() => page)
   await scene.build()
 
-  await page.keyboard.press('Meta+Alt+k')
+  await page.keyboard.press('ControlOrMeta+Alt+k')
   const dialog = page.getByRole('alertdialog')
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: 'Cancel' }).click()
   await expect(dialog).toBeHidden()
   expect(await scene.types()).toEqual(COMPONENT)
 
-  await page.keyboard.press('Meta+Alt+k')
+  await page.keyboard.press('ControlOrMeta+Alt+k')
   await dialog.getByRole('button', { name: 'Convert to frame' }).click()
   await expect.poll(() => scene.types()).toEqual(DETACHED)
 
-  await page.keyboard.press('Meta+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect.poll(() => scene.types()).toEqual(COMPONENT)
 })
 

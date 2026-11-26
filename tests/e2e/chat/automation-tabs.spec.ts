@@ -91,7 +91,7 @@ test('Save As of the running document keeps its reply in front', async ({
   await chat.submit('paused short stream')
   await expect(chat.assistantMessage()).toContainText('Line 1')
 
-  await page.keyboard.press('Meta+Shift+s')
+  await page.keyboard.press('ControlOrMeta+Shift+s')
   await expect(page.getByTestId('chat-run-location')).toHaveCount(0)
   await expect(page.getByTestId('chat-stop-button')).toBeVisible()
   await expect(page.locator(stoppedMarker)).toHaveCount(0)

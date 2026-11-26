@@ -35,7 +35,7 @@ test('a fill’s colour binding stays with it when a fill above it is removed', 
   await expect.poll(bindings).toEqual({ 'fills/0/color': red, 'fills/1/color': blue })
 
   await fill.getByRole('heading', { name: 'Fill' }).click()
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z')
+  await page.keyboard.press('ControlOrMeta+z')
   await expect.poll(fillCount).toBe(3)
   await expect.poll(bindings).toEqual({ 'fills/0/color': red, 'fills/2/color': blue })
 })

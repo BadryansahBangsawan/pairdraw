@@ -113,7 +113,7 @@ async function documentPoint(page: Page, canvasX: number, canvasY: number) {
 
 /** Picks the plugin's command from the palette and waits for the palette to leave the canvas. */
 async function startPlugin(page: Page): Promise<void> {
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+KeyK' : 'Control+KeyK')
+  await page.keyboard.press('ControlOrMeta+KeyK')
   const palette = page.getByRole('dialog', { name: 'Command palette' })
   await palette.getByRole('searchbox', { name: 'Search commands' }).fill('Take pointer')
   await palette.getByRole('option', { name: /Take pointer/ }).click()
@@ -212,7 +212,7 @@ test('only a primary press this layer started ends the sequence', async ({ page 
 test.describe('a plugin waiting for the pointer when its document goes away', () => {
   /** Opens a second document in a tab of its own and makes it the one in front. */
   async function newDocument(page: Page) {
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+KeyN' : 'Control+KeyN')
+    await page.keyboard.press('ControlOrMeta+KeyN')
     await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
   }
 

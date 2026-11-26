@@ -12,7 +12,7 @@ async function saveWith(name: string): Promise<{ suggested: string; size: number
   page.once('dialog', (dialog) => void dialog.accept(name))
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 15000 }),
-    page.keyboard.press('Meta+s')
+    page.keyboard.press('ControlOrMeta+s')
   ])
   const path = await download.path()
   return {
@@ -26,7 +26,7 @@ test('⌘S saves while a layer name field is being typed in', async () => {
   await editor.canvas.drawRect(120, 120, 80, 60)
   // The rename field is the layer row's, drawn while the Layers view shows.
   await editor.page.getByTestId('left-panel-layers-tab').click()
-  await editor.page.keyboard.press('Meta+r')
+  await editor.page.keyboard.press('ControlOrMeta+r')
   const field = editor.page.locator('[data-slot="rename-input"]').first()
   await field.waitFor({ state: 'visible', timeout: 5000 })
   await field.fill('Renamed layer')

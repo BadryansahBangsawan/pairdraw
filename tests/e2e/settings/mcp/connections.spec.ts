@@ -132,7 +132,7 @@ async function serveOAuthMCP(context: BrowserContext) {
 async function openMCPSettings(page: Page) {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')
+  await page.keyboard.press('ControlOrMeta+,')
   await page.getByTestId('settings-section-mcp').click()
   return page.getByTestId('app-settings-dialog')
 }

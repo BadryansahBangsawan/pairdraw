@@ -28,10 +28,10 @@ async function createTextAndType(value: string) {
 
 test('undo while editing text removes the last typed character and keeps the caret', async () => {
   await createTextAndType('abc')
-  await editor.page.keyboard.press('Meta+z')
+  await editor.page.keyboard.press('ControlOrMeta+z')
   await expect.poll(textState).toMatchObject({ editing: true, text: 'ab', cursor: 2, anchor: null })
 
-  await editor.page.keyboard.press('Meta+Shift+z')
+  await editor.page.keyboard.press('ControlOrMeta+Shift+z')
   await expect
     .poll(textState)
     .toMatchObject({ editing: true, text: 'abc', cursor: 3, anchor: null })
@@ -39,10 +39,10 @@ test('undo while editing text removes the last typed character and keeps the car
 
 test('undo steps back through a typing run one group at a time', async () => {
   await createTextAndType('abc')
-  await editor.page.keyboard.press('Meta+z')
-  await editor.page.keyboard.press('Meta+z')
+  await editor.page.keyboard.press('ControlOrMeta+z')
+  await editor.page.keyboard.press('ControlOrMeta+z')
   await expect.poll(textState).toMatchObject({ editing: true, text: 'a', cursor: 1 })
-  await editor.page.keyboard.press('Meta+z')
+  await editor.page.keyboard.press('ControlOrMeta+z')
   await expect.poll(textState).toMatchObject({ editing: true, text: '', cursor: 0 })
 })
 

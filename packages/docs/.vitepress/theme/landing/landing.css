@@ -247,7 +247,11 @@ html:has(.landing-home) .VPLocalNav {
       animation-timing-function: var(--lp-ease-out), var(--lp-ease-out);
     }
 
-    /* What the frame holds fills in once, the first time it is seen; the box then lets go. */
+    /*
+     * What the frame holds fills in once, the first time it is seen; the box then lets go.
+     * Backwards fill only: a kept final clip-path would cut off whatever a child draws past its
+     * own box, such as the closing frame's selection box and cursors.
+     */
     .lp-draw-ready [data-draw]:not([data-drawn]) > * {
       clip-path: inset(0 100% 0 0);
       opacity: 0;
@@ -255,7 +259,7 @@ html:has(.landing-home) .VPLocalNav {
 
     .lp-draw-ready [data-draw][data-drawn] > * {
       animation-name: lp-draw-content;
-      animation-fill-mode: both;
+      animation-fill-mode: backwards;
       animation-timing-function: var(--lp-ease-out);
       animation-duration: 520ms;
       animation-delay: calc(var(--i, 0) * var(--lp-stagger));

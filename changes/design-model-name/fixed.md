@@ -1,0 +1,1 @@
+- A profile a person named “Design model” keeps its name when settings load; only the migrated default profile is renamed by the interface language.

@@ -114,11 +114,21 @@ describe('parseAIModelSettings', () => {
     })
   })
 
-  test('leaves the default name to the interface language', () => {
+  test('leaves the migrated default name to the interface language', () => {
+    const parsed = parseAIModelSettings(
+      settings({
+        models: [{ ...profile, id: 'model-default', name: 'Design model' }],
+        assignments: { design: 'model-default', review: null, fast: null, vision: null }
+      })
+    )
+    expect(parsed?.models[0].name).toBe('')
+  })
+
+  test('keeps the name of a profile the person named like the default label', () => {
     const parsed = parseAIModelSettings(
       settings({ models: [{ ...profile, name: 'Design model' }] })
     )
-    expect(parsed?.models[0].name).toBe('')
+    expect(parsed?.models[0].name).toBe('Design model')
   })
 
   test('keeps a name the person gave a profile', () => {

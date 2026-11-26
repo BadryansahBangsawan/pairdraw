@@ -57,10 +57,13 @@ test('tool support errors are forwarded by the schema to the active model field'
 })
 
 test('independent field errors survive a failed tool-support rule', () => {
-  expect(errors({}, { ...values, name: '', tools: false })).toEqual({
-    name: ['Required'],
-    modelID: ['Tools required']
+  expect(errors({ design: false }, { ...values, name: '', tools: false })).toEqual({
+    name: ['Required']
   })
+})
+
+test('a design model may save unnamed, since its label follows the interface', () => {
+  expect(errors({ design: true }, { ...values, name: '' })).toEqual({})
 })
 
 test('Pi may leave the model empty to use the default model set in Pi', () => {

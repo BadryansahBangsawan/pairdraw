@@ -45,7 +45,12 @@ export function modelProfileSchema(
   const requiresModel = requiresAPI || context.providerKind === 'cloud'
   return v.pipe(
     v.object({
-      name: context.intent === 'save' ? requiredSetting(messages.requiredField) : v.string(),
+      // The design model is unnamed until one is set, and its label follows the interface
+      // language, so saving it does not require a name of its own.
+      name:
+        context.intent === 'save' && !context.design
+          ? requiredSetting(messages.requiredField)
+          : v.string(),
       modelID:
         requiresModel && !context.customModel
           ? requiredSetting(messages.requiredField)

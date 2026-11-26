@@ -57,10 +57,10 @@ test('frees only the closing document’s cards', () => {
 })
 
 test('frees a closing document’s cards even when no render queue subscribed', () => {
-  let disposed: (() => void) | null = null
+  const captured: { listener?: () => void } = {}
   const storeLike = {
     onDispose: (listener: () => void) => {
-      disposed = listener
+      captured.listener = listener
       return () => undefined
     }
   }
@@ -68,7 +68,7 @@ test('frees a closing document’s cards even when no render queue subscribed', 
   setTurnRenders(storeLike, id(3), cleared())
   expect(readTurnRenders(id(3))).not.toBeNull()
 
-  disposed?.()
+  captured.listener?.()
 
   expect(readTurnRenders(id(3))).toBeNull()
 })

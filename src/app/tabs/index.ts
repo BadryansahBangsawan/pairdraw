@@ -203,6 +203,9 @@ export function ensureHomeTab(): void {
   if (pinned !== tabsRef.value) tabsRef.value = [...pinned]
 }
 
+/** Stops the page-global navigation hook an earlier activation registered on its own store. */
+const stopNavigationHooks = new WeakMap<EditorStore, () => void>()
+
 function activateTab(tab: Tab) {
   const previous = tabsRef.value.find((candidate) => candidate.id === activeTabId.value)
   previous?.store.setSnapGuides([])
@@ -211,7 +214,9 @@ function activateTab(tab: Tab) {
   activeTabId.value = tab.id
   setActiveEditorStore(tab.store)
   triggerRef(tabsRef)
-  setPairdrawStore(tab.store)
+  const disposeNavigation = setPairdrawStore(tab.store)
+  stopNavigationHooks.get(tab.store)?.()
+  stopNavigationHooks.set(tab.store, tab.store.onDispose(disposeNavigation))
 }
 
 /** Activates the tab. False when no tab carries that id, so callers can tell a no-op apart. */

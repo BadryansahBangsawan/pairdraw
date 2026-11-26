@@ -55,14 +55,28 @@ function windowAPI(): PairdrawWindowAPI {
   return window.pairdraw
 }
 
-export function setPairdrawStore(store: EditorStore) {
-  activeStore = store
-  if (!IS_BROWSER) return
-  const api = windowAPI()
-  if (appRuntimeConfig.navigationBenchmark) {
-    const testHooks = (api.test ??= {})
-    testHooks.navigation = createNavigationBenchmarkHooks(store)
+/**
+ * Installs the navigation benchmark hook and returns a disposer that removes it only while it is
+ * still the page's hook: a newer activation owns the global, and an older store's disposal must
+ * leave it alone.
+ */
+export function installNavigationHooks(
+  testHooks: { navigation?: NavigationBenchmarkHooks },
+  store: EditorStore
+): () => void {
+  const hooks = createNavigationBenchmarkHooks(store)
+  testHooks.navigation = hooks
+  return () => {
+    if (testHooks.navigation === hooks) delete testHooks.navigation
   }
+}
+
+export function setPairdrawStore(store: EditorStore): () => void {
+  activeStore = store
+  if (!IS_BROWSER) return noopDispose
+  const api = windowAPI()
+  if (!appRuntimeConfig.navigationBenchmark) return noopDispose
+  return installNavigationHooks((api.test ??= {}), store)
 }
 
 export function exposeCollaborationActions(

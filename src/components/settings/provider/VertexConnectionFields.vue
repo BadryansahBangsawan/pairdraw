@@ -62,7 +62,7 @@ const projectHint = computed(() =>
   <ProviderSettingsField
     v-slot="{ control }"
     :label="settings.vertexProject"
-    :hint="projectHint"
+    :hint="projectError ? undefined : projectHint"
     :error="projectError"
     @blur="emit('projectBlur')"
   >

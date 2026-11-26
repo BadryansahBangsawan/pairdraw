@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: BadryansahBangsawan/pairdraw/.github/actions/pairdraw-check@v0.20.0
+      - uses: BadryansahBangsawan/pairdraw/.github/actions/pairdraw-check@v0.21.0
 ```
 
 The action installs the CLI, finds the pull request's changed `.fig` and `.pen` files, reads the merge base's copies

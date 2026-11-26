@@ -7,7 +7,7 @@ description: How Pairdraw and Paper differ in files, agent access, pricing, comp
 
 Both tools put an agent next to a canvas. The difference is what the canvas holds. Paper's layers are HTML elements that the browser lays out; Pairdraw keeps a scene graph in a file you own and renders it with Skia. That decides what each one can do with components, prototypes, and tokens.
 
-Competitor facts on this page were checked on 2026-11-25 at the linked sources. Pairdraw facts describe version 0.20.0.
+Competitor facts on this page were checked on 2026-11-25 at the linked sources. Pairdraw facts describe version 0.21.0.
 
 ## Who each one suits
 
@@ -17,7 +17,7 @@ Competitor facts on this page were checked on 2026-11-25 at the linked sources. 
 
 ## Side by side
 
-|                          | Pairdraw 0.20.0                                                                                                                                                             | Paper                                                                                                                                                                                   |
+|                          | Pairdraw 0.21.0                                                                                                                                                             | Paper                                                                                                                                                                                   |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Document and files       | Scene graph in `.fig` and `.pen` files on disk ([exporting](/user-guide/exporting))                                                                                         | HTML/CSS DOM as the document; cloud-first web app and Desktop; no public document format is documented ([llms.txt](https://paper.design/llms.txt))                                      |
 | Account                  | None; no backend for local documents ([README](https://github.com/BadryansahBangsawan/pairdraw#readme))                                                                     | Account for the web app and seats ([pricing](https://paper.design/pricing))                                                                                                             |
@@ -53,4 +53,4 @@ Not supported today: Paper's **Copy as React CSS** and **Copy as Tailwind** outp
 
 ## Sources
 
-Checked 2026-11-25: [paper.design](https://paper.design/), [pricing](https://paper.design/pricing), [MCP docs](https://paper.design/docs/mcp), [tokens](https://paper.design/docs/tokens), [paste](https://paper.design/docs/paste), [Snapshot](https://paper.design/snapshot-extension), [build log](https://paper.design/build-log), [roadmap](https://paper.design/roadmap), [llms.txt](https://paper.design/llms.txt), [Paper Mono](https://paper.design/mono), [shaders](https://shaders.paper.design/). The benchmark is [Braintrust's MCP eval](https://www.braintrust.dev/evals/paper-vs-figma-mcp). Pairdraw facts come from this repository at 0.20.0 ([CHANGELOG](https://github.com/BadryansahBangsawan/pairdraw/blob/main/CHANGELOG.md)).
+Checked 2026-11-25: [paper.design](https://paper.design/), [pricing](https://paper.design/pricing), [MCP docs](https://paper.design/docs/mcp), [tokens](https://paper.design/docs/tokens), [paste](https://paper.design/docs/paste), [Snapshot](https://paper.design/snapshot-extension), [build log](https://paper.design/build-log), [roadmap](https://paper.design/roadmap), [llms.txt](https://paper.design/llms.txt), [Paper Mono](https://paper.design/mono), [shaders](https://shaders.paper.design/). The benchmark is [Braintrust's MCP eval](https://www.braintrust.dev/evals/paper-vs-figma-mcp). Pairdraw facts come from this repository at 0.21.0 ([CHANGELOG](https://github.com/BadryansahBangsawan/pairdraw/blob/main/CHANGELOG.md)).

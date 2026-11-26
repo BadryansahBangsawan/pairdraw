@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: BadryansahBangsawan/pairdraw/.github/actions/pairdraw-check@v0.20.0
+      - uses: BadryansahBangsawan/pairdraw/.github/actions/pairdraw-check@v0.21.0
 ```
 
 Pin the action to a release tag: the tag names the app release whose `@pairdraw/cli` the action installs, so the
@@ -37,15 +37,15 @@ check and the action stay in step. `version: latest` follows npm and can change 
 
 ## Inputs
 
-| Input | Default | Meaning |
-| --- | --- | --- |
-| `version` | `latest` | `@pairdraw/cli` version to install |
-| `files` | `` | Design files to check, newline- or space-separated. Empty uses the pull request's changed `.fig` and `.pen` files |
-| `config` | `.pairdraw/check.json` | Settings file; used only when it exists |
-| `base` | `` | Git ref to compare with. Empty uses the pull request's merge base |
-| `fail-on` | `` | `error`, `warning`, or `never`; empty keeps the config file's level |
-| `comment` | `true` | Post or update the one comment |
-| `node-version` | `22` | Node version for the CLI |
+| Input          | Default                | Meaning                                                                                                           |
+| -------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `version`      | `latest`               | `@pairdraw/cli` version to install                                                                                |
+| `files`        | ``                     | Design files to check, newline- or space-separated. Empty uses the pull request's changed `.fig` and `.pen` files |
+| `config`       | `.pairdraw/check.json` | Settings file; used only when it exists                                                                           |
+| `base`         | ``                     | Git ref to compare with. Empty uses the pull request's merge base                                                 |
+| `fail-on`      | ``                     | `error`, `warning`, or `never`; empty keeps the config file's level                                               |
+| `comment`      | `true`                 | Post or update the one comment                                                                                    |
+| `node-version` | `22`                   | Node version for the CLI                                                                                          |
 
 ## Settings file
 
@@ -68,11 +68,11 @@ check and the action stay in step. `version: latest` follows npm and can change 
 
 Unknown keys are refused, so a typo cannot silently turn a check off. `failOn` decides what fails the job:
 
-| `failOn` | Fails on |
-| --- | --- |
-| `error` | a new design-memory finding the memory refuses, or token drift |
+| `failOn`  | Fails on                                                                   |
+| --------- | -------------------------------------------------------------------------- |
+| `error`   | a new design-memory finding the memory refuses, or token drift             |
 | `warning` | the above, plus new warnings (including responsive ones and text overflow) |
-| `never` | nothing; the comment is still written |
+| `never`   | nothing; the comment is still written                                      |
 
 Adopting the check on a repo with older findings: leave `failOn` at `error` — findings the base revision already
 had are listed but never fail. Token drift is not baselined: drift means the design and the code disagree now.

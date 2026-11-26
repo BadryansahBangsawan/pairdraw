@@ -7,7 +7,7 @@ description: How Pairdraw and pen.dev differ in agent metering, sharing, prototy
 
 pen.dev and Pairdraw both read and write `.pen` files, both keep the design next to the code, and both put an agent on the canvas. The practical difference is what the agent is allowed to do per month and what happens to the file when you stop paying.
 
-pen.dev facts on this page were checked on 2026-11-25 at the linked sources. Pairdraw facts describe version 0.20.0.
+pen.dev facts on this page were checked on 2026-11-25 at the linked sources. Pairdraw facts describe version 0.21.0.
 
 ## Who each one suits
 
@@ -17,7 +17,7 @@ pen.dev facts on this page were checked on 2026-11-25 at the linked sources. Pai
 
 ## Side by side
 
-|                          | Pairdraw 0.20.0                                                                                                                                                                                                           | pen.dev                                                                                                                                                                       |
+|                          | Pairdraw 0.21.0                                                                                                                                                                                                           | pen.dev                                                                                                                                                                       |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Document and files       | `.pen` and `.fig` on disk, no account ([exporting](/user-guide/exporting))                                                                                                                                                | `.pen` JSON in the repository; account and hosted share snapshots ([docs](https://docs.pen.dev/))                                                                             |
 | Account                  | None ([README](https://github.com/BadryansahBangsawan/pairdraw#readme))                                                                                                                                                   | Account for the app and shares ([pricing](https://pen.dev/pricing))                                                                                                           |
@@ -43,10 +43,10 @@ pen.dev facts on this page were checked on 2026-11-25 at the linked sources. Pai
 ## Moving from pen.dev
 
 1. **Open the file.** Drag the `.pen` onto the window, File → Open, or open it from the CLI. Pairdraw reads `.pen` libraries the document names, up to two folders above it in the desktop app ([exporting](/user-guide/exporting)).
-2. **Expect the design memory to start empty.** `.pen` has no place for a design memory, so saving in that format drops it; keep working in `.fig` when you want the memory kept ([checking designs](/user-guide/checking-designs)).
+2. **Keep the design memory with the file.** Pairdraw writes the allowed values, decisions, and pinned examples into both `.fig` and `.pen` files, so reopening either format in Pairdraw keeps the memory ([checking designs](/user-guide/checking-designs)).
 3. **Rebuild what only exists on their server.** Share links with per-snapshot permissions and hosted model credits belong to pen.dev's account. Pairdraw's equivalent for sharing is [Pairdraw Cloud](/user-guide/pairdraw-cloud); for models it is your own key.
 4. **Nothing is metered per day.** Agent use over MCP is limited by your provider, not by Pairdraw, and the [design memory](/user-guide/checking-designs) replaces plan-level guardrails.
 
 ## Sources
 
-Checked 2026-11-25: [pen.dev](https://pen.dev/), [pricing](https://pen.dev/pricing), [changelog](https://www.pen.dev/changelog), [docs.pen.dev](https://docs.pen.dev/), [design to code](https://docs.pen.dev/design-and-code/design-to-code). Pairdraw facts come from this repository at 0.20.0 ([CHANGELOG](https://github.com/BadryansahBangsawan/pairdraw/blob/main/CHANGELOG.md)).
+Checked 2026-11-25: [pen.dev](https://pen.dev/), [pricing](https://pen.dev/pricing), [changelog](https://www.pen.dev/changelog), [docs.pen.dev](https://docs.pen.dev/), [design to code](https://docs.pen.dev/design-and-code/design-to-code). Pairdraw facts come from this repository at 0.21.0 ([CHANGELOG](https://github.com/BadryansahBangsawan/pairdraw/blob/main/CHANGELOG.md)).

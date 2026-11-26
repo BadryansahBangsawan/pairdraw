@@ -65,4 +65,4 @@ Agents are judged on the values they write: a color or font outside the memory i
 
 With a frame selected, the **Design memory** section learns values from it and pins it as an example. Agents read the memory in the chat, through MCP with `get_design_memory`, and from the command line with `pairdraw design-memory`; they can write decisions down and pin examples. This covers agents working through Pairdraw's chat, MCP server, and `pairdraw agent`. A program that writes through CLI commands such as `pairdraw tool call` or `pairdraw eval` counts as you and is only warned.
 
-The memory is kept in `.fig` files. Saving as `.pen` drops it, as Pencil.dev has no place for it.
+The memory is kept in the document's `.fig` or `.pen` file, along with its status workflow.

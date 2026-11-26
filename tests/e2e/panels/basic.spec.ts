@@ -1,5 +1,6 @@
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
+import { CanvasHelper } from '#tests/helpers/canvas'
 
 const editor = useEditorSetup()
 
@@ -76,6 +77,7 @@ test('the sidebar reopens at one width on a narrow and a wide window', async ({
       expectDefined(await panel.boundingBox(), 'layers panel bounds').width
 
     await page.goto('/?test')
+    await new CanvasHelper(page).waitForInit({ designPanel: false })
     await expect(panel).toBeVisible()
     const narrow = await panelWidth()
     expect(narrow).toBeGreaterThan(230)
@@ -95,6 +97,7 @@ test('the sidebar reopens at one width on a narrow and a wide window', async ({
     for (const width of [1920, 1280]) {
       await page.setViewportSize({ width, height: 900 })
       await page.reload()
+      await new CanvasHelper(page).waitForInit({ designPanel: false })
       await expect(panel).toBeVisible()
       expect(Math.abs((await panelWidth()) - narrow)).toBeLessThanOrEqual(1)
     }

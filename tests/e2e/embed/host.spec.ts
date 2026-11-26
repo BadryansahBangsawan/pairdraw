@@ -4,6 +4,7 @@ import type { JSHandle, Page } from '@playwright/test'
 
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { openDesignPanel } from '#tests/helpers/properties'
+import { EDITOR_BOOT_WAIT_MS } from '#tests/helpers/timeouts'
 
 /**
  * A host page embeds the editor in an iframe and drives it over the embed protocol. The host is
@@ -288,7 +289,9 @@ test.describe('embed mode', () => {
       `${app}/?test&embed&origin=${encodeURIComponent('https://elsewhere.example')}`
     )
     const status = embeddedFrame(page).locator('[data-slot="embed-status"]')
-    await expect(status).toHaveAttribute('data-status', 'waiting')
+    await expect(status).toHaveAttribute('data-status', 'waiting', {
+      timeout: EDITOR_BOOT_WAIT_MS
+    })
     const answered = await page.evaluate(
       (embedOrigin) =>
         new Promise<boolean>((resolve) => {

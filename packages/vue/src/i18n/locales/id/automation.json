@@ -30,7 +30,7 @@
   "mcpFailureCopy": "Salin detail",
   "localServer": "Server lokal",
   "localServerDesktopOnly": "MCP server lokal berjalan bersama aplikasi desktop Pairdraw. Di browser, gunakan WebMCP di bawah.",
-  "webmcpDescription": "Biarakan agent browser menggunakan dokumen ini langsung, tanpa MCP server lokal atau token Bearer. Pengaturan server lokal tidak berlaku di sini.",
+  "webmcpDescription": "Biarkan agent browser menggunakan dokumen ini langsung, tanpa MCP server lokal atau token Bearer. Pengaturan server lokal tidak berlaku di sini.",
   "browserAccess": "Akses agent browser",
   "accessOff": "Nonaktif",
   "accessInspect": "Inspeksi",

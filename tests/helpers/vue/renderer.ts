@@ -54,3 +54,57 @@ export function createTestRenderer() {
     }
   })
 }
+
+/**
+ * A renderer over a real DOM, for tests that need an element CodeMirror can attach to. Vue's
+ * runtime-dom captures `document` when its module loads, so `createApp` from `vue` mounts nothing
+ * in a test process where another file loaded Vue before this test installed happy-dom. This
+ * renderer takes the document explicitly and never reads runtime-dom's captured one.
+ */
+export function createDOMTestRenderer(document: Document) {
+  return createRenderer<Node, Element>({
+    patchProp(el, key, _previous, next) {
+      if (key === 'class') {
+        el.className = next == null ? '' : String(next)
+        return
+      }
+      if (key === 'style') {
+        if (next == null) el.removeAttribute('style')
+        else if (typeof next === 'string') el.setAttribute('style', next)
+        return
+      }
+      if (next == null) el.removeAttribute(key)
+      else el.setAttribute(key, String(next))
+    },
+    insert(child, parent, anchor) {
+      if (anchor) (anchor as ChildNode).before(child)
+      else parent.append(child)
+    },
+    remove(child) {
+      child.parentNode?.removeChild(child)
+    },
+    createElement: (tag) => document.createElement(tag),
+    createText: (text) => document.createTextNode(text),
+    createComment: (text) => document.createComment(text),
+    setText(node, text) {
+      node.nodeValue = text
+    },
+    setElementText(el, text) {
+      el.textContent = text
+    },
+    parentNode: (node) => node.parentElement,
+    nextSibling: (node) => node.nextSibling,
+    querySelector: (selector) => document.querySelector(selector),
+    setScopeId: (el, id) => el.setAttribute(id, ''),
+    insertStaticContent(content, parent, anchor) {
+      const template = document.createElement('template')
+      template.innerHTML = content
+      const start = template.content.firstChild
+      if (!start) throw new Error('Vue inserted static content that produced no node')
+      const end = template.content.lastChild ?? start
+      if (anchor) (anchor as ChildNode).before(template.content)
+      else parent.append(template.content)
+      return [start, end]
+    }
+  })
+}

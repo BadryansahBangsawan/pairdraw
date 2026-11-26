@@ -60,7 +60,13 @@ export function useFormulaField(
     extensions: [
       history(),
       options.dialect.language,
-      autocompletion({ override: [options.dialect.complete(options.completions)], icons: false }),
+      // The list only opens while the person types and Enter is their explicit commit, so the
+      // anti-accidental-accept delay would only swallow the first Enter.
+      autocompletion({
+        override: [options.dialect.complete(options.completions)],
+        icons: false,
+        interactionDelay: 0
+      }),
       keymap.of([...completionKeymap, { key: 'Tab', run: acceptCompletion }]),
       referencePills,
       resultDecoration,

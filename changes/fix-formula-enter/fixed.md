@@ -1,0 +1,1 @@
+- Enter right after a value field's completion list opens now accepts the highlighted reference instead of doing nothing.

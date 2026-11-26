@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+
 import { ref } from 'vue'
 
 import type { EditorStore } from '@/app/editor/active-store'

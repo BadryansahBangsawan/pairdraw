@@ -7,12 +7,12 @@ import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'
 import { exploreVariationsOf } from '@/app/ai/explore/variations'
 import type { EditorStore } from '@/app/editor/active-store'
+import { reportNothingToCopy } from '@/app/editor/clipboard/notice'
 import {
   pasteClipboardToReplace,
   pasteClipboardToReplaceInInstance
 } from '@/app/editor/clipboard/paste/replace'
 import { copyLayersAsPNG } from '@/app/editor/clipboard/png'
-import { reportNothingToCopy } from '@/app/editor/clipboard/notice'
 import {
   copySelectionProperties,
   pasteClipboardProperties

@@ -4,8 +4,6 @@
  * follows the effect's own slot table and the two cannot drift.
  */
 
-import { ResourceCache } from '#core/cache/resource'
-
 import type { CanvasKit, RuntimeEffect } from 'canvaskit-wasm'
 
 import type { Vector } from '@pairdraw/scene-graph/primitives'
@@ -15,6 +13,8 @@ import {
   type ShaderUniform,
   type ShaderUniformValue
 } from '@pairdraw/scene-graph/shaders'
+
+import { ResourceCache } from '#core/cache/resource'
 
 import { FRAME_HEIGHT_UNIFORM, OBJECT_SIZE_UNIFORM, translateShader } from './translate'
 

@@ -42,6 +42,18 @@ const MAX_LIVE_RECORDS = 8
 const records = shallowReactive(new Map<string, TurnRecord>())
 const freeListeners = new Set<(messageId: string) => void>()
 
+/** Owners already subscribed to their own dispose, so a closed document frees its cards. */
+const disposeSubscribed = new WeakSet<object>()
+
+/** A card can be set for a document no render queue ever subscribed for, so subscribe here too. */
+function freeCardsOnDispose(owner: object): void {
+  if (disposeSubscribed.has(owner)) return
+  const onDispose = (owner as { onDispose?: (listener: () => void) => unknown }).onDispose
+  if (typeof onDispose !== 'function') return
+  disposeSubscribed.add(owner)
+  onDispose.call(owner, () => freeTurnRendersOf(owner))
+}
+
 /** Reactive in a computed or template: the map tracks reads by key. */
 export function readTurnRenders(messageId: string): TurnRenders | null {
   return records.get(messageId)?.renders ?? null
@@ -60,6 +72,7 @@ export function freeTurnRenders(messageId: string): void {
 }
 
 export function setTurnRenders(owner: object, messageId: string, renders: TurnRenders): void {
+  freeCardsOnDispose(owner)
   records.set(messageId, { owner, renders })
   while (records.size > MAX_LIVE_RECORDS) {
     const oldest = records.keys().next().value

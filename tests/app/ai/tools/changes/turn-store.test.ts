@@ -56,6 +56,23 @@ test('frees only the closing document’s cards', () => {
   expect(readTurnRenders(id(2))).not.toBeNull()
 })
 
+test('frees a closing document’s cards even when no render queue subscribed', () => {
+  let disposed: (() => void) | null = null
+  const storeLike = {
+    onDispose: (listener: () => void) => {
+      disposed = listener
+      return () => {}
+    }
+  }
+
+  setTurnRenders(storeLike, id(3), cleared())
+  expect(readTurnRenders(id(3))).not.toBeNull()
+
+  disposed?.()
+
+  expect(readTurnRenders(id(3))).toBeNull()
+})
+
 test('clears a ready card’s images and keeps what it counted', () => {
   setTurnRenders(owner, id(1), {
     status: 'ready',

@@ -23,8 +23,12 @@ import { sdfShader } from './sdf'
 /** When the page started drawing shaders, which is what `@time` counts from. */
 const startedAt = Date.now()
 
-/** The effect each paint last compiled with, by frame image, so a broken edit keeps drawing. */
-const lastGood = new Map<string, CompiledShader>()
+/**
+ * The source each paint last compiled from, by frame image, so a broken edit keeps drawing. A source
+ * is stored rather than the compiled object: the compile cache owns the handle, and a remembered
+ * object could be disposed by an eviction between the edit and the draw.
+ */
+const lastGood = new Map<string, string>()
 
 /** How many paints keep a last good effect, so a long session does not hold every one forever. */
 const KEEP_LAST_GOOD = 32
@@ -42,7 +46,7 @@ function effectFor(r: SkiaRenderer, shader: ShaderSourcePaint): CompiledShader |
   const compiled = compileShader(r.ck, shader.source)
   if (compiled.effect) {
     lastGood.delete(shader.image)
-    lastGood.set(shader.image, compiled)
+    lastGood.set(shader.image, shader.source)
     while (lastGood.size > KEEP_LAST_GOOD) {
       const oldest = lastGood.keys().next().value
       if (oldest === undefined) break
@@ -50,7 +54,10 @@ function effectFor(r: SkiaRenderer, shader: ShaderSourcePaint): CompiledShader |
     }
     return compiled
   }
-  return lastGood.get(shader.image) ?? null
+  const goodSource = lastGood.get(shader.image)
+  if (goodSource === undefined) return null
+  const good = compileShader(r.ck, goodSource)
+  return good.effect ? good : null
 }
 
 /**

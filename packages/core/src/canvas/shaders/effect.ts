@@ -23,26 +23,14 @@ const MAX_SIDE = 4096
 /** When the page started drawing shaders, which is what `@time` counts from. */
 const startedAt = Date.now()
 
-/** The effect each layer last compiled with, so a broken edit keeps drawing instead of blanking. */
-const lastGood = new Map<string, CompiledShader>()
-
-/** How many layers keep a last good effect, so a long session does not hold every one forever. */
-const KEEP_LAST_GOOD = 32
-
-/** The effect to draw `effect` with: its own compile, or the one it last compiled with. */
+/**
+ * The effect to draw `effect` with. A failed compile has nothing to fall back to here: the last
+ * good compile of a source is that same source's entry, which `compileShader` memoizes, so its
+ * effect is already returned by a successful compile. The compile cache owns the handle.
+ */
 function effectFor(r: SkiaRenderer, effect: ShaderEffect): CompiledShader | null {
   const compiled = compileShader(r.ck, effect.source)
-  if (compiled.effect) {
-    lastGood.delete(effect.source)
-    lastGood.set(effect.source, compiled)
-    while (lastGood.size > KEEP_LAST_GOOD) {
-      const oldest = lastGood.keys().next().value
-      if (oldest === undefined) break
-      lastGood.delete(oldest)
-    }
-    return compiled
-  }
-  return lastGood.get(effect.source) ?? null
+  return compiled.effect ? compiled : null
 }
 
 /** The device pixels one layer coordinate spans, so the snapshot draws at the canvas's own rate. */

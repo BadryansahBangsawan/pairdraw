@@ -4,6 +4,8 @@
  * follows the effect's own slot table and the two cannot drift.
  */
 
+import { ResourceCache } from '#core/cache/resource'
+
 import type { CanvasKit, RuntimeEffect } from 'canvaskit-wasm'
 
 import type { Vector } from '@pairdraw/scene-graph/primitives'
@@ -24,8 +26,14 @@ export interface CompiledShader {
   error: string | null
 }
 
-/** One cache per CanvasKit instance, so a reload gets fresh effects. */
-const caches = new WeakMap<CanvasKit, Map<string, CompiledShader>>()
+/** Sources compiled per CanvasKit instance; the shader library and edits share this budget. */
+export const SHADER_CACHE_ENTRIES = 64
+
+/**
+ * One owning cache per CanvasKit instance, so a reload gets fresh effects. Effects are native
+ * handles: the cache is their only owner, and disposing a slot is what frees one.
+ */
+const caches = new WeakMap<CanvasKit, ResourceCache<string, CompiledShader>>()
 
 /** The frame values the renderer supplies instead of the document. */
 export interface ShaderFrame {
@@ -109,7 +117,10 @@ export function shaderSamplers(compiled: CompiledShader): string[] {
 export function compileShader(ck: CanvasKit, source: string): CompiledShader {
   let cache = caches.get(ck)
   if (!cache) {
-    cache = new Map()
+    cache = new ResourceCache<string, CompiledShader>({
+      maxEntries: SHADER_CACHE_ENTRIES,
+      dispose: (compiled) => compiled.effect?.delete()
+    })
     caches.set(ck, cache)
   }
   const cached = cache.get(source)

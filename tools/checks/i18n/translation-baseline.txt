@@ -673,7 +673,6 @@ id:ai.aiSetupPiCompanion
 id:ai.baseURL
 id:ai.chatSettings
 id:ai.completions
-id:ai.editModel
 id:ai.fileAttachmentDetails
 id:ai.modelAgentConnection
 id:ai.modelCapabilityVisionShort
@@ -683,8 +682,6 @@ id:ai.notifyTitle
 id:ai.thinkingMinimal
 id:ai.toolInput
 id:ai.toolOutput
-id:automation.authenticationBearer
-id:automation.bearerToken
 id:automation.port
 id:automation.status
 id:browser.addressPlaceholder
@@ -747,7 +744,6 @@ id:diagnostics.categoryRenderer
 id:diagnostics.categoryRuntime
 id:diagnostics.durationMs
 id:editor.cornerRadius
-id:editor.goodies
 id:explore.activeVariants
 id:explore.axisLayout
 id:explore.mode
@@ -756,7 +752,6 @@ id:fonts.usedByOneLayer
 id:media.imageAIBaseURL
 id:media.imageAIModel
 id:media.imagePrompt
-id:menu.goodies
 id:panels.ai
 id:panels.alpha
 id:panels.assetLibraryBadge
@@ -795,7 +790,6 @@ id:panels.componentPropertyVariant
 id:panels.componentSet
 id:panels.discretionaryLigatures
 id:panels.fill
-id:panels.flow
 id:panels.frame
 id:panels.framePresetCategoryDesktop
 id:panels.framePresetCategoryFigmaCommunity
@@ -823,7 +817,6 @@ id:panels.iconWeightSemibold
 id:panels.iconWeightThin
 id:panels.iconWeightUltralight
 id:panels.imageModeFill
-id:panels.imageTint
 id:panels.kerning
 id:panels.layout
 id:panels.lightness
@@ -881,7 +874,6 @@ id:panels.sizingHug
 id:panels.sizingHugShort
 id:panels.smallCaps
 id:panels.solid
-id:panels.spaceAround
 id:panels.stroke
 id:panels.stylisticSet
 id:panels.tabularFigures

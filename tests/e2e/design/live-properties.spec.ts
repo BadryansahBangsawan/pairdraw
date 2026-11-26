@@ -140,7 +140,7 @@ test('a height typed digit by digit places constrained children from the size th
   const height = editor.page.getByRole('spinbutton', { name: 'Height', exact: true })
   await expect(height).toHaveAttribute('aria-valuenow', '250')
   await height.click()
-  await height.press('Meta+a')
+  await height.press('ControlOrMeta+a')
   await height.pressSequentially('375')
 
   const placed = () =>

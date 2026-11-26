@@ -4,6 +4,11 @@ name: App end-to-end tests
 # so it broke unnoticed. It runs nightly beside Heavy tests and on every release tag.
 on:
   workflow_dispatch:
+    inputs:
+      update_snapshots:
+        description: Rewrite the Linux snapshot baselines from the runner image and upload them
+        type: boolean
+        default: false
   schedule:
     - cron: '17 3 * * *'
   push:
@@ -14,7 +19,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: app-e2e-${{ github.ref }}
+  # A baseline dispatch is its own run: it must not replace a nightly test run, and the nightly must
+  # not replace it. On schedule and tag pushes `inputs` is empty, so the group is the plain one and a
+  # newer test run still replaces an older one.
+  group: app-e2e-${{ github.ref }}${{ inputs.update_snapshots && '-baselines' || '' }}
   cancel-in-progress: true
 
 env:
@@ -23,6 +31,46 @@ env:
   PAIRDRAW_TEST_REUSE_SERVER: '0'
 
 jobs:
+  linux-baselines:
+    name: Linux snapshot baselines
+    # Dispatch-only. Every screenshot baseline must come from this runner image: the font stack and
+    # the GL stack decide the pixels, so a baseline made on a developer's machine fails here. The
+    # job writes the `*-linux.png` files next to the `*-darwin.png` ones and uploads them; a person
+    # commits them, because CI never pushes.
+    if: github.event_name == 'workflow_dispatch' && inputs.update_snapshots == true
+    # Its own group, never cancelled: a nightly run and a baseline dispatch may overlap, and the
+    # baseline job must finish rather than be replaced by the other run.
+    concurrency:
+      group: app-e2e-linux-baselines
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-bun
+        with:
+          lfs: 'true'
+
+      - uses: ./.github/actions/setup-playwright
+
+      - name: Build packages
+        run: bun run build:packages
+
+      - name: Rewrite the Linux baselines
+        run: bun run test:update --grep-invert @real-llm --reporter=line
+
+      - name: Upload the baselines
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: app-e2e-linux-baselines
+          path: tests/e2e/**/*-snapshots/**
+          retention-days: 7
+          if-no-files-found: error
+
   app-e2e:
     name: App Playwright — shard ${{ matrix.shard }}/4
     runs-on: ubuntu-latest

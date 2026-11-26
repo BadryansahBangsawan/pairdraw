@@ -1,1 +1,1 @@
-- The Indonesian interface says “Ubah model”, “Ekstra”, “Alur”, “Ruang sekeliling”, “Pewarnaan”, and “Token Bearer” instead of leaving those labels in English.
+- The Indonesian interface says “Ekstra”, “Alur”, “Ruang sekeliling”, “Pewarnaan”, and “Token Bearer” instead of leaving those labels in English.

@@ -1,1 +1,0 @@
-- A `.pen` file keeps the document's design memory: allowed values, decisions, and pinned examples survive a save and reopen instead of being lost.

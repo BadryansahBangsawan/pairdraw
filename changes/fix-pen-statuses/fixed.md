@@ -1,1 +1,0 @@
-- A `.pen` file keeps the document's status workflow and each layer's status: the states a team chose and the status on every frame survive a save and reopen instead of falling back to Figma's two.

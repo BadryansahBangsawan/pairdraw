@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/core",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Pairdraw editor engine: the CanvasKit renderer, Yoga layout, the framework-agnostic editor, the Figma Plugin API, and the AI/MCP tool definitions.",
   "keywords": [
     "pairdraw",

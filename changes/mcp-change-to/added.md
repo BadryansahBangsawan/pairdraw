@@ -1,1 +1,0 @@
-- `set_reactions` authors a Change to by naming a variant's properties, such as `{ State: "Hover" }`, instead of its id, so an agent can build tabs and accordions that switch variants in one frame per state.

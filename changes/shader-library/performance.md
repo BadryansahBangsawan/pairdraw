@@ -1,5 +1,0 @@
-- Preview plays a shader only while one of its layers is on screen; a shader that never changes keeps its still frame, and moving the view away from every shader stops the frame loop.
-- Preview follows the animation preference: with motion turned off a shader shows its still frame, and a hidden tab stops its shaders until it comes back.
-- A page plays at most 16 shaders at once, keeping the ones on screen and leaving the rest as still frames.
-- A shader written in code repaints the canvas only while it is visible on the current page, instead of from any page and while scrolled away.
-- Shader Mode stops asking for frames while its clock is paused, and starts again on play or a seek.

@@ -1,1 +1,0 @@
-- Layers without instance overrides now share one empty override state instead of each holding two empty maps, which removes about 9 MB from a large document's memory use without changing any saved data.

@@ -1,2 +1,0 @@
-- Added comparison pages for Paper, Figma, and pen.dev beside the Penpot comparison, each with checked sources, an honest list of what the other tool does better, and the import path that works today.
-- Added an "Open by design" page that states the no-account, no-seat, and no-MCP-cap rules, with setup for Claude Code, Codex, Cursor, and Pi.

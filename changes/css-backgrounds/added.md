@@ -1,2 +1,0 @@
-- Imported HTML keeps each background picture's size, position, and repeat, and paints stacked backgrounds in the order CSS gives them.
-- Imported HTML paints boxes in the page's `z-index` order, with negative layers under their container's background.

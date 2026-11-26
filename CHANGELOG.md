@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+## 0.21.0 — 2026-11-26
+
+This release sharpens what the canvas shows and what an agent costs: the shader gallery grows to 21 complete shaders
+that only paint while they are on screen, Display P3 documents draw and blend in their own profile and keep it in PNG,
+SVG, CSS, Tailwind, JSX, and token exports, agents read a subtree as compact CSS-like lines instead of JSX, and a reply
+shows the frames it changed. In the Comment tool you can circle an area and let the agent fix what is circled,
+`pairdraw check` reviews a pull request's design files in CI, and a saved `.pen` file keeps the document's design
+memory, statuses, and image fills. The interface is translated into Indonesian, and the fixes below cover the canvas
+staying put when the panels beside it hide, variable deletion, layer names, and idle cost.
+
+### Added
+
+- Draw a ring around an area in the Comment tool instead of clicking, write a note, and **Fix with agent** sends that area, the layers inside it and a crop of it to the agent, which fixes what is circled, replies and resolves the comment.
+- A reply that changes frames shows them under its text as small before and after renders, with narrower renders for frames that reflow; each one opens its frame on the page.
+- `get_css` reads a node subtree as compact CSS-like lines — `flex:row;gap:12px;padding:16px 24px;bg:var(--color/brand, #4F46E5);radius:8px`, text as `font:600 14px/20px Inter` — with lengths in px and a `max_bytes` budget, so an agent reads only what a task needs: on the same five agent tasks it costs 44.6% fewer bytes than `get_jsx` and 78.5% fewer than `describe`/`get_node`. It writes a colour in the document's profile, as `get_jsx` does (`#RRGGBB` in an sRGB document, `color(display-p3 …)` in a Display P3 one, inside the `var(--token, …)` fallback too).
+- `set_layout` takes `padding` and `gap` as CSS shorthand (`"16px 24px"`, `"12px 4px"`), `set_radius` takes `"12px 12px 4px 0"`, and `set_fill` takes a token name (`"var(--color/brand)"`), painting its value and binding the fill; a name two variables share is refused with both, never guessed.
+- A property bound to a variable deleted in its source file keeps that binding and shows a mark naming the variable and why it is gone.
+- The shader gallery offers 21 complete shaders, up from 9: liquid chrome, fluted glass, paper, god rays, thermal, Voronoi cells, deep water, smoke, neon pulse, grain wash, obsidian, and marble ink add to the Sunset, Northern lights, Retro screen, Halftone print, Dithered dusk, Glass orb, Marble, Neon grid, and Velvet presets.
+- A shader effect's gradient stops are edited as a list of colours and positions in the properties panel, and its shape is chosen from the shapes the library draws, instead of both being edited in the preset's JSON.
+- `pairdraw check` and the `pairdraw-check` GitHub Action check a pull request's `.fig` and `.pen` changes: frames rendered at several widths, token drift, and new design-memory findings, reported in one comment kept up to date.
+- `set_reactions` authors a Change to by naming a variant's properties, such as `{ State: "Hover" }`, instead of its id, so an agent can build tabs and accordions that switch variants in one frame per state; a target that matches several variants is refused.
+- Imported HTML keeps each background picture's size, position, and repeat, paints stacked backgrounds in the order CSS gives them, and paints boxes in the page's `z-index` order with negative layers under their container's background.
+- The interface, desktop notifications, the Web Capture extension, and Pairdraw Cloud are translated into Indonesian (Bahasa Indonesia): the comment empty state reads as a full sentence, the prototype overflow select no longer clips its "No scrolling" choice, the Fix with agent rename is translated, and an unconfigured design model is named in Indonesian in the chat composer, profile menu, switch confirmation, guided setup and Settings › Models. A profile keeps the name a person gave it, including profiles older builds saved under the English name.
+- Added comparison pages for Paper, Figma, and pen.dev beside the Penpot comparison, each with checked sources, an honest list of what the other tool does better, and the import path that works today, and an "Open by design" page that states the no-account, no-seat, and no-MCP-cap rules, with setup for Claude Code, Codex, Cursor, and Pi.
+- `useCanvas` takes `onViewportMove(dx, dy)`, called when a resize moves the canvas on screen, so a host can pan the view the other way and keep the drawing still.
+
+### Changed
+
+- A Display P3 document draws, blends, and exports in its own color profile: on a P3 display its colors look as designed, PNG exports keep the P3 profile, SVG, CSS, Tailwind, JSX, and token exports write its colors as they show, text fills keep their wide gamut, and sRGB documents draw exactly as before. The color picker, gradient and mesh editors, and eyedropper loupe preview the colour the canvas draws; the loupe and the picker's hex field read and take sRGB codes. A CSS or Tailwind token import keeps `oklch()` or `color(display-p3 …)` as that colour in a Display P3 document, exported tokens label its colours with its own profile, and vectorizing an image reads a colour that names its space into it. JPEG, WEBP, and PDF export write a Display P3 document in sRGB, the export panel says so, and a `.pen` file writes its colors as sRGB hex, the only form Pencil.dev holds.
+- The website's home page draws its frames as they enter, carries the agent cursor into the feature tabs while it streams tool calls, and shows its copy before the agent acts.
+
+### Fixed
+
+- Read a color that names its own space, such as `color(display-p3 1 0 0)`, into the document's color profile wherever one is authored: pasted and placed SVG files, token imports, MCP tools, and colors written directly on a design JSX layer. A Display P3 document keeps the P3 numbers, and an sRGB document maps the color into sRGB by reducing chroma, as CSS does; CSS declarations from an imported stylesheet stay sRGB, as they are authored.
+- A saved `.pen` file keeps the libraries it imports, so instances of their components stay linked when the file reopens and keep the icon a layer inside one swaps in, and keeps the libraries the document enabled and the library it publishes as.
+- A variable or collection deleted in Figma leaves every variable list and token export, while layers bound to it still resolve it and `.fig` saves keep it deleted; a `.pen` write leaves out deleted variables and collections and stores the value a deleted binding resolved to; a `.fig` file whose variables include a type Pairdraw does not model, such as a paint variable, now opens and saves with those records intact.
+- A `.pen` file keeps the document's design memory (allowed values, decisions, pinned examples) and its status workflow with each layer's status, instead of losing them on save.
+- Saving a Pencil.dev (`.pen`) file embeds image fills and reports the content the format cannot hold — noise and texture effects, image adjustment filters, scroll overflow, OpenType features, and extra pages — instead of throwing or dropping it silently.
+- Deeply nested layers keep their names readable: the layers panel scrolls sideways to the selected layer, as in Figma, including when focus moves through the panel with the keyboard.
+- Pasting the same component from another document again reuses the component the first paste created, instead of adding a duplicate, and the same holds for component sets.
+- Hiding or showing the panels beside the canvas keeps the drawing where it is on screen instead of jumping by the panel's width.
+
+### Performance
+
+- Shaders play through WebGPU; without it the gallery shows each preset's palette and Shader Mode shows a note instead of playing. Preview plays a shader only while one of its layers is on screen, a shader that never changes keeps its still frame, moving the view away from every shader stops the frame loop, a hidden tab stops its shaders until it comes back, and a page plays at most 16 shaders at once. With motion turned off a shader shows its still frame, Shader Mode stops asking for frames while its clock is paused, and a shader written in code repaints only while it is visible on the current page.
+- A collaboration room stops rechecking its connection twice a second once its document has loaded, a voice call stops sampling audio levels while its tab is muted and alone in the call, a file opened through the browser is no longer polled for changes while its tab is hidden, and the cloud connection and invitation dialogs no longer tick a clock or wake the app while they are closed.
+- Laying out a frame no longer walks the layers inside a child that keeps its own size, so dragging a padding or spacing handle on a card of fixed sections costs the same however many layers those sections hold.
+- Layers without instance overrides share one empty override state instead of each holding two empty maps, which removes about 9 MB from a large document's memory use without changing any saved data.
+
+### Security
+
+- Markup imported from a webpage or written by an agent reaches the styling sandbox without event handlers, embedded documents, or executable links, so nothing it carries can run while its styles are measured.
+
 ## 0.20.0 — 2026-11-24
 
 This release makes Pairdraw a place where you and an agent design together under the same rules: a design memory the agent must follow, variations it can cook up for you to pick from, prompts and reviews you shape yourself, and a token meter that shows what each reply costs. Prototypes grow up — interactive components with hover/press/delay triggers, Smart animate, scrolling frames with fixed and sticky layers, and video export to MP4/GIF/WebM — and the everyday canvas gets the tools Figma users reach for: an eyedropper, document colors, on-canvas auto layout handles, image adjustments, noise and texture effects, OpenType features, replace-fonts, and push-to-main. Figma grid auto layout and draw.io connector routes survive a round trip. Under the hood, a large `.fig` opens faster, prepares each page once, and keeps fewer copies of each layer.

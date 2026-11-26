@@ -1,3 +1,0 @@
-- A collaboration room stops rechecking its connection twice a second once its document has loaded.
-- A voice call stops sampling audio levels while its tab is muted and alone in the call.
-- A file opened through the browser is no longer polled for changes while its tab is hidden.

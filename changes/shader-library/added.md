@@ -1,2 +1,0 @@
-- The shader gallery offers 21 complete shaders, up from 9: liquid chrome, fluted glass, paper, god rays, thermal, Voronoi cells, deep water, smoke, neon pulse, grain wash, obsidian, and marble ink add to the Sunset, Northern lights, Retro screen, Halftone print, Dithered dusk, Glass orb, Marble, Neon grid, and Velvet presets.
-- A shader effect's gradient stops are edited as a list of colours and positions in the properties panel, and its shape is chosen from the shapes the library draws, instead of both being edited in the preset's JSON.

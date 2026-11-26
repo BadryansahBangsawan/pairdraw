@@ -1,1 +1,0 @@
-- Markup imported from a webpage or written by an agent reaches the styling sandbox without event handlers, embedded documents, or executable links, so nothing it carries can run while its styles are measured.

@@ -1,1 +1,0 @@
-- The cloud connection and invitation dialogs no longer tick a clock, and wake the app, while they are closed.

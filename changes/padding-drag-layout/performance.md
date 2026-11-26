@@ -1,1 +1,0 @@
-- Laying out a frame no longer walks the layers inside a child that keeps its own size, so dragging a padding or spacing handle on a card of fixed sections costs the same however many layers those sections hold.

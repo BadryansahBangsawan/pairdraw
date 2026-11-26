@@ -1,1 +1,0 @@
-- Moving focus through the layers panel scrolls the focused row sideways so a deep layer stays readable.

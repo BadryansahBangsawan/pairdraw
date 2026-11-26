@@ -1,1 +1,0 @@
-- Hiding or showing the panels beside the canvas keeps the drawing where it is on screen instead of jumping by the panel's width.

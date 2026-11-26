@@ -1,1 +1,0 @@
-- The interface, desktop notifications, and the Web Capture extension are translated into Indonesian (Bahasa Indonesia).

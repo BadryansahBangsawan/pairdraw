@@ -1,1 +1,0 @@
-- A property bound to a variable deleted in its source file keeps that binding and shows a mark naming the variable and why it is gone.

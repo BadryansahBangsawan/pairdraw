@@ -89,6 +89,7 @@ test('sorts recent files by name, last use, and when they were added, and keeps 
   expect(await names(page)).toEqual(['Catalog', 'Avatar', 'Brochure'])
 
   await page.reload()
+  await waitForHome(page)
   await expect(entries(page)).toHaveCount(3)
   expect(await names(page)).toEqual(['Catalog', 'Avatar', 'Brochure'])
 })
@@ -123,6 +124,7 @@ test('Cmd/Ctrl+click and Shift+click select files that are removed from Recents 
   expect(await names(page)).toEqual(['Avatar'])
 
   await page.reload()
+  await waitForHome(page)
   await expect(entries(page)).toHaveCount(1)
 })
 

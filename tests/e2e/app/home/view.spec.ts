@@ -18,6 +18,7 @@ for (const width of [390, 1280]) {
     await list.click()
     await expect(list).toHaveAttribute('aria-pressed', 'true')
     await page.reload()
+    await waitForHome(page)
     await expect(list).toHaveAttribute('aria-pressed', 'true')
   })
 }

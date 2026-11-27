@@ -186,6 +186,10 @@ test('paint effect and export rows share compact visual anatomy', async () => {
 })
 
 test('adding a second fill shows two fill items', async () => {
+  // This spec shares one page in serial mode; select a rectangle here so the test stands alone.
+  await editor.canvas.drawRect(100, 100, 120, 80)
+  await editor.canvas.waitForRender()
+
   const addBtn = fillSection().getByRole('button', { name: 'Add fill' })
   await addBtn.click()
   await editor.canvas.waitForRender()

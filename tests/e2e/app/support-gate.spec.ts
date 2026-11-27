@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { EDITOR_BOOT_WAIT_MS } from '#tests/helpers/timeouts'
+
 test.describe('browser support gate', () => {
   test('explains a missing baseline feature instead of booting into a blank window', async ({
     page
@@ -49,7 +51,9 @@ test.describe('browser support gate', () => {
     await page.goto('/')
 
     const notice = page.getByRole('alert')
-    await expect(notice.getByRole('heading', { level: 1 })).toHaveText("Pairdraw couldn't start")
+    await expect(notice.getByRole('heading', { level: 1 })).toHaveText("Pairdraw couldn't start", {
+      timeout: EDITOR_BOOT_WAIT_MS
+    })
     await expect(notice).toContainText('Chrome 111')
     await notice.getByText('Details', { exact: true }).click()
     await expect(notice.locator('pre')).toContainText('history is unavailable')
@@ -69,7 +73,9 @@ test.describe('browser support gate', () => {
     await page.goto('/')
 
     const notice = page.getByRole('alert')
-    await expect(notice.getByRole('heading', { level: 1 })).toHaveText("Pairdraw couldn't start")
+    await expect(notice.getByRole('heading', { level: 1 })).toHaveText("Pairdraw couldn't start", {
+      timeout: EDITOR_BOOT_WAIT_MS
+    })
     await notice.getByText('Details', { exact: true }).click()
     await expect(notice.locator('pre')).toContainText('getRandomValues is unavailable')
   })

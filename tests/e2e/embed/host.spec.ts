@@ -310,13 +310,17 @@ test.describe('embed mode', () => {
       app
     )
     expect(answered).toBe(false)
-    await expect(status).toHaveAttribute('data-status', 'waiting')
+    await expect(status).toHaveAttribute('data-status', 'waiting', {
+      timeout: EDITOR_BOOT_WAIT_MS
+    })
   })
 
   test('a link without a valid origin explains that it cannot connect', async ({ page }) => {
     await page.goto('/?test&embed&origin=*')
     const status = page.locator('[data-slot="embed-status"]')
-    await expect(status).toHaveAttribute('data-status', 'invalid-origin')
+    await expect(status).toHaveAttribute('data-status', 'invalid-origin', {
+      timeout: EDITOR_BOOT_WAIT_MS
+    })
     await expect(status.getByRole('heading', { level: 1 })).toBeVisible()
   })
 })

@@ -96,6 +96,8 @@ test('Enter on a selected connector types its label', async () => {
   const connector = await lastConnector()
   await connectors.select(connector.id)
   await editor.page.keyboard.press('Enter')
+  // Enter starts the label edit in a frame; type once the textarea owns the keystrokes.
+  await expect(editor.page.locator('textarea[aria-hidden="true"]:focus')).toHaveCount(1)
   await editor.page.keyboard.type('Next')
   await editor.page.keyboard.press('Escape')
   await editor.canvas.waitForRender()

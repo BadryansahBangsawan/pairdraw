@@ -52,6 +52,9 @@ export interface SceneGraphToDesignOptions {
 /** Layers whose shape only paths describe, which CSS boxes cannot draw. */
 const VECTOR_SHAPES = new Set<SceneNode['type']>(['VECTOR', 'BOOLEAN_OPERATION', 'STAR', 'POLYGON'])
 
+/** What a vector's own SVG draws, so the placement wrapper leaves it out; a backdrop stays on the wrapper. */
+const VECTOR_WRAPPER_PAINT = /^(background|border|box-shadow|outline|filter)/
+
 /** Every CSS property that paints a layer, wherever its paint is written. */
 export const PAINT_PROPERTY =
   /^(background|backdrop-filter|border|box-shadow|outline|filter|color|fill|stroke|text-shadow)/
@@ -537,7 +540,7 @@ function vectorDesignNode(
   const drawn = context.vectorElement?.(context.graph, node)
   if (!drawn) return null
   const placement = Object.fromEntries(
-    Object.entries(style).filter(([property]) => !PAINT_PROPERTY.test(property))
+    Object.entries(style).filter(([property]) => !VECTOR_WRAPPER_PAINT.test(property))
   )
   return {
     ...drawn,

@@ -87,3 +87,41 @@ describe('vector layers', () => {
     expect(code).not.toContain('fill-rule')
   })
 })
+
+describe('vector placement keeps paint the SVG cannot draw', () => {
+  for (const type of ['VECTOR', 'BOOLEAN_OPERATION', 'STAR'] as const) {
+    test(`${type} keeps its background blur`, () => {
+      const graph = new SceneGraph()
+      const frame = graph.createNode('FRAME', graph.getPages()[0].id, {
+        name: 'Card',
+        width: 100,
+        height: 100
+      })
+      graph.createNode(type, frame.id, {
+        name: 'Shape',
+        x: 10,
+        y: 10,
+        width: 40,
+        height: 40,
+        effects: [
+          {
+            type: 'BACKGROUND_BLUR',
+            color: { r: 0, g: 0, b: 0, a: 0 },
+            offset: { x: 0, y: 0 },
+            radius: 12,
+            spread: 0,
+            visible: true
+          }
+        ]
+      })
+
+      const projected = sceneNodeToDesignDocument(graph, frame.id, { vectorElement: renderer })
+      const card = projected.children[0]
+      if (card.type !== 'element') throw new Error('no card')
+      const shape = card.children[0]
+      if (shape.type !== 'element') throw new Error('no shape')
+
+      expect(shape.inlineStyle?.['backdrop-filter']).toBe('blur(5.16px)')
+    })
+  }
+})

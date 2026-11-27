@@ -44,7 +44,13 @@ describe('copy as … with nothing to copy', () => {
   })
 
   test('Copy as PNG reports it when the layers render nothing', async () => {
-    Reflect.set(globalThis, 'ClipboardItem', class ClipboardItemStub { readonly kind = 'stub' })
+    Reflect.set(
+      globalThis,
+      'ClipboardItem',
+      class ClipboardItemStub {
+        readonly kind = 'stub'
+      }
+    )
     const store: Partial<EditorStore> = { renderExportImage: () => Promise.resolve(null) }
 
     await copyLayersAsPNG(store as EditorStore, ['node'])

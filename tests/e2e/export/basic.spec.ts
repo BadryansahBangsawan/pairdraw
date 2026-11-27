@@ -229,7 +229,10 @@ test('multiple export formats download as a single zip', async () => {
   await forceBlobDownload()
 
   const [download] = await Promise.all([page.waitForEvent('download'), exportButton().click()])
-  expect(download.suggestedFilename()).toBe('Export rect 1.zip')
+  // WebKit's download handler replaces spaces with underscores; Chromium keeps them.
+  const zipName =
+    test.info().project.name === 'pairdraw-webkit' ? 'Export_rect_1.zip' : 'Export rect 1.zip'
+  expect(download.suggestedFilename()).toBe(zipName)
   canvas.assertNoErrors()
 })
 

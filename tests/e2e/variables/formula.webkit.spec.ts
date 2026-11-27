@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
@@ -15,6 +15,17 @@ test.beforeEach(async ({ page }) => {
     route.fulfill({ json: cloudDiscoveryFixture('https://cloud.example.com') })
   )
 })
+
+/**
+ * Replaces the value field's text. `fill()` alone can leave the previous text in place on WebKit
+ * when CodeMirror restores a selection after a commit; clear through the keyboard first, then let
+ * `fill()` insert into an empty field, which also opens completion as typing does.
+ */
+async function setFormulaValue(value: Locator, text: string) {
+  await value.press('ControlOrMeta+A')
+  await value.press('Backspace')
+  await value.fill(text)
+}
 
 async function openToken(page: Page, id: string) {
   await page
@@ -38,14 +49,14 @@ test('a number field takes literals, references and formulas, and reports errors
   const { inspector, row } = await openToken(page, ids.width)
   const value = inspector.getByRole('textbox', { name: 'Value', exact: true })
   await expect(value).toHaveText('8px')
-  await value.fill('{base} * 3')
+  await setFormulaValue(value, '{base} * 3')
   await expect(inspector.getByText('= 12px', { exact: true })).toBeVisible()
   expect((await formulaSceneState(page, ids)).width).toBe(8)
   await value.press('Enter')
   await expect.poll(async () => (await formulaSceneState(page, ids)).width).toBe(12)
   await expect(row).toContainText('12px')
 
-  await value.fill('1 / 0')
+  await setFormulaValue(value, '1 / 0')
   await expect(value).toHaveAttribute('aria-invalid', 'false')
   await value.press('Enter')
   await expect(value).toHaveAttribute('aria-invalid', 'true')
@@ -54,15 +65,15 @@ test('a number field takes literals, references and formulas, and reports errors
   await value.press('Escape')
   await expect(value).toContainText('* 3')
 
-  await value.fill('base')
+  await setFormulaValue(value, 'base')
   await value.press('Enter')
   expect((await formulaSceneState(page, ids)).numberDefinition).toEqual({ aliasId: ids.base })
   await expect(value.locator('[data-reference]')).toHaveCount(1)
-  await value.fill('16')
+  await setFormulaValue(value, '16')
   await value.press('Enter')
   expect((await formulaSceneState(page, ids)).numberDefinition).toBe(16)
 
-  await value.fill('{base} * 2')
+  await setFormulaValue(value, '{base} * 2')
   await value.press('End')
   await value.press('Shift+ArrowLeft')
   await inspector.getByRole('button', { name: 'Use a variable', exact: true }).click()
@@ -82,7 +93,7 @@ test('a number field takes literals, references and formulas, and reports errors
   await css.press('Enter')
   await expect(page.getByTestId('token-output')).toContainText('clamp(1rem, 4vw, 2rem)')
   expect((await formulaSceneState(page, ids)).width).toBe(16)
-  await value.fill('24')
+  await setFormulaValue(value, '24')
   await value.press('Enter')
   await expect(css).toContainText('clamp(1rem, 4vw, 2rem)')
   await expect(cssToggle).toHaveAttribute('aria-pressed', 'true')
@@ -108,13 +119,13 @@ test('a true/false value keeps its switch until a formula is asked for', async (
   await value.press('Enter')
   await expect.poll(async () => (await formulaSceneState(page, ids)).visible).toBe(false)
 
-  await value.fill('{size} > 4')
+  await setFormulaValue(value, '{size} > 4')
   await expect(value.locator('[data-reference]')).toHaveCount(1)
   await expect(inspector.getByText('= true', { exact: true })).toBeVisible()
   await value.press('Enter')
   await expect.poll(async () => (await formulaSceneState(page, ids)).visible).toBe(true)
 
-  await value.fill('false')
+  await setFormulaValue(value, 'false')
   await value.press('Enter')
   expect((await formulaSceneState(page, ids)).booleanDefinition).toBe(false)
   await expect(inspector.getByRole('switch', { name: 'Value' })).not.toBeChecked()
@@ -130,7 +141,7 @@ test('references are atomic pills with editable operators and plain source on co
   const ids = await seedFormulaScene(page)
   const { inspector } = await openToken(page, ids.width)
   const value = inspector.getByRole('textbox', { name: 'Value', exact: true })
-  await value.fill('{base} * 2')
+  await setFormulaValue(value, '{base} * 2')
   const pill = value.locator('[data-reference]')
   await expect(pill).toHaveText('base')
   await expect(pill.locator('xpath=..')).toHaveAttribute('contenteditable', 'false')
@@ -145,7 +156,7 @@ test('references are atomic pills with editable operators and plain source on co
   })
   expect(copied).toBe('{base} * 2')
 
-  await value.fill('{base}')
+  await setFormulaValue(value, '{base}')
   await value.press('End')
   await value.press('Backspace')
   await expect(pill).toHaveCount(0)
@@ -223,7 +234,7 @@ test('completion inserts a reference and the table shows the result', async ({ p
   const { dialog, inspector, row } = await openToken(page, ids.width)
   const value = inspector.getByRole('textbox', { name: 'Value', exact: true })
   const completion = dialog.locator('.cm-tooltip-autocomplete')
-  await value.fill('2 * ')
+  await setFormulaValue(value, '2 * ')
   await value.press('End')
   await value.pressSequentially('ba')
   await expect(completion.getByRole('option', { name: /base/ })).toBeVisible()
@@ -234,7 +245,7 @@ test('completion inserts a reference and the table shows the result', async ({ p
   await expect.poll(async () => (await formulaSceneState(page, ids)).width).toBe(8)
   await expect(row).toContainText('8px')
   await expect(row).not.toContainText('{')
-  await value.fill('{ba')
+  await setFormulaValue(value, '{ba')
   await expect(completion.getByRole('option', { name: /base/ })).toBeVisible()
   await value.press('Escape')
   await expect(value).toHaveText('{ba')
@@ -251,17 +262,17 @@ test('completion offers functions where a name goes and inserts the call', async
   const { dialog, inspector } = await openToken(page, ids.width)
   const value = inspector.getByRole('textbox', { name: 'Value', exact: true })
   const completion = dialog.locator('.cm-tooltip-autocomplete')
-  await value.fill('2 * ')
+  await setFormulaValue(value, '2 * ')
   await value.press('End')
   await value.pressSequentially('i')
   await expect(completion.getByRole('option', { name: /^if/ })).toBeVisible()
   await value.press('Enter')
   await expect(value).toHaveText('2 * if(')
-  await value.fill('tex')
+  await setFormulaValue(value, 'tex')
   await value.press('End')
   await value.pressSequentially('t')
   await expect(completion.getByRole('option', { name: /^text/ })).toBeVisible()
-  await value.fill('{tru')
+  await setFormulaValue(value, '{tru')
   await value.press('End')
   await value.pressSequentially('t')
   await expect(completion.getByRole('option', { name: /^truthy/ })).toHaveCount(0)
@@ -320,7 +331,7 @@ test('long values span lines', async ({ page }) => {
   const ids = await seedFormulaScene(page)
   const { inspector } = await openToken(page, ids.width)
   const value = inspector.getByRole('textbox', { name: 'Value', exact: true })
-  await value.fill('{base} * 2')
+  await setFormulaValue(value, '{base} * 2')
   await value.press('End')
   await value.press('Shift+Enter')
   await page.keyboard.insertText('+ {base}')

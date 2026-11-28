@@ -1,7 +1,7 @@
 {
   "name": "pairdraw",
   "displayName": "Pairdraw",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "private": true,
   "description": "Edit Pairdraw .fig and .pen documents in the IDE.",
   "categories": [

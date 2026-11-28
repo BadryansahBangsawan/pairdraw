@@ -1,1 +1,0 @@
-- The Vertex AI project field shows one message when it needs a project, instead of the same sentence as both its hint and its error.

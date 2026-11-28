@@ -1,1 +1,0 @@
-- The Indonesian interface says “Ekstra”, “Alur”, “Ruang sekeliling”, “Pewarnaan”, and “Token Bearer” instead of leaving those labels in English.

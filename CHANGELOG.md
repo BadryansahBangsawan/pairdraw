@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 0.21.1 — 2026-11-27
+
+### Added
+
+- Saving or exporting a file now lists what the chosen format could not hold, once the save has succeeded: a draw.io file names the variables it does not carry — “draw.io has no variables: 1 variable in 1 collection (Brand) not written.” — and a Pencil.dev file lists the pages merged into the first one plus the content it cannot carry: noise and texture effects, image adjustment filters, scroll overflow, and OpenType features.
+
+### Fixed
+
+- A profile a person named “Design model” keeps its name when settings load; only the migrated default profile is renamed by the interface language.
+- Copy as SVG, PNG, JSX, or HTML now says “Could not copy: Nothing to copy” when the selection draws nothing, instead of doing nothing.
+- Enter right after a value field's completion list opens now accepts the highlighted reference instead of doing nothing.
+- The Indonesian interface says “Ekstra”, “Alur”, “Ruang sekeliling”, “Pewarnaan”, and “Token Bearer” instead of leaving those labels in English.
+- Shortcut labels off macOS name their key as the platform does — “Backspace”, “Tab”, “Enter”, “PageUp”, “PageDown” — instead of showing the macOS glyph.
+- The Vertex AI project field shows one message when it needs a project, instead of the same sentence as both its hint and its error.
+
+### Performance
+
+- Compiled shader effects live in a bounded cache that releases them, so a long session no longer keeps every effect's GPU resource and a paint whose effect was evicted recompiles instead of drawing a deleted effect.
+
 ## 0.21.0 — 2026-11-26
 
 This release sharpens what the canvas shows and what an agent costs: the shader gallery grows to 21 complete shaders
